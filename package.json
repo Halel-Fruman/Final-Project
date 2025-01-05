@@ -1,9 +1,7 @@
 {
-  "devDependencies": {
-    "typescript": "^4.9.5"
-  },
   "dependencies": {
     "bootstrap": "^5.3.3",
+    "mongoose": "^8.9.3",
     "react-bootstrap": "^2.10.7"
   }
 }
