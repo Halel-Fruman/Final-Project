@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const PersonalArea = ({ userId }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -19,25 +21,24 @@ const PersonalArea = ({ userId }) => {
     fetchUser();
   }, [userId]);
 
-
   return user ? (
     <div>
-      <h1>Welcome, {user.username}</h1>
-      <p>Email: {user.email}</p>
-      <h2>Your Cart</h2>
-      {user.cart.map((item) => (
-        <div key={item.productId}>
-          <p>Product ID: {item.productId}</p>
-          <p>Quantity: {item.quantity}</p>
+      <h1>{t('personal_area.welcome', { username: user.username })}</h1>
+      <p>{t('personal_area.email')}: {user.email}</p>
+      <h2>{t('personal_area.yourCart')}</h2>
+      {user.cart.map((item, index) => (
+        <div key={`${item.productId}-${index}`}>
+          <p>{t('personal_area.productId')}: {item.productId}</p>
+          <p>{t('personal_area.quantity')}: {item.quantity}</p>
         </div>
       ))}
-      <h2>Your Wishlist</h2>
-      {user.wishlist.map((item) => (
-        <p key={item}>Product ID: {item}</p>
+      <h2>{t('personal_area.yourWishlist')}</h2>
+      {user.wishlist.map((item, index) => (
+        <p key={`${item}-${index}`}>{t('personal_area.productId')}: {item}</p>
       ))}
     </div>
   ) : (
-    <p>Loading...</p>
+    <p>{t('personal_area.loading')}</p>
   );
 };
 

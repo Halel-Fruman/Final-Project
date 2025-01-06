@@ -1,8 +1,78 @@
-.header {
+/* עיצוב לוגו */
+.logo-image {
+  height: 40px; /* גובה הלוגו */
+  width: auto; /* שמירה על פרופורציות */
+}
 
-    border-radius: 8px;
+/* עיצוב כפתורי בורר שפות */
+.language-selector button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 10px;
+  font-size: 14px;
+  border-radius: 5px;
+  transition: background-color 0.3s ease;
+}
+
+.language-selector button:hover {
+  background-color: #f0f0f0; /* שינוי צבע רקע בזמן ריחוף */
+}
+
+/* רווח בין פריטים */
+.navbar-nav .nav-item {
+  margin-left: 10px;
+}
+
+/* כפתורים */
+.btn {
+  font-size: 14px;
+  padding: 8px 12px;
+  border-radius: 5px;
+}
+
+.btn-success {
+  background-color: #28a745;
+  border-color: #28a745;
+}
+
+.btn-danger {
+  background-color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-primary {
+  background-color: #007bff;
+  border-color: #007bff;
+}
+
+/* כפתור Toggle (לתפריט במסכים קטנים) */
+.navbar-toggler {
+  border: none;
+}
+
+.navbar-toggler-icon {
+  background-image: url('data:image/svg+xml;charset=utf8,%3Csvg viewBox="0 0 30 30" xmlns="http://www.w3.org/2000/svg"%3E%3Cpath stroke="rgba%280, 0, 0, 0.5%29" stroke-width="2" d="M4 7h22M4 15h22M4 23h22"/%3E%3C/svg%3E');
+}
+
+/* ריווח בין האזורים */
+.container {
+  padding: 0 15px;
+}
+
+/* התאמה למסכים קטנים */
+@media (max-width: 768px) {
+  .navbar-nav {
+    text-align: center;
   }
-  .bg-custom {
-    background-color: #006a69; /* צבע הרקע החדש */
-    color: white;
+
+  .nav-item {
+    margin-left: 0;
+    margin-bottom: 10px;
   }
+
+  .language-selector {
+    justify-content: center;
+    margin-bottom: 15px;
+  }
+}

@@ -2,6 +2,7 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
 import './Header.css';
+import logo from '../../logo-ilan-g.svg';
 
 const Header = ({ onLogout, isLoggedIn }) => {
   const { i18n } = useTranslation();
@@ -11,29 +12,71 @@ const Header = ({ onLogout, isLoggedIn }) => {
   };
 
   return (
-    <header className="header bg-light py-3">
-      <div className="container d-flex justify-content-between align-items-center">
-        <h1 className="display-4">חנות איל"ן</h1>
-        <div className="language-selector">
-          <button className="btn btn-primary mx-2" onClick={() => changeLanguage('en')}>
-            English
-          </button>
-          <button className="btn btn-primary mx-2" onClick={() => changeLanguage('he')}>
-            עברית
-          </button>
+    <header className="bg-light shadow-sm">
+      <nav className="navbar navbar-expand-lg navbar-light bg-light container">
+        {/* לוגו */}
+        <Link to="/" className="navbar-brand d-flex align-items-center">
+          <img src={logo} alt="Logo" className="logo-image me-2" />
+          <span className="fw-bold text-primary"></span>
+        </Link>
+
+        {/* תפריט ניווט */}
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+
+        <div className="collapse navbar-collapse" id="navbarNav">
+          <ul className="navbar-nav ms-auto align-items-center">
+            {/* בורר שפות */}
+            <li className="nav-item me-3">
+              <div className="d-flex">
+                <button
+                  className="btn btn-outline-primary btn-sm me-2"
+                  onClick={() => changeLanguage('en')}
+                >
+                  EN 🌍
+                </button>
+                <button
+                  className="btn btn-outline-primary btn-sm"
+                  onClick={() => changeLanguage('he')}
+                >
+                  HE 🌍
+                </button>
+              </div>
+            </li>
+
+            {/* כפתורי התחברות/הרשמה/התנתקות */}
+            {isLoggedIn ? (
+              <li className="nav-item">
+                <button className="btn btn-danger btn-sm" onClick={onLogout}>
+                  התנתק
+                </button>
+              </li>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link to="/login" className="btn btn-success btn-sm me-2">
+                    התחבר
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link to="/register" className="btn btn-primary btn-sm">
+                    הרשם
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
         </div>
-        <div>
-          {isLoggedIn ? (
-            <button className="btn btn-danger mx-2" onClick={onLogout}>
-              התנתק
-            </button>
-          ) : (
-            <Link to="/login" className="btn btn-success mx-2">
-              התחבר
-            </Link>
-          )}
-        </div>
-      </div>
+      </nav>
     </header>
   );
 };

@@ -43,7 +43,6 @@ app.post('/login', async (req, res) => {
 
   const { email, password } = req.body;
   try {
-    console.log('col:', await User.find());
     const user = await User.findOne({email });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
@@ -56,6 +55,18 @@ app.post('/login', async (req, res) => {
     res.status(400).json({ error: 'Error logging in: ' + err.message });
   }
 });
+
+// Get User
+app.get('/User/:id', async (req, res) => {
+  try {
+    const user = await User.findById(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.status(200).json(user);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching user: ' + error.message });
+  }
+});
+
 
 // Start Server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

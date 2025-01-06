@@ -8,6 +8,7 @@ import PersonalArea from './pages/PersonalArea/PersonalArea.js';
 import CartPage from './pages/PersonalArea/CartPage.js';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
+import RegisterPage from './pages/Registeration/RegisterPage';
 import './App.css';
 import '@fontsource/rubik';
 
@@ -38,6 +39,8 @@ const App = () => {
           <Route path="/login" element={token ? <Navigate to="/personal-area" /> : <LoginPage setToken={setToken} setUserId={setUserId} />} />
           <Route path="/personal-area" element={token ? <PersonalArea userId={userId} /> : <Navigate to="/login" />} />
           <Route path="/cart" element={token ? <CartPage userId={userId} /> : <Navigate to="/login" />} />
+          <Route path="/register" element={<RegisterPage />} />
+
         </Routes>
       </div>
       <Footer />

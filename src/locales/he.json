@@ -10,5 +10,23 @@
     },
     "featured_products": "מוצרים נבחרים",
     "price": "מחיר",
-    "view_details": "צפה בפרטים"
+    "view_details": "צפה בפרטים",
+    "personal_area":{
+      "welcome": "ברוך הבא, {{username}}",
+      "email": "דוא\"ל",
+      "yourCart": "העגלה שלך",
+      "productId": "מזהה מוצר",
+      "quantity": "כמות",
+      "yourWishlist": "רשימת המשאלות שלך",
+      "loading": "טוען..."
+    },
+    "register": {
+    "title": "הרשמה",
+    "email": "דוא\"ל",
+    "username": "שם משתמש",
+    "password": "סיסמה",
+    "submit": "הרשם",
+    "error": "אירעה שגיאה בהרשמה, נסה שוב"
+  }
+
   }
