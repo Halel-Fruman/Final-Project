@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 
 const CartPage = ({ userId }) => {
   const [cart, setCart] = useState([]);
@@ -20,11 +19,25 @@ const CartPage = ({ userId }) => {
     fetchCart();
   }, [userId]);
 
-
   const handleRemove = async (productId) => {
-    const updatedCart = cart.filter((item) => item.productId !== productId);
-    await axios.put('http://localhost:5000/api/users/cart', { userId, cart: updatedCart });
-    setCart(updatedCart);
+    try {
+      const updatedCart = cart.filter((item) => item.productId !== productId);
+      const response = await fetch('http://localhost:5000/api/users/cart', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, cart: updatedCart }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update cart');
+      }
+
+      setCart(updatedCart);
+    } catch (err) {
+      console.error(err.message);
+    }
   };
 
   return (
