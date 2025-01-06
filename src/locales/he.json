@@ -11,6 +11,7 @@
     "featured_products": "מוצרים נבחרים",
     "price": "מחיר",
     "view_details": "צפה בפרטים",
+
     "personal_area":{
       "welcome": "ברוך הבא, {{username}}",
       "email": "דוא\"ל",
@@ -18,15 +19,32 @@
       "productId": "מזהה מוצר",
       "quantity": "כמות",
       "yourWishlist": "רשימת המשאלות שלך",
-      "loading": "טוען..."
+      "loading": "טוען...",
+      "noItemsWishlist": "אין פריטים ברשימת המשאלות שלך",
+      "noItemsCart":"אין פריטים בעגלה שלך"
     },
-    "register": {
+
+   "register": {
     "title": "הרשמה",
-    "email": "דוא\"ל",
-    "username": "שם משתמש",
+    "email": "כתובת אימייל",
     "password": "סיסמה",
+    "confirmPassword": "אשר סיסמה",
     "submit": "הרשם",
-    "error": "אירעה שגיאה בהרשמה, נסה שוב"
+    "success": "ההרשמה הצליחה!",
+    "errors": {
+      "passwordMismatch": "הסיסמאות אינן תואמות!",
+      "failed": "ההרשמה נכשלה."
+    }
+  },
+  "login": {
+    "title": "התחברות",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "submit": "התחבר",
+    "emailPlaceholder": "הכנס את כתובת האימייל שלך",
+    "passwordPlaceholder": "הכנס את הסיסמה שלך",
+    "success": "ההתחברות הצליחה!",
+    "failed": "ההתחברות נכשלה. אנא בדוק את הפרטים."
   }
 
   }

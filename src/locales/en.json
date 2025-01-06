@@ -11,6 +11,7 @@
     "featured_products": "Featured Products",
     "price": "Price",
     "view_details": "View Details",
+
     "personal_area":{
       "welcome": "Welcome, {{username}}",
       "email": "Email",
@@ -18,15 +19,33 @@
       "productId": "Product ID",
       "quantity": "Quantity",
       "yourWishlist": "Your Wishlist",
-      "loading": "Loading..."
+      "loading": "Loading...",
+      "noItemsWishlist": "There are no items in your wishlist",
+      "noItemsCart":"There are no items in your cart"
     },
+
     "register": {
-    "title": "Register",
-    "email": "Email",
-    "username": "Username",
-    "password": "Password",
-    "submit": "Register",
-    "error": "An error occurred during registration, please try again"
-  }
+      "title": "Register",
+      "email": "Email Address",
+      "password": "Password",
+      "confirmPassword": "Confirm Password",
+      "submit": "Register",
+      "success": "Registration successful!",
+      "errors": {
+        "passwordMismatch": "Passwords do not match!",
+        "failed": "Registration failed."
+      }
+    },
+    "login": {
+      "title": "Login",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Login",
+      "emailPlaceholder": "Enter your email",
+      "passwordPlaceholder": "Enter your password",
+      "success": "Login successful!",
+      "failed": "Login failed. Please check your credentials."
+    }
+
 
   }

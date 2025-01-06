@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useTranslation } from 'react-i18next';
 
 const RegisterPage = () => {
+  const { t } = useTranslation(); // שימוש בתרגום
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
@@ -8,7 +10,7 @@ const RegisterPage = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     if (password !== confirmPassword) {
-      alert('Passwords do not match!');
+      alert(t('register.errors.passwordMismatch')); // שימוש בתרגום לשגיאה
       return;
     }
 
@@ -21,10 +23,10 @@ const RegisterPage = () => {
       if (!response.ok) {
         throw new Error('Failed to register');
       }
-      alert('Registration successful!');
+      alert(t('register.success')); // הודעה מתורגמת להרשמה מוצלחת
     } catch (err) {
       console.error(err.message);
-      alert('Registration failed.');
+      alert(t('register.errors.failed')); // הודעה מתורגמת לשגיאה
     }
   };
 
@@ -33,10 +35,10 @@ const RegisterPage = () => {
       <div className="row justify-content-center">
         <div className="col-md-6">
           <div className="card p-4 shadow">
-            <h2 className="text-center mb-4">Register</h2>
+            <h2 className="text-center mb-4">{t('register.title')}</h2>
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
-                <label htmlFor="email" className="form-label">Email Address</label>
+                <label htmlFor="email" className="form-label">{t('register.email')}</label>
                 <input
                   type="email"
                   className="form-control"
@@ -47,7 +49,7 @@ const RegisterPage = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="password" className="form-label">Password</label>
+                <label htmlFor="password" className="form-label">{t('register.password')}</label>
                 <input
                   type="password"
                   className="form-control"
@@ -58,7 +60,7 @@ const RegisterPage = () => {
                 />
               </div>
               <div className="mb-3">
-                <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
+                <label htmlFor="confirmPassword" className="form-label">{t('register.confirmPassword')}</label>
                 <input
                   type="password"
                   className="form-control"
@@ -68,7 +70,7 @@ const RegisterPage = () => {
                   required
                 />
               </div>
-              <button type="submit" className="btn btn-primary w-100">Register</button>
+              <button type="submit" className="btn btn-primary w-100">{t('register.submit')}</button>
             </form>
           </div>
         </div>

@@ -1,6 +1,9 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import "./PersonalArea.css";
 
 const PersonalArea = ({ userId }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
 
   useEffect(() => {
@@ -8,7 +11,7 @@ const PersonalArea = ({ userId }) => {
       try {
         const response = await fetch(`http://localhost:5000/User/${userId}`);
         if (!response.ok) {
-          throw new Error('Failed to fetch user');
+          throw new Error("Failed to fetch user");
         }
         const data = await response.json();
         setUser(data);
@@ -20,43 +23,48 @@ const PersonalArea = ({ userId }) => {
   }, [userId]);
 
   return user ? (
-    <div className="container mt-5">
-      <div className="card p-4 shadow">
-        <h2 className="text-center mb-4">Personal Area</h2>
-        <p><strong>Username:</strong> {user.username}</p>
-        <p><strong>Email:</strong> {user.email}</p>
+    <div className="personal-area-container">
+      <h1>{t("personal_area.welcome")}</h1>
+      <div className="user-info">
 
-        <h3>Your Cart</h3>
+        <p>
+          <span>{t("personal_area.email")}:</span> {user.email}
+        </p>
+      </div>
+      <div className="section">
+        <h2>{t("personal_area.yourCart")}</h2>
         {user.cart.length > 0 ? (
-          <ul className="list-group">
-            {user.cart.map((item, index) => (
-              <li key={index} className="list-group-item">
-                Product ID: {item.productId}, Quantity: {item.quantity}
-              </li>
-            ))}
-          </ul>
+          user.cart.map((item, index) => (
+            <div key={index} className="item">
+              <p>
+                <strong>{t("personal_area.productId")}:</strong> {item.productId}
+              </p>
+              <p>
+                <strong>{t("personal_area.quantity")}:</strong> {item.quantity}
+              </p>
+            </div>
+          ))
         ) : (
-          <p>Your cart is empty.</p>
+          <p>{t("personal_area.noItemsCart")}</p>
         )}
-
-        <h3 className="mt-4">Your Wishlist</h3>
+      </div>
+      <div className="section">
+        <h2>{t("personal_area.yourWishlist")}</h2>
         {user.wishlist.length > 0 ? (
-          <ul className="list-group">
-            {user.wishlist.map((item, index) => (
-              <li key={index} className="list-group-item">Product ID: {item}</li>
-            ))}
-          </ul>
+          user.wishlist.map((item, index) => (
+            <div key={index} className="item">
+              <p>
+                <strong>{t("personal_area.productId")}:</strong> {item}
+              </p>
+            </div>
+          ))
         ) : (
-          <p>Your wishlist is empty.</p>
+          <p>{t("personal_area.noItemsWishlist")}</p>
         )}
       </div>
     </div>
   ) : (
-    <div className="text-center mt-5">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
-    </div>
+    <p>{t("personal_area.loading")}</p>
   );
 };
 
