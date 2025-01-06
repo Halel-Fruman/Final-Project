@@ -47,3 +47,7 @@ a:hover {
   color: #004d4d;
 }
 
+/* שינוי פונט ברירת המחדל של Bootstrap */
+body, .btn, .navbar, .form-control, .dropdown-menu {
+  font-family: 'Rubik', sans-serif;
+}
