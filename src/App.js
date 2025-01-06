@@ -3,12 +3,12 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-d
 import { useTranslation } from 'react-i18next';
 import HomePage from './pages/HomePage/HomePage';
 import ProductPage from './pages/ProductPage/ProductPage';
-import LoginPage from './pages/PersonalArea/LoginPage.js';
-import PersonalArea from './pages/PersonalArea/PersonalArea.js';
+import LoginPage from './pages/PersonalArea/LoginPage.jsx';
+import PersonalArea from './pages/PersonalArea/PersonalArea.jsx';
 import CartPage from './pages/PersonalArea/CartPage.js';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-import RegisterPage from './pages/Registeration/RegisterPage';
+import RegisterPage from './pages/Registeration/RegisterPage.jsx';
 import './App.css';
 import '@fontsource/rubik';
 
