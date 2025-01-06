@@ -12,6 +12,7 @@ router.post('/login', async (req, res) => {
 
   try {
     // חיפוש המשתמש ב-collection
+    console.log('coll:', await User.find());
     const user = await User.findOne({ email });
     if (!user) return res.status(404).send('User not found');
 

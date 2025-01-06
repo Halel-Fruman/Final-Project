@@ -22,7 +22,7 @@ const CartPage = ({ userId }) => {
   const handleRemove = async (productId) => {
     try {
       const updatedCart = cart.filter((item) => item.productId !== productId);
-      const response = await fetch('http://localhost:5000/api/users/cart', {
+      const response = await fetch('http://localhost:5000/User/cart', {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

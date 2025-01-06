@@ -7,14 +7,17 @@ const LoginPage = ({ setToken, setUserId }) => {
 
   const handleLogin = async () => {
     try {
-      const response = await axios.post('http://localhost:5000/api/users/login', { email, password });
+      console.log('Sending:', { email, password }); // הדפסה לפני שליחה
+      const response = await axios.post('http://localhost:5000/login',
+        { email, password },
+        { headers: { 'Content-Type': 'application/json' } }
+      );
+      console.log('Response:', response.data);
       const { token, userId } = response.data;
 
-      // שמירת הטוקן והמשתמש ב-LocalStorage
       localStorage.setItem('token', token);
       localStorage.setItem('userId', userId);
 
-      // עדכון הסטייט
       setToken(token);
       setUserId(userId);
     } catch (error) {
@@ -22,14 +25,25 @@ const LoginPage = ({ setToken, setUserId }) => {
     }
   };
 
+
   return (
     <div>
-      <h1>Login</h1>
-      <input type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <input type="password" placeholder="Password" value={password} onChange={(e) => setPassword(e.target.value)} />
+      <input
+        type="email"
+        placeholder="Enter your email"
+        value={email}
+        onChange={(e) => setEmail(e.target.value)} // עדכון המשתנה email
+      />
+      <input
+        type="password"
+        placeholder="Enter your password"
+        value={password}
+        onChange={(e) => setPassword(e.target.value)} // עדכון המשתנה password
+      />
       <button onClick={handleLogin}>Login</button>
     </div>
   );
+
 };
 
 export default LoginPage;

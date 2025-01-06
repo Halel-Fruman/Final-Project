@@ -21,14 +21,8 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // User Schema & Model
-const userSchema = new mongoose.Schema({
-  email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-});
+const User = require('./models/User');
 
-const User = mongoose.model('User', userSchema);
-
-// Routes
 
 // Register
 app.post('/register', async (req, res) => {
@@ -45,9 +39,12 @@ app.post('/register', async (req, res) => {
 
 // Login
 app.post('/login', async (req, res) => {
+  console.log('Request body:', req.body); // תוודא שהנתונים של email ו-password מגיעים
+
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({ email });
+    console.log('col:', await User.find());
+    const user = await User.findOne({email });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
