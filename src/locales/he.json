@@ -11,28 +11,59 @@
     "featured_products": "מוצרים נבחרים",
     "price": "מחיר",
     "view_details": "צפה בפרטים",
+"personal_area": {
+  "welcome": "ברוך הבא, {{username}}",
+  "userInfo": "פרטי משתמש",
+  "email": "כתובת מייל",
+  "firstName": "שם פרטי",
+  "lastName": "שם משפחה",
+  "edit": "ערוך",
+  "save": "שמור",
+  "cancel": "בטל",
+  "changePassword": "שנה סיסמה",
+  "currentPassword": "סיסמה נוכחית",
+  "newPassword": "סיסמה חדשה",
+  "confirmPassword": "וידוא סיסמה",
+  "passwordMismatch": "הסיסמאות אינן תואמות",
+  "updateSuccess": "{{field}} עודכן בהצלחה",
+  "updateFailed": "שגיאה בעדכון {{field}}",
+  "yourAddresses": "הכתובות שלך",
+  "addNewAddress": "הוסף כתובת חדשה",
+  "addressAdded": "כתובת נוספה בהצלחה",
+  "addressAddFailed": "שגיאה בהוספת כתובת",
+  "addressDeleted": "כתובת נמחקה בהצלחה",
+  "addressDeleteFailed": "שגיאה במחיקת כתובת",
+  "yourCart": "עגלת הקניות שלך",
+  "productId": "מזהה מוצר",
+  "quantity": "כמות",
+  "noItemsCart": "אין פריטים בעגלה",
+  "yourWishlist": "רשימת המשאלות שלך",
+  "noItemsWishlist": "אין פריטים ברשימת המשאלות",
+  "loading": "טוען...",
+  "actions": {
+    "delete": "מחק",
+    "add": "הוסף",
+    "edit": "ערוך",
+    "cancel": "בטל",
+    "save": "שמור",
+    "addAddress": "הוסף כתובת"
 
-
-      "personal_area": {
-        "welcome": "ברוך הבא, {{username}}",
-        "firstName": "שם פרטי",
-        "lastName": "שם משפחה",
-        "addresses": "כתובות",
-        "edit": "ערוך",
-        "save": "שמור",
-        "cancel": "בטל",
-        "delete": "מחק",
-        "changePassword": "שנה סיסמה",
-        "newPassword": "סיסמה חדשה",
-        "updatePassword": "עדכן סיסמה",
-        "nameUpdateSuccess": "השם עודכן בהצלחה!",
-        "nameUpdateFailed": "עדכון השם נכשל.",
-        "passwordUpdateSuccess": "הסיסמה עודכנה בהצלחה!",
-        "passwordUpdateFailed": "עדכון הסיסמה נכשל.",
-        "loading": "טוען..."
-      },
-
-
+  },
+  "fields": {
+    "addresses": "כתובות",
+    "password": "סיסמה",
+    "cart": "עגלה",
+    "wishlist": "רשימת משאלות"
+  },
+  "alerts": {
+    "passwordMismatch": "הסיסמאות אינן תואמות. אנא נסה שוב.",
+    "saveSuccess": "עודכן בהצלחה!",
+    "saveError": "שגיאה בעת שמירת השינויים.",
+    "deleteConfirm": "האם אתה בטוח שברצונך למחוק את הפריט?",
+    "noAddresses": "אין כתובות זמינות"
+  }
+}
+,
 
    "register": {
     "first_name": "שם פרטי",
