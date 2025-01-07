@@ -1,8 +1,8 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
 import './ProductPage.css';
-import ProductDetails from '../../components/ProductDetails/ProductDetails';
-import Footer from '../../components/Footer/Footer';
+import ProductDetails from './ProductDetails';
+import Footer from '../Footer/Footer';
 
 const ProductPage = () => {
   // Get product details from the URL

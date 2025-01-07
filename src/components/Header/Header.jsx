@@ -53,6 +53,15 @@ const Header = ({ onLogout, isLoggedIn }) => {
               </div>
             </li>
 
+            {/* כפתור אזור אישי */}
+            {isLoggedIn && (
+              <li className="nav-item">
+                <Link to="/personal-area" className="btn btn-info btn-sm me-2">
+                  אזור אישי
+                </Link>
+              </li>
+            )}
+
             {/* כפתורי התחברות/הרשמה/התנתקות */}
             {isLoggedIn ? (
               <li className="nav-item">

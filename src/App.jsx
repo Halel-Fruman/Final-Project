@@ -6,11 +6,11 @@ import ProductPage from './pages/ProductPage/ProductPage';
 import LoginPage from './pages/PersonalArea/LoginPage.jsx';
 import PersonalArea from './pages/PersonalArea/PersonalArea.jsx';
 import CartPage from './pages/PersonalArea/CartPage.js';
+import RegisterPage from './pages/Registeration/RegisterPage.jsx';
+import AddAddressPage from './pages/Registeration/AddAddressPage.jsx';
 import Header from './components/Header/Header';
 import Footer from './components/Footer/Footer';
-import RegisterPage from './pages/Registeration/RegisterPage.jsx';
 import './App.css';
-import '@fontsource/rubik';
 
 const App = () => {
   const { i18n } = useTranslation();
@@ -18,7 +18,6 @@ const App = () => {
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
 
   useEffect(() => {
-    // Set direction (LTR or RTL) based on selected language
     document.documentElement.dir = i18n.language === 'he' ? 'rtl' : 'ltr';
   }, [i18n.language]);
 
@@ -37,10 +36,10 @@ const App = () => {
           <Route path="/" element={<HomePage />} />
           <Route path="/product/:id" element={<ProductPage />} />
           <Route path="/login" element={token ? <Navigate to="/personal-area" /> : <LoginPage setToken={setToken} setUserId={setUserId} />} />
+          <Route path="/register" element={<RegisterPage />} />
           <Route path="/personal-area" element={token ? <PersonalArea userId={userId} /> : <Navigate to="/login" />} />
           <Route path="/cart" element={token ? <CartPage userId={userId} /> : <Navigate to="/login" />} />
-          <Route path="/register" element={<RegisterPage />} />
-
+          <Route path="/add-address" element={token ? <AddAddressPage userId={userId} /> : <Navigate to="/login" />} />
         </Routes>
       </div>
       <Footer />

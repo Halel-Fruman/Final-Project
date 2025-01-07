@@ -1,9 +1,12 @@
+
 require('dotenv').config();
 const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
+const userRoutes = require('./Routes/userRoutes'); // שים את הנתיב הנכון
+
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -22,6 +25,8 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // User Schema & Model
 const User = require('./models/User');
+app.use('/User', userRoutes); // כל הנתיבים של userRoute יתחילו ב- /User
+
 
 
 // Register
@@ -66,6 +71,35 @@ app.get('/User/:id', async (req, res) => {
     res.status(500).json({ error: 'Error fetching user: ' + error.message });
   }
 });
+
+//Add Address
+app.post('/User/:userId/add-address', async (req, res) => {
+  const { userId } = req.params;
+  const { address } = req.body;
+
+  if (!address) {
+    return res.status(400).json({ error: 'Address is required' });
+  }
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    user.addresses = user.addresses || []; // וודא שהמפתח קיים
+    user.addresses.push(address); // הוספת הכתובת לרשימת הכתובות
+    await user.save();
+
+    res.status(200).json({ message: 'Address added successfully' });
+  } catch (err) {
+    console.error(err.message);
+    res.status(500).json({ error: 'Failed to add address' });
+  }
+});
+
+
+
 
 
 // Start Server

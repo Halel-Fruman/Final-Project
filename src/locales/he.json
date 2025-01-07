@@ -1,5 +1,5 @@
 {
-    "welcome": "ברוכים הבאים לחנות שלי",
+    "welcome": "ברוכים הבאים לחנות איל''ן",
     "welcome_subtitle": "מצאו את המוצרים הטובים ביותר במחירים ללא תחרות!",
     "categories": {
       "title": "קניות לפי קטגוריה",
@@ -12,19 +12,31 @@
     "price": "מחיר",
     "view_details": "צפה בפרטים",
 
-    "personal_area":{
-      "welcome": "ברוך הבא, {{username}}",
-      "email": "דוא\"ל",
-      "yourCart": "העגלה שלך",
-      "productId": "מזהה מוצר",
-      "quantity": "כמות",
-      "yourWishlist": "רשימת המשאלות שלך",
-      "loading": "טוען...",
-      "noItemsWishlist": "אין פריטים ברשימת המשאלות שלך",
-      "noItemsCart":"אין פריטים בעגלה שלך"
-    },
+
+      "personal_area": {
+        "welcome": "ברוך הבא, {{username}}",
+        "firstName": "שם פרטי",
+        "lastName": "שם משפחה",
+        "addresses": "כתובות",
+        "edit": "ערוך",
+        "save": "שמור",
+        "cancel": "בטל",
+        "delete": "מחק",
+        "changePassword": "שנה סיסמה",
+        "newPassword": "סיסמה חדשה",
+        "updatePassword": "עדכן סיסמה",
+        "nameUpdateSuccess": "השם עודכן בהצלחה!",
+        "nameUpdateFailed": "עדכון השם נכשל.",
+        "passwordUpdateSuccess": "הסיסמה עודכנה בהצלחה!",
+        "passwordUpdateFailed": "עדכון הסיסמה נכשל.",
+        "loading": "טוען..."
+      },
+
+
 
    "register": {
+    "first_name": "שם פרטי",
+    "last_name": "שם משפחה",
     "title": "הרשמה",
     "email": "כתובת אימייל",
     "password": "סיסמה",
@@ -45,6 +57,15 @@
     "passwordPlaceholder": "הכנס את הסיסמה שלך",
     "success": "ההתחברות הצליחה!",
     "failed": "ההתחברות נכשלה. אנא בדוק את הפרטים."
+  },
+  "addAddress": {
+  "title": "הוספת כתובת",
+  "address": "כתובת",
+  "submit": "שלח",
+  "success": "כתובת נוספה בהצלחה!",
+  "errors": {
+    "failed": "נכשלה הוספת הכתובת."
   }
 
   }
+}

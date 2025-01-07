@@ -12,19 +12,25 @@
     "price": "Price",
     "view_details": "View Details",
 
-    "personal_area":{
+    "personal_area": {
       "welcome": "Welcome, {{username}}",
       "email": "Email",
-      "yourCart": "Your Cart",
-      "productId": "Product ID",
-      "quantity": "Quantity",
-      "yourWishlist": "Your Wishlist",
-      "loading": "Loading...",
-      "noItemsWishlist": "There are no items in your wishlist",
-      "noItemsCart":"There are no items in your cart"
+      "firstName": "First Name",
+      "lastName": "Last Name",
+      "yourAddresses": "Your Addresses",
+      "changePassword": "Change Password",
+      "newPassword": "New Password",
+      "save": "Save",
+      "cancel": "Cancel",
+      "edit": "Edit",
+      "updateSuccess": "{{field}} updated successfully!",
+      "updateFailed": "Failed to update.",
+      "loading": "Loading..."
     },
 
     "register": {
+      "first_name": "First Name",
+      "last_name": "Last Name",
       "title": "Register",
       "email": "Email Address",
       "password": "Password",
