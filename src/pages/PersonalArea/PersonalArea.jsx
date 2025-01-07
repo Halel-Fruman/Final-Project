@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
-import PersonalAreaEditor from "./PersonalFields/PersonalAreaEditor"; // ייבוא הקובץ לעריכת פרטים אישיים
-import PasswordManager from "./PersonalFields/PasswordManager"; // ייבוא הקובץ לניהול סיסמאות
-import CartAndWishlist from "./PersonalFields/CartAndWishlist"; // ייבוא הקובץ לניהול עגלה ורשימת משאלות
+import PersonalAreaEditor from "./PersonalFields/PersonalAreaEditor";
+import PasswordManager from "./PersonalFields/PasswordManager";
+import CartAndWishlist from "./PersonalFields/CartAndWishlist";
+import AddressManager from "./PersonalFields/AddressManager";
 import { useTranslation } from "react-i18next";
-
 const PersonalArea = ({ userId }) => {
+  console.log(userId);
+
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
@@ -27,10 +29,11 @@ const PersonalArea = ({ userId }) => {
 
   const handleSave = async (updatedUser) => {
     try {
+      console.log("Updating user details:", updatedUser); // בדוק את הנתונים הנשלחים
       const response = await fetch(`http://localhost:5000/User/${userId}/edit`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ updatedUser }),
+        body: JSON.stringify(updatedUser), // אין צורך להכניס `updatedUser` בתוך אובייקט נוסף
       });
 
       if (!response.ok) {
@@ -38,11 +41,33 @@ const PersonalArea = ({ userId }) => {
       }
 
       const updatedData = await response.json();
+      console.log("Server response:", updatedData); // בדוק את תגובת השרת
       setUser(updatedData);
       setIsEditing(false);
     } catch (err) {
       console.error(err.message);
       alert(t("personal_area.updateFailed"));
+    }
+  };
+
+
+  const handleAddressUpdate = async (updatedAddresses) => {
+    try {
+      const response = await fetch(`http://localhost:5000/User/${userId}/update-addresses`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ addresses: updatedAddresses }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to update addresses");
+      }
+
+      const updatedUser = await response.json();
+      setUser(updatedUser);
+    } catch (err) {
+      console.error(err.message);
+      alert(t("personal_area.addressUpdateFailed"));
     }
   };
 
@@ -53,19 +78,24 @@ const PersonalArea = ({ userId }) => {
         {t("personal_area.editprofile")}
       </button>
 
-      {/* עורך פרטי משתמש */}
       {isEditing && (
         <PersonalAreaEditor
           user={user}
           onSave={handleSave}
           onCancel={() => setIsEditing(false)}
+          onAddressUpdate={handleAddressUpdate}
         />
       )}
 
-      {/* ניהול סיסמאות */}
+      <AddressManager
+        addresses={user.addresses}
+        userId={userId}
+        onUpdate={handleAddressUpdate}
+      />
+
+
       <PasswordManager userId={userId} />
 
-      {/* עגלה ורשימת משאלות */}
       <CartAndWishlist cart={user.cart} wishlist={user.wishlist} />
     </div>
   ) : (

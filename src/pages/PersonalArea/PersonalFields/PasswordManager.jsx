@@ -37,7 +37,6 @@ const PasswordManager = ({ userId }) => {
   };
 
   return (
-    <div className="card mb-4">
       <div className="card-body">
         {isEditing ? (
           <>
@@ -74,7 +73,6 @@ const PasswordManager = ({ userId }) => {
             {t("personal_area.changePassword")}
           </button>
         )}
-      </div>
     </div>
   );
 };
