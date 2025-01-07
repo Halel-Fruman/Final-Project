@@ -9,6 +9,8 @@
 /coverage
 # Environment variables
 .env
+DataBase/.env
+
 # production
 /build
 
@@ -19,8 +21,11 @@
 .env.test.local
 .env.production.local
 .env
+DataBase/.env
+
 
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+DataBase/.env
 DataBase/.env

@@ -107,7 +107,7 @@ const PersonalAreaEditor = ({ user, onSave, onCancel, onAddressUpdate }) => {
               onChange={(e) => setNewAddress(e.target.value)}
             />
             <button className="btn btn-primary" onClick={handleAddAddress}>
-              {t("personal_area.addAddress")}
+              {t("personal_area.addNewAddress")}
             </button>
           </div>
         </div>

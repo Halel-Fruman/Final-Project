@@ -1,57 +1,99 @@
 {
-    "welcome": "Welcome to My Store",
-    "welcome_subtitle": "Find the best products at unbeatable prices!",
-    "categories": {
-      "title": "Shop by Category",
-      "electronics": "Electronics",
-      "clothing": "Clothing",
-      "home_garden": "Home & Garden",
-      "beauty_health": "Beauty & Health"
-    },
-    "featured_products": "Featured Products",
-    "price": "Price",
-    "view_details": "View Details",
-
-    "personal_area": {
-      "welcome": "Welcome, {{username}}",
-      "email": "Email",
-      "firstName": "First Name",
-      "lastName": "Last Name",
-      "yourAddresses": "Your Addresses",
-      "changePassword": "Change Password",
-      "newPassword": "New Password",
-      "save": "Save",
-      "cancel": "Cancel",
+  "welcome": "Welcome to Ilan's Store",
+  "welcome_subtitle": "Find the best products at unbeatable prices!",
+  "categories": {
+    "title": "Shop by Category",
+    "electronics": "Electronics",
+    "clothing": "Clothing",
+    "home_garden": "Home & Garden",
+    "beauty_health": "Beauty & Health"
+  },
+  "featured_products": "Featured Products",
+  "price": "Price",
+  "view_details": "View Details",
+  "personal_area": {
+    "welcome": "Welcome, {{username}}",
+    "userInfo": "User Info",
+    "email": "Email",
+    "firstName": "First Name",
+    "lastName": "Last Name",
+    "edit": "Edit",
+    "editprofile": "Edit Profile",
+    "save": "Save",
+    "cancel": "Cancel",
+    "changePassword": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "Confirm Password",
+    "passwordMismatch": "Passwords do not match",
+    "updateSuccess": "{{field}} updated successfully",
+    "updateFailed": "Failed to update {{field}}",
+    "yourAddresses": "Your Addresses",
+    "addNewAddress": "Add Address",
+    "addressAdded": "Address added successfully",
+    "addressAddFailed": "Failed to add address",
+    "addressDeleted": "Address deleted successfully",
+    "addressDeleteFailed": "Failed to delete address",
+    "yourCart": "Your Cart",
+    "productId": "Product ID",
+    "quantity": "Quantity",
+    "noItemsCart": "No items in cart",
+    "yourWishlist": "Your Wishlist",
+    "noItemsWishlist": "No items in wishlist",
+    "loading": "Loading...",
+    "actions": {
+      "delete": "Delete",
+      "add": "Add",
       "edit": "Edit",
-      "updateSuccess": "{{field}} updated successfully!",
-      "updateFailed": "Failed to update.",
-      "loading": "Loading..."
+      "cancel": "Cancel",
+      "save": "Save",
+      "addAddress": "Add Address"
     },
-
-    "register": {
-      "first_name": "First Name",
-      "last_name": "Last Name",
-      "title": "Register",
-      "email": "Email Address",
+    "fields": {
+      "addresses": "Addresses",
       "password": "Password",
-      "confirmPassword": "Confirm Password",
-      "submit": "Register",
-      "success": "Registration successful!",
-      "errors": {
-        "passwordMismatch": "Passwords do not match!",
-        "failed": "Registration failed."
-      }
+      "cart": "Cart",
+      "wishlist": "Wishlist"
     },
-    "login": {
-      "title": "Login",
-      "email": "Email",
-      "password": "Password",
-      "submit": "Login",
-      "emailPlaceholder": "Enter your email",
-      "passwordPlaceholder": "Enter your password",
-      "success": "Login successful!",
-      "failed": "Login failed. Please check your credentials."
+    "alerts": {
+      "passwordMismatch": "Passwords do not match. Please try again.",
+      "saveSuccess": "Updated successfully!",
+      "saveError": "Error while saving changes.",
+      "deleteConfirm": "Are you sure you want to delete the item?",
+      "noAddresses": "No available addresses"
     }
-
-
+  },
+  "register": {
+    "first_name": "First Name",
+    "last_name": "Last Name",
+    "title": "Register",
+    "email": "Email",
+    "password": "Password",
+    "confirmPassword": "Confirm Password",
+    "submit": "Sign Up",
+    "success": "Registration successful!",
+    "errors": {
+      "passwordMismatch": "Passwords do not match!",
+      "failed": "Registration failed."
+    }
+  },
+  "login": {
+    "title": "Login",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Log In",
+    "emailPlaceholder": "Enter your email address",
+    "passwordPlaceholder": "Enter your password",
+    "success": "Login successful!",
+    "failed": "Login failed. Please check your credentials."
+  },
+  "addAddress": {
+    "title": "Add Address",
+    "address": "Address",
+    "submit": "Submit",
+    "success": "Address added successfully!",
+    "errors": {
+      "failed": "Failed to add the address."
+    }
   }
+}
