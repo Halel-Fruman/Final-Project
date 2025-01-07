@@ -4,8 +4,7 @@ const mongoose = require('mongoose');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
-const userRoutes = require('./Routes/userRoutes'); // שים את הנתיב הנכון
-
+const userRoutes = require('./Routes/userRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -15,15 +14,13 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI )
+mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
 // User Schema & Model
 const User = require('./models/User');
-app.use('/User', userRoutes); // כל הנתיבים של userRoute יתחילו ב- /User
-
-
+app.use('/User', userRoutes); // All routes of userRoutes will start with /User
 
 // Register
 app.post('/register', async (req, res) => {
@@ -40,11 +37,11 @@ app.post('/register', async (req, res) => {
 
 // Login
 app.post('/login', async (req, res) => {
-  console.log('Request body:', req.body); // תוודא שהנתונים של email ו-password מגיעים
+  console.log('Request body:', req.body); // Ensure that email and password data is received
 
   const { email, password } = req.body;
   try {
-    const user = await User.findOne({email });
+    const user = await User.findOne({ email });
     if (!user) return res.status(404).json({ error: 'User not found' });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -68,7 +65,7 @@ app.get('/User/:id', async (req, res) => {
   }
 });
 
-//Add Address
+// Add Address
 app.post('/User/:userId/add-address', async (req, res) => {
   const { userId } = req.params;
   const { address } = req.body;
@@ -83,8 +80,8 @@ app.post('/User/:userId/add-address', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    user.addresses = user.addresses || []; // וודא שהמפתח קיים
-    user.addresses.push(address); // הוספת הכתובת לרשימת הכתובות
+    user.addresses = user.addresses || []; // Ensure the key exists
+    user.addresses.push(address); // Add the address to the list of addresses
     await user.save();
 
     res.status(200).json({ message: 'Address added successfully' });
@@ -93,10 +90,6 @@ app.post('/User/:userId/add-address', async (req, res) => {
     res.status(500).json({ error: 'Failed to add address' });
   }
 });
-
-
-
-
 
 // Start Server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
