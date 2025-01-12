@@ -1,91 +1,140 @@
-import React from 'react';
-import { Link } from 'react-router-dom';
-import { useTranslation } from 'react-i18next';
-import './Header.css';
-import logo from '../../logo-ilan-g.svg';
+import React, { useState } from "react";
+import { Link } from "react-router-dom";
+import { useTranslation } from "react-i18next";
+import { Dialog } from "@headlessui/react";
+import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
+import LanguageSelector from "../LanguageSelector";
+import { Icon } from "@iconify/react";
+import logo from "../../logo-ilan-g.svg";
 
 const Header = ({ onLogout, isLoggedIn }) => {
-  const { i18n } = useTranslation();
+  const { i18n, t } = useTranslation();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
   };
 
   return (
-    <header className="bg-light shadow-sm">
-      <nav className="navbar navbar-expand-lg navbar-light bg-light container">
+    <header className="bg-gray-50 shadow border-b-2 border-gray-200">
+      <nav className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* לוגו */}
-        <Link to="/" className="navbar-brand d-flex align-items-center">
-          <img src={logo} alt="Logo" className="logo-image me-2" />
-          <span className="fw-bold text-primary"></span>
-        </Link>
+        <div className="flex items-center">
+          <Link to="/" className="flex items-center">
+            <img src={logo} alt={t("siteName")} className="h-8 mr-2" />
+          </Link>
+        </div>
 
-        {/* תפריט ניווט */}
-        <button
-          className="navbar-toggler"
-          type="button"
-          data-bs-toggle="collapse"
-          data-bs-target="#navbarNav"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
-        >
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        {/* ניווט דסקטופ */}
+        <div className="hidden lg:flex items-center space-x-6">
+          <LanguageSelector changeLanguage={changeLanguage} currentLanguage={i18n.language} />
 
-        <div className="collapse navbar-collapse" id="navbarNav">
-          <ul className="navbar-nav ms-auto align-items-center">
-            {/* בורר שפות */}
-            <li className="nav-item me-3">
-              <div className="d-flex">
-                <button
-                  className="btn btn-outline-primary btn-sm me-2"
-                  onClick={() => changeLanguage('en')}
-                >
-                  EN 🌍
-                </button>
-                <button
-                  className="btn btn-outline-primary btn-sm"
-                  onClick={() => changeLanguage('he')}
-                >
-                  HE 🌍
-                </button>
-              </div>
-            </li>
+          {isLoggedIn && (
+            <Link
+              to="/personal-area"
+              className="text-sm font-medium text-gray-700 hover:text-gray-800"
+            >
+              {t("header.personal_area")}
+            </Link>
+          )}
 
-            {/* כפתור אזור אישי */}
-            {isLoggedIn && (
-              <li className="nav-item">
-                <Link to="/personal-area" className="btn btn-info btn-sm me-2">
-                  אזור אישי
-                </Link>
-              </li>
-            )}
+          {isLoggedIn ? (
+            <button
+              onClick={onLogout}
+              className="text-sm font-medium text-gray-700 hover:text-gray-800"
+            >
+              <Icon icon="mdi-light:logout" width="24" height="24" />
+            </button>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="text-sm font-medium text-gray-700 hover:text-gray-800"
+              >
+                {t("login.title")}
+              </Link>
+              <Link
+                to="/register"
+                className="text-sm font-medium text-gray-700 hover:text-gray-800"
+              >
+                {t("register.title")}
+              </Link>
+            </>
+          )}
+        </div>
 
-            {/* כפתורי התחברות/הרשמה/התנתקות */}
-            {isLoggedIn ? (
-              <li className="nav-item">
-                <button className="btn btn-danger btn-sm" onClick={onLogout}>
-                  התנתק
-                </button>
-              </li>
-            ) : (
-              <>
-                <li className="nav-item">
-                  <Link to="/login" className="btn btn-success btn-sm me-2">
-                    התחבר
-                  </Link>
-                </li>
-                <li className="nav-item">
-                  <Link to="/register" className="btn btn-primary btn-sm">
-                    הרשם
-                  </Link>
-                </li>
-              </>
-            )}
-          </ul>
+        {/* כפתור תפריט מובייל */}
+        <div className="lg:hidden">
+          <button
+            onClick={() => setMobileMenuOpen(true)}
+            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700"
+          >
+            <Bars3Icon className="h-6 w-6" />
+          </button>
         </div>
       </nav>
+
+      {/* תפריט מובייל */}
+      <Dialog
+        open={mobileMenuOpen}
+        onClose={() => setMobileMenuOpen(false)}
+        className="lg:hidden"
+      >
+        <div className="fixed inset-0 z-10 bg-black bg-opacity-50" />
+        <Dialog.Panel className="fixed inset-y-0 right-0 z-20 w-80 bg-gray-700 shadow-lg">
+          <div className="flex items-center justify-between p-4 bg-secondaryColor">
+            <Link to="/" className="flex items-center">
+              <img src={logo} alt={t("siteName")} className="h-8 mr-2" />
+              <span className="text-lg font-bold text-gray-700">{t("siteName")}</span>
+            </Link>
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="-m-2.5 rounded-md p-2.5 text-gray-700"
+            >
+              <XMarkIcon className="h-6 w-6" />
+            </button>
+          </div>
+          <div className="px-4 py-6">
+            <div className="space-y-4">
+              {/* בורר שפה */}
+              <LanguageSelector changeLanguage={changeLanguage} currentLanguage={i18n.language} />
+
+              {isLoggedIn && (
+                <Link
+                  to="/personal-area"
+                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor"
+                >
+                  {t("header.personal_area")}
+                </Link>
+              )}
+
+              {isLoggedIn ? (
+                <button
+                  onClick={onLogout}
+                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-red-500 rounded hover:bg-red-600"
+                >
+                  {t("logout")}
+                </button>
+              ) : (
+                <>
+                  <Link
+                    to="/login"
+                    className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-green-500 rounded hover:bg-green-600"
+                  >
+                    {t("login.title")}
+                  </Link>
+                  <Link
+                    to="/register"
+                    className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-blue-500 rounded hover:bg-blue-600"
+                  >
+                    {t("register.title")}
+                  </Link>
+                </>
+              )}
+            </div>
+          </div>
+        </Dialog.Panel>
+      </Dialog>
     </header>
   );
 };

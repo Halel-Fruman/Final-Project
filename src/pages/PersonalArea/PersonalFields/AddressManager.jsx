@@ -82,10 +82,7 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
           <h5>{t("personal_area.fields.addresses")}</h5>
           {addresses?.length > 0 ? (
             addresses.map((address, index) => (
-              <div
-                key={index}
-                className="card mb-3 p-2"
-              >
+              <div key={index} className="card mb-3 p-2">
                 <div className="d-flex justify-content-between align-items-center">
                   {editingIndex === index ? (
                     <>
@@ -111,21 +108,23 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
                   ) : (
                     <>
                       <span>{address}</span>
-                      <button
-                        className="btn btn-link btn-sm me-2"
-                        onClick={() => {
-                          setEditingIndex(index);
-                          setEditingValue(address);
-                        }}
-                      >
-                        {t("personal_area.actions.edit")}
-                      </button>
-                      <button
-                        className="btn btn-danger btn-sm"
-                        onClick={() => handleDeleteAddress(index)}
-                      >
-                        {t("personal_area.actions.delete")}
-                      </button>
+                      <div>
+                        <button
+                          className="btn btn-primary btn-sm me-2"
+                          onClick={() => {
+                            setEditingIndex(index);
+                            setEditingValue(address);
+                          }}
+                        >
+                          {t("personal_area.actions.edit")}
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          onClick={() => handleDeleteAddress(index)}
+                        >
+                          {t("personal_area.actions.delete")}
+                        </button>
+                      </div>
                     </>
                   )}
                 </div>

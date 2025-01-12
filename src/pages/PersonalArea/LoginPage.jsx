@@ -1,90 +1,114 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import { useTranslation } from 'react-i18next';
-import './LoginPage.css';
+import React, { useState } from "react";
+import { useTranslation } from "react-i18next";
 
-const LoginPage = ({ setToken, setUserId }) => {
+export default function Login({ setToken, setUserId }) {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError] = useState(null);
+
   const { t } = useTranslation();
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
-    // בדיקת שדות ריקים
-    if (!email || !password) {
-      alert(t('login.emptyFields'));
-      return;
-    }
+    setError(null);
 
     try {
-      // בקשת POST לשרת
-      const response = await axios.post('http://localhost:5000/User/login', {
-        email,
-        password,
+      const response = await fetch("http://localhost:5000/User/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      const { token, userId } = response.data;
-
-      // שמירת הטוקן וה-ID ב-LocalStorage
-      localStorage.setItem('token', token);
-      localStorage.setItem('userId', userId);
-
-      // עדכון ה-Token וה-UserId
-      setToken(token);
-      setUserId(userId);
-
-      alert(t('login.success'));
-    } catch (error) {
-      // טיפול בשגיאות
-      console.error('Login failed:', error.response?.data || error.message);
-
-      // תצוגת שגיאה מתורגמת
-      if (error.response?.status === 404) {
-        alert(t('login.errors.userNotFound'));
-      } else if (error.response?.status === 401) {
-        alert(t('login.errors.invalidCredentials'));
-      } else {
-        alert(t('login.failed'));
+      if (!response.ok) {
+        throw new Error("Login failed. Please check your credentials.");
       }
+
+      const data = await response.json();
+
+      // שמירה ב-localStorage ועדכון מצב
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("userId", data.userId);
+      setToken(data.token);
+      setUserId(data.userId);
+    } catch (err) {
+      setError(err.message);
     }
   };
 
   return (
-    <div className="login-container">
-      <form className="login-form" onSubmit={handleSubmit}>
-        <h1>{t('login.title')}</h1>
+    <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm bg-gray-50 border border-gray-300 rounded-md shadow-md py-0 p-6">
+      <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
+          {t("login.title")}
+        </h2>
+      </div>
 
-        <div className="form-group">
-          <label htmlFor="email">{t('login.email')}</label>
-          <input
-            type="email"
-            id="email"
-            className="form-control"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            placeholder={t('login.emailPlaceholder')}
-          />
-        </div>
+      <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div>
+            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+              {t("login.email")}
+            </label>
+            <div className="mt-2">
+              <input
+                id="email"
+                name="email"
+                type="email"
+                placeholder={t("login.emailPlaceholder")}
+                required
+                autoComplete="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primaryColor sm:text-sm"
+              />
+            </div>
+          </div>
 
-        <div className="form-group">
-          <label htmlFor="password">{t('login.password')}</label>
-          <input
-            type="password"
-            id="password"
-            className="form-control"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder={t('login.passwordPlaceholder')}
-          />
-        </div>
+          <div>
+            <div className="flex items-center justify-between">
+              <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+                {t("login.password")}
+              </label>
+              <div className="text-sm">
+                <a href="#" className="font-semibold text-primaryColor hover:text-secondaryColor">
+                  Forgot password?
+                </a>
+              </div>
+            </div>
+            <div className="mt-2">
+              <input
+                id="password"
+                name="password"
+                type="password"
+                placeholder={t("login.passwordPlaceholder")}
+                required
+                autoComplete="current-password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline focus:outline-2 focus:-outline-offset-2 focus:outline-primaryColor sm:text-sm"
+              />
+            </div>
+          </div>
 
-        <button type="submit" className="btn btn-primary">
-          {t('login.submit')}
-        </button>
-      </form>
+          {error && <p className="text-sm text-red-600">{error}</p>}
+
+          <div>
+            <button
+              type="submit"
+              className="flex w-full justify-center rounded-md bg-primaryColor px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primaryColor focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryColor"
+            >
+              {t("login.submit")}
+            </button>
+          </div>
+        </form>
+
+        <p className="mt-10 text-center text-sm text-gray-500">
+          {t("login.notMember")}{" "}
+          <a href="/register" className="font-semibold text-primaryColor hover:text-secondaryColor">
+            {t("login.registerLink")}
+          </a>
+        </p>
+      </div>
     </div>
   );
-};
-
-export default LoginPage;
+}

@@ -1,6 +1,5 @@
 import React from 'react';
 import { useParams } from 'react-router-dom';
-import './ProductPage.css';
 import ProductDetails from './ProductDetails';
 import Footer from '../Footer/Footer';
 

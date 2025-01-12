@@ -1,105 +1,86 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import Sidebar from "./PersonalFields/SideBar";
 import PersonalAreaEditor from "./PersonalFields/PersonalAreaEditor";
 import PasswordManager from "./PersonalFields/PasswordManager";
-import CartAndWishlist from "./PersonalFields/CartAndWishlist";
 import AddressManager from "./PersonalFields/AddressManager";
-import { useTranslation } from "react-i18next";
-const PersonalArea = ({ userId }) => {
-  console.log(userId);
+import CartAndWishlist from "./PersonalFields/CartAndWishlist";
 
+const PersonalArea = ({ userId }) => {
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
-  const [isEditing, setIsEditing] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentView, setCurrentView] = useState("details"); // ניווט בין תצוגות
+
+  const fetchUser = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000/User/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch user");
+      const data = await response.json();
+      setUser(data);
+    } catch (err) {
+      console.error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [userId]);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/User/${userId}`);
-        if (!response.ok) {
-          throw new Error("Failed to fetch user");
-        }
-        const data = await response.json();
-        setUser(data);
-      } catch (err) {
-        console.error(err.message);
-      }
-    };
     fetchUser();
-  }, [userId]);
+  }, [fetchUser]);
 
   const handleSave = async (updatedUser) => {
     try {
-      console.log("Updating user details:", updatedUser); // בדוק את הנתונים הנשלחים
       const response = await fetch(`http://localhost:5000/User/${userId}/edit`, {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUser), // אין צורך להכניס `updatedUser` בתוך אובייקט נוסף
+        body: JSON.stringify(updatedUser),
       });
-
-      if (!response.ok) {
-        throw new Error("Failed to update user");
-      }
-
+      if (!response.ok) throw new Error("Failed to update user");
       const updatedData = await response.json();
-      console.log("Server response:", updatedData); // בדוק את תגובת השרת
       setUser(updatedData);
-      setIsEditing(false);
     } catch (err) {
       console.error(err.message);
       alert(t("personal_area.updateFailed"));
     }
   };
 
-
-  const handleAddressUpdate = async (updatedAddresses) => {
-    try {
-      const response = await fetch(`http://localhost:5000/User/${userId}/update-addresses`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ addresses: updatedAddresses }),
-      });
-
-      if (!response.ok) {
-        throw new Error("Failed to update addresses");
-      }
-
-      const updatedUser = await response.json();
-      setUser(updatedUser);
-    } catch (err) {
-      console.error(err.message);
-      alert(t("personal_area.addressUpdateFailed"));
-    }
-  };
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="spinner-border animate-spin w-16 h-16 border-4 border-secondaryColor border-t-transparent rounded-full" role="status">
+          <span className="sr-only">{t("personal_area.loading")}</span>
+        </div>
+      </div>
+    );
+  }
 
   return user ? (
-    <div className="container mt-5">
-      <h1>{t("personal_area.welcome", { username: user.first_name })}</h1>
-      <button className="btn btn-primary mb-4" onClick={() => setIsEditing(true)}>
-        {t("personal_area.editprofile")}
-      </button>
+    <div className="bg-gray-100 min-h-screen">
+      <div className="container mx-auto py-8">
+        <div className="grid grid-cols-12 gap-6">
+          {/* Sidebar */}
+          <Sidebar currentView={currentView} onViewChange={setCurrentView} />
 
-      {isEditing && (
-        <PersonalAreaEditor
-          user={user}
-          onSave={handleSave}
-          onCancel={() => setIsEditing(false)}
-          onAddressUpdate={handleAddressUpdate}
-        />
-      )}
-
-      <AddressManager
-        addresses={user.addresses}
-        userId={userId}
-        onUpdate={handleAddressUpdate}
-      />
-
-
-      <PasswordManager userId={userId} />
-
-      <CartAndWishlist cart={user.cart} wishlist={user.wishlist} />
+          {/* Main Content */}
+          <div className="col-span-9 bg-white shadow rounded-lg p-6">
+            {currentView === "details" && (
+              <PersonalAreaEditor user={user} setUser={setUser} onSave={handleSave} />
+            )}
+            {currentView === "addresses" && <AddressManager addresses={user.addresses} />}
+            {currentView === "password" && <PasswordManager userId={userId} />}
+            {currentView === "cart" && (
+              <CartAndWishlist cart={user.cart} wishlist={user.wishlist} />
+            )}
+          </div>
+        </div>
+      </div>
     </div>
   ) : (
-    <p>{t("personal_area.loading")}</p>
+    <div className="text-center mt-6">
+      <p>{t("personal_area.loadingFailed")}</p>
+    </div>
   );
 };
 

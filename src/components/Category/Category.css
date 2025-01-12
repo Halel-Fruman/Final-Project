@@ -1,8 +1,0 @@
-.category {
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.category:hover {
-  background-color: #f8f9fa; /* צבע Bootstrap */
-}

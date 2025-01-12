@@ -132,7 +132,37 @@ const UserController = {
     } catch (error) {
       res.status(500).send('Error deleting address: ' + error.message);
     }
-  }
+  },
+
+  register: async (req, res) => {
+    const { email, password, firstName, lastName } = req.body;
+    console.log(req.body);
+
+    try {
+      // בדוק אם משתמש עם אותו אימייל כבר קיים
+      const existingUser = await User.findOne({ email });
+      if (existingUser) {
+        return res.status(400).json({ message: 'Email already exists' });
+      }
+
+      // יצירת משתמש חדש עם סיסמה מוצפנת
+      const hashedPassword = await bcrypt.hash(password, 10);
+      const newUser = new User({
+        email,
+        password: hashedPassword,
+        firstName,
+        lastName,
+        addresses: [],
+      });
+
+      await newUser.save();
+
+      res.status(201).json({ message: 'User registered successfully', userId: newUser._id });
+    } catch (error) {
+      res.status(500).json({ message: 'Error registering user: ' + error.message });
+    }
+  },
 };
+
 
 module.exports = UserController;

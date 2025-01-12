@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import AddressManager from "./AddressManager";
 
-const PersonalAreaEditor = ({ user, onSave, onCancel, onAddressUpdate }) => {
+const PersonalAreaEditor = ({ user, setUser, onSave }) => {
   const { t } = useTranslation();
+  const [isEditing, setIsEditing] = useState(false);
   const [editedUser, setEditedUser] = useState({ ...user });
 
   const handleFieldChange = (field, value) => {
@@ -11,9 +11,10 @@ const PersonalAreaEditor = ({ user, onSave, onCancel, onAddressUpdate }) => {
   };
 
   const handleSave = async () => {
-    console.log("Final user data before save:", editedUser);
     try {
       await onSave(editedUser);
+      setUser(editedUser); // עדכון נתוני המשתמש לאחר שמירה
+      setIsEditing(false); // חזרה למצב תצוגה
       alert(t("personal_area.updateSuccess"));
     } catch (err) {
       console.error(err.message);
@@ -21,55 +22,102 @@ const PersonalAreaEditor = ({ user, onSave, onCancel, onAddressUpdate }) => {
     }
   };
 
-
-
-  return (
-    <div className="container mt-5">
-      <h1 className="text-center">{t("personal_area.welcome", { username: user.first_name })}</h1>
-
-      {/* User Details */}
-      <div className="card mb-4">
-        <div className="card-body">
-          <h5>{t("personal_area.userInfo")}</h5>
-          <div className="mb-3">
-            <label>{t("personal_area.firstName")}</label>
+  if (isEditing) {
+    return (
+      <div>
+        <h2 className="text-xl font-bold mb-4">{t("personal_area.editprofile")}</h2>
+        <div className="grid grid-cols-2 gap-4">
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              {t("personal_area.firstName")}
+            </label>
             <input
               type="text"
-              className="form-control"
               value={editedUser.first_name}
               onChange={(e) => handleFieldChange("first_name", e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
             />
           </div>
-          <div className="mb-3">
-            <label>{t("personal_area.lastName")}</label>
+
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              {t("personal_area.lastName")}
+            </label>
             <input
               type="text"
-              className="form-control"
               value={editedUser.last_name}
               onChange={(e) => handleFieldChange("last_name", e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
             />
           </div>
-          <div className="mb-3">
-            <label>{t("personal_area.email")}</label>
+
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              {t("personal_area.email")}
+            </label>
             <input
               type="email"
-              className="form-control"
               value={editedUser.email}
               onChange={(e) => handleFieldChange("email", e.target.value)}
+              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
             />
           </div>
         </div>
+        <div className="flex justify-end mt-4 space-x-4">
+          <button
+            onClick={() => setIsEditing(false)}
+            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
+          >
+            {t("personal_area.cancel")}
+          </button>
+          <button
+            onClick={handleSave}
+            className="px-4 py-2 bg-secondaryColor text-white rounded hover:bg-blue-600"
+          >
+            {t("personal_area.save")}
+          </button>
+        </div>
       </div>
+    );
+  }
 
+  return (
+    <div>
+      <h2 className="text-xl font-bold mb-4">{t("personal_area.myDetails")}</h2>
+      <div className="grid grid-cols-2 gap-4">
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">
+            {t("personal_area.firstName")}
+          </label>
+          <p className="block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm px-2 py-1">
+            {user.first_name}
+          </p>
+        </div>
 
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">
+            {t("personal_area.lastName")}
+          </label>
+          <p className="block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm px-2 py-1">
+            {user.last_name}
+          </p>
+        </div>
 
-      {/* Buttons */}
-      <div className="d-flex justify-content-center">
-        <button className="btn btn-success me-3" onClick={handleSave}>
-          {t("personal_area.save")}
-        </button>
-        <button className="btn btn-secondary" onClick={onCancel}>
-          {t("personal_area.cancel")}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">
+            {t("personal_area.email")}
+          </label>
+          <p className="block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm px-2 py-1">
+            {user.email}
+          </p>
+        </div>
+      </div>
+      <div className="mt-6">
+        <button
+          onClick={() => setIsEditing(true)}
+          className="px-4 py-2 bg-secondaryColor text-white rounded hover:bg-primaryColor"
+        >
+          {t("personal_area.editprofile")}
         </button>
       </div>
     </div>

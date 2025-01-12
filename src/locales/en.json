@@ -8,11 +8,24 @@
     "home_garden": "Home & Garden",
     "beauty_health": "Beauty & Health"
   },
+  "header": {
+    "home": "Home",
+    "products": "Products",
+    "login": "Login",
+    "register": "Register",
+    "logout": "Logout",
+    "personal_area": "Personal Area",
+    "cart": "Cart",
+    "search": "Search"
+  },
   "featured_products": "Featured Products",
   "price": "Price",
   "view_details": "View Details",
   "personal_area": {
     "welcome": "Welcome, {{username}}",
+    "myAccount": "My Account",
+    "myDetails": "My Details",
+    "addressBook": "Address Book",
     "userInfo": "User Info",
     "email": "Email",
     "firstName": "First Name",
@@ -40,6 +53,7 @@
     "noItemsCart": "No items in cart",
     "yourWishlist": "Your Wishlist",
     "noItemsWishlist": "No items in wishlist",
+
     "loading": "Loading...",
     "actions": {
       "delete": "Delete",

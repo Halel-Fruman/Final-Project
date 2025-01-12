@@ -1,5 +1,4 @@
 import React from 'react';
-import './Category.css';
 
 const Category = ({ name }) => {
   return (

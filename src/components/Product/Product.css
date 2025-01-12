@@ -1,8 +1,0 @@
-/* התאמות אישיות */
-.product {
-  transition: transform 0.2s;
-}
-
-.product:hover {
-  transform: scale(1.05);
-}
