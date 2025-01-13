@@ -1,16 +1,14 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { StarIcon as SolidStarIcon } from '@heroicons/react/20/solid';
-import { StarIcon as OutlineStarIcon } from '@heroicons/react/24/outline';
+import { StarIcon as SolidStarIcon } from "@heroicons/react/20/solid";
+import { StarIcon as OutlineStarIcon } from "@heroicons/react/24/outline";
 
-
-const HomePage = ({ addToWishlist, wishlist }) => {
+const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -32,19 +30,14 @@ const HomePage = ({ addToWishlist, wishlist }) => {
   }, []);
 
   const toggleWishlist = (product) => {
-    const isInWishlist = wishlist.some((item) => item.productId && item.productId._id === product._id);
-
-    addToWishlist(product, isInWishlist); // שלח את המידע האם להוסיף או להסיר
+    const isInWishlist = wishlist.some(
+      (item) =>
+        String(item.productId?._id || item.productId) === String(product._id)
+    );
+    addToWishlist(product, isInWishlist);
   };
 
-  const categories = [
-    { id: 1, name: t("categories.electronics") },
-    { id: 2, name: t("categories.clothing") },
-    { id: 3, name: t("categories.home_garden") },
-    { id: 4, name: t("categories.beauty_health") },
-  ];
-
-  if (isLoading) {
+  if (isLoading || wishlistLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <p>{t("loading")}</p>
@@ -55,47 +48,36 @@ const HomePage = ({ addToWishlist, wishlist }) => {
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p className="text-red-600">{t("error")}: {error}</p>
+        <p className="text-red-600">
+          {t("error")}: {error}
+        </p>
       </div>
     );
   }
 
   return (
     <div className="bg-white">
-      {/* Header */}
       <header className="relative bg-secondaryColor text-white">
-        {/* Title and Subtitle */}
         <h1 className="text-xxl font text-white-200">{t("welcome")}</h1>
         <p className="mt-2 text-xl text-white-300">{t("welcome_subtitle")}</p>
       </header>
 
-      {/* Categories Section */}
       <section className="my-10 px-6 lg:px-12">
-        <h2 className="text-center text-2xl font-bold mb-6">{t("categories.title")}</h2>
-        <div className="grid grid-cols-2 gap-6 sm:grid-cols-3 lg:grid-cols-4">
-          {categories.map((category) => (
-            <div
-              key={category.id}
-              className="bg-gray-100 p-4 rounded-lg text-center shadow hover:shadow-lg transition"
-            >
-              <h5 className="text-lg font-semibold text-gray-700">{category.name}</h5>
-            </div>
-          ))}
-        </div>
-      </section>
-
-      {/* Products Section */}
-      <section className="my-10 px-6 lg:px-12">
-        <h2 className="text-center text-2xl font-bold mb-6">{t("featured_products")}</h2>
+        <h2 className="text-center text-2xl font-bold mb-6">
+          {t("featured_products")}
+        </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => {
-            const isInWishlist = wishlist.some((item) => item.productId && item.productId._id === product._id);
+            const isInWishlist = wishlist.some(
+              (item) =>
+                String(item.productId?._id || item.productId) ===
+                String(product._id)
+            );
 
             return (
               <div
                 key={product._id}
-                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition"
-              >
+                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
                 <img
                   src={product.picture}
                   alt={product.name[i18n.language]}
@@ -105,21 +87,18 @@ const HomePage = ({ addToWishlist, wishlist }) => {
                   <h3 className="text-lg font-semibold text-gray-800">
                     {product.name[i18n.language]}
                   </h3>
-                  <p className="text-secondaryColor text-xl font-bold mt-2">₪{product.price}</p>
+                  <p className="text-secondaryColor text-xl font-bold mt-2">
+                    ₪{product.price}
+                  </p>
                   <div className="mt-4 flex justify-center space-x-4">
                     <Link
                       to={`/product/${product._id}`}
-                      className="bg-secondaryColor text-white py-2 px-4 rounded hover:bg-primaryColor transition"
-                      aria-label={t("view_details", { product: product.name[i18n.language] })}
-                    >
+                      className="bg-secondaryColor text-white py-2 px-4 rounded hover:bg-primaryColor transition">
                       {t("view_details")}
                     </Link>
                     <button
                       onClick={() => toggleWishlist(product)}
-                      className="flex items-center justify-center"
-                      aria-label={isInWishlist ? t("wishlist.removeButton") : t("wishlist.addButton")}
-                    >
-
+                      className="flex items-center justify-center">
                       {isInWishlist ? (
                         <SolidStarIcon className="h-6 w-6 text-yellow-400" />
                       ) : (

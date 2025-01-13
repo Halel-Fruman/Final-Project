@@ -32,11 +32,14 @@ const PersonalArea = ({ userId }) => {
 
   const handleSave = async (updatedUser) => {
     try {
-      const response = await fetch(`http://localhost:5000/User/${userId}/edit`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedUser),
-      });
+      const response = await fetch(
+        `http://localhost:5000/User/${userId}/edit`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedUser),
+        }
+      );
       if (!response.ok) throw new Error("Failed to update user");
       const updatedData = await response.json();
       setUser(updatedData);
@@ -49,7 +52,9 @@ const PersonalArea = ({ userId }) => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="spinner-border animate-spin w-16 h-16 border-4 border-secondaryColor border-t-transparent rounded-full" role="status">
+        <div
+          className="spinner-border animate-spin w-16 h-16 border-4 border-secondaryColor border-t-transparent rounded-full"
+          role="status">
           <span className="sr-only">{t("personal_area.loading")}</span>
         </div>
       </div>
@@ -66,9 +71,15 @@ const PersonalArea = ({ userId }) => {
           {/* Main Content */}
           <div className="col-span-9 bg-white shadow rounded-lg p-6">
             {currentView === "details" && (
-              <PersonalAreaEditor user={user} setUser={setUser} onSave={handleSave} />
+              <PersonalAreaEditor
+                user={user}
+                setUser={setUser}
+                onSave={handleSave}
+              />
             )}
-            {currentView === "addresses" && <AddressManager addresses={user.addresses} />}
+            {currentView === "addresses" && (
+              <AddressManager addresses={user.addresses} />
+            )}
             {currentView === "password" && <PasswordManager userId={userId} />}
             {currentView === "cart" && (
               <CartAndWishlist cart={user.cart} wishlist={user.wishlist} />

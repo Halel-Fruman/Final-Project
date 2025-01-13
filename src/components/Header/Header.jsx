@@ -21,6 +21,7 @@ const Header = ({ onLogout, isLoggedIn }) => {
         {/* לוגו */}
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
+        <img src={logo} alt="logo-ilan-g.svg" className="h-12 w-12" />
           </Link>
         </div>
 
