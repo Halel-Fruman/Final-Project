@@ -22,7 +22,8 @@ mongoose.connect(process.env.MONGO_URI, {
 
 // User Schema & Model
 const User = require('./models/User');
-
+// Store Routes
+const storeRoutes = require('./Routes/storeRoutes'); // ייבוא הנתיבים של החנויות
 
 // Register
 app.post('/register', async (req, res) => {
@@ -67,6 +68,8 @@ app.get('/User/:id', async (req, res) => {
   }
 });
 
+// חיבור לנתיבים של החנויות
+app.use('/Stores', storeRoutes); // כל הנתיבים של החנויות יתחילו ב- /api/stores
 
 // Start Server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));

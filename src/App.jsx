@@ -1,13 +1,15 @@
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { useTranslation } from 'react-i18next';
-import HomePage from './pages/HomePage/HomePage';
-import ProductPage from './pages/ProductPage/ProductPage';
+import HomePage from './pages/HomePage/HomePage.js';
+import ProductPage from './pages/ProductPage/ProductPage.js';
 import LoginPage from './pages/PersonalArea/LoginPage.jsx';
 import PersonalArea from './pages/PersonalArea/PersonalArea.jsx';
 import CartPage from './pages/PersonalArea/CartPage.js';
-import Header from './components/Header/Header';
-import Footer from './components/Footer/Footer';
+import Header from './components/Header/Header.js';
+import Footer from './components/Footer/Footer.js';
+import SysAdmin from './pages/SysAdmin/SysAdmin.jsx';
+// import StoreManagment from './pages/StoreManagment/StoreManagment.jsx';
 import RegisterPage from './pages/Registeration/RegisterPage.jsx';
 import './App.css';
 import '@fontsource/rubik';
@@ -40,6 +42,9 @@ const App = () => {
           <Route path="/personal-area" element={token ? <PersonalArea userId={userId} /> : <Navigate to="/login" />} />
           <Route path="/cart" element={token ? <CartPage userId={userId} /> : <Navigate to="/login" />} />
           <Route path="/register" element={<RegisterPage />} />
+          {/* <Route path='/loginAdmin' element={token ? <Navigate to="/AdminPage" /> : <LoginPage setToken={setToken} setAdminId={setAdminId} />} /> */}
+          {/* <Route path='/SysAdmin' element={token ? <SysAdmin AdminId={AdminId} /> : <Navigate to="/loginAdmin" />} /> */}
+          <Route path="/SysAdmin" element={<SysAdmin />} />
 
         </Routes>
       </div>

@@ -52,6 +52,11 @@ const Header = ({ onLogout, isLoggedIn }) => {
                 </button>
               </div>
             </li>
+            <button className="btn btn-outline-primary btn-sm me-2">
+               <Link to="/SysAdmin" className="btn btn-danger btn-sm text-decoration-none">
+                Admin
+              </Link>
+            </button>
 
             {/* כפתורי התחברות/הרשמה/התנתקות */}
             {isLoggedIn ? (

@@ -27,6 +27,40 @@
     "password": "Password",
     "submit": "Register",
     "error": "An error occurred during registration, please try again"
+  
+},
+"sysadmin": {
+    "admin_management": "System Administration",
+    "stores": "Stores",
+    "store_name": "Store Name",
+    "store_address": "Store Address",
+    "managers": "Managers",
+    "manager_name": "Manager Name",
+    "manager_email": "Manager Email",
+    "actions": "Actions",
+    "add_store": "Add Store",
+    "add_manager": "+",
+    "edit_manager": "Edit Manager",
+    "save": "Save",
+    "save_managers": "Save Managers",
+    "delete": "Delete",
+    "delete_manager": "Delete Manager",
+    "statistics": "Statistics",
+    "statistics_info": "Here, statistical data about store activities will be displayed.",
+    "invalid_email" : "Invalid Email! please enter a valid email"
+  
+  
+
+    
+  },
+  "storemanage": {
+    "manage_products": "Manage Products",
+    "add_product": "Add Product",
+    "product_name": "Product Name",
+    "product_price": "Product Price",
+    "add": "Add",
+    "products": "Products",
+    "delete": "Delete"
   }
 
   }
