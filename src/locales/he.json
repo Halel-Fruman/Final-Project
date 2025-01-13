@@ -86,6 +86,7 @@
     "password": "סיסמה",
     "confirmPassword": "אשר סיסמה",
     "submit": "הרשם",
+<<<<<<< HEAD
     "success": "ההרשמה הצליחה!",
     "errors": {
       "passwordMismatch": "הסיסמאות אינן תואמות!",
@@ -118,5 +119,46 @@
     "remove": "הסר מרשימת המשאלות",
     "added": "הפריט נוסף לרשימת המשאלות",
     "removed": "הפריט הוסר מרשימת המשאלות"
+=======
+    "error": "אירעה שגיאה בהרשמה, נסה שוב"
+  },
+
+
+  
+  "sysadmin": {
+    "admin_management": "ניהול מערכת",
+    "stores": "חנויות",
+    "store_name": "שם החנות",
+    "store_address": "כתובת החנות",
+    "managers": "מנהלים",
+    "manager_name": "שם המנהל",
+    "manager_email": "אימייל של המנהל",
+    "actions": "פעולות",
+    "add_store": "הוסף חנות",
+    "add_manager": "+",
+    "save": "שמור",
+    "save_managers": "שמור מנהלים",
+    "edit_manager": "ערוך מנהלים",
+    "delete": "מחק",
+    "delete_manager": "מחק מנהל",
+    "statistics": "סטטיסטיקה",
+    "statistics_info": "כאן יוצגו נתונים סטטיסטיים על פעילות החנויות.",
+    "invalid_email" : "כתובת מייל לא חוקית! הכנס בבקשה כתובת מייל חוקית."
+
+  
+  },
+
+
+  "storemanage": {
+    "manage_products": "ניהול מוצרים",
+    "add_product": "הוסף מוצר",
+    "product_name": "שם המוצר",
+    "product_price": "מחיר המוצר",
+    "add": "הוסף",
+    "products": "מוצרים",
+    "delete": "מחק"
+  }
+
+>>>>>>> origin/main
   }
 }
