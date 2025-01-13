@@ -10,6 +10,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // טעינת המוצרים
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -30,21 +31,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   }, []);
 
   const toggleWishlist = (product) => {
-    const isInWishlist = wishlist.some(
+    const isInWishlist = wishlist?.some(
       (item) =>
         String(item.productId?._id || item.productId) === String(product._id)
     );
     addToWishlist(product, isInWishlist);
   };
 
-  if (isLoading || wishlistLoading) {
-    return (
-      <div className="flex items-center justify-center h-screen">
-        <p>{t("loading")}</p>
-      </div>
-    );
-  }
-
+  // במקרה של שגיאה
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -55,24 +49,37 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   }
 
+  // הצגת מסך הטעינה רק כאשר המוצרים עצמם נטענים
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <p>{t("loading")}</p>
+      </div>
+    );
+  }
+
   return (
     <div className="bg-white">
+      {/* Header */}
       <header className="relative bg-secondaryColor text-white">
         <h1 className="text-xxl font text-white-200">{t("welcome")}</h1>
         <p className="mt-2 text-xl text-white-300">{t("welcome_subtitle")}</p>
       </header>
 
+      {/* Products Section */}
       <section className="my-10 px-6 lg:px-12">
         <h2 className="text-center text-2xl font-bold mb-6">
           {t("featured_products")}
         </h2>
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {products.map((product) => {
-            const isInWishlist = wishlist.some(
-              (item) =>
-                String(item.productId?._id || item.productId) ===
-                String(product._id)
-            );
+            const isInWishlist = wishlistLoading
+              ? false // אם ה-wishlist עדיין בטעינה, התייחס כאילו המוצר אינו מסומן
+              : wishlist?.some(
+                  (item) =>
+                    String(item.productId?._id || item.productId) ===
+                    String(product._id)
+                );
 
             return (
               <div
