@@ -1,5 +1,7 @@
 const express = require('express');
 const UserController = require('../Controllers/userController'); // קובץ חדש לשליטה בלוגיקה של משתמשים
+const authenticateToken = require('../Middleware/authenticateToken'); // ייבוא המידלוור
+
 const router = express.Router();
 
 //  login
@@ -25,5 +27,12 @@ router.put('/:userId/update-addresses', UserController.updateAddresses);
 
 // delete address
 router.delete('/:userId/delete-address', UserController.deleteAddress);
+
+// add to wishlist
+router.post('/:userId/wishlist', UserController.addToWishlist);
+// get wishlist
+router.get('/:userId/wishlist', UserController.getWishlist);
+// remove from wishlist
+router.delete('/:userId/wishlist', UserController.removeFromWishlist);
 
 module.exports = router;

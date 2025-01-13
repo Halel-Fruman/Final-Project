@@ -162,6 +162,72 @@ const UserController = {
       res.status(500).json({ message: 'Error registering user: ' + error.message });
     }
   },
+  addToWishlist: async (req, res) => {
+    const { userId } = req.params;
+    const { productId } = req.body;
+
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ error: 'User not found' });
+
+      const alreadyInWishlist = user.wishlist.some(
+        (item) => item.productId.toString() === productId
+      );
+
+      if (alreadyInWishlist) {
+        return res.status(400).json({ error: 'Product is already in the wishlist' });
+      }
+
+      user.wishlist.push({ productId });
+      await user.save();
+
+      res.status(200).json({ wishlist: user.wishlist });
+    } catch (error) {
+      res.status(500).json({ error: 'Error adding product to wishlist: ' + error.message });
+    }
+  },
+
+
+
+getWishlist: async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId).populate({
+      path: 'wishlist.productId',
+      model:'Example_products',
+      select: 'name price picture',
+    });
+
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    res.status(200).json(user.wishlist);
+  } catch (error) {
+    res.status(500).json({ error: 'Error fetching wishlist: ' + error.message });
+  }
+},
+
+removeFromWishlist: async (req, res) => {
+  const { userId } = req.params;
+  const { productId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+
+    user.wishlist = user.wishlist.filter(
+      (item) => item.productId.toString() !== productId
+    );
+    await user.save();
+
+    res.status(200).json({ wishlist: user.wishlist });
+  } catch (error) {
+    res.status(500).json({ error: 'Error removing product from wishlist: ' + error.message });
+  }
+},
+
+
+
 };
 
 

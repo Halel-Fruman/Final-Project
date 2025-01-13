@@ -15,6 +15,7 @@ const App = () => {
   const { i18n } = useTranslation();
   const [token, setToken] = useState(localStorage.getItem('token'));
   const [userId, setUserId] = useState(localStorage.getItem('userId'));
+  const [wishlist, setWishlist] = useState([]);
 
   useEffect(() => {
     document.documentElement.dir = i18n.language === 'he' ? 'rtl' : 'ltr';
@@ -25,19 +26,72 @@ const App = () => {
     setUserId(null);
     localStorage.removeItem('token');
     localStorage.removeItem('userId');
-
   };
+
+  const addToWishlist = async (product, isInWishlist) => {
+    try {
+      const method = isInWishlist ? 'DELETE' : 'POST';
+      const response = await fetch(`http://localhost:5000/User/${userId}/wishlist`, {
+        method,
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId: product._id }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to update wishlist');
+      }
+
+      const data = await response.json();
+      setWishlist(data.wishlist);
+    } catch (error) {
+      console.error('Error updating wishlist:', error.message);
+    }
+  };
+
+
+
+  useEffect(() => {
+    const fetchWishlist = async () => {
+      try {
+        const response = await fetch(`http://localhost:5000/User/${userId}/wishlist`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
+        if (!response.ok) {
+          throw new Error('Failed to fetch wishlist');
+        }
+        const data = await response.json();
+        setWishlist(data);
+      } catch (error) {
+        console.error('Error fetching wishlist:', error.message);
+      }
+    };
+
+    if (userId && token) {
+      fetchWishlist();
+    }
+  }, [userId, token]);
+
+
+
 
   return (
     <Router>
       <Header onLogout={handleLogout} isLoggedIn={!!token} />
       <div className="app-content">
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<HomePage addToWishlist={addToWishlist} wishlist={wishlist}/>}/>
           <Route path="/product/:id" element={<ProductPage />} />
-          <Route path="/login" element={token ? <Navigate to="/" /> : <LoginPage setToken={setToken} setUserId={setUserId} />} />
-          <Route path="/register" element={<RegisterPage setToken={setToken} setUserId={setUserId} />} />
-          <Route path="/personal-area" element={token ? <PersonalArea userId={userId} /> : <Navigate to="/login" />} />
+          <Route path="/login" element={token ? <Navigate to="/" /> : <LoginPage setToken={setToken} setUserId={setUserId} />}/>
+          <Route path="/register" element={<RegisterPage setToken={setToken} setUserId={setUserId} />}/>
+          <Route
+            path="/personal-area"
+            element={token ? <PersonalArea userId={userId} wishlist={wishlist} /> : <Navigate to="/login" />}
+          />
           <Route path="/cart" element={token ? <CartPage userId={userId} /> : <Navigate to="/login" />} />
           <Route path="/add-address" element={token ? <AddAddressPage userId={userId} /> : <Navigate to="/login" />} />
         </Routes>

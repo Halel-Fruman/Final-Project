@@ -21,7 +21,6 @@ const Header = ({ onLogout, isLoggedIn }) => {
         {/* לוגו */}
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
-            <img src={logo} alt={t("siteName")} className="h-8 mr-2" />
           </Link>
         </div>
 
@@ -84,8 +83,7 @@ const Header = ({ onLogout, isLoggedIn }) => {
         <Dialog.Panel className="fixed inset-y-0 right-0 z-20 w-80 bg-gray-700 shadow-lg">
           <div className="flex items-center justify-between p-4 bg-secondaryColor">
             <Link to="/" className="flex items-center">
-              <img src={logo} alt={t("siteName")} className="h-8 mr-2" />
-              <span className="text-lg font-bold text-gray-700">{t("siteName")}</span>
+              <span className="text-lg font-bold text-gray-700"></span>
             </Link>
             <button
               onClick={() => setMobileMenuOpen(false)}
@@ -113,7 +111,7 @@ const Header = ({ onLogout, isLoggedIn }) => {
                   onClick={onLogout}
                   className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-red-500 rounded hover:bg-red-600"
                 >
-                  {t("logout")}
+                  {t()}
                 </button>
               ) : (
                 <>

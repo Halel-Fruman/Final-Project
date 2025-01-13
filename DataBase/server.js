@@ -3,6 +3,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./Routes/userRoutes');
+const productRoutes = require('./Routes/productsRoutes');
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,6 +19,8 @@ mongoose.connect(process.env.MONGO_URI)
 
 // Routes
 app.use('/User', userRoutes); // כל הנתיבים של userRoutes יתחילו ב- /User
+app.use('/Example_products', productRoutes);
+
 
 // Start Server
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
