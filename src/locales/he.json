@@ -1,31 +1,125 @@
 {
-    "welcome": "ברוכים הבאים לחנות שלי",
-    "welcome_subtitle": "מצאו את המוצרים הטובים ביותר במחירים ללא תחרות!",
-    "categories": {
-      "title": "קניות לפי קטגוריה",
-      "electronics": "אלקטרוניקה",
-      "clothing": "ביגוד",
-      "home_garden": "בית וגינה",
-      "beauty_health": "יופי ובריאות"
+  "welcome": "ברוכים הבאים לחנות איל''ן",
+  "welcome_subtitle": " אנו מזמינים אתכם להיות שותפים למטרה ולרכוש מוצרים ומתנות שמייצרים באהבה אנשים עם מוגבלות.",
+  "categories": {
+    "title": "קניות לפי קטגוריה",
+    "electronics": "אלקטרוניקה",
+    "clothing": "ביגוד",
+    "home_garden": "בית וגינה",
+    "beauty_health": "יופי ובריאות"
+  },
+  "header": {
+    "home": "בית",
+    "products": "מוצרים",
+    "login": "התחבר",
+    "register": "הרשמה",
+    "logout": "התנתק",
+    "personal_area": "אזור אישי",
+    "cart": "עגלת קניות",
+    "search": "חיפוש"
+  },
+  "featured_products": "מוצרים נבחרים",
+  "price": "מחיר",
+  "view_details": "צפה בפרטים",
+  "personal_area": {
+    "welcome": "ברוך הבא, {{username}}",
+    "userInfo": "פרטי משתמש",
+    "email": "כתובת מייל ",
+    "firstName": "שם פרטי ",
+    "lastName": "שם משפחה ",
+    "edit": "ערוך",
+    "editprofile": "ערוך פרופיל",
+    "save": "שמור",
+    "cancel": "בטל",
+    "changePassword": "שנה סיסמה",
+    "currentPassword": "סיסמה נוכחית",
+    "newPassword": "סיסמה חדשה",
+    "confirmPassword": "וידוא סיסמה",
+    "passwordMismatch": "הסיסמאות אינן תואמות",
+    "updateSuccess": "{{field}} עודכן בהצלחה",
+    "updateFailed": "שגיאה בעדכון {{field}}",
+    "yourAddresses": "הכתובות שלך",
+    "addNewAddress": "הוסף כתובת",
+    "addressAdded": "כתובת נוספה בהצלחה",
+    "addressAddFailed": "שגיאה בהוספת כתובת",
+    "addressDeleted": "כתובת נמחקה בהצלחה",
+    "addressDeleteFailed": "שגיאה במחיקת כתובת",
+    "yourCart": "עגלת הקניות שלך",
+    "productId": "מזהה מוצר",
+    "quantity": "כמות",
+    "noItemsCart": "אין פריטים בעגלה",
+    "yourWishlist": "רשימת המשאלות שלך",
+    "noItemsWishlist": "אין פריטים ברשימת המשאלות",
+    "loading": "טוען...",
+    "myDetails": "הפרטים שלי",
+    "addressBook": "הכתובות שלי",
+    "orders": "ההזמנות שלי",
+    "myAccount": "החשבון שלי",
+    "accountSettings": "הגדרות החשבון",
+    "actions": {
+      "delete": "מחק",
+      "add": "הוסף",
+      "edit": "ערוך",
+      "cancel": "בטל",
+      "save": "שמור",
+      "addAddress": "הוסף כתובת"
     },
-    "featured_products": "מוצרים נבחרים",
-    "price": "מחיר",
-    "view_details": "צפה בפרטים",
-    "personal_area":{
-      "welcome": "ברוך הבא, {{username}}",
-      "email": "דוא\"ל",
-      "yourCart": "העגלה שלך",
-      "productId": "מזהה מוצר",
-      "quantity": "כמות",
-      "yourWishlist": "רשימת המשאלות שלך",
-      "loading": "טוען..."
+    "fields": {
+      "addresses": "כתובות",
+      "password": "סיסמה",
+      "cart": "עגלה",
+      "wishlist": "רשימת משאלות"
     },
-    "register": {
+    "alerts": {
+      "passwordMismatch": "הסיסמאות אינן תואמות. אנא נסה שוב.",
+      "saveSuccess": "עודכן בהצלחה!",
+      "saveError": "שגיאה בעת שמירת השינויים.",
+      "deleteConfirm": "האם אתה בטוח שברצונך למחוק את הפריט?",
+      "noAddresses": "אין כתובות זמינות"
+    }
+  },
+  "register": {
+    "first_name": "שם פרטי",
+    "last_name": "שם משפחה",
     "title": "הרשמה",
-    "email": "דוא\"ל",
-    "username": "שם משתמש",
+    "email": "כתובת אימייל",
     "password": "סיסמה",
+    "confirmPassword": "אשר סיסמה",
     "submit": "הרשם",
+<<<<<<< HEAD
+    "success": "ההרשמה הצליחה!",
+    "errors": {
+      "passwordMismatch": "הסיסמאות אינן תואמות!",
+      "failed": "ההרשמה נכשלה."
+    }
+  },
+  "login": {
+    "title": "התחברות",
+    "email": "אימייל",
+    "password": "סיסמה",
+    "submit": "התחבר",
+    "emailPlaceholder": "הכנס את כתובת האימייל שלך",
+    "passwordPlaceholder": "הכנס את הסיסמה שלך",
+    "success": "ההתחברות הצליחה!",
+    "failed": "ההתחברות נכשלה. אנא בדוק את הפרטים."
+  },
+  "addAddress": {
+    "title": "הוספת כתובת",
+    "address": "כתובת",
+    "submit": "שלח",
+    "success": "כתובת נוספה בהצלחה!",
+    "errors": {
+      "failed": "נכשלה הוספת הכתובת."
+    }
+  },
+  "wishlist": {
+    "title": "רשימת משאלות",
+    "noItems": "אין פריטים ברשימת המשאלות",
+    "addButton": "הוסף לרשימת המשאלות",
+    "remove": "הסר מרשימת המשאלות",
+    "added": "הפריט נוסף לרשימת המשאלות",
+    "removed": "הפריט הוסר מרשימת המשאלות"
+=======
     "error": "אירעה שגיאה בהרשמה, נסה שוב"
   },
 
@@ -65,4 +159,6 @@
     "delete": "מחק"
   }
 
+>>>>>>> origin/main
   }
+}

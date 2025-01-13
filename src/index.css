@@ -1,3 +1,10 @@
+/* Ensure Tailwind CSS is installed and configured correctly */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Rubik','Segoe UI', 'Roboto', 'Oxygen',
@@ -11,3 +18,4 @@ code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
     monospace;
 }
+
