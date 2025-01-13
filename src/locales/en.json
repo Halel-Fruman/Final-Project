@@ -112,7 +112,7 @@
   },
 
     "submit": "Register",
-    "error": "An error occurred during registration, please try again"
+    "error": "An error occurred during registration, please try again",
 
 
 "sysadmin": {
@@ -147,6 +147,6 @@
     "add": "Add",
     "products": "Products",
     "delete": "Delete"
-  }
+  }}
 
 
