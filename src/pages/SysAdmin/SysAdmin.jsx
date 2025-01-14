@@ -10,7 +10,6 @@ const SysAdmin = () => {
   const [stores, setStores] = useState([]); // To store the list of stores
 
   const [editedStores, setEditedStores] = useState({});
-  const [managers, setManagers] = useState([]);
   const [editedManagers, setEditedManagers] = useState({});
   const [managerName, setManagerName] = useState('');
   const [managerEmail, setManagerEmail] = useState('');
@@ -117,38 +116,52 @@ const SysAdmin = () => {
     const invalidEmail = editedManagers[storeId]?.some(
       (mgr) => !validateEmail(mgr.emailAdrress)
     );
-
+  
     if (invalidEmail) {
       alert(t('sysadmin.invalid_email')); // הודעה אם יש מייל לא תקני
       return; // לא לשמור אם יש מייל לא תקני
     }
-
+  
+    console.log('Edited managers before saving:', editedManagers[storeId]); // לוג לפני השליחה לשרת
+  
     // עדכון בבסיס הנתונים
     axios
       .put(`http://localhost:5000/Stores/${storeId}`, {
-        manager: editedManagers[storeId],
+        managers: editedManagers[storeId], // שים לב לשם השדה 'managers'
       })
       .then((res) => {
-        setStores(stores.map((store) => (store._id === storeId ? res.data : store)));
+        console.log('Response from server:', res.data); // לוג של התגובה מהשרת
+  
+        setStores((prevStores) => {
+          const updatedStores = prevStores.map((store) =>
+            store._id === storeId ? { ...store, managers: editedManagers[storeId] } : store
+          );
+  
+          console.log('Updated stores state:', updatedStores); // לוג של הסטייט המעודכן
+          return updatedStores;
+        });
+  
         setIsEditingManagers((prev) => {
           const updated = { ...prev };
           delete updated[storeId];
           return updated;
         });
+  
         setEditedManagers((prev) => {
           const updated = { ...prev };
           delete updated[storeId];
           return updated;
         });
       })
-      .catch((err) => console.log(err));
-
+      .catch((err) => console.log('Error updating managers:', err));
+  
     setIsEditingManagers({
       ...isEditingManagers,
       [storeId]: false, // קבע שסטור זה במצב עריכה
     });
-    <window className="location reloed"></window>
   };
+  
+  
 
 
   const validateEmail = (email) => {
@@ -314,13 +327,17 @@ const SysAdmin = () => {
                           readOnly={!isEditingManagers[store._id]} // אם לא במצב עריכה, השדה יהיה readOnly
 
                         />
+                              {isEditingManagers[store._id] && ( // הצג כפתור מחיקה רק אם במצב עריכה
+
                         <button
                           className="btn btn-danger"
                           onClick={() => handleDeleteManager(store._id, index)}
                         >
                           {t('sysadmin.delete_manager')}
                         </button>
-                      </div>
+                           )}
+
+                     </div>
                     ))}
                     {isEditingManagers ? (
                       <>
