@@ -1,10 +1,9 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
-import { StarIcon as SolidStarIcon } from "@heroicons/react/20/solid";
-import { StarIcon as OutlineStarIcon } from "@heroicons/react/24/outline";
-import backgroundImage from '../../backgroung.jpg';
-
+import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
+import backgroundImage from "../../backgroung.jpg";
 
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
@@ -61,40 +60,52 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   }
 
   return (
-    <div className="bg-white">
+    <div className="bg-backGC">
       {/* Header */}
       <header
-  className="relative bg-primaryColor text-white"
-  style={{
-    backgroundImage: `url(${backgroundImage})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center",
-    height: "775px",
-  }}
->
-  {/* שכבת Overlay */}
-  <div
-    className="absolute inset-0 bg-black opacity-50"
-    style={{ mixBlendMode: "multiply" }}
-  ></div>
+        className="relative bg-primaryColor text-white"
+        style={{
+          backgroundImage: `url(${backgroundImage})`,
+          backgroundSize: "cover",
+          backgroundPosition: "center",
+          height: "700px",
+        }}>
+        {/* שכבת Overlay */}
+        <div
+          className="absolute inset-0 bg-black opacity-40"
+          style={{ mixBlendMode: "multiply" }}></div>
 
-  {/* תוכן הכותרת */}
-  <div className="relative z-10 flex flex-col items-center justify-center h-full">
-    <h1 className="text-xxl font-bold text-white">{t("welcome")}</h1>
-    <p className="mt-2 text-xl text-white">{t("welcome_subtitle")}</p>
-  </div>
-</header>
+        {/* תוכן הכותרת */}
+        <div className="relative z-10 flex flex-col items-center justify-center h-full">
+          <h1 className="text-8.5xl font-bold text-secondaryColor">
+            {t("welcome")}
+          </h1>
+          <p
+            className="mt-2 text-5xl text-secondaryColor"
+            dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
 
+          {/* כפתור גלילה */}
+          <button
+            className="mt-6 bg-white text-black py-2 px-4 rounded-lg font-bold hover:bg-gray-300 transition"
+            onClick={() => {
+              document.getElementById("products-section").scrollIntoView({
+                behavior: "smooth",
+              });
+            }}>
+            {t("view_products")}
+          </button>
+        </div>
+      </header>
 
       {/* Products Section */}
-      <section className="my-10 px-6 lg:px-12">
+      <section id="products-section" className="my-10 px-6 lg:px-12">
         <h2 className="text-center text-2xl font-bold mb-6">
           {t("featured_products")}
         </h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
           {products.map((product) => {
             const isInWishlist = wishlistLoading
-              ? false // אם ה-wishlist עדיין בטעינה, התייחס כאילו המוצר אינו מסומן
+              ? false
               : wishlist?.some(
                   (item) =>
                     String(item.productId?._id || item.productId) ===
@@ -102,44 +113,44 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                 );
 
             return (
-              <div
-                key={product._id}
-                className="bg-white shadow-md rounded-lg overflow-hidden hover:shadow-lg transition">
-                <img
-                  src={product.picture}
-                  alt={product.name[i18n.language]}
-                  className="w-full h-48 object-cover"
-                />
+              <div>
+                <div
+                  key={product._id}
+                  className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
+                  {/* כפתור Wishlist */}
+                  <button
+                    onClick={() => toggleWishlist(product)}
+                    className="absolute top-2 right-2 z-10 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100">
+                    {isInWishlist ? (
+                      <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
+                    ) : (
+                      <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
+                    )}
+                  </button>
+
+                  {/* תמונה */}
+                  <Link to={`/product/${product._id}`}>
+                    <div className="aspect-w-1 aspect-h-1 rounded-lg">
+                      <img
+                        src={product.picture}
+                        alt={product.name[i18n.language]}
+                        className="object-cover w-full h-72"
+                      />
+                    </div>
+                  </Link>
+                </div>
+                {/* פרטים */}
                 <div className="p-4 text-center">
-                  <h3 className="text-lg font-semibold text-gray-800">
+                  <h3 className="text-lg font-medium text-gray-900">
                     {product.name[i18n.language]}
                   </h3>
-                  <p className="text-secondaryColor text-xl font-bold mt-2">
-                    ₪{product.price}
-                  </p>
-                  <div className="mt-4 flex justify-center space-x-4">
-                    <Link
-                      to={`/product/${product._id}`}
-                      className="bg-secondaryColor text-white py-2 px-4 rounded hover:bg-primaryColor transition">
-                      {t("view_details")}
-                    </Link>
-                    <button
-                      onClick={() => toggleWishlist(product)}
-                      className="flex items-center justify-center">
-                      {isInWishlist ? (
-                        <SolidStarIcon className="h-6 w-6 text-yellow-400" />
-                      ) : (
-                        <OutlineStarIcon className="h-6 w-6 text-gray-400 hover:text-yellow-400" />
-                      )}
-                    </button>
-                  </div>
+                  <p className="mt-1 text-sm text-gray-500">₪{product.price}</p>
                 </div>
               </div>
             );
           })}
         </div>
       </section>
-
     </div>
   );
 };
