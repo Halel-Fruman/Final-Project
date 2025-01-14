@@ -5,7 +5,7 @@ import { StarIcon } from "@heroicons/react/20/solid";
 
 const ProductPage = () => {
   const { id } = useParams();
-  const { i18n } = useTranslation();
+  const { t, i18n } = useTranslation();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -17,7 +17,7 @@ const ProductPage = () => {
           `http://localhost:5000/Example_products/${id}`
         );
         if (!response.ok) {
-          throw new Error("Failed to fetch product details");
+          throw new Error(t("error.fetchProduct"));
         }
         const data = await response.json();
         setProduct(data);
@@ -29,12 +29,12 @@ const ProductPage = () => {
     };
 
     fetchProduct();
-  }, [id]);
+  }, [id, t]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>Loading...</p>
+        <p>{t("loading")}</p>
       </div>
     );
   }
@@ -50,72 +50,79 @@ const ProductPage = () => {
   if (!product) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <p>No product found</p>
+        <p>{t("product.notFound")}</p>
       </div>
     );
   }
 
-  const language = i18n.language; // השפה הנוכחית
-  const highlights = product.highlight[language] || [];
-  const details = product.details[language] || "";
+  const language = i18n.language;
+  const productName = product.name[language] || product.name["en"];
+  const productDetails = product.details[language] || product.details["en"];
+  const productHighlights =
+    product.highlight[language] || product.highlight["en"] || [];
+  const productPrice = product.price || t("product.noPrice");
+  const productPicture = product.picture || "https://placehold.co/300";
+  const productReview = product.review || { average: 0, totalCount: 0 };
 
   return (
     <div className="bg-gray-50">
       <div className="container mx-auto py-12">
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-12">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 items-stretch">
           {/* תמונת המוצר */}
-          <div>
+          <div className="flex">
             <img
-              src={product.picture}
-              alt={product.name[language]}
-              className="w-full h-auto rounded-lg shadow-lg"
+              src={productPicture}
+              alt={productName}
+              className="h-auto max-h-128 w-auto max-w-full rounded-lg shadow-lg"
             />
           </div>
 
           {/* פרטי המוצר */}
-          <div className="bg-white rounded-lg shadow-lg p-6">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
-              {product.name[language]}
-            </h1>
-            <p className="text-xl text-secondaryColor font-semibold mb-4">
-              ₪{product.price}
-            </p>
-            <div className="flex items-center mb-4">
-              {[...Array(5)].map((_, i) => (
-                <StarIcon
-                  key={i}
-                  className={`h-6 w-6 ${
-                    i < Math.round(product.review?.average || 0)
-                      ? "text-yellow-400"
-                      : "text-gray-300"
-                  }`}
-                />
-              ))}
-              <span className="ml-2 text-gray-600">
-                ({product.review?.totalCount || 0} reviews)
-              </span>
-            </div>
-
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Highlights
-              </h3>
-              <ul className="list-disc pl-5 text-gray-700">
-                {highlights.map((highlight, index) => (
-                  <li key={index}>{highlight}</li>
+          <div className="bg-white rounded-lg shadow-lg p-6 flex-grow  justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">
+                {productName}
+              </h1>
+              <p className="text-xl text-secondaryColor font-semibold mb-4">
+                ₪{productPrice}
+              </p>
+              <div className="flex items-center mb-4">
+                {[...Array(5)].map((_, i) => (
+                  <StarIcon
+                    key={i}
+                    className={`h-6 w-6 ${
+                      i < Math.round(productReview.average)
+                        ? "text-yellow-400"
+                        : "text-gray-300"
+                    }`}
+                  />
                 ))}
-              </ul>
-            </div>
+                <span className="ml-2 text-gray-600">
+                  ({productReview.totalCount} {t("product.reviews")})
+                </span>
+              </div>
 
-            <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                Details
-              </h3>
-              <p className="text-gray-700">{details}</p>
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {t("product.highlights")}
+                </h3>
+                <ul className="list-disc pl-5 text-gray-700">
+                  {productHighlights.map((highlight, index) => (
+                    <li key={index}>{highlight}</li>
+                  ))}
+                </ul>
+              </div>
+
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                  {t("product.details")}
+                </h3>
+                <p className="text-gray-700">{productDetails}</p>
+              </div>
             </div>
 
             <button className="w-full bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
-              Add to Cart
+              {t("product.addToCart")}
             </button>
           </div>
         </div>

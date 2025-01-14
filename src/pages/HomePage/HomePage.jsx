@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import { Link } from "react-router-dom";
 import { StarIcon as SolidStarIcon } from "@heroicons/react/20/solid";
 import { StarIcon as OutlineStarIcon } from "@heroicons/react/24/outline";
+import backgroundImage from '../../backgroung.jpg';
+
 
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
@@ -61,10 +63,28 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   return (
     <div className="bg-white">
       {/* Header */}
-      <header className="relative bg-secondaryColor text-white">
-        <h1 className="text-xxl font text-white-200">{t("welcome")}</h1>
-        <p className="mt-2 text-xl text-white-300">{t("welcome_subtitle")}</p>
-      </header>
+      <header
+  className="relative bg-primaryColor text-white"
+  style={{
+    backgroundImage: `url(${backgroundImage})`,
+    backgroundSize: "cover",
+    backgroundPosition: "center",
+    height: "775px",
+  }}
+>
+  {/* שכבת Overlay */}
+  <div
+    className="absolute inset-0 bg-black opacity-50"
+    style={{ mixBlendMode: "multiply" }}
+  ></div>
+
+  {/* תוכן הכותרת */}
+  <div className="relative z-10 flex flex-col items-center justify-center h-full">
+    <h1 className="text-xxl font-bold text-white">{t("welcome")}</h1>
+    <p className="mt-2 text-xl text-white">{t("welcome_subtitle")}</p>
+  </div>
+</header>
+
 
       {/* Products Section */}
       <section className="my-10 px-6 lg:px-12">
@@ -119,6 +139,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           })}
         </div>
       </section>
+
     </div>
   );
 };
