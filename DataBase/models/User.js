@@ -1,19 +1,18 @@
 const mongoose = require('mongoose');
 
-// User Schema
 const userSchema = new mongoose.Schema({
+  first_name: String,
+  last_name: String,
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  cart: [
+  addresses: { type: [String], default: [] },
+  cart: { type: Array, default: [] },
+  wishlist: [
     {
-      productId: String,
-      quantity: Number,
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+      addedAt: { type: Date, default: Date.now },
     },
-  ],
-  wishlist: [String],
+  ]
 });
 
-// הגדרת המודל ושם ה-collection
-const User = mongoose.model('User', userSchema, 'User');
-
-module.exports = User;
+module.exports = mongoose.model('User', userSchema,'User');

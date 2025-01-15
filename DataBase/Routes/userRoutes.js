@@ -1,31 +1,38 @@
 const express = require('express');
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const UserController = require('../Controllers/userController'); // קובץ חדש לשליטה בלוגיקה של משתמשים
+const authenticateToken = require('../Middleware/authenticateToken'); // ייבוא המידלוור
+
 const router = express.Router();
 
-const SECRET_KEY = 'your-secret-key'; // החלף במפתח סודי אמיתי
+//  login
+router.post('/login', UserController.login);
 
-// התחברות משתמש
-router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
+// register
+router.post('/register', UserController.register);
 
-  try {
-    // חיפוש המשתמש ב-collection
-    console.log('coll:', await User.find());
-    const user = await User.findOne({ email });
-    if (!user) return res.status(404).send('User not found');
+// get user
+router.get('/:userId', UserController.getUser);
 
-    // בדיקה שהסיסמה תואמת
-    const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).send('Invalid credentials');
+// edit
+router.put('/:userId/edit', UserController.editUser);
 
-    // יצירת Token
-    const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: '1h' });
-    res.status(200).json({ token, userId: user._id });
-  } catch (error) {
-    res.status(500).send('Error logging in: ' + error.message);
-  }
-});
+// change password
+router.put('/:userId/change-password', UserController.changePassword);
+
+//add address
+router.post('/:userId/add-address', UserController.addAddress);
+
+// update addresses
+router.put('/:userId/update-addresses', UserController.updateAddresses);
+
+// delete address
+router.delete('/:userId/delete-address', UserController.deleteAddress);
+
+// add to wishlist
+router.post('/:userId/wishlist', UserController.addToWishlist);
+// get wishlist
+router.get('/:userId/wishlist', UserController.getWishlist);
+// remove from wishlist
+router.delete('/:userId/wishlist', UserController.removeFromWishlist);
 
 module.exports = router;

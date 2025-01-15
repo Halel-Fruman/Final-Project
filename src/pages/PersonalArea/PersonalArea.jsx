@@ -1,61 +1,96 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from "react";
+import { useTranslation } from "react-i18next";
+import Sidebar from "./PersonalFields/SideBar";
+import PersonalAreaEditor from "./PersonalFields/PersonalAreaEditor";
+import PasswordManager from "./PersonalFields/PasswordManager";
+import AddressManager from "./PersonalFields/AddressManager";
+import CartAndWishlist from "./PersonalFields/CartAndWishlist";
 
 const PersonalArea = ({ userId }) => {
+  const { t } = useTranslation();
   const [user, setUser] = useState(null);
+  const [isLoading, setIsLoading] = useState(true);
+  const [currentView, setCurrentView] = useState("details"); // ניווט בין תצוגות
 
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const response = await fetch(`http://localhost:5000/User/${userId}`);
-        if (!response.ok) {
-          throw new Error('Failed to fetch user');
-        }
-        const data = await response.json();
-        setUser(data);
-      } catch (err) {
-        console.error(err.message);
-      }
-    };
-    fetchUser();
+  const fetchUser = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const response = await fetch(`http://localhost:5000/User/${userId}`);
+      if (!response.ok) throw new Error("Failed to fetch user");
+      const data = await response.json();
+      setUser(data);
+    } catch (err) {
+      console.error(err.message);
+    } finally {
+      setIsLoading(false);
+    }
   }, [userId]);
 
+  useEffect(() => {
+    fetchUser();
+  }, [fetchUser]);
+
+  const handleSave = async (updatedUser) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/User/${userId}/edit`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(updatedUser),
+        }
+      );
+      if (!response.ok) throw new Error("Failed to update user");
+      const updatedData = await response.json();
+      setUser(updatedData);
+    } catch (err) {
+      console.error(err.message);
+      alert(t("personal_area.updateFailed"));
+    }
+  };
+
+  if (isLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div
+          className="spinner-border animate-spin w-16 h-16 border-4 border-secondaryColor border-t-transparent rounded-full"
+          role="status">
+          <span className="sr-only">{t("personal_area.loading")}</span>
+        </div>
+      </div>
+    );
+  }
+
   return user ? (
-    <div className="container mt-5">
-      <div className="card p-4 shadow">
-        <h2 className="text-center mb-4">Personal Area</h2>
-        <p><strong>Username:</strong> {user.username}</p>
-        <p><strong>Email:</strong> {user.email}</p>
+    <div className="bg-gray-100 min-h-screen">
+      <div className="container mx-auto py-8">
+        <div className="grid grid-cols-12 gap-6">
+          {/* Sidebar */}
+          <Sidebar currentView={currentView} onViewChange={setCurrentView} />
 
-        <h3>Your Cart</h3>
-        {user.cart.length > 0 ? (
-          <ul className="list-group">
-            {user.cart.map((item, index) => (
-              <li key={index} className="list-group-item">
-                Product ID: {item.productId}, Quantity: {item.quantity}
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Your cart is empty.</p>
-        )}
-
-        <h3 className="mt-4">Your Wishlist</h3>
-        {user.wishlist.length > 0 ? (
-          <ul className="list-group">
-            {user.wishlist.map((item, index) => (
-              <li key={index} className="list-group-item">Product ID: {item}</li>
-            ))}
-          </ul>
-        ) : (
-          <p>Your wishlist is empty.</p>
-        )}
+          {/* Main Content */}
+          <div className="col-span-9 bg-white shadow rounded-lg p-6">
+            {currentView === "details" && (
+              <PersonalAreaEditor
+                user={user}
+                setUser={setUser}
+                onSave={handleSave}
+              />
+            )}
+            {currentView === "addresses" && (
+              <AddressManager addresses={user.addresses} />
+            )}
+            {currentView === "password" && <PasswordManager userId={userId} />}
+            {currentView === "cart" && (
+              <CartAndWishlist cart={user.cart} wishlist={user.wishlist} />
+            )}
+          </div>
+        </div>
       </div>
     </div>
   ) : (
-    <div className="text-center mt-5">
-      <div className="spinner-border text-primary" role="status">
-        <span className="visually-hidden">Loading...</span>
-      </div>
+    <div className="text-center mt-6">
+      <p>{t("personal_area.loadingFailed")}</p>
     </div>
   );
 };
