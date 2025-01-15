@@ -113,7 +113,13 @@
 
     "submit": "Register",
     "error": "An error occurred during registration, please try again",
-
+"product":{
+  "addToCart": "Add to Cart",
+  "noPrice": "Price not available",
+  "highlights": "Highlight",
+  "details": "Details",
+  "reviews": "Reviews"
+},
 
 "sysadmin": {
     "admin_management": "System Administration",
