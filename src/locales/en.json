@@ -125,6 +125,7 @@
     "manager_email": "Manager Email",
     "actions": "Actions",
     "add_store": "Add Store",
+    "edit_store": "Edit Store",
     "add_manager": "+",
     "edit_manager": "Edit Manager",
     "save": "Save",
@@ -133,7 +134,10 @@
     "delete_manager": "Delete Manager",
     "statistics": "Statistics",
     "statistics_info": "Here, statistical data about store activities will be displayed.",
-    "invalid_email" : "Invalid Email! please enter a valid email"
+    "invalid_email" : "Invalid Email! please enter a valid email",
+    "edit" : "Edit",
+    "cancel": "Cancel"
+
 
 
 

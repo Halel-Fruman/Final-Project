@@ -12,6 +12,7 @@ module.exports = {
       colors: {
         primaryColor: '#006a69',
         secondaryColor: '#66b2b1',
+        deleteC: '#dc3968',
       },
     },
   },

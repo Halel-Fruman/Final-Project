@@ -1,374 +1,271 @@
-import React, { useState, useEffect } from "react"; // Importing necessary React hooks
-import { useTranslation } from "react-i18next"; // Importing the translation hook for multi-language support
-import axios from "axios"; // Importing axios for making HTTP requests
+import React, { useState, useEffect } from "react";
+import { useTranslation } from "react-i18next";
+import axios from "axios";
+import { Icon } from '@iconify/react';
+
 
 const SysAdmin = () => {
-  const { t } = useTranslation(); // Initializing translation function
+  const { t } = useTranslation();
 
-  // State hooks for storing stores and new store name
-  const [stores, setStores] = useState([]); // To store the list of stores
+  const [stores, setStores] = useState([]);
+  const [selectedStore, setSelectedStore] = useState(null); // Store selected for editing
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [newStoreMode, setNewStoreMode] = useState(false); // Flag for new store mode
 
-  const [editedStores, setEditedStores] = useState({});
-  const [editedManagers, setEditedManagers] = useState({});
-  const [managerName, setManagerName] = useState("");
-  const [managerEmail, setManagerEmail] = useState("");
-  const [isEditingManagers, setIsEditingManagers] = useState(false); // מצב אם המנהלים בעריכה
-
-  // Modified new store state to include manager fields
-  const [newStore, setNewStore] = useState({
-    name: "",
-    address: "",
-    managers: [{ name: "", emailAdrress: "" }], // Initialize with one empty manager
-  });
-
-  // Fetching stores from the database using axios when the component is mounted
   useEffect(() => {
     axios
-      .get("http://localhost:5000/Stores/") // שליחה לבקשה לשלוף את החנויות
+      .get("http://localhost:5000/Stores/")
       .then((res) => {
-        console.log("Stores fetched:", res.data); // הדפס את הנתונים שהתקבלו
-        setStores(res.data); // עדכון הסטייט של החנויות
-        const managers = {};
-        res.data.forEach((store) => {
-          managers[store._id] = store.manager || [];
-        });
-        setEditedManagers(managers); // עדכון הסטייט של המנהלים
+        console.log("Stores fetched:", res.data);
+
+        // הפיכת ה-JSON למערך באמצעות Object.values
+        setStores(Object.values(res.data));
       })
-      .catch((err) => console.log(err)); // טיפול בשגיאות
-  }, []); // Empty dependency array means it runs once when the component mounts
+      .catch((err) => console.log(err));
+  }, []);
 
-  const handleFieldChange = (storeId, field, value) => {
-    setEditedStores({
-      ...editedStores,
-      [storeId]: { ...editedStores[storeId], [field]: value },
-    });
-  };
 
-  const handleSaveField = (storeId) => {
-    if (editedStores[storeId]) {
-      axios
-        .put(`http://localhost:5000/Stores/${storeId}`, editedStores[storeId])
-        .then((res) => {
-          setStores(
-            stores.map((store) => (store._id === storeId ? res.data : store))
-          );
-          setEditedStores((prev) => {
-            const updated = { ...prev };
-            delete updated[storeId];
-            return updated;
-          });
-        })
-        .catch((err) => console.log(err));
-    }
-  };
-
-  ////////////// managers area/////////////
-  const handleAddManagerField = (storeId) => {
-    setEditedManagers({
-      ...editedManagers,
-      [storeId]: [
-        ...(editedManagers[storeId] || []),
-        { name: managerName, emailAdrress: managerEmail },
-      ],
-    });
-    // הפוך את המנהל לערוך מיד לאחר ההוספה
-    setIsEditingManagers({
-      ...isEditingManagers,
-      [storeId]: true, // קבע שסטור זה במצב עריכה
-    });
-    setManagerName("");
-    setManagerEmail("");
-  };
-
-  const handleEditManagers = (storeId) => {
-    setIsEditingManagers({
-      ...isEditingManagers,
-      [storeId]: true, // הופכים את המנהלים לעריכה
-    });
-  };
-
-  const handleManagerFieldChange = (storeId, index, field, value) => {
-    if (field === "emailAdrress" && !validateEmail(value)) {
-      alert(t("sysadmin.invalid_email")); // הודעה אם המייל לא תקני
-      return; // לא לעדכן את השדה אם המייל לא תקני
-    }
-
-    const updatedManagers = [...(editedManagers[storeId] || [])];
-    updatedManagers[index][field] = value;
-    setEditedManagers({ ...editedManagers, [storeId]: updatedManagers });
-  };
-
-  const handleDeleteManager = (storeId, index) => {
-    const updatedManagers = [...(editedManagers[storeId] || [])];
-    updatedManagers.splice(index, 1);
-    setEditedManagers({ ...editedManagers, [storeId]: updatedManagers });
-  };
-
-  const handleSaveManagers = (storeId) => {
-    const invalidEmail = editedManagers[storeId]?.some(
-      (mgr) => !validateEmail(mgr.emailAdrress)
+  const handleOpenModal = (store = null) => {
+    setSelectedStore(
+      store || {
+        name: "",
+        address: "",
+        manager: [{ name: "", emailAdrress: "" }],
+      }
     );
-  
-    if (invalidEmail) {
-      alert(t("sysadmin.invalid_email")); // הודעה אם יש מייל לא תקני
-      return; // לא לשמור אם יש מייל לא תקני
-    }
-  
-    console.log('Edited managers before saving:', editedManagers[storeId]); // לוג לפני השליחה לשרת
-  
-    // עדכון בבסיס הנתונים
-    axios
-      .put(`http://localhost:5000/Stores/${storeId}`, {
-        managers: editedManagers[storeId], // שים לב לשם השדה 'managers'
-      })
-      .then((res) => {
-        setStores(
-          stores.map((store) => (store._id === storeId ? res.data : store))
-        );
-        setIsEditingManagers((prev) => {
-          const updated = { ...prev };
-          delete updated[storeId];
-          return updated;
-        });
-  
-        setEditedManagers((prev) => {
-          const updated = { ...prev };
-          delete updated[storeId];
-          return updated;
-        });
-      })
-      .catch((err) => console.log('Error updating managers:', err));
-  
-    setIsEditingManagers({
-      ...isEditingManagers,
-      [storeId]: false, // קבע שסטור זה במצב עריכה
-    });
-    <window className="location reloed"></window>;
+    setNewStoreMode(!store); // אם אין חנות נבחרת, מצב של הוספת חנות חדשה
+    setIsModalOpen(true);
   };
 
-  const validateEmail = (email) => {
-    // Regular expression for validating email format
-    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedStore(null);
+  };
+
+  const handleFieldChange = (field, value) => {
+    setSelectedStore({ ...selectedStore, [field]: value });
+  };
+
+  const handleManagerChange = (index, field, value) => {
+    const updatedManagers = [...selectedStore.manager];
+    updatedManagers[index][field] = value;
+    setSelectedStore({ ...selectedStore, manager: updatedManagers });
+  };
+
+  // פונקציה לבדוק אם המייל תקין
+  const isEmailValid = (email) => {
+    const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
     return emailPattern.test(email);
   };
 
-  //////////////////////////
+  // פונקציה לבדוק אם המייל ייחודי (לא קיים במערכת)
+  const isEmailUnique = (email, managers) => {
+    const existingEmails = managers.map((manager) => manager.emailAdrress);
+    return !existingEmails.includes(email);
+  };
 
-  // בהוספת חנות חדשה
-  const handleAddStore = () => {
-    axios
-      .post("http://localhost:5000/Stores/", {
-        name: newStore.name,
-        address: newStore.address,
-        manager: newStore.managers, // הוספת המנהלים מה-state החדש
-      })
+  // פונקציה לבדוק אם שם המנהל לא ריק
+  const isNameValid = (name) => {
+    return name.trim().length > 0;
+  };
+
+  const handleAddManager = () => {
+    setSelectedStore({
+      ...selectedStore,
+      manager: [...selectedStore.manager, { name: "", emailAdrress: "" }],
+    });
+  };
+
+  const handleSave = () => {
+    // בדיקת כל המנהלים לפני השמירה
+    const invalidManagers = selectedStore.manager.filter(
+      (manager, index, managers) =>
+        !isEmailValid(manager.emailAdrress) ||
+        !isNameValid(manager.name) ||
+        !isEmailUnique(manager.emailAdrress, managers.slice(0, index))
+    );
+
+    if (invalidManagers.length > 0) {
+      alert("יש מנהלים עם קלט לא תקין. ודא שמילאת את כל השדות בצורה נכונה.");
+      return; // עצור את הביצוע אם יש מנהלים לא תקינים
+    }
+
+    const url = newStoreMode
+      ? "http://localhost:5000/Stores/"
+      : `http://localhost:5000/Stores/${selectedStore._id}`;
+    const method = newStoreMode ? "post" : "put";
+
+    axios[method](url, selectedStore)
       .then((res) => {
-        setStores([...stores, res.data]);
-        setNewStore({
-          name: "",
-          address: "",
-          managers: [{ name: "", emailAdrress: "" }],
-        }); // לאפס את הסטייט
+        if (newStoreMode) {
+          setStores([...stores, res.data]);
+        } else {
+          setStores(
+            stores.map((store) =>
+              store._id === selectedStore._id ? res.data : store
+            )
+          );
+        }
+        handleCloseModal();
       })
       .catch((err) => console.log(err));
+  }; const handleDeleteStore = () => {
+    if (window.confirm("האם אתה בטוח שברצונך למחוק את החנות?")) {
+      axios
+        .delete(`http://localhost:5000/Stores/${selectedStore._id}`)
+        .then(() => {
+          setStores(stores.filter((store) => store._id !== selectedStore._id));
+          handleCloseModal();
+          alert("החנות נמחקה בהצלחה.");
+        })
+        .catch((err) => {
+          console.log(err);
+          alert("אירעה שגיאה בעת מחיקת החנות.");
+        });
+    }
   };
-  // Function to handle deleting a store
-  const handleDeleteStore = (storeId) => {
-    axios
-      .delete(`http://localhost:5000/Stores/${storeId}`) // HTTP DELETE request to delete the store
-      .then(() => {
-        setStores(stores.filter((store) => store._id !== storeId)); // Remove the deleted store from state
-      })
-      .catch((err) => console.log(err)); // Log any errors
+
+  const handleRemoveManager = (index) => {
+    const updatedManagers = selectedStore.manager.filter((_, i) => i !== index);
+    setSelectedStore({ ...selectedStore, manager: updatedManagers });
   };
+
 
   return (
-    <div className="sysadmin-page container">
-      <header className="bg-custom text-white text-center py-5 mb-4 rounded">
-        <h1>{t("sysadmin.admin_management")}</h1>
+    <div className="container mx-auto p-5">
+      <header className="text-center mb-8">
+        <h1 className="text-5xl text-primaryColor  font-bold">{t("sysadmin.admin_management")}</h1>
       </header>
 
-      <section className="my-5">
-        <h2 className="text-center mb-4">{t("sysadmin.stores")}</h2>
-        <div className="text-center mb-4">
-          <div className="input-group mb-3 w-50 mx-auto">
-            <input
-              type="text"
-              className="form-control"
-              value={newStore.name} // השתמש ב-name של newStore
-              onChange={(e) =>
-                setNewStore({ ...newStore, name: e.target.value })
-              } // עדכון השם של החנות
-              placeholder={t("sysadmin.store_name")}
-            />
-            <input
-              type="text"
-              className="form-control"
-              value={newStore.address} // השתמש ב-address של newStore
-              onChange={(e) =>
-                setNewStore({ ...newStore, address: e.target.value })
-              } // עדכון הכתובת של החנות
-              placeholder={t("sysadmin.store_address")}
-            />
-            {/* שדה שם המנהל */}
-            <input
-              type="text"
-              className="form-control"
-              value={newStore.managers[0].name} // השתמש ב-name של המנהל הראשון במערך managers
-              onChange={(e) =>
-                setNewStore({
-                  ...newStore,
-                  managers: [{ ...newStore.managers[0], name: e.target.value }],
-                })
-              } // עדכון שם המנהל
-              placeholder={t("sysadmin.manager_name")}
-            />
-            {/* שדה המייל של המנהל */}
-            <input
-              type="email"
-              className="form-control"
-              value={newStore.managers[0].emailAdrress} // השתמש ב-emailAdrress של המנהל הראשון במערך managers
-              onChange={(e) =>
-                setNewStore({
-                  ...newStore,
-                  managers: [
-                    { ...newStore.managers[0], emailAdrress: e.target.value },
-                  ],
-                })
-              } // עדכון המייל של המנהל
-              placeholder={t("sysadmin.manager_email")}
-            />
-          </div>
-          {/* כפתור הוסף חנות */}
-          <button className="btn btn-success" onClick={handleAddStore}>
-            {t("sysadmin.add_store")}
-          </button>
-        </div>
-        {/* // טבלת חנויות */}
+      <div className="flex justify-end mb-4">
+        <button
+          className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+          onClick={() => handleOpenModal()}
+        >
+          <Icon icon="material-symbols:add-business-outline" width="48" height="48" />        </button>
+      </div>
 
-        <div className="table-responsive">
-          <table className="table table-striped table-bordered">
-            <thead>
-              <tr>
-                <th>{t("sysadmin.store_name")}</th>
-                <th>{t("sysadmin.store_address")}</th>
-                <th>{t("sysadmin.managers")}</th>
-                <th>{t("sysadmin.actions")}</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stores.map((store) => (
-                <tr key={store._id}>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editedStores[store._id]?.name || store.name}
-                      onChange={(e) =>
-                        handleFieldChange(store._id, "name", e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    <input
-                      type="text"
-                      className="form-control"
-                      value={editedStores[store._id]?.address || store.address}
-                      onChange={(e) =>
-                        handleFieldChange(store._id, "address", e.target.value)
-                      }
-                    />
-                  </td>
-                  <td>
-                    {editedManagers[store._id]?.map((mgr, index) => (
-                      <div key={index} className="mb-2">
-                        <input
-                          type="text"
-                          className="form-control d-inline-block me-2"
-                          style={{ width: "40%" }}
-                          value={mgr.name}
-                          placeholder={t("sysadmin.manager_name")}
-                          onChange={(e) =>
-                            handleManagerFieldChange(
-                              store._id,
-                              index,
-                              "name",
-                              e.target.value
-                            )
-                          }
-                          readOnly={!isEditingManagers[store._id]} // אם לא במצב עריכה, השדה יהיה readOnly
-                        />
-                        <input
-                          type="email"
-                          className="form-control d-inline-block me-2"
-                          style={{ width: "40%" }}
-                          value={mgr.emailAdrress}
-                          placeholder={t("sysadmin.manager_email")}
-                          onChange={(e) =>
-                            handleManagerFieldChange(
-                              store._id,
-                              index,
-                              "emailAdrress",
-                              e.target.value
-                            )
-                          }
-                          readOnly={!isEditingManagers[store._id]} // אם לא במצב עריכה, השדה יהיה readOnly
-                        />
-                              {isEditingManagers[store._id] && ( // הצג כפתור מחיקה רק אם במצב עריכה
+      <table className="table-auto w-full border border-gray-300">
+        <thead>
+          <tr className="bg-primaryColor  text-white ">
+            <th className="border px-4 py-2">{t("sysadmin.store_name")}</th>
+            <th className="border px-4 py-2">{t("sysadmin.store_address")}</th>
+            <th className="border px-4 py-2">{t("sysadmin.managers")}</th>
+            <th className="border px-2 py-2">{t("sysadmin.actions")}</th>
+          </tr>
+        </thead>
+        <tbody>
+          {stores.map((store) => (
+            <tr key={store._id}>
+              <td className="border px-4 py-2">{store.name}</td>
+              <td className="border px-4 py-2">{store.address}</td>
+              <td className="border px-4 py-2">
+                {store.manager.map((mgr, index) => (
+                  <div key={index}>{mgr.name}</div>
+                ))}
+              </td>
+              <td className="border px-4 py-2">
+                <button
+                  className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+                  onClick={() => handleOpenModal(store)}
+                >
+                  <Icon icon="tabler:shopping-bag-edit" width="24" height="24" />                </button>
+              </td>
+            </tr>
+          ))}
+        </tbody>
+      </table>
 
-                        <button
-                          className="btn btn-danger"
-                          onClick={() => handleDeleteManager(store._id, index)}>
-                          {t("sysadmin.delete_manager")}
-                        </button>
-                           )}
+      {isModalOpen && (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
+          <div className="bg-white p-8 rounded shadow-lg w-1/2">
+            <h2 className="text-3xl font-bold mb-4 items-center text-center">
+              {newStoreMode ? t("sysadmin.add_store") : t("sysadmin.edit_store")}
+            </h2>
 
-                     </div>
-                    ))}
-                    {isEditingManagers ? (
-                      <>
-                        <button
-                          className="btn btn-primary mt-2"
-                          onClick={() => handleAddManagerField(store._id)}>
-                          {t("sysadmin.add_manager")}
-                        </button>
-                        <button
-                          className="btn btn-success mt-2"
-                          onClick={() => handleSaveManagers(store._id)}>
-                          {t("sysadmin.save_managers")}
-                        </button>
-                      </>
-                    ) : (
-                      <button
-                        className="btn btn-primary mt-2"
-                        onClick={() => handleEditManagers(store._id)}>
-                        {t("sysadmin.edit_manager")}
-                      </button>
-                    )}
-                  </td>
-                  <td>
-                    <button
-                      className="btn btn-success me-2"
-                      onClick={() => handleSaveField(store._id)}>
-                      {t("sysadmin.save")}
-                    </button>
-                    <button
-                      className="btn btn-danger"
-                      onClick={() => handleDeleteStore(store._id)}>
-                      {t("sysadmin.delete")}
-                    </button>
-                  </td>
-                </tr>
+            <div className="mb-4">
+              <label className="block mb-1">{t("sysadmin.store_name")}</label>
+              <input
+                type="text"
+                className="w-full border px-3 py-2"
+                value={selectedStore.name}
+                onChange={(e) => handleFieldChange("name", e.target.value)}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-1">{t("sysadmin.store_address")}</label>
+              <input
+                type="text"
+                className="w-full border px-3 py-2"
+                value={selectedStore.address}
+                onChange={(e) => handleFieldChange("address", e.target.value)}
+              />
+            </div>
+
+            <div className="mb-4">
+              <label className="block mb-1">{t("sysadmin.managers")}</label>
+              {selectedStore.manager.map((mgr, index) => (
+                <div key={index} className="flex items-center mb-2">
+                  <input
+                    type="text"
+                    placeholder={t("sysadmin.manager_name")}
+                    className="border px-3 py-2 mr-2 flex-1"
+                    value={mgr.name}
+                    onChange={(e) =>
+                      handleManagerChange(index, "name", e.target.value)
+                    }
+                  />
+                  <input
+                    type="email"
+                    placeholder={t("sysadmin.manager_email")}
+                    className="border px-3 py-2 mr-2 flex-1"
+                    value={mgr.emailAdrress}
+                    onChange={(e) =>
+                      handleManagerChange(index, "emailAdrress", e.target.value)
+                    }
+                  />
+                  <button
+                    className="bg-white text-deleteC px-2 py-2 rounded hover:bg-deleteC hover:text-white "
+                    onClick={() => handleRemoveManager(index)}
+                  >
+                    <Icon icon="material-symbols:delete-outline" width="24" height="24" />
+                  </button>
+                </div>
               ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
+              <button
+                className=" text-black px-2 py-2 rounded mt-2 flex items-center rounded hover:bg-primaryColor hover:text-white "
+                onClick={handleAddManager}
+              >
+                <Icon icon="material-symbols:add-circle-outline-rounded" width="24" height="24" />                </button>
+            </div>
+            <div className="flex justify-between items-center mt-6">
+              <button
+                className="bg-deleteC text-white px-4 py-2 border-red-500 rounded hover:bg-red-700"
+                onClick={handleDeleteStore}
+              >
+                <Icon icon="material-symbols:delete-outline" width="28" height="28" />
+              </button>
 
-      <section className="my-5">
-        <h2 className="text-center mb-4">{t("sysadmin.statistics")}</h2>
-        <div className="alert alert-info">{t("sysadmin.statistics_info")}</div>
-      </section>
+              <div className="flex justify-end">
+                <button
+                  className="bg-white text-gray-600 px-2 py-2 border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 "
+                  onClick={handleCloseModal}
+                >
+                  <Icon icon="material-symbols:cancel-outline-rounded" width="36" height="36" />
+                </button>
+                <button
+                  className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded mr-2 rounded hover:bg-primaryColor hover:text-gray-300 "
+                  onClick={handleSave}
+                >
+                  <Icon icon="material-symbols:check-circle-outline-rounded" width="36" height="36" />
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      )}
     </div>
   );
 };
