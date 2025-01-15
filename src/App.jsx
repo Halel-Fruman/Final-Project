@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -14,7 +13,7 @@ import PersonalArea from "./pages/PersonalArea/PersonalArea.jsx";
 import CartPage from "./pages/PersonalArea/CartPage.js";
 import RegisterPage from "./pages/Registeration/RegisterPage.jsx";
 import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
-import SysAdmin from './pages/SysAdmin/SysAdmin.jsx';
+import SysAdmin from "./pages/SysAdmin/SysAdmin.jsx";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 
@@ -25,10 +24,12 @@ const App = () => {
   const [wishlist, setWishlist] = useState([]);
   const [wishlistLoading, setWishlistLoading] = useState(true);
 
+  // מתאימה את כיוון השפה
   useEffect(() => {
     document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
   }, [i18n.language]);
 
+  // פונקציית יציאה
   const handleLogout = () => {
     setToken(null);
     setUserId(null);
@@ -36,9 +37,16 @@ const App = () => {
     localStorage.removeItem("userId");
   };
 
-  const fetchWishlist = async () => {
+  // פונקציית טעינת Wishlist
+  const fetchWishlist = useCallback(async () => {
     setWishlistLoading(true);
     try {
+      if (!userId || !token) {
+        setWishlist([]);
+        setWishlistLoading(false);
+        return;
+      }
+
       const response = await fetch(
         `http://localhost:5000/User/${userId}/wishlist`,
         {
@@ -58,8 +66,9 @@ const App = () => {
     } finally {
       setWishlistLoading(false);
     }
-  };
+  }, [userId, token]);
 
+  // הוספה או הסרה מ-Wishlist
   const addToWishlist = async (product, isInWishlist) => {
     try {
       const method = isInWishlist ? "DELETE" : "POST";
@@ -81,20 +90,16 @@ const App = () => {
         );
       }
 
-      await fetchWishlist(); // עדכן את ה-wishlist מיד לאחר הפעולה
+      await fetchWishlist(); // עדכון הרשימה לאחר שינוי
     } catch (error) {
       console.error("Error updating wishlist:", error.message);
     }
   };
 
+  // טוען את ה-Wishlist לאחר התחברות המשתמש
   useEffect(() => {
-    if (userId && token) {
-      fetchWishlist();
-    } else {
-      setWishlist([]);
-      setWishlistLoading(false);
-    }
-  }, [userId, token]);
+    fetchWishlist();
+  }, [fetchWishlist]);
 
   return (
     <Router>
@@ -111,7 +116,12 @@ const App = () => {
               />
             }
           />
-          <Route path="/product/:id" element={<ProductPage />} />
+          <Route
+            path="/product/:id"
+            element={
+              <ProductPage addToWishlist={addToWishlist} wishlist={wishlist} />
+            }
+          />
           <Route
             path="/login"
             element={
@@ -126,8 +136,7 @@ const App = () => {
             path="/register"
             element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
           />
-                    <Route path="/SysAdmin" element={<SysAdmin />} />
-
+          <Route path="/SysAdmin" element={<SysAdmin />} />
           <Route
             path="/personal-area"
             element={

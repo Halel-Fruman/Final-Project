@@ -2,8 +2,10 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
+import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
+import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 
-const ProductPage = () => {
+const ProductPage = ({ addToWishlist, wishlist }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation(); // שימוש ב-i18n וב-t לצורך תרגום
   const [product, setProduct] = useState(null);
@@ -30,6 +32,14 @@ const ProductPage = () => {
 
     fetchProduct();
   }, [id, t]);
+
+  const toggleWishlist = () => {
+    const isInWishlist = wishlist?.some(
+      (item) => String(item.productId._id || item.productId) === String(product._id)
+    );
+
+    addToWishlist(product, isInWishlist);
+  };
 
   if (isLoading) {
     return (
@@ -63,6 +73,10 @@ const ProductPage = () => {
   const productPrice = product.price || t("product.noPrice");
   const productPicture = product.picture || "https://placehold.co/300";
   const productReview = product.review || { average: 0, totalCount: 0 };
+  const isInWishlist = wishlist?.find(
+    (item) => String(item.productId._id || item.productId) === String(product._id)
+  );
+  console.log(wishlist);
 
   return (
     <div className="bg-gray-50">
@@ -119,9 +133,23 @@ const ProductPage = () => {
               <p className="text-gray-700">{productDetails}</p>
             </div>
 
-            <button className="w-full bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
-              {t("product.addToCart")}
-            </button>
+            <div className="flex gap-4">
+              {/* כפתור הוספה לסל */}
+              <button className="w-1/2 bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
+                {t("product.addToCart")}
+              </button>
+
+              {/* כפתור Wishlist */}
+              <button
+                onClick={toggleWishlist}
+                className="bg-white p-2 rounded-full shadow-lg  hover:bg-gray-100 transition">
+                {isInWishlist ? (
+                      <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
+                ) : (
+                      <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
+                )}
+              </button>
+            </div>
           </div>
         </div>
       </div>
