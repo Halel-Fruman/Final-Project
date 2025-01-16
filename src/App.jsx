@@ -97,6 +97,8 @@ const App = () => {
             element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
           />
           <Route path="/SysAdmin" element={<SysAdmin />} />
+          <Route path="/store-management" element={<StoreManagement />} />
+
           <Route
             path="/personal-area"
             element={
