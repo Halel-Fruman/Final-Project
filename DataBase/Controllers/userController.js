@@ -83,6 +83,8 @@ const UserController = {
   addAddress: async (req, res) => {
     const { userId } = req.params;
     const { address } = req.body;
+    console.log("params", req.params);
+    console.log("body", req.body);
 
     try {
       const user = await User.findById(userId);

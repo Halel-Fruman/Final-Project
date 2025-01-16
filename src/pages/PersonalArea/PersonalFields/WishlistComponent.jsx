@@ -1,12 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Icon } from '@iconify/react';
+import { Icon } from "@iconify/react";
 
-const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart }) => {
+const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart, refreshWishlist }) => {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -35,9 +34,16 @@ const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart }) => {
     if (wishlist?.length > 0) {
       fetchProducts();
     } else {
+      setProducts([]); // אם הווישליסט ריק, נעדכן את הרשימה ל-[]
       setIsLoading(false);
     }
   }, [wishlist]);
+
+  const handleRemoveFromWishlist = async (product) => {
+    await removeFromWishlist(product,true); // מסיר את המוצר
+    console.log("product._id1",product._id);
+    refreshWishlist(); // טוען מחדש את הווישליסט
+  };
 
   if (isLoading) {
     return <p>{t("loading")}</p>;
@@ -55,16 +61,16 @@ const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart }) => {
       <p className="text-center text-gray-600 mb-6">
         {t("wishlist.subtitle", { count: products.length })}
       </p>
-      <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg">
+      <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg table-fixed">
         <thead className="bg-gray-100">
           <tr>
-            <th className="p-4 text-left border-b border-gray-200">
+            <th className="p-4 text-center border-b border-gray-200">
               {t("wishlist.productName")}
             </th>
-            <th className="p-4 text-left border-b border-gray-200">
+            <th className="p-4 text-center border-b border-gray-200">
               {t("wishlist.unitPrice")}
             </th>
-            <th className="p-4 text-left border-b border-gray-200">
+            <th className="p-4 text-center border-b border-gray-200">
               {t("wishlist.stockStatus")}
             </th>
             <th className="p-4 text-center border-b border-gray-200">
@@ -75,27 +81,24 @@ const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart }) => {
         <tbody>
           {products.map((product) => (
             <tr key={product._id} className="hover:bg-gray-50">
-              <td className="p-4 flex items-center">
+              <td className="p-4 flex items-center ">
                 <img
                   src={product.picture || "https://placehold.co/50"}
                   alt={
                     product.name[i18n.language] || t("product.nameUnavailable")
                   }
-                  className="w-12 h-12 rounded-full mr-4"
+                  className="w-12 h-12 rounded-full ml-2"
                 />
-                <span>{product.name[i18n.language]}</span>
+                <span className="text-gray-700">
+                  {product.name[i18n.language]}
+                </span>
               </td>
-              <td className="p-4">
-                {product.oldPrice && (
-                  <span className="line-through text-gray-400 mr-2">
-                    ₪{product.oldPrice}
-                  </span>
-                )}
+              <td className="p-4 text-center">
                 <span className="font-semibold text-primaryColor">
                   ₪{product.price}
                 </span>
               </td>
-              <td className="p-4 text-gray-700">
+              <td className="p-4 text-center text-gray-700">
                 {product.inStock
                   ? t("wishlist.inStock")
                   : t("wishlist.outOfStock")}
@@ -103,14 +106,22 @@ const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart }) => {
               <td className="p-4 text-center flex justify-center items-center space-x-2">
                 <button
                   onClick={() => addToCart(product._id)}
-                  className="bg-blue-500 text-white py-2 px-4 rounded hover:bg-blue-600 transition">
-                  {t("wishlist.addToCart")}
+                  className="bg-secondaryColor text-gray-100 py-2 px-2 ml-2 rounded-full shadow-lg hover:bg-primaryColor transition">
+                  <Icon
+                    icon="material-symbols:add-shopping-cart-rounded"
+                    width="24"
+                    height="24"
+                  />{" "}
                 </button>
                 <button
-                  onClick={() => removeFromWishlist(product._id)}
-                  className="bg-red-500 text-white p-2 rounded-full hover:bg-red-600 transition">
-                    <Icon icon="material-symbols:delete-outline" width="24" height="24" />
-                    </button>
+                  onClick={() => handleRemoveFromWishlist(product)}
+                  className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white">
+                  <Icon
+                    icon="material-symbols:delete-outline"
+                    width="24"
+                    height="24"
+                  />
+                </button>
               </td>
             </tr>
           ))}

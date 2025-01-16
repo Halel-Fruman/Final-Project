@@ -16,6 +16,7 @@ import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import SysAdmin from "./pages/SysAdmin/SysAdmin.jsx";
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
+import { fetchWishlist, updateWishlist } from "./utils/Wishlist"; // ייבוא הפונקציות
 
 const App = () => {
   const { i18n } = useTranslation();
@@ -29,81 +30,36 @@ const App = () => {
     document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
   }, [i18n.language]);
 
-  // פונקציית יציאה
-  const handleLogout = () => {
-    setToken(null);
-    setUserId(null);
-    localStorage.removeItem("token");
-    localStorage.removeItem("userId");
-  };
-
   // פונקציית טעינת Wishlist
-  const fetchWishlist = useCallback(async () => {
+  const loadWishlist = useCallback(async () => {
     setWishlistLoading(true);
-    try {
-      if (!userId || !token) {
-        setWishlist([]);
-        setWishlistLoading(false);
-        return;
-      }
-
-      const response = await fetch(
-        `http://localhost:5000/User/${userId}/wishlist`,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to fetch wishlist");
-      }
-      const data = await response.json();
-      setWishlist(Array.isArray(data) ? data : []);
-    } catch (error) {
-      console.error("Error fetching wishlist:", error.message);
+    if (!userId || !token) {
       setWishlist([]);
-    } finally {
       setWishlistLoading(false);
+      return;
     }
+
+    const data = await fetchWishlist(userId, token);
+    setWishlist(data);
+    setWishlistLoading(false);
   }, [userId, token]);
 
-  // הוספה או הסרה מ-Wishlist
+  // פונקציית עדכון Wishlist
   const addToWishlist = async (product, isInWishlist) => {
-    try {
-      const method = isInWishlist ? "DELETE" : "POST";
-      const response = await fetch(
-        `http://localhost:5000/User/${userId}/wishlist`,
-        {
-          method,
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({ productId: product._id }),
-        }
-      );
-
-      if (!response.ok) {
-        throw new Error(
-          `Failed to ${isInWishlist ? "remove from" : "add to"} wishlist`
-        );
-      }
-
-      await fetchWishlist(); // עדכון הרשימה לאחר שינוי
-    } catch (error) {
-      console.error("Error updating wishlist:", error.message);
+    const success = await updateWishlist(userId, token, product, isInWishlist);
+    if (success) {
+      loadWishlist(); // עדכון הרשימה לאחר השינוי
     }
   };
 
   // טוען את ה-Wishlist לאחר התחברות המשתמש
   useEffect(() => {
-    fetchWishlist();
-  }, [fetchWishlist]);
+    loadWishlist();
+  }, [loadWishlist]);
 
   return (
     <Router>
-      <Header onLogout={handleLogout} isLoggedIn={!!token} />
+      <Header onLogout={() => setToken(null)} isLoggedIn={!!token} />
       <div className="app-content">
         <Routes>
           <Route
@@ -141,7 +97,11 @@ const App = () => {
             path="/personal-area"
             element={
               token ? (
-                <PersonalArea userId={userId} wishlist={wishlist} />
+                <PersonalArea
+                  userId={userId}
+                  addToWishlist={addToWishlist}
+                  wishlist={wishlist}
+                />
               ) : (
                 <Navigate to="/login" />
               )

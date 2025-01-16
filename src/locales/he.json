@@ -7,7 +7,9 @@
     "clothing": "ביגוד",
     "home_garden": "בית וגינה",
     "beauty_health": "יופי ובריאות"
+
   },
+  "loading": "טוען...",
   "view_products": "צפה במוצרים",
   "header": {
     "home": "בית",
@@ -56,6 +58,8 @@
     "addressBook": "הכתובות שלי",
     "orders": "ההזמנות שלי",
     "myAccount": "החשבון שלי",
+    "passwordManagement": "ניהול סיסמה",
+    "Wishlist": "רשימת המשאלות שלי",
     "accountSettings": "הגדרות החשבון",
     "actions": {
       "delete": "מחק",
@@ -109,17 +113,30 @@
     "submit": "שלח",
     "success": "כתובת נוספה בהצלחה!",
     "errors": {
-      "failed": "נכשלה הוספת הכתובת."
+      "failed": "נכשלה הוספת הכתובת.",
+      "deleteSuccess": "הכתובת נמחקה בהצלחה!",
+      "deleteError": "שגיאה במחיקת הכתובת.",
+      "addressAdded": "כתובת נוספה בהצלחה!",
+      "addError": "שגיאה בהוספת כתובת",
+      "updateError": "שגיאה בעדכון כתובת",
+      "updateSuccess": "כתובת עודכנה בהצלחה!",
+      "noAddresses": "אין כתובות זמינות"
+
     }
   },
   "wishlist": {
-    "title": "רשימת משאלות",
-    "noItems": "אין פריטים ברשימת המשאלות",
-    "addButton": "הוסף לרשימת המשאלות",
-    "remove": "הסר מרשימת המשאלות",
-    "added": "הפריט נוסף לרשימת המשאלות",
-    "removed": "הפריט הוסר מרשימת המשאלות",
-    "error": "אירעה שגיאה בהרשמה, נסה שוב"
+    "title": "רשימת המשאלות שלך",
+    "subtitle": "יש לך {{count}} פריטים ברשימת המשאלות שלך",
+    "productName": "שם המוצר",
+    "unitPrice": "מחיר יחידה",
+    "stockStatus": "סטטוס מלאי",
+    "actions": "פעולות",
+    "addToCart": "הוסף לעגלת הקניות",
+    "remove": "הסר",
+    "inStock": "במלאי",
+    "outOfStock": "אין במלאי",
+    "empty": "רשימת המשאלות שלך ריקה",
+    "loading": "טוען את רשימת המשאלות שלך..."
   },
   "product": {
     "addToCart": "הוסף לעגלת הקניות",

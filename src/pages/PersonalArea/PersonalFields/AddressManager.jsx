@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Icon } from "@iconify/react";
 
 const AddressManager = ({ addresses, userId, onUpdate }) => {
   const { t } = useTranslation();
@@ -10,11 +11,14 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
 
   const handleAddAddress = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/User/${userId}/add-address`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address: newAddress }),
-      });
+      const response = await fetch(
+        `http://localhost:5000/User/${userId}/add-address`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ address: newAddress }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(t("personal_area.alerts.addError"));
@@ -33,11 +37,17 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
 
   const handleEditAddress = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/User/${userId}/edit`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ field: `addresses.${editingIndex}`, value: editingValue }),
-      });
+      const response = await fetch(
+        `http://localhost:5000/User/${userId}/edit`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            field: `addresses.${editingIndex}`,
+            value: editingValue,
+          }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(t("personal_area.alerts.updateError"));
@@ -56,11 +66,14 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
 
   const handleDeleteAddress = async (index) => {
     try {
-      const response = await fetch(`http://localhost:5000/User/${userId}/delete-address`, {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ index }),
-      });
+      const response = await fetch(
+        `http://localhost:5000/User/${userId}/delete-address`,
+        {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ index }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error(t("personal_area.alerts.deleteError"));
@@ -79,7 +92,9 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
     <div className="mb-4">
       <div className="card">
         <div className="card-body">
-          <h5>{t("personal_area.fields.addresses")}</h5>
+          <h5 className="text-xl font-bold mb-4">
+            {t("personal_area.fields.addresses")}
+          </h5>
           {addresses?.length > 0 ? (
             addresses.map((address, index) => (
               <div key={index} className="card mb-3 p-2">
@@ -94,34 +109,32 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
                       />
                       <button
                         className="btn btn-success btn-sm me-2"
-                        onClick={handleEditAddress}
-                      >
+                        onClick={handleEditAddress}>
                         {t("personal_area.actions.save")}
                       </button>
                       <button
                         className="btn btn-secondary btn-sm"
-                        onClick={() => setEditingIndex(null)}
-                      >
+                        onClick={() => setEditingIndex(null)}>
                         {t("personal_area.actions.cancel")}
                       </button>
                     </>
                   ) : (
                     <>
-                      <span>{address}</span>
+                      <span className="w-1/3 block rounded-md border-2 border-gray-300 bg-gray-100 shadow-sm px-2 py-1">
+                        {address}
+                      </span>
                       <div>
                         <button
                           className="btn btn-primary btn-sm me-2"
                           onClick={() => {
                             setEditingIndex(index);
                             setEditingValue(address);
-                          }}
-                        >
+                          }}>
                           {t("personal_area.actions.edit")}
                         </button>
                         <button
                           className="btn btn-danger btn-sm"
-                          onClick={() => handleDeleteAddress(index)}
-                        >
+                          onClick={() => handleDeleteAddress(index)}>
                           {t("personal_area.actions.delete")}
                         </button>
                       </div>
@@ -142,22 +155,34 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
                 value={newAddress}
                 onChange={(e) => setNewAddress(e.target.value)}
               />
-              <button className="btn btn-success me-2" onClick={handleAddAddress}>
-                {t("personal_area.actions.add")}
-              </button>
               <button
-                className="btn btn-secondary"
-                onClick={() => setShowAddAddress(false)}
-              >
-                {t("personal_area.actions.cancel")}
+                className="btn btn-success me-2"
+                onClick={handleAddAddress}
+                aria-label={t("personal_area.actions.add")}>
+                                    <Icon icon="material-symbols:check-circle-outline-rounded" width="36" height="36" />
+
+                </button>
+              <button
+                className="bg-white text-gray-600  border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full "
+                aria-label={t("personal_area.actions.cancel")}
+                onClick={() => setShowAddAddress(false)}>
+                <Icon
+                  icon="material-symbols:cancel-outline-rounded"
+                  width="36"
+                  height="36"
+                />
               </button>
             </div>
           ) : (
             <button
-              className="btn btn-primary mt-3"
-              onClick={() => setShowAddAddress(true)}
-            >
-              {t("personal_area.actions.add")}
+              className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+              aria-label={t("personal_area.actions.add")}
+              onClick={() => setShowAddAddress(true)}>
+              <Icon
+                icon="material-symbols:add-home-outline-rounded"
+                width="36"
+                height="36"
+              />
             </button>
           )}
         </div>

@@ -15,7 +15,8 @@ module.exports = {
         secondaryColor: '#009D9C',
         textColor: '#333333',
         backGC: '#f6eee0',
-        boxesC:'#f2dbd0'
+        boxesC:'#f2dbd0',
+        deleteC: '#dc3968',
       },
       maxHeight: {
         '112': '28rem', // לדוגמה, מידה חדשה בגובה 448px
@@ -38,8 +39,7 @@ module.exports = {
         '128': '32rem', // לדוגמה, מידה חדשה ברוחב 512px
         '144': '36rem', // לדוגמה, מידה חדשה ברוחב 576px
         '176': '44rem', // לדוגמה, מידה חדשה ברוחב 704px
-        secondaryColor: '#66b2b1',
-        deleteC: '#dc3968',
+
       },
     },
   },

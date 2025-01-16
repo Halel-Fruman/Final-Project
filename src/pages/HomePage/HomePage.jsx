@@ -62,7 +62,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   return (
     <div className="bg-backGC">
       {/* Header */}
-      <header
+      <section
         className="relative bg-primaryColor text-white"
         style={{
           backgroundImage: `url(${backgroundImage})`,
@@ -77,10 +77,11 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
         {/* תוכן הכותרת */}
         <div className="relative z-10 flex flex-col items-center justify-center h-full">
-          <h1 className="text-8.5xl font-bold text-secondaryColor">
+          <h1 id="welcome" className="text-8.5xl font-bold text-secondaryColor">
             {t("welcome")}
           </h1>
           <p
+            id="welcome-subtitle"
             className="mt-2 text-5xl text-secondaryColor"
             dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
 
@@ -95,10 +96,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             {t("view_products")}
           </button>
         </div>
-      </header>
+      </section>
 
       {/* Products Section */}
-      <section id="products-section" className="my-10 px-6 lg:px-12">
+      <main id="products-section" className="my-10 px-6 lg:px-12">
         <h2 className="text-center text-2xl font-bold mb-6">
           {t("featured_products")}
         </h2>
@@ -114,12 +115,17 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
             return (
               <div>
-                <div
+                <article
                   key={product._id}
                   className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
                   {/* כפתור Wishlist */}
                   <button
                     onClick={() => toggleWishlist(product)}
+                    title={
+                      isInWishlist
+                        ? t("remove_from_wishlist")
+                        : t("add_to_wishlist")
+                    }
                     className="absolute top-2 right-2 z-10 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100">
                     {isInWishlist ? (
                       <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
@@ -138,7 +144,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                       />
                     </div>
                   </Link>
-                </div>
+                </article>
                 {/* פרטים */}
                 <div className="p-4 text-center">
                   <h3 className="text-lg font-medium text-gray-900">
@@ -150,7 +156,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             );
           })}
         </div>
-      </section>
+      </main>
     </div>
   );
 };
