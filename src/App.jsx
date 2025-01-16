@@ -15,8 +15,12 @@ import CartPage from "./pages/PersonalArea/CartPage.js";
 import RegisterPage from "./pages/Registeration/RegisterPage.jsx";
 import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import SysAdmin from './pages/SysAdmin/SysAdmin.jsx';
+import StoreManagement from './pages/StoreManagement/StoreManagement.jsx'
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
+import { AlertProvider } from './components/AlertDialog.jsx';
+
+
 
 const App = () => {
   const { i18n } = useTranslation();
@@ -97,68 +101,78 @@ const App = () => {
   }, [userId, token]);
 
   return (
-    <Router>
-      <Header onLogout={handleLogout} isLoggedIn={!!token} />
-      <div className="app-content">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                addToWishlist={addToWishlist}
-                wishlist={wishlist}
-                wishlistLoading={wishlistLoading}
-              />
-            }
-          />
-          <Route path="/product/:id" element={<ProductPage />} />
-          <Route
-            path="/login"
-            element={
-              token ? (
-                <Navigate to="/" />
-              ) : (
-                <LoginPage setToken={setToken} setUserId={setUserId} />
-              )
-            }
-          />
-          <Route
-            path="/register"
-            element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
-          />
-                    <Route path="/SysAdmin" element={<SysAdmin />} />
+    <AlertProvider >
 
-          <Route
-            path="/personal-area"
-            element={
-              token ? (
-                <PersonalArea userId={userId} wishlist={wishlist} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-          <Route
-            path="/cart"
-            element={
-              token ? <CartPage userId={userId} /> : <Navigate to="/login" />
-            }
-          />
-          <Route
-            path="/add-address"
-            element={
-              token ? (
-                <AddAddressPage userId={userId} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-        </Routes>
-      </div>
-      <Footer />
-    </Router>
+      <Router>
+        <Header onLogout={handleLogout} isLoggedIn={!!token} />
+        <div className="app-content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  addToWishlist={addToWishlist}
+                  wishlist={wishlist}
+                  wishlistLoading={wishlistLoading}
+                />
+              }
+            />
+            <Route path="/product/:id" element={<ProductPage />} />
+            <Route
+              path="/login"
+              element={
+                token ? (
+                  <Navigate to="/" />
+                ) : (
+                  <LoginPage setToken={setToken} setUserId={setUserId} />
+                )
+              }
+            />
+            <Route
+              path="/register"
+              element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
+            />
+            <Route path="/SysAdmin" element={<SysAdmin />} />
+
+            <Route
+              path="/personal-area"
+              element={
+                token ? (
+                  <PersonalArea userId={userId} wishlist={wishlist} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route path="/store-management" element={<StoreManagement />} />
+
+            <Route
+              path="/cart"
+              element={
+                token ? <CartPage userId={userId} /> : <Navigate to="/login" />
+              }
+            />
+            <Route
+              path="/add-address"
+              element={
+                token ? (
+                  <AddAddressPage userId={userId} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+          </Routes>
+        </div>
+        <Footer />
+      </Router>
+    </AlertProvider>
+
   );
 };
+
+
+
+
 
 export default App;

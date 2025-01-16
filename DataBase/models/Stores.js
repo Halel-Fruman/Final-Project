@@ -10,13 +10,17 @@ const storeSchema = new mongoose.Schema({
       type: String,
       required: true,
     },
+    email: {
+      type: String,
+      required: true,
+    },
     manager: [
       {
         name: {
           type: String,
           required: true,
         },
-        emailAdrress: {
+        emailAddress: {
           type: String,
           required: true,
           match: /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}/, // אימות כתובת מייל

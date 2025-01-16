@@ -136,7 +136,11 @@
     "statistics_info": "Here, statistical data about store activities will be displayed.",
     "invalid_email" : "Invalid Email! please enter a valid email",
     "edit" : "Edit",
-    "cancel": "Cancel"
+    "cancel": "Cancel",
+
+
+
+    "store_email": "Store Email"
 
 
 

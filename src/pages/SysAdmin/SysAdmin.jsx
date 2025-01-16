@@ -2,15 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { Icon } from '@iconify/react';
+import { useAlert } from '../../components/AlertDialog.jsx';
 
 
-const SysAdmin = () => {
+const SysAdmin = () => { 
   const { t } = useTranslation();
 
   const [stores, setStores] = useState([]);
   const [selectedStore, setSelectedStore] = useState(null); // Store selected for editing
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStoreMode, setNewStoreMode] = useState(false); // Flag for new store mode
+  const { showAlert } = useAlert();
 
   useEffect(() => {
     axios
@@ -22,6 +24,8 @@ const SysAdmin = () => {
         setStores(Object.values(res.data));
       })
       .catch((err) => console.log(err));
+    showAlert("אירעה שגיאה בשרת, אנא נסה שנית.", "error");
+
   }, []);
 
 
@@ -30,7 +34,8 @@ const SysAdmin = () => {
       store || {
         name: "",
         address: "",
-        manager: [{ name: "", emailAdrress: "" }],
+        email: "",
+        manager: [{ name: "", emailAddress: "" }],
       }
     );
     setNewStoreMode(!store); // אם אין חנות נבחרת, מצב של הוספת חנות חדשה
@@ -60,7 +65,7 @@ const SysAdmin = () => {
 
   // פונקציה לבדוק אם המייל ייחודי (לא קיים במערכת)
   const isEmailUnique = (email, managers) => {
-    const existingEmails = managers.map((manager) => manager.emailAdrress);
+    const existingEmails = managers.map((manager) => manager.emailAddress);
     return !existingEmails.includes(email);
   };
 
@@ -68,28 +73,68 @@ const SysAdmin = () => {
   const isNameValid = (name) => {
     return name.trim().length > 0;
   };
+  const isStoreNameValid = (name) => {
+    const hebrewPattern = /^[\u0590-\u05FFa-zA-Z0-9\s-]+$/; // תומך בעברית, אנגלית, מספרים ומקפים
+    return name.trim().length > 0 && hebrewPattern.test(name);
+  };
+
+  const isStoreNameUnique = (name, stores, currentStoreId = null) => {
+    const normalizedNewName = name.trim().normalize("NFKC");
+
+    return !stores.some(store =>
+      store._id !== currentStoreId &&  // מתעלם מהחנות הנוכחית בעריכה
+      store.name.trim().normalize("NFKC") === normalizedNewName
+    );
+  };
+
+  const isAddressValid = (address) => address.trim().length > 0;
+
+
+
 
   const handleAddManager = () => {
     setSelectedStore({
       ...selectedStore,
-      manager: [...selectedStore.manager, { name: "", emailAdrress: "" }],
+      manager: [...selectedStore.manager, { name: "", emailAddress: "" }],
     });
   };
 
   const handleSave = () => {
-    // בדיקת כל המנהלים לפני השמירה
+    if (!isStoreNameValid(selectedStore.name)) {
+      showAlert("שם החנות לא יכול להיות ריק.", "error");
+      return;
+    }
+
+    // בדיקת ייחודיות שם החנות רק כאשר מוסיפים חנות חדשה
+    if (!isStoreNameUnique(selectedStore.name, stores, selectedStore._id)) {
+      showAlert("שם החנות כבר קיים במערכת. בחר שם אחר.", "error");
+      return;
+    }
+
+    // בדיקת כתובת החנות
+    if (!isAddressValid(selectedStore.address)) {
+      showAlert("כתובת החנות לא יכולה להיות ריקה.", "error");
+      return;
+    }
+
+    if (!isEmailValid(selectedStore.email)) {
+      showAlert("כתובת המייל של החנות אינה תקינה.", "error");
+      return;
+    }
+    // בדיקה שכל המנהלים תקינים
     const invalidManagers = selectedStore.manager.filter(
       (manager, index, managers) =>
-        !isEmailValid(manager.emailAdrress) ||
+        !isEmailValid(manager.emailAddress) ||
         !isNameValid(manager.name) ||
-        !isEmailUnique(manager.emailAdrress, managers.slice(0, index))
+        !isEmailUnique(manager.emailAddress, managers.slice(0, index))
     );
 
     if (invalidManagers.length > 0) {
-      alert("יש מנהלים עם קלט לא תקין. ודא שמילאת את כל השדות בצורה נכונה.");
-      return; // עצור את הביצוע אם יש מנהלים לא תקינים
+      showAlert("יש מנהלים עם קלט לא תקין. ודא שמילאת את כל השדות בצורה נכונה.", "error");
+      return;
     }
 
+    // הגדרת URL ושיטת הבקשה לפי מצב (חדש או עריכה)
     const url = newStoreMode
       ? "http://localhost:5000/Stores/"
       : `http://localhost:5000/Stores/${selectedStore._id}`;
@@ -98,36 +143,55 @@ const SysAdmin = () => {
     axios[method](url, selectedStore)
       .then((res) => {
         if (newStoreMode) {
-          setStores([...stores, res.data]);
+          setStores([...stores, res.data]); // הוספת חנות חדשה
+          showAlert("החנות נוספה בהצלחה!", "success");  // הודעת הצלחה
+
         } else {
-          setStores(
-            stores.map((store) =>
-              store._id === selectedStore._id ? res.data : store
-            )
-          );
+          setStores(stores.map((store) =>
+            store._id === selectedStore._id ? res.data : store
+          ));
+          showAlert("החנות עודכנה בהצלחה!", "success");  // הודעת הצלחה לעדכון
+
         }
         handleCloseModal();
       })
-      .catch((err) => console.log(err));
-  }; const handleDeleteStore = () => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק את החנות?")) {
-      axios
-        .delete(`http://localhost:5000/Stores/${selectedStore._id}`)
-        .then(() => {
-          setStores(stores.filter((store) => store._id !== selectedStore._id));
-          handleCloseModal();
-          alert("החנות נמחקה בהצלחה.");
-        })
-        .catch((err) => {
-          console.log(err);
-          alert("אירעה שגיאה בעת מחיקת החנות.");
-        });
-    }
+      .catch((err) => {
+        console.log(err)
+        showAlert("אירעה שגיאה בעת שמירת החנות.", "error");  // הודעת שגיאה
+
+      });
+
+  };
+
+
+  const handleDeleteStore = () => {
+    showAlert("האם אתה בטוח שברצונך למחוק את החנות?",
+
+      "warning",
+      () => {
+        axios
+          .delete(`http://localhost:5000/Stores/${selectedStore._id}`)
+          .then(() => {
+            setStores(stores.filter((store) => store._id !== selectedStore._id));
+            handleCloseModal();
+            showAlert(" החנות נמחקה בהצלחה!", "success");
+          })
+          .catch((err) => {
+            console.log(err);
+            showAlert(" אירעה שגיאה בעת מחיקת החנות.", "error");
+          });
+      }
+    );
   };
 
   const handleRemoveManager = (index) => {
-    const updatedManagers = selectedStore.manager.filter((_, i) => i !== index);
-    setSelectedStore({ ...selectedStore, manager: updatedManagers });
+    showAlert("האם אתה בטוח שברצונך למחוק את המנהל?",
+
+      "warning",
+      () => {
+        const updatedManagers = selectedStore.manager.filter((_, i) => i !== index);
+        setSelectedStore({ ...selectedStore, manager: updatedManagers });
+      });
   };
 
 
@@ -150,6 +214,7 @@ const SysAdmin = () => {
           <tr className="bg-primaryColor  text-white ">
             <th className="border px-4 py-2">{t("sysadmin.store_name")}</th>
             <th className="border px-4 py-2">{t("sysadmin.store_address")}</th>
+            <th className="border px-4 py-2">{t("sysadmin.store_email")}</th>
             <th className="border px-4 py-2">{t("sysadmin.managers")}</th>
             <th className="border px-2 py-2">{t("sysadmin.actions")}</th>
           </tr>
@@ -159,6 +224,7 @@ const SysAdmin = () => {
             <tr key={store._id}>
               <td className="border px-4 py-2">{store.name}</td>
               <td className="border px-4 py-2">{store.address}</td>
+              <td className="border px-4 py-2">{store.email}</td>
               <td className="border px-4 py-2">
                 {store.manager.map((mgr, index) => (
                   <div key={index}>{mgr.name}</div>
@@ -202,6 +268,15 @@ const SysAdmin = () => {
                 onChange={(e) => handleFieldChange("address", e.target.value)}
               />
             </div>
+            <div className="mb-4">
+              <label className="block mb-1">{t("sysadmin.store_email")}</label>
+              <input
+                type="email"
+                className="w-full border px-3 py-2"
+                value={selectedStore.email}
+                onChange={(e) => handleFieldChange("email", e.target.value)}
+              />
+            </div>
 
             <div className="mb-4">
               <label className="block mb-1">{t("sysadmin.managers")}</label>
@@ -220,9 +295,9 @@ const SysAdmin = () => {
                     type="email"
                     placeholder={t("sysadmin.manager_email")}
                     className="border px-3 py-2 mr-2 flex-1"
-                    value={mgr.emailAdrress}
+                    value={mgr.emailAddress}
                     onChange={(e) =>
-                      handleManagerChange(index, "emailAdrress", e.target.value)
+                      handleManagerChange(index, "emailAddress", e.target.value)
                     }
                   />
                   <button
@@ -240,12 +315,14 @@ const SysAdmin = () => {
                 <Icon icon="material-symbols:add-circle-outline-rounded" width="24" height="24" />                </button>
             </div>
             <div className="flex justify-between items-center mt-6">
-              <button
-                className="bg-deleteC text-white px-4 py-2 border-red-500 rounded hover:bg-red-700"
-                onClick={handleDeleteStore}
-              >
-                <Icon icon="material-symbols:delete-outline" width="28" height="28" />
-              </button>
+              {!newStoreMode && (
+                <button
+                  className="bg-deleteC text-white px-4 py-2 border-red-500 rounded hover:bg-red-700"
+                  onClick={handleDeleteStore}
+                >
+                  <Icon icon="material-symbols:delete-outline" width="28" height="28" />
+                </button>
+              )}
 
               <div className="flex justify-end">
                 <button
