@@ -4,9 +4,9 @@ import Sidebar from "./PersonalFields/SideBar";
 import PersonalAreaEditor from "./PersonalFields/PersonalAreaEditor";
 import PasswordManager from "./PersonalFields/PasswordManager";
 import AddressManager from "./PersonalFields/AddressManager";
-import CartAndWishlist from "./PersonalFields/CartAndWishlist";
+import WishlistComponent from "./PersonalFields/WishlistComponent";
 
-const PersonalArea = ({ userId }) => {
+const PersonalArea = ({ userId, addToWishlist }) => {
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -78,11 +78,15 @@ const PersonalArea = ({ userId }) => {
               />
             )}
             {currentView === "addresses" && (
-              <AddressManager addresses={user.addresses} />
+              <AddressManager addresses={user.addresses} userId={userId}  onUpdate={handleSave} />
             )}
             {currentView === "password" && <PasswordManager userId={userId} />}
             {currentView === "cart" && (
-              <CartAndWishlist cart={user.cart} wishlist={user.wishlist} />
+              <WishlistComponent
+                wishlist={user.wishlist}
+                removeFromWishlist={addToWishlist}
+                refreshWishlist={fetchUser}
+              />
             )}
           </div>
         </div>
