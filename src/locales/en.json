@@ -110,6 +110,20 @@
       "failed": "Failed to add the address."
     }
   },
+  "wishlist": {
+    "title": "Your Favorite Items",
+    "subtitle": "There are {{count}} products in this list",
+    "productName": "Product Name",
+    "unitPrice": "Unit Price",
+    "stockStatus": "Stock Status",
+    "actions": "Action",
+    "addToCart": "Add to Cart",
+    "remove": "Remove",
+    "inStock": "In Stock",
+    "outOfStock": "Out of Stock",
+    "empty": "Your wishlist is empty",
+    "loading": "Loading your wishlist..."
+  },
 
     "submit": "Register",
     "error": "An error occurred during registration, please try again",

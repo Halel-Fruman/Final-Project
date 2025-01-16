@@ -38,7 +38,7 @@ const Sidebar = ({ currentView, onViewChange }) => {
           }`}
           onClick={() => onViewChange("cart")}
         >
-          {t("personal_area.cartAndWishlist")}
+          {t("personal_area.Wishlist")}
         </li>
       </ul>
     </div>

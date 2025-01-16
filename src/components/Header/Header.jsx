@@ -38,6 +38,7 @@ const Header = ({ onLogout, isLoggedIn }) => {
           {isLoggedIn ? (
             <button
               onClick={onLogout}
+              title={t("header.logout")}
               className="text-sm font-medium text-gray-700  hover:text-gray-800">
               <Icon icon="mdi-light:logout" width="24" height="24" />
             </button>

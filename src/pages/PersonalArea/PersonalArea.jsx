@@ -4,10 +4,9 @@ import Sidebar from "./PersonalFields/SideBar";
 import PersonalAreaEditor from "./PersonalFields/PersonalAreaEditor";
 import PasswordManager from "./PersonalFields/PasswordManager";
 import AddressManager from "./PersonalFields/AddressManager";
-import CartAndWishlist from "./PersonalFields/CartAndWishlist";
 import WishlistComponent from "./PersonalFields/WishlistComponent";
 
-const PersonalArea = ({ userId }) => {
+const PersonalArea = ({ userId, addToWishlist }) => {
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -50,29 +49,6 @@ const PersonalArea = ({ userId }) => {
     }
   };
 
-  const removeFromWishlist = async (productId) => {
-    try {
-      const response = await fetch(
-        `http://localhost:5000/User/${userId}/wishlist/${productId}`,
-        {
-          method: "DELETE",
-          headers: {
-          },
-        }
-      );
-      if (!response.ok) {
-        throw new Error("Failed to remove product from wishlist");
-      }
-      const updatedWishlist = await response.json();
-      setUser((prevUser) => ({
-        ...prevUser,
-        wishlist: updatedWishlist,
-      }));
-    } catch (err) {
-      console.error("Error removing product:", err.message);
-    }
-  };
-
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -102,13 +78,14 @@ const PersonalArea = ({ userId }) => {
               />
             )}
             {currentView === "addresses" && (
-              <AddressManager addresses={user.addresses} />
+              <AddressManager addresses={user.addresses} userId={userId}  onUpdate={handleSave} />
             )}
             {currentView === "password" && <PasswordManager userId={userId} />}
             {currentView === "cart" && (
               <WishlistComponent
                 wishlist={user.wishlist}
-                removeFromWishlist={removeFromWishlist}
+                removeFromWishlist={addToWishlist}
+                refreshWishlist={fetchUser}
               />
             )}
           </div>

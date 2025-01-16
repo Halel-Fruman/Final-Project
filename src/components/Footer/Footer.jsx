@@ -85,7 +85,7 @@ const Footer = () => {
         </div>
 
         <div className="g-grid mt-8 text-center">
-          <p className="text-gray-600 text-sm">
+          <p className="text-black text-sm">
             © {new Date().getFullYear()} עמותת איל"ן. כל הזכויות שמורות.
           </p>
         </div>
