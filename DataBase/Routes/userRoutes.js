@@ -9,6 +9,9 @@ router.post('/login', UserController.login);
 
 // register
 router.post('/register', UserController.register);
+// verify token
+router.get("/verify-token", UserController.verifyToken);
+
 
 // get user
 router.get('/:userId', authenticateToken,UserController.getUser);
@@ -42,8 +45,6 @@ router.get("/:userId/cart", UserController.getCart);
 router.put("/:userId/cart", UserController.updateCartQuantity);
 // remove from cart
 router.delete("/:userId/cart", UserController.removeFromCart);
-// verify token
-router.get("/verify-token", UserController.verifyToken);
 
 
 

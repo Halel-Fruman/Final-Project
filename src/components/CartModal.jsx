@@ -13,9 +13,12 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
         const detailedCart = await Promise.all(
           Array.isArray(cartItems)
             ? cartItems.map(async (item) => {
-                // השתמש רק במזהה `_id`
-                console.log("productId:", item.productId._id); // בדוק את הערך
-                const productDetails = await fetchProductDetails(item.productId._id);
+                const productId = item.productId?._id || item.productId;
+                if (!productId) {
+                  console.warn("Skipping item with undefined productId:", item);
+                  return null; // התעלם מפריטים עם productId לא מוגדר
+                }
+                const productDetails = await fetchProductDetails(productId);
                 return {
                   ...item,
                   ...productDetails,
@@ -23,11 +26,13 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
               })
             : []
         );
-        setDetailedCartItems(detailedCart);
+
+        setDetailedCartItems(detailedCart.filter((item) => item !== null));
       } catch (error) {
         console.error("Error loading cart details:", error.message);
       }
     };
+
 
 
 
@@ -112,14 +117,14 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
                   {t("cart.shipping")}
                 </p>
                 <div className="mt-6">
-                  <button className="w-full bg-indigo-600 text-white py-2 px-4 rounded-md shadow hover:bg-indigo-700">
+                  <button className="w-full bg-secondaryColor text-white py-2 px-4 rounded-md shadow hover:bg-primaryColor">
                     {t("cart.checkout")}
                   </button>
                 </div>
                 <div className="mt-6 text-sm text-center text-gray-500">
                   <button
                     onClick={onClose}
-                    className="font-medium text-indigo-600 hover:text-indigo-500">
+                    className="font-medium text-primaryColor hover:text-secondaryColor">
                     {t("cart.continueShopping")} &rarr;
                   </button>
                 </div>

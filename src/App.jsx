@@ -20,7 +20,7 @@ import {
   fetchCart,
   saveCart,
   addToCart,
-  removeFromCart as removeFromCartHelper,
+  removeFromCart,
   fetchProductDetails,
 } from "./utils/Cart";
 import { fetchWishlist, updateWishlist } from "./utils/Wishlist";
@@ -47,7 +47,7 @@ const App = () => {
 
     if (storedToken && storedUserId) {
       try {
-        const response = await fetch("http://localhost:5000/verify-token", {
+        const response = await fetch("http://localhost:5000/User/verify-token", {
           headers: {
             Authorization: `Bearer ${storedToken}`,
           },
@@ -65,12 +65,26 @@ const App = () => {
       }
     }
   };
+  useEffect(() => {
+    verifyToken();
+  }, []);
+
 
   const handleOpenCart = () => setIsCartOpen(true);
   const handleCloseCart = () => setIsCartOpen(false);
 
-  const handleRemoveFromCart = (id) => {
-    setCartItems((prev) => removeFromCartHelper(prev, id));
+  const loadCart = useCallback(async () => {
+    if (userId && token) {
+      const data = await fetchCart(userId, token);
+      setCartItems(data);
+    }
+  }, [userId, token]);
+
+  const handleRemoveFromCart = async (productId) => {
+    const updatedCart = await removeFromCart(userId, token, productId);
+    if (updatedCart) {
+      setCartItems(updatedCart);
+    }
   };
 
   const handleAddToCart = async (product) => {
@@ -97,12 +111,7 @@ const App = () => {
     setWishlistLoading(false);
   }, [userId, token]);
 
-  const loadCart = useCallback(async () => {
-    if (userId && token) {
-      const data = await fetchCart(userId, token);
-      setCartItems(data);
-    }
-  }, [userId, token]);
+
 
   useEffect(() => {
     verifyToken();

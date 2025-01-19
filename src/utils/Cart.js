@@ -82,6 +82,7 @@ export const fetchCart = async (userId, token) => {
 
   // הסרת פריט מהעגלה
   export const removeFromCart = async (userId, token, productId) => {
+    console.log("Removing product from cart:", { productId });
     try {
       const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
         method: "DELETE",
@@ -113,16 +114,21 @@ export const fetchCart = async (userId, token) => {
   };
 
   export const fetchProductDetails = async (productId) => {
+    if (!productId) {
+      console.error("fetchProductDetails called with undefined productId");
+      return null;
+    }
+
     try {
       const response = await fetch(`http://localhost:5000/Example_products/${productId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch product details.");
       }
-      const data = await response.json();
-      return data;
+      return await response.json();
     } catch (error) {
       console.error("Error fetching product details:", error.message);
       return null;
     }
   };
+
 
