@@ -6,7 +6,7 @@ import PasswordManager from "./PersonalFields/PasswordManager";
 import AddressManager from "./PersonalFields/AddressManager";
 import WishlistComponent from "./PersonalFields/WishlistComponent";
 
-const PersonalArea = ({ userId, addToWishlist }) => {
+const PersonalArea = ({ userId, addToWishlist,addToCart }) => {
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -86,6 +86,7 @@ const PersonalArea = ({ userId, addToWishlist }) => {
                 wishlist={user.wishlist}
                 removeFromWishlist={addToWishlist}
                 refreshWishlist={fetchUser}
+                addToCart={addToCart}
               />
             )}
           </div>

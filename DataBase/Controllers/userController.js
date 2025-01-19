@@ -232,13 +232,95 @@ const UserController = {
 
       res.status(200).json({ wishlist: user.wishlist });
     } catch (error) {
-      res
-        .status(500)
-        .json({
-          error: "Error removing product from wishlist: " + error.message,
-        });
+      res.status(500).json({
+        error: "Error removing product from wishlist: " + error.message,
+      });
     }
   },
+
+
+  addToCart: async (req, res) => {
+    const { userId } = req.params;
+    const { productId } = req.body;
+
+    try {
+        const user = await User.findById(userId);
+        if (!user) return res.status(404).json({ error: "User not found" });
+
+        let existingItem = user.cart.find(
+            (item) => item.productId.toString() === productId
+        );
+
+        if (existingItem) {
+            // אם המוצר כבר קיים, עדכן את הכמות
+            existingItem.quantity += 1;
+        } else {
+            // אחרת, הוסף מוצר חדש לעגלה
+            user.cart.push({ productId, quantity: 1 });
+        }
+
+        await user.save();
+
+        res.status(200).json(user.cart);
+    } catch (error) {
+        res.status(500).json({ error: "Error adding product to cart: " + error.message });
+    }
+},
+
+
+  removeFromCart: async (req, res) => {
+  const { userId } = req.params;
+  const { productId } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.cart = user.cart.filter(
+      (item) => item.productId.toString() !== productId
+    );
+    await user.save();
+
+    res.status(200).json(user.cart);
+  } catch (error) {
+    res.status(500).json({ error: "Error removing product from cart: " + error.message });
+  }
+},
+getCart: async (req, res) => {
+  const { userId } = req.params;
+
+  try {
+    const user = await User.findById(userId).populate({
+      path: "cart.productId",
+      model: "Example_products",
+      select: "name price picture",
+    });
+
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    res.status(200).json(user.cart);
+  } catch (error) {
+    res.status(500).json({ error: "Error fetching cart: " + error.message });
+  }
+},
+
+
+updateCartQuantity: async (req, res) => {
+  const { userId } = req.params;
+  const { cartItems } = req.body;
+
+  try {
+    const user = await User.findById(userId);
+    if (!user) return res.status(404).json({ error: "User not found" });
+
+    user.cart = cartItems; // עדכון עגלה חדשה לחלוטין
+    await user.save();
+
+    res.status(200).json(user.cart);
+  } catch (error) {
+    res.status(500).json({ error: "Error updating cart: " + error.message });
+  }
+},
 };
 
 module.exports = UserController;

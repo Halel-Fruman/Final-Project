@@ -9,6 +9,8 @@
     "beauty_health": "יופי ובריאות"
 
   },
+  "add_to_wishlist ":"הוסף לרשימת המשאלות",
+  "remove_from_wishlist": "הסר מרשימת המשאלות",
   "loading": "טוען...",
   "view_products": "צפה במוצרים",
   "header": {
@@ -178,5 +180,23 @@
     "add": "הוסף",
     "products": "מוצרים",
     "delete": "מחק"
+  },
+
+    "cart": {
+    "title": "עגלת קניות",
+    "close": "סגור",
+    "price": "מחיר",
+    "quantity": "כמות",
+    "remove": "הסר",
+    "empty": "העגלה שלך ריקה.",
+    "subtotal": "סכום ביניים",
+    "shipping": "משלוח ומסים יחושבו בתשלום.",
+    "checkout": "לקופה",
+    "continueShopping": "המשך בקניות"
   }
+
+
+
+
+
 }

@@ -69,14 +69,15 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           backgroundSize: "cover",
           backgroundPosition: "center",
           height: "700px",
-        }}>
+        }}
+        >
         {/* שכבת Overlay */}
         <div
           className="absolute inset-0 bg-black opacity-40"
           style={{ mixBlendMode: "multiply" }}></div>
 
         {/* תוכן הכותרת */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full">
+        <div className="relative z-9 flex flex-col items-center justify-center h-full">
           <h1 id="welcome" className="text-8.5xl font-bold text-secondaryColor">
             {t("welcome")}
           </h1>

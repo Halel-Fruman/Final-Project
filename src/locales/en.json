@@ -171,6 +171,25 @@
     "add": "Add",
     "products": "Products",
     "delete": "Delete"
-  }}
+  },
+
+
+    "cart": {
+      "title": "Shopping Cart",
+      "close": "Close",
+      "price": "Price",
+      "quantity": "Quantity",
+      "remove": "Remove",
+      "empty": "Your cart is empty.",
+      "subtotal": "Subtotal",
+      "shipping": "Shipping and taxes calculated at checkout.",
+      "checkout": "Checkout",
+      "continueShopping": "Continue Shopping"
+    }
+
+
+
+
+}
 
 
