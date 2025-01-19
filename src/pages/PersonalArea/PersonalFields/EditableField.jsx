@@ -6,11 +6,17 @@ const EditableField = ({ title, field, value, userId, onSave }) => {
 
   const handleSave = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/User/${userId}/edit`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ field, value: newValue }),
-      });
+      const response = await fetch(
+        `http://localhost:5000/User/${userId}/edit`,
+        {
+          method: "PUT",
+          headers: {
+            Authorization: `Bearer ${token}`, // הוסף את ה-token לכותרות
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ field, value: newValue }),
+        }
+      );
 
       if (!response.ok) {
         throw new Error("Failed to update field");

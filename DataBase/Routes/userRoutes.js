@@ -11,29 +11,29 @@ router.post('/login', UserController.login);
 router.post('/register', UserController.register);
 
 // get user
-router.get('/:userId', UserController.getUser);
+router.get('/:userId', authenticateToken,UserController.getUser);
 
 // edit
-router.put('/:userId/edit', UserController.editUser);
+router.put('/:userId/edit',authenticateToken, UserController.editUser);
 
 // change password
-router.put('/:userId/change-password', UserController.changePassword);
+router.put('/:userId/change-password',authenticateToken, UserController.changePassword);
 
 //add address
-router.post('/:userId/add-address', UserController.addAddress);
+router.post('/:userId/add-address',authenticateToken, UserController.addAddress);
 
 // update addresses
-router.put('/:userId/update-addresses', UserController.updateAddresses);
+router.put('/:userId/update-addresses',authenticateToken, UserController.updateAddresses);
 
 // delete address
-router.delete('/:userId/delete-address', UserController.deleteAddress);
+router.delete('/:userId/delete-address',authenticateToken, UserController.deleteAddress);
 
 // add to wishlist
-router.post('/:userId/wishlist', UserController.addToWishlist);
+router.post('/:userId/wishlist',authenticateToken ,UserController.addToWishlist);
 // get wishlist
-router.get('/:userId/wishlist', UserController.getWishlist);
+router.get('/:userId/wishlist',authenticateToken, UserController.getWishlist);
 // remove from wishlist
-router.delete('/:userId/wishlist', UserController.removeFromWishlist);
+router.delete('/:userId/wishlist',authenticateToken, UserController.removeFromWishlist);
 // add to cart
 router.post("/:userId/cart", UserController.addToCart);
 // get cart
@@ -42,6 +42,9 @@ router.get("/:userId/cart", UserController.getCart);
 router.put("/:userId/cart", UserController.updateCartQuantity);
 // remove from cart
 router.delete("/:userId/cart", UserController.removeFromCart);
+// verify token
+router.get("/verify-token", UserController.verifyToken);
+
 
 
 module.exports = router;

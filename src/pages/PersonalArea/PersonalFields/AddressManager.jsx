@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-const AddressManager = ({ addresses, userId, onUpdate }) => {
+const AddressManager = ({ addresses, userId, onUpdate,token }) => {
   const { t } = useTranslation();
   const [newAddress, setNewAddress] = useState("");
   const [showAddAddress, setShowAddAddress] = useState(false);
@@ -15,7 +15,10 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
         `http://localhost:5000/User/${userId}/add-address`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ address: newAddress }),
         }
       );
@@ -41,7 +44,10 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
         `http://localhost:5000/User/${userId}/edit`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             field: `addresses.${editingIndex}`,
             value: editingValue,
@@ -70,7 +76,10 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
         `http://localhost:5000/User/${userId}/delete-address`,
         {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`, // הוסף את ה-token לכותרות
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ index }),
         }
       );

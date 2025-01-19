@@ -34,6 +34,38 @@ const App = () => {
   const [cartItems, setCartItems] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
 
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    setToken(null);
+    setUserId(null);
+  };
+
+  const verifyToken = async () => {
+    const storedToken = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
+
+    if (storedToken && storedUserId) {
+      try {
+        const response = await fetch("http://localhost:5000/verify-token", {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        if (response.ok) {
+          setToken(storedToken);
+          setUserId(storedUserId);
+        } else {
+          handleLogout();
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        handleLogout();
+      }
+    }
+  };
+
   const handleOpenCart = () => setIsCartOpen(true);
   const handleCloseCart = () => setIsCartOpen(false);
 
@@ -44,17 +76,14 @@ const App = () => {
   const handleAddToCart = async (product) => {
     const updatedCart = await addToCart(userId, token, product);
     if (updatedCart) {
-      setCartItems(updatedCart); // רק אם יש עגלה מעודכנת
-
+      setCartItems(updatedCart);
     }
   };
 
-  // מתאימה את כיוון השפה
   useEffect(() => {
     document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
   }, [i18n.language]);
 
-  // פונקציית טעינת Wishlist
   const loadWishlist = useCallback(async () => {
     setWishlistLoading(true);
     if (!userId || !token) {
@@ -68,7 +97,6 @@ const App = () => {
     setWishlistLoading(false);
   }, [userId, token]);
 
-  // פונקציית טעינת עגלה
   const loadCart = useCallback(async () => {
     if (userId && token) {
       const data = await fetchCart(userId, token);
@@ -76,24 +104,21 @@ const App = () => {
     }
   }, [userId, token]);
 
-  // // שומר את העגלה בדאטה בייס
-  // useEffect(() => {
-  //   if (userId && token) {
-  //     saveCart(userId, token, cartItems);
-  //     console.log("cartItemsSaved:", cartItems);
-  //   }
-  // }, [cartItems, userId, token]);
-
-  // טוען את ה-Wishlist לאחר התחברות המשתמש
   useEffect(() => {
-    loadCart();
-    loadWishlist();
-  }, [loadWishlist, loadCart]);
+    verifyToken();
+  }, []);
+
+  useEffect(() => {
+    if (token && userId) {
+      loadCart();
+      loadWishlist();
+    }
+  }, [token, userId, loadWishlist, loadCart]);
 
   const addToWishlist = async (product, isInWishlist) => {
     const success = await updateWishlist(userId, token, product, isInWishlist);
     if (success) {
-      loadWishlist(); // עדכון הרשימה לאחר השינוי
+      loadWishlist();
     }
   };
 
@@ -101,7 +126,7 @@ const App = () => {
     <Router>
       <Header
         onCartClick={handleOpenCart}
-        onLogout={() => setToken(null)}
+        onLogout={handleLogout}
         isLoggedIn={!!token}
       />
       <CartModal
@@ -158,6 +183,7 @@ const App = () => {
                   userId={userId}
                   addToWishlist={addToWishlist}
                   wishlist={wishlist}
+                  token={token}
                 />
               ) : (
                 <Navigate to="/login" />
@@ -169,7 +195,7 @@ const App = () => {
             path="/add-address"
             element={
               token ? (
-                <AddAddressPage userId={userId} />
+                <AddAddressPage userId={userId} token={token} />
               ) : (
                 <Navigate to="/login" />
               )

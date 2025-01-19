@@ -6,7 +6,7 @@ import PasswordManager from "./PersonalFields/PasswordManager";
 import AddressManager from "./PersonalFields/AddressManager";
 import WishlistComponent from "./PersonalFields/WishlistComponent";
 
-const PersonalArea = ({ userId, addToWishlist,addToCart }) => {
+const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
   const { t } = useTranslation();
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -15,7 +15,11 @@ const PersonalArea = ({ userId, addToWishlist,addToCart }) => {
   const fetchUser = useCallback(async () => {
     setIsLoading(true);
     try {
-      const response = await fetch(`http://localhost:5000/User/${userId}`);
+      const response = await fetch(`http://localhost:5000/User/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (!response.ok) throw new Error("Failed to fetch user");
       const data = await response.json();
       setUser(data);
@@ -24,7 +28,7 @@ const PersonalArea = ({ userId, addToWishlist,addToCart }) => {
     } finally {
       setIsLoading(false);
     }
-  }, [userId]);
+  }, [userId, token]);
 
   useEffect(() => {
     fetchUser();
@@ -36,7 +40,10 @@ const PersonalArea = ({ userId, addToWishlist,addToCart }) => {
         `http://localhost:5000/User/${userId}/edit`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
           body: JSON.stringify(updatedUser),
         }
       );
@@ -78,7 +85,11 @@ const PersonalArea = ({ userId, addToWishlist,addToCart }) => {
               />
             )}
             {currentView === "addresses" && (
-              <AddressManager addresses={user.addresses} userId={userId}  onUpdate={handleSave} />
+              <AddressManager
+                addresses={user.addresses}
+                userId={userId}
+                onUpdate={handleSave}
+              />
             )}
             {currentView === "password" && <PasswordManager userId={userId} />}
             {currentView === "cart" && (
