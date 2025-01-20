@@ -81,8 +81,19 @@ const ProductManagement = ({ storeId }) => {
   };
 
   const handleCancel = () => {
-    setIsAddingProduct(false); // סגירת המודאל כשיש לחיצה על ביטול
+    showAlert(
+      "האם אתה בטוח שברצונך לבטל?",
+      "warning",
+      () => {
+        console.log("אושר"); 
+        setIsAddingProduct(false); // סגירת המודאל אם המשתמש מאשר
+      },
+      () => {
+        console.log("בוטל"); 
+      }
+    );
   };
+  
 
   return (
     <div className="container mx-auto p-5">
@@ -161,7 +172,7 @@ const ProductManagement = ({ storeId }) => {
             </div>
 
             <div className="mb-4">
-              <label className="block mb-1">קטגוריות</label>
+              <label className="block mb-2 font-bold">קטגוריות:</label>
               <div className="space-y-2">
                 {categories.map((category) => (
                   <div key={category._id} className="flex items-center">
@@ -170,7 +181,7 @@ const ProductManagement = ({ storeId }) => {
                       value={category._id}
                       onChange={handleCategoryChange}
                       checked={newProduct.selectedCategories.includes(category._id)}
-                      className="mr-2"
+                      className="m-2"
                     />
                     <span>{category.name.en} / {category.name.he}</span>
                   </div>

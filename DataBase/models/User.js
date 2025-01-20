@@ -5,6 +5,7 @@ const userSchema = new mongoose.Schema({
   last_name: String,
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
+  roll:{type: String, enum: [user,manager,admin], default: user},
   addresses: { type: [String], default: [] },
   cart: { type: Array, default: [] },
   wishlist: [

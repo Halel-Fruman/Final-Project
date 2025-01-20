@@ -203,7 +203,10 @@ const SysAdmin = () => {
       () => {
         const updatedManagers = selectedStore.manager.filter((_, i) => i !== index);
         setSelectedStore({ ...selectedStore, manager: updatedManagers });
-      });
+      },
+
+    () =>console.log("בוטל")
+    );
   };
 
 
