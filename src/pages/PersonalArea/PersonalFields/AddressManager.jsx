@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-const AddressManager = ({ addresses, userId, onUpdate }) => {
+const AddressManager = ({ addresses, userId, onUpdate,token }) => {
   const { t } = useTranslation();
   const [newAddress, setNewAddress] = useState("");
   const [showAddAddress, setShowAddAddress] = useState(false);
@@ -15,7 +15,10 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
         `http://localhost:5000/User/${userId}/add-address`,
         {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ address: newAddress }),
         }
       );
@@ -41,7 +44,10 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
         `http://localhost:5000/User/${userId}/edit`,
         {
           method: "PUT",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({
             field: `addresses.${editingIndex}`,
             value: editingValue,
@@ -70,7 +76,10 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
         `http://localhost:5000/User/${userId}/delete-address`,
         {
           method: "DELETE",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            Authorization: `Bearer ${token}`, // הוסף את ה-token לכותרות
+            "Content-Type": "application/json",
+          },
           body: JSON.stringify({ index }),
         }
       );
@@ -103,19 +112,29 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
                     <>
                       <input
                         type="text"
-                        className="form-control me-2"
+                        className="w-1/3 block rounded-md border-4 border-gray-800 bg-gray-100 shadow-sm px-2 py-1"
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
                       />
                       <button
-                        className="btn btn-success btn-sm me-2"
+                        className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white hover:rounded-full"
+                        aria-label={t("personal_area.actions.save")}
                         onClick={handleEditAddress}>
-                        {t("personal_area.actions.save")}
+                        <Icon
+                          icon="material-symbols:check-circle-outline-rounded"
+                          width="36"
+                          height="36"
+                        />
                       </button>
                       <button
-                        className="btn btn-secondary btn-sm"
+                        className="bg-white text-gray-600  border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full "
+                        aria-label={t("personal_area.actions.cancel")}
                         onClick={() => setEditingIndex(null)}>
-                        {t("personal_area.actions.cancel")}
+                        <Icon
+                          icon="material-symbols:cancel-outline-rounded"
+                          width="36"
+                          height="36"
+                        />
                       </button>
                     </>
                   ) : (
@@ -125,17 +144,25 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
                       </span>
                       <div>
                         <button
-                          className="btn btn-primary btn-sm me-2"
+                          className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white"
                           onClick={() => {
                             setEditingIndex(index);
                             setEditingValue(address);
                           }}>
-                          {t("personal_area.actions.edit")}
+                          <Icon
+                            icon="tabler:home-edit"
+                            width="36"
+                            height="36"
+                          />{" "}
                         </button>
                         <button
-                          className="btn btn-danger btn-sm"
+                          className="bg-white text-deleteC  rounded hover:bg-deleteC hover:text-white "
                           onClick={() => handleDeleteAddress(index)}>
-                          {t("personal_area.actions.delete")}
+                          <Icon
+                            icon="material-symbols:delete-outline"
+                            width="36"
+                            height="36"
+                          />
                         </button>
                       </div>
                     </>
@@ -150,18 +177,21 @@ const AddressManager = ({ addresses, userId, onUpdate }) => {
             <div className="d-flex mt-3">
               <input
                 type="text"
-                className="form-control me-2"
+                className="w-1/3 block rounded-md border-4 border-gray-800 bg-gray-100 shadow-sm px-2 py-1"
                 placeholder={t("personal_area.actions.addAddress")}
                 value={newAddress}
                 onChange={(e) => setNewAddress(e.target.value)}
               />
               <button
-                className="btn btn-success me-2"
+                className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white"
                 onClick={handleAddAddress}
                 aria-label={t("personal_area.actions.add")}>
-                                    <Icon icon="material-symbols:check-circle-outline-rounded" width="36" height="36" />
-
-                </button>
+                <Icon
+                  icon="material-symbols:check-circle-outline-rounded"
+                  width="36"
+                  height="36"
+                />
+              </button>
               <button
                 className="bg-white text-gray-600  border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full "
                 aria-label={t("personal_area.actions.cancel")}

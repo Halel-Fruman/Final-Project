@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart, refreshWishlist }) => {
+const WishlistComponent = ({ wishlist, removeFromWishlist, refreshWishlist , addToCart}) => {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -105,7 +105,7 @@ const WishlistComponent = ({ wishlist, removeFromWishlist, addToCart, refreshWis
               </td>
               <td className="p-4 text-center flex justify-center items-center space-x-2">
                 <button
-                  onClick={() => addToCart(product._id)}
+                  onClick={() => addToCart(product)}
                   className="bg-secondaryColor text-gray-100 py-2 px-2 ml-2 rounded-full shadow-lg hover:bg-primaryColor transition">
                   <Icon
                     icon="material-symbols:add-shopping-cart-rounded"

@@ -6,7 +6,10 @@ const userSchema = new mongoose.Schema({
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   addresses: { type: [String], default: [] },
-  cart: { type: Array, default: [] },
+  cart: [{
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+    quantity: { type: Number, min: 1 },
+  },],
   wishlist: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },

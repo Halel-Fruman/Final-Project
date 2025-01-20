@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import LanguageSelector from "../LanguageSelector";
 import { Icon } from "@iconify/react";
 import logo from "../../logo-ilan-g.svg";
+import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 
-const Header = ({ onLogout, isLoggedIn }) => {
+
+const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
   const { i18n, t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -62,6 +64,12 @@ const Header = ({ onLogout, isLoggedIn }) => {
             changeLanguage={changeLanguage}
             currentLanguage={i18n.language}
           />
+          <button onClick={onCartClick} className="relative">
+            <ShoppingCartIcon className="h-6 w-6 text-gray-500" />
+            <span className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-white text-xs">
+              {cartItems?.length||0}
+            </span>
+          </button>
         </div>
 
         {/* כפתור תפריט מובייל */}
@@ -80,7 +88,7 @@ const Header = ({ onLogout, isLoggedIn }) => {
         onClose={() => setMobileMenuOpen(false)}
         className="lg:hidden">
         <div className="fixed inset-0 z-10 bg-black bg-opacity-50" />
-        <Dialog.Panel className="fixed inset-y-0 right-0 z-20 w-80 bg-gray-700 shadow-lg">
+        <DialogPanel className="fixed inset-y-0 right-0 z-20 w-80 bg-gray-700 shadow-lg">
           <div className="flex items-center justify-between p-4 bg-secondaryColor">
             <Link to="/" className="flex items-center">
               <span className="text-lg font-bold text-gray-700"></span>
@@ -129,7 +137,7 @@ const Header = ({ onLogout, isLoggedIn }) => {
               )}
             </div>
           </div>
-        </Dialog.Panel>
+        </DialogPanel>
       </Dialog>
     </header>
   );
