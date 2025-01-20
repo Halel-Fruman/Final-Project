@@ -4,9 +4,16 @@ import { XMarkIcon } from "@heroicons/react/24/outline";
 import { DialogPanel } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
 
-const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductDetails }) => {
+const CartModal = ({
+  isOpen,
+  onClose,
+  cartItems,
+  onRemoveFromCart,
+  fetchProductDetails,
+}) => {
   const { t, i18n } = useTranslation();
   const [detailedCartItems, setDetailedCartItems] = useState([]);
+
   useEffect(() => {
     const loadCartDetails = async () => {
       try {
@@ -33,13 +40,9 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
       }
     };
 
-
-
-
     if (isOpen) {
       loadCartDetails();
     }
-    console.log("fetchProductDetails:",detailedCartItems)
   }, [isOpen, cartItems, fetchProductDetails]);
 
   const calculateTotal = () => {
@@ -56,8 +59,8 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
 
       {/* Slide-over Panel */}
       <div className="fixed inset-0 z-50 overflow-hidden">
-        <div className="absolute inset-y-0 right-0 flex max-w-full pl-10">
-          <DialogPanel className="w-screen max-w-md transform bg-white shadow-xl transition-all">
+        <div className="absolute inset-y-0 right-0 flex max-w-full">
+          <DialogPanel className="w-screen max-w-md sm:max-w-lg transform bg-white shadow-xl transition-all">
             {/* Close Button */}
             <div className="flex items-start justify-between p-4 border-b border-gray-200">
               <h2 className="text-lg font-medium text-gray-900">
@@ -72,7 +75,7 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
             </div>
 
             {/* Cart Items */}
-            <div className="p-6">
+            <div className="p-4 overflow-y-auto max-h-[80vh]">
               {detailedCartItems.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                   {detailedCartItems.map((item) => (
@@ -83,7 +86,7 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
                         className="w-16 h-16 m-2 rounded-md object-cover"
                       />
                       <div className="ml-4 flex-1">
-                        <p className="font-medium text-gray-900">
+                        <p className="font-medium text-gray-900 truncate">
                           {item.name[i18n.language]}
                         </p>
                         <p className="text-sm text-gray-500">
@@ -108,7 +111,7 @@ const CartModal = ({ isOpen, onClose, cartItems, onRemoveFromCart, fetchProductD
 
             {/* Cart Summary */}
             {detailedCartItems.length > 0 && (
-              <div className="border-t border-gray-200 p-6">
+              <div className="border-t border-gray-200 p-4">
                 <div className="flex justify-between text-lg font-medium text-gray-900">
                   <p>{t("cart.subtotal")}</p>
                   <p>₪{calculateTotal().toFixed(2)}</p>
