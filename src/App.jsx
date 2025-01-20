@@ -34,6 +34,7 @@ const App = () => {
   const { i18n } = useTranslation();
   const [token, setToken] = useState(localStorage.getItem("token"));
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
+  const [role, setRole] = useState(localStorage.getItem("role"));
   const [wishlist, setWishlist] = useState([]);
   const [wishlistLoading, setWishlistLoading] = useState(true);
   const [cartItems, setCartItems] = useState([]);
@@ -42,13 +43,17 @@ const App = () => {
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
+    localStorage.removeItem("role");
+
     setToken(null);
     setUserId(null);
+    setRole(null);
   };
 
   const verifyToken = async () => {
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
+    const storedUserRole = localStorage.getItem("role");
 
     if (storedToken && storedUserId) {
       try {
@@ -61,6 +66,7 @@ const App = () => {
         if (response.ok) {
           setToken(storedToken);
           setUserId(storedUserId);
+          setUserId(storedUserRole);
         } else {
           handleLogout();
         }
@@ -138,90 +144,95 @@ const App = () => {
 
   return (
     <AlertProvider>
-    <Router>
-      <Header
-        onCartClick={handleOpenCart}
-        onLogout={handleLogout}
-        isLoggedIn={!!token}
-      />
-      <CartModal
-        isOpen={isCartOpen}
-        onClose={handleCloseCart}
-        cartItems={cartItems}
-        onRemoveFromCart={handleRemoveFromCart}
-        fetchProductDetails={fetchProductDetails}
-      />
+      <Router>
+        <Header
+          onCartClick={handleOpenCart}
+          onLogout={handleLogout}
+          isLoggedIn={!!token}
+          role={role}
+        />
+        <CartModal
+          isOpen={isCartOpen}
+          onClose={handleCloseCart}
+          cartItems={cartItems}
+          onRemoveFromCart={handleRemoveFromCart}
+          fetchProductDetails={fetchProductDetails}
+        />
 
-      <div className="app-content">
-        <Routes>
-          <Route
-            path="/"
-            element={
-              <HomePage
-                addToWishlist={addToWishlist}
-                wishlist={wishlist}
-                wishlistLoading={wishlistLoading}
-                addToCart={handleAddToCart}
-              />
-            }
-          />
-          <Route
-            path="/product/:id"
-            element={
-              <ProductPage
-                addToWishlist={addToWishlist}
-                wishlist={wishlist}
-                addToCart={handleAddToCart}
-              />
-            }
-          />
-          <Route
-            path="/login"
-            element={
-              token ? (
-                <Navigate to="/" />
-              ) : (
-                <LoginPage setToken={setToken} setUserId={setUserId} />
-              )
-            }
-          />
-          <Route
-            path="/register"
-            element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
-          />
-          <Route path="/SysAdmin" element={<Sidebar />} />
-          <Route path="/store-management" element={<StoreManagement />} />
-
-          <Route
-            path="/personal-area"
-            element={
-              token ? (
-                <PersonalArea
-                  userId={userId}
+        <div className="app-content">
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
                   addToWishlist={addToWishlist}
                   wishlist={wishlist}
-                  token={token}
+                  wishlistLoading={wishlistLoading}
+                  addToCart={handleAddToCart}
                 />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
+              }
+            />
+            <Route
+              path="/product/:id"
+              element={
+                <ProductPage
+                  addToWishlist={addToWishlist}
+                  wishlist={wishlist}
+                  addToCart={handleAddToCart}
+                />
+              }
+            />
+            <Route
+              path="/login"
+              element={
+                token ? (
+                  <Navigate to="/" />
+                ) : (
+                  <LoginPage setToken={setToken} setUserId={setUserId} setUserRole={setRole} />
+                )
+              }
+            />
+            <Route
+              path="/register"
+              element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
+            />
+            <Route path="/SysAdmin" element={token && (role === 'admin') ?
+              (<Sidebar
+              />
+              ) : (<Navigate to="/login" />)} />
+            <Route path="/store-management" element={token && (role === 'storeManager') ?
+              (<StoreManagement />) : (<Navigate to="/login" />)} />
 
-          <Route
-            path="/add-address"
-            element={
-              token ? (
-                <AddAddressPage userId={userId} token={token} />
-              ) : (
-                <Navigate to="/login" />
-              )
-            }
-          />
-        </Routes>
-      </div>
-      <Footer />
-    </Router>
+            <Route
+              path="/personal-area"
+              element={
+                token ? (
+                  <PersonalArea
+                    userId={userId}
+                    addToWishlist={addToWishlist}
+                    wishlist={wishlist}
+                    token={token}
+                  />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+
+            <Route
+              path="/add-address"
+              element={
+                token ? (
+                  <AddAddressPage userId={userId} token={token} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+          </Routes>
+        </div>
+        <Footer />
+      </Router>
     </AlertProvider>
   );
 };

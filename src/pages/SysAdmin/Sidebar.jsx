@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useAlert } from '../../components/AlertDialog.jsx';
 import CategoryManagement from './CategoryManagement.jsx'; // הוספנו את ניהול הקטגוריות
 import SysAdmin from './SysAdmin.jsx'; // ייבוא רכיב ניהול חנויות
+import UserManagement from './UserManagement.jsx'; // הוספנו את ניהול users
 
 const Sidebar = () => {
     const { t } = useTranslation();
@@ -20,11 +21,15 @@ const Sidebar = () => {
                 return <SysAdmin />; // הצגת רכיב ניהול החנויות
             case "categories":
                 return <CategoryManagement />; // ניהול קטגוריות
+            case "users":
+                return <UserManagement />; // ניהול קטגוריות
             default:
                 return <div className="p-6">בחר קטגוריה מהתפריט</div>;
         }
     };
 
+        
+    
     return (
         <div className="flex h-screen bg-gray-100">
             {/* תפריט צדדי */}
@@ -35,6 +40,7 @@ const Sidebar = () => {
                         { id: "dashboard", label: "סטטיסטיקות כלליות", icon: "material-symbols:bar-chart-outline" },
                         { id: "stores", label: "ניהול חנויות", icon: "material-symbols:business-outline" },
                         { id: "categories", label: "ניהול קטגוריות", icon: "material-symbols:bar-chart-outline" },
+                        { id: "users", label: "ניהול משתמשים", icon: "material-symbols:bar-chart-outline" },
                     ].map((tab) => (
                         <button
                             key={tab.id}

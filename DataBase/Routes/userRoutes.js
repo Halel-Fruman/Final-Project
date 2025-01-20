@@ -12,9 +12,15 @@ router.post('/register', UserController.register);
 // verify token
 router.get("/verify-token", UserController.verifyToken);
 
+// שינוי רול של משתמש
+router.put('/:userId/change-role', authenticateToken, UserController.changeRole);
+
 
 // get user
 router.get('/:userId', authenticateToken,UserController.getUser);
+
+//get all users
+router.get('/', authenticateToken, UserController.getUsers);
 
 // edit
 router.put('/:userId/edit',authenticateToken, UserController.editUser);

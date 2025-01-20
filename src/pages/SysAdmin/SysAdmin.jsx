@@ -4,7 +4,6 @@ import axios from "axios";
 import { Icon } from '@iconify/react';
 import { useAlert } from '../../components/AlertDialog.jsx';
 
-
 const SysAdmin = () => { 
   const { t } = useTranslation();
 
@@ -13,6 +12,9 @@ const SysAdmin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStoreMode, setNewStoreMode] = useState(false); // Flag for new store mode
   const { showAlert } = useAlert();
+
+  
+
 
   useEffect(() => {
     axios

@@ -19,6 +19,85 @@ const UserController = {
       res.status(200).json({ message: "Token is valid", userId: decoded.id });
     });
   },
+////
+
+
+// UserController.js
+
+  // קבלת כל המשתמשים
+  getUsers: async (req, res) => {
+    try {
+      const users = await User.find(); // מחפש את כל המשתמשים
+      if (!users || users.length === 0) {
+        return res.status(404).json({ error: "No users found" });
+      }
+      res.status(200).json(users);
+    } catch (error) {
+      res.status(500).json({ error: "Error fetching users: " + error.message });
+    }
+  },
+
+  // קבלת פרטי משתמש ספציפי
+  getUser: async (req, res) => {
+    try {
+      const { userId } = req.params;
+      const user = await User.findById(userId);
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).json({ error: "Error fetching user: " + error.message });
+    }
+  },
+
+  // עריכת פרטי משתמש
+  editUser: async (req, res) => {
+    const { userId } = req.params;
+    const updatedFields = req.body;
+
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).send("User not found");
+
+      // עדכון שדות ספציפיים
+      Object.keys(updatedFields).forEach((field) => {
+        user[field] = updatedFields[field];
+      });
+
+      await user.save();
+      res.status(200).json(user);
+    } catch (error) {
+      res.status(500).send("Error updating user: " + error.message);
+    }
+  },
+
+  // שינוי רול של משתמש
+  changeRole: async (req, res) => {
+    const { userId } = req.params;
+    const { role } = req.body;
+
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).send("User not found");
+
+      user.role = role;  // עדכון הרול של המשתמש
+      await user.save();
+      
+      res.status(200).json(user); // החזרת המשתמש המעודכן
+    } catch (error) {
+      res.status(500).send("Error updating user role: " + error.message);
+    }
+  },
+
+  // פונקציות נוספות כאן (כמו changePassword, addAddress וכו')
+
+
+
+
+///////
+
+
   login: async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
@@ -32,7 +111,7 @@ const UserController = {
       if (!isMatch) return res.status(401).send("Invalid credentials");
 
       const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
-      res.status(200).json({ token, userId: user._id });
+      res.status(200).json({ token, userId: user._id ,role:user.role});
     } catch (error) {
       res.status(500).send("Error logging in: " + error.message);
     }
@@ -52,6 +131,20 @@ const UserController = {
     } catch (error) {
       console.error("Error fetching user:", error.message);
       res.status(500).json({ error: "Error fetching user: " + error.message });
+    }
+  },
+  getUsers: async (req, res) => {
+    try {
+      const users = await User.find(); // מחפש את כל המשתמשים
+      if (!users || users.length === 0) {
+        console.log("No users found");
+        return res.status(404).json({ error: "No users found" });
+      }
+      console.log(`Users found: ${users.length}`);
+      res.status(200).json(users);
+    } catch (error) {
+      console.error("Error fetching users:", error.message);
+      res.status(500).json({ error: "Error fetching users: " + error.message });
     }
   },
 

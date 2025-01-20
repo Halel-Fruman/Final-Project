@@ -8,16 +8,18 @@ import { Icon } from "@iconify/react";
 import logo from "../../logo-ilan-g.svg";
 import { ShoppingCartIcon } from '@heroicons/react/24/outline';
 
-
-const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
+const Header = ({ onLogout, isLoggedIn, onCartClick, cartItems, role }) => {
   const { i18n, t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
   };
-
+  console.log(isLoggedIn);   // האם המשתמש מחובר?
+  console.log(role);   // מה הערך של ה-role?
+  
   return (
+    
     <header className="bg-gray-50 shadow border-b-2 border-gray-200">
       <nav className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* לוגו */}
@@ -29,6 +31,22 @@ const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
 
         {/* ניווט דסקטופ */}
         <div className="hidden lg:flex items-center space-x-2">
+          {isLoggedIn && role === 'admin' && (
+            <Link
+              to="/SysAdmin"
+              className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
+              ניהול מערכת
+            </Link>
+          )}
+
+          {isLoggedIn && role === 'storeManager' && (
+            <Link
+              to="/store-management"
+              className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
+              {t("header.store_management")}
+            </Link>
+          )}
+
           {isLoggedIn && (
             <Link
               to="/personal-area"
@@ -41,7 +59,7 @@ const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
             <button
               onClick={onLogout}
               title={t("header.logout")}
-              className="text-sm font-medium text-gray-700  hover:text-gray-800">
+              className="text-sm font-medium text-gray-700 hover:text-gray-800">
               <Icon icon="mdi-light:logout" width="24" height="24" />
             </button>
           ) : (
@@ -60,6 +78,7 @@ const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
               </Link>
             </>
           )}
+
           <LanguageSelector
             changeLanguage={changeLanguage}
             currentLanguage={i18n.language}
@@ -67,7 +86,7 @@ const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
           <button onClick={onCartClick} className="relative">
             <ShoppingCartIcon className="h-6 w-6 text-gray-500" />
             <span className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-white text-xs">
-              {cartItems?.length||0}
+              {cartItems?.length || 0}
             </span>
           </button>
         </div>
@@ -107,6 +126,22 @@ const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
                 currentLanguage={i18n.language}
               />
 
+              {isLoggedIn && role === 'admin' && (
+                <Link
+                  to="/admin-dashboard"
+                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
+                  {t("header.admin_dashboard")}
+                </Link>
+              )}
+
+              {isLoggedIn && role === 'storeManager' && (
+                <Link
+                  to="/store-management"
+                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
+                  {t("header.store_management")}
+                </Link>
+              )}
+
               {isLoggedIn && (
                 <Link
                   to="/personal-area"
@@ -119,7 +154,7 @@ const Header = ({ onLogout, isLoggedIn,onCartClick,cartItems }) => {
                 <button
                   onClick={onLogout}
                   className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-red-500 rounded hover:bg-red-600">
-                  {t()}
+                  {t("header.logout")}
                 </button>
               ) : (
                 <>

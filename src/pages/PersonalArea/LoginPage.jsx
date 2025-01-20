@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 
-export default function Login({ setToken, setUserId }) {
+export default function Login({ setToken, setUserId, setUserRole }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
@@ -32,11 +32,13 @@ export default function Login({ setToken, setUserId }) {
       }
 
       const data = await response.json();
-
+        console.log(data.role);
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
+      localStorage.setItem("userRole", data.role);
       setToken(data.token);
       setUserId(data.userId);
+      setUserRole(data.role);
 
       navigate("/");
     } catch (err) {
