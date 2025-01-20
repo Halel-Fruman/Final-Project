@@ -10,14 +10,21 @@ import HomePage from "./pages/HomePage/HomePage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import LoginPage from "./pages/PersonalArea/LoginPage.jsx";
 import PersonalArea from "./pages/PersonalArea/PersonalArea.jsx";
-import CartPage from "./pages/PersonalArea/CartPage.js";
+import CartModal from "./components/CartModal";
 import RegisterPage from "./pages/Registeration/RegisterPage.jsx";
 import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import SysAdmin from "./pages/SysAdmin/SysAdmin.jsx";
 import StoreManagement from './pages/StoreManagement/StoreManagement.jsx'
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
-import { fetchWishlist, updateWishlist } from "./utils/Wishlist"; // ייבוא הפונקציות
+import {
+  fetchCart,
+  saveCart,
+  addToCart,
+  removeFromCart,
+  fetchProductDetails,
+} from "./utils/Cart";
+import { fetchWishlist, updateWishlist } from "./utils/Wishlist";
 import { AlertProvider } from './components/AlertDialog.jsx';
 import Sidebar from './pages/SysAdmin/Sidebar.jsx'; // ייבוא Sidebar
 
@@ -29,13 +36,73 @@ const App = () => {
   const [userId, setUserId] = useState(localStorage.getItem("userId"));
   const [wishlist, setWishlist] = useState([]);
   const [wishlistLoading, setWishlistLoading] = useState(true);
+  const [cartItems, setCartItems] = useState([]);
+  const [isCartOpen, setIsCartOpen] = useState(false);
 
-  // מתאימה את כיוון השפה
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    setToken(null);
+    setUserId(null);
+  };
+
+  const verifyToken = async () => {
+    const storedToken = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
+
+    if (storedToken && storedUserId) {
+      try {
+        const response = await fetch("http://localhost:5000/User/verify-token", {
+          headers: {
+            Authorization: `Bearer ${storedToken}`,
+          },
+        });
+
+        if (response.ok) {
+          setToken(storedToken);
+          setUserId(storedUserId);
+        } else {
+          handleLogout();
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        handleLogout();
+      }
+    }
+  };
+  useEffect(() => {
+    verifyToken();
+  }, []);
+
+
+  const handleOpenCart = () => setIsCartOpen(true);
+  const handleCloseCart = () => setIsCartOpen(false);
+
+  const loadCart = useCallback(async () => {
+    if (userId && token) {
+      const data = await fetchCart(userId, token);
+      setCartItems(data);
+    }
+  }, [userId, token]);
+
+  const handleRemoveFromCart = async (productId) => {
+    const updatedCart = await removeFromCart(userId, token, productId);
+    if (updatedCart) {
+      setCartItems(updatedCart);
+    }
+  };
+
+  const handleAddToCart = async (product) => {
+    const updatedCart = await addToCart(userId, token, product);
+    if (updatedCart) {
+      setCartItems(updatedCart);
+    }
+  };
+
   useEffect(() => {
     document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
   }, [i18n.language]);
 
-  // פונקציית טעינת Wishlist
   const loadWishlist = useCallback(async () => {
     setWishlistLoading(true);
     if (!userId || !token) {
@@ -49,23 +116,42 @@ const App = () => {
     setWishlistLoading(false);
   }, [userId, token]);
 
-  // פונקציית עדכון Wishlist
+
+
+  useEffect(() => {
+    verifyToken();
+  }, []);
+
+  useEffect(() => {
+    if (token && userId) {
+      loadCart();
+      loadWishlist();
+    }
+  }, [token, userId, loadWishlist, loadCart]);
+
   const addToWishlist = async (product, isInWishlist) => {
     const success = await updateWishlist(userId, token, product, isInWishlist);
     if (success) {
-      loadWishlist(); // עדכון הרשימה לאחר השינוי
+      loadWishlist();
     }
   };
-
-  // טוען את ה-Wishlist לאחר התחברות המשתמש
-  useEffect(() => {
-    loadWishlist();
-  }, [loadWishlist]);
 
   return (
     <AlertProvider>
     <Router>
-      <Header onLogout={() => setToken(null)} isLoggedIn={!!token} />
+      <Header
+        onCartClick={handleOpenCart}
+        onLogout={handleLogout}
+        isLoggedIn={!!token}
+      />
+      <CartModal
+        isOpen={isCartOpen}
+        onClose={handleCloseCart}
+        cartItems={cartItems}
+        onRemoveFromCart={handleRemoveFromCart}
+        fetchProductDetails={fetchProductDetails}
+      />
+
       <div className="app-content">
         <Routes>
           <Route
@@ -75,13 +161,18 @@ const App = () => {
                 addToWishlist={addToWishlist}
                 wishlist={wishlist}
                 wishlistLoading={wishlistLoading}
+                addToCart={handleAddToCart}
               />
             }
           />
           <Route
             path="/product/:id"
             element={
-              <ProductPage addToWishlist={addToWishlist} wishlist={wishlist} />
+              <ProductPage
+                addToWishlist={addToWishlist}
+                wishlist={wishlist}
+                addToCart={handleAddToCart}
+              />
             }
           />
           <Route
@@ -109,23 +200,19 @@ const App = () => {
                   userId={userId}
                   addToWishlist={addToWishlist}
                   wishlist={wishlist}
+                  token={token}
                 />
               ) : (
                 <Navigate to="/login" />
               )
             }
           />
-          <Route
-            path="/cart"
-            element={
-              token ? <CartPage userId={userId} /> : <Navigate to="/login" />
-            }
-          />
+
           <Route
             path="/add-address"
             element={
               token ? (
-                <AddAddressPage userId={userId} />
+                <AddAddressPage userId={userId} token={token} />
               ) : (
                 <Navigate to="/login" />
               )

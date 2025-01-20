@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-
+import { Icon } from "@iconify/react";
 const PersonalAreaEditor = ({ user, setUser, onSave }) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -25,7 +25,9 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
   if (isEditing) {
     return (
       <div>
-        <h2 className="text-xl font-bold mb-4">{t("personal_area.editprofile")}</h2>
+        <h2 className="text-xl font-bold mb-4">
+          {t("personal_area.editprofile")}
+        </h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
@@ -35,7 +37,7 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
               type="text"
               value={editedUser.first_name}
               onChange={(e) => handleFieldChange("first_name", e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
+              className="block w-full rounded-md border border-gray-800 bg-gray-100  px-2 py-1 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
             />
           </div>
 
@@ -47,7 +49,7 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
               type="text"
               value={editedUser.last_name}
               onChange={(e) => handleFieldChange("last_name", e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
+              className="block w-full rounded-md border border-gray-800 bg-gray-100  px-2 py-1 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
             />
           </div>
 
@@ -59,22 +61,31 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
               type="email"
               value={editedUser.email}
               onChange={(e) => handleFieldChange("email", e.target.value)}
-              className="block w-full rounded-md border-gray-300 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
+              className="block w-full rounded-md border border-gray-800 bg-gray-100  px-2 py-1 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
             />
           </div>
         </div>
-        <div className="flex justify-end mt-4 space-x-4">
+        <div className="mt-6">
+          {" "}
           <button
             onClick={() => setIsEditing(false)}
-            className="px-4 py-2 bg-gray-500 text-white rounded hover:bg-gray-600"
-          >
-            {t("personal_area.cancel")}
+            aria-label={t("personal_area.cancel")}
+            className="bg-white text-gray-600  border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full ">
+            <Icon
+              icon="material-symbols:cancel-outline-rounded"
+              width="36"
+              height="36"
+            />
           </button>
           <button
             onClick={handleSave}
-            className="px-4 py-2 bg-secondaryColor text-white rounded hover:bg-blue-600"
-          >
-            {t("personal_area.save")}
+            aria-label={t("personal_area.save")}
+            className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white hover:rounded-full">
+            <Icon
+              icon="material-symbols:check-circle-outline-rounded"
+              width="36"
+              height="36"
+            />
           </button>
         </div>
       </div>
@@ -115,9 +126,13 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
       <div className="mt-6">
         <button
           onClick={() => setIsEditing(true)}
-          className="px-4 py-2 bg-secondaryColor text-white rounded hover:bg-primaryColor"
-        >
-          {t("personal_area.editprofile")}
+          aria-label={t("personal_area.editprofile")}
+          className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white">
+          <Icon
+            icon="material-symbols:person-edit-outline-rounded"
+            width="36"
+            height="36"
+          />
         </button>
       </div>
     </div>

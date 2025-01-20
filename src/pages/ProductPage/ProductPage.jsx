@@ -5,7 +5,7 @@ import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 
-const ProductPage = ({ addToWishlist, wishlist }) => {
+const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation(); // שימוש ב-i18n וב-t לצורך תרגום
   const [product, setProduct] = useState(null);
@@ -35,10 +35,20 @@ const ProductPage = ({ addToWishlist, wishlist }) => {
 
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
-      (item) => String(item.productId._id || item.productId) === String(product._id)
+      (item) =>
+        String(item.productId._id || item.productId) === String(product._id)
     );
 
     addToWishlist(product, isInWishlist);
+  };
+
+  const handleAddToCart = () => {
+    console.log("Adding to cart:", product._id);
+    addToCart({
+      productId: product._id,
+      quantity: 1,
+    }); // קריאה לפונקציה שמנהלת את העגלה
+    alert(t("cart.added", { name: product.name[i18n.language] }));
   };
 
   if (isLoading) {
@@ -74,9 +84,9 @@ const ProductPage = ({ addToWishlist, wishlist }) => {
   const productPicture = product.picture || "https://placehold.co/300";
   const productReview = product.review || { average: 0, totalCount: 0 };
   const isInWishlist = wishlist?.find(
-    (item) => String(item.productId._id || item.productId) === String(product._id)
+    (item) =>
+      String(item.productId._id || item.productId) === String(product._id)
   );
-  console.log(wishlist);
 
   return (
     <div className="bg-gray-50">
@@ -135,7 +145,9 @@ const ProductPage = ({ addToWishlist, wishlist }) => {
 
             <div className="flex gap-4">
               {/* כפתור הוספה לסל */}
-              <button className="w-1/2 bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
+              <button
+                onClick={handleAddToCart}
+                className="w-1/2 bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
 
@@ -144,9 +156,9 @@ const ProductPage = ({ addToWishlist, wishlist }) => {
                 onClick={toggleWishlist}
                 className="bg-white p-2 rounded-full shadow-lg  hover:bg-gray-100 transition">
                 {isInWishlist ? (
-                      <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
+                  <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
                 ) : (
-                      <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
+                  <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
                 )}
               </button>
             </div>

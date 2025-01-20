@@ -1,16 +1,20 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
 
 export default function Login({ setToken, setUserId }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(false);
 
   const { t } = useTranslation();
+  const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
+    setLoading(true);
 
     try {
       const response = await fetch("http://localhost:5000/User/login", {
@@ -20,18 +24,25 @@ export default function Login({ setToken, setUserId }) {
       });
 
       if (!response.ok) {
-        throw new Error("Login failed. Please check your credentials.");
+        if (response.status === 401) {
+          throw new Error(t("login.invalidCredentials"));
+        } else {
+          throw new Error(t("login.genericError"));
+        }
       }
 
       const data = await response.json();
 
-      // שמירה ב-localStorage ועדכון מצב
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       setToken(data.token);
       setUserId(data.userId);
+
+      navigate("/");
     } catch (err) {
       setError(err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -46,7 +57,9 @@ export default function Login({ setToken, setUserId }) {
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-sm">
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+            <label
+              htmlFor="email"
+              className="block text-sm font-medium text-gray-900">
               {t("login.email")}
             </label>
             <div className="mt-2">
@@ -66,11 +79,15 @@ export default function Login({ setToken, setUserId }) {
 
           <div>
             <div className="flex items-center justify-between">
-              <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-900">
                 {t("login.password")}
               </label>
               <div className="text-sm">
-                <a href="#" className="font-semibold text-primaryColor hover:text-secondaryColor">
+                <a
+                  href="#"
+                  className="font-semibold text-primaryColor hover:text-secondaryColor">
                   Forgot password?
                 </a>
               </div>
@@ -91,12 +108,13 @@ export default function Login({ setToken, setUserId }) {
           </div>
 
           {error && <p className="text-sm text-red-600">{error}</p>}
+          {loading && <div className="text-center">Loading...</div>}
 
           <div>
             <button
               type="submit"
               className="flex w-full justify-center rounded-md bg-primaryColor px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primaryColor focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primaryColor"
-            >
+              disabled={loading}>
               {t("login.submit")}
             </button>
           </div>
@@ -104,7 +122,9 @@ export default function Login({ setToken, setUserId }) {
 
         <p className="mt-10 text-center text-sm text-gray-500">
           {t("login.notMember")}{" "}
-          <a href="/register" className="font-semibold text-primaryColor hover:text-secondaryColor">
+          <a
+            href="/register"
+            className="font-semibold text-primaryColor hover:text-secondaryColor">
             {t("login.registerLink")}
           </a>
         </p>

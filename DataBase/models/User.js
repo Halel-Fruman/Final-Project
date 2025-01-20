@@ -7,7 +7,10 @@ const userSchema = new mongoose.Schema({
   password: { type: String, required: true },
   roll:{type: String, enum: [user,manager,admin], default: user},
   addresses: { type: [String], default: [] },
-  cart: { type: Array, default: [] },
+  cart: [{
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+    quantity: { type: Number, min: 1 },
+  },],
   wishlist: [
     {
       productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },

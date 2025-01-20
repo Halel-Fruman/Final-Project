@@ -11,7 +11,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // טעינת המוצרים
+  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -39,7 +39,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     addToWishlist(product, isInWishlist);
   };
 
-  // במקרה של שגיאה
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -50,7 +49,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   }
 
-  // הצגת מסך הטעינה רק כאשר המוצרים עצמם נטענים
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -60,9 +58,9 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   }
 
   return (
-    <div className="bg-backGC">
-      {/* Header */}
-      <section
+    <div className="bg-gray-50">
+      {/* Header Section */}
+      <header
         className="relative bg-primaryColor text-white"
         style={{
           backgroundImage: `url(${backgroundImage})`,
@@ -70,24 +68,19 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           backgroundPosition: "center",
           height: "700px",
         }}>
-        {/* שכבת Overlay */}
         <div
-          className="absolute inset-0 bg-black opacity-40"
+          className="absolute inset-0 bg-black opacity-50"
           style={{ mixBlendMode: "multiply" }}></div>
 
-        {/* תוכן הכותרת */}
-        <div className="relative z-10 flex flex-col items-center justify-center h-full">
-          <h1 id="welcome" className="text-8.5xl font-bold text-secondaryColor">
+        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
+          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8.5xl font-bold text-secondaryColor">
             {t("welcome")}
           </h1>
           <p
-            id="welcome-subtitle"
-            className="mt-2 text-5xl text-secondaryColor"
+            className="mt-4 text-xl sm:text-2xl md:text-5xl text-secondaryColor"
             dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
-
-          {/* כפתור גלילה */}
           <button
-            className="mt-6 bg-white text-black py-2 px-4 rounded-lg font-bold hover:bg-gray-300 transition"
+            className="mt-6 bg-white text-black py-2 px-6 rounded-lg font-semibold shadow-lg hover:bg-gray-200 transition"
             onClick={() => {
               document.getElementById("products-section").scrollIntoView({
                 behavior: "smooth",
@@ -96,14 +89,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             {t("view_products")}
           </button>
         </div>
-      </section>
+      </header>
 
       {/* Products Section */}
-      <main id="products-section" className="my-10 px-6 lg:px-12">
-        <h2 className="text-center text-2xl font-bold mb-6">
+      <main id="products-section" className="py-10 px-4 sm:px-6 lg:px-12">
+        <h2 className="text-center text-2xl font-bold mb-8">
           {t("featured_products")}
         </h2>
-        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
           {products.map((product) => {
             const isInWishlist = wishlistLoading
               ? false
@@ -114,11 +107,9 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                 );
 
             return (
-              <div>
-                <article
-                  key={product._id}
-                  className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
-                  {/* כפתור Wishlist */}
+              <div key={product._id} className="flex flex-col">
+                <article className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
+                  {/* Wishlist Button */}
                   <button
                     onClick={() => toggleWishlist(product)}
                     title={
@@ -134,20 +125,21 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                     )}
                   </button>
 
-                  {/* תמונה */}
+                  {/* Product Image */}
                   <Link to={`/product/${product._id}`}>
                     <div className="aspect-w-1 aspect-h-1 rounded-lg">
                       <img
                         src={product.picture}
                         alt={product.name[i18n.language]}
-                        className="object-cover w-full h-72"
+                        className="object-cover w-full h-56 sm:h-64 lg:h-72"
                       />
                     </div>
                   </Link>
                 </article>
-                {/* פרטים */}
+
+                {/* Product Details */}
                 <div className="p-4 text-center">
-                  <h3 className="text-lg font-medium text-gray-900">
+                  <h3 className="text-base font-medium text-gray-900">
                     {product.name[i18n.language]}
                   </h3>
                   <p className="mt-1 text-sm text-gray-500">₪{product.price}</p>
