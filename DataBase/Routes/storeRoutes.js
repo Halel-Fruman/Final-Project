@@ -15,10 +15,10 @@ router.get('/', async (req, res) => {
 
 // נתיב להוספת חנות חדשה
 router.post('/', async (req, res) => {
-  const { name, address, manager } = req.body; // פרטי החנות החדשה
+  const { name, address, email, manager } = req.body; // פרטי החנות החדשה
 
   try {
-    const newStore = new Store({ name, address, manager });
+    const newStore = new Store({ name, address, email, manager });
     await newStore.save(); // שמירת החנות החדשה ב-DB
     res.status(201).json(newStore); // החזרת החנות החדשה כ-json
   } catch (error) {
@@ -28,11 +28,11 @@ router.post('/', async (req, res) => {
 
 // עדכון פרטי חנות
 router.put('/:id', async (req, res) => {
-    const { name, address, manager } = req.body;
+    const { name, address, email, manager } = req.body;
     try {
       const updatedStore = await Store.findByIdAndUpdate(
         req.params.id,
-        { name, address, manager }, // עדכון כל השדות, כולל המנהלים
+        { name, address, email, manager }, // עדכון כל השדות, כולל המנהלים
         { new: true }
       );
       res.status(200).json(updatedStore);

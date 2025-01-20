@@ -14,6 +14,7 @@ import CartModal from "./components/CartModal";
 import RegisterPage from "./pages/Registeration/RegisterPage.jsx";
 import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import SysAdmin from "./pages/SysAdmin/SysAdmin.jsx";
+import StoreManagement from './pages/StoreManagement/StoreManagement.jsx'
 import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import {
@@ -24,6 +25,10 @@ import {
   fetchProductDetails,
 } from "./utils/Cart";
 import { fetchWishlist, updateWishlist } from "./utils/Wishlist";
+import { AlertProvider } from './components/AlertDialog.jsx';
+import Sidebar from './pages/SysAdmin/Sidebar.jsx'; // ייבוא Sidebar
+
+
 
 const App = () => {
   const { i18n } = useTranslation();
@@ -132,6 +137,7 @@ const App = () => {
   };
 
   return (
+    <AlertProvider>
     <Router>
       <Header
         onCartClick={handleOpenCart}
@@ -183,7 +189,9 @@ const App = () => {
             path="/register"
             element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
           />
-          <Route path="/SysAdmin" element={<SysAdmin />} />
+          <Route path="/SysAdmin" element={<Sidebar />} />
+          <Route path="/store-management" element={<StoreManagement />} />
+
           <Route
             path="/personal-area"
             element={
@@ -214,7 +222,12 @@ const App = () => {
       </div>
       <Footer />
     </Router>
+    </AlertProvider>
   );
 };
+
+
+
+
 
 export default App;

@@ -150,6 +150,7 @@
 
   "sysadmin": {
     "admin_management": "ניהול מערכת",
+    "store_managemnt" : "ניהול חנות",
     "stores": "חנויות",
     "store_name": "שם החנות",
     "store_address": "כתובת החנות",
@@ -168,7 +169,12 @@
     "statistics_info": "כאן יוצגו נתונים סטטיסטיים על פעילות החנויות.",
     "invalid_email": "כתובת מייל לא חוקית! הכנס בבקשה כתובת מייל חוקית.",
     "cancel": "ביטול",
-    "edit" : "ערוך"
+    "edit" : "ערוך",
+
+
+
+    "store_email": "מייל החנות"
+
 
   },
 

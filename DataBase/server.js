@@ -5,6 +5,9 @@ const cors = require('cors');
 const userRoutes = require('./Routes/userRoutes');
 const productRoutes = require('./Routes/productsRoutes');
 const storeRoutes = require('./Routes/storeRoutes'); // ייבוא הנתיבים של החנויות
+const realProductRoutes = require('./Routes/realProductsRoutes'); // מוצרים אמיתיים
+const transactionRoutes = require('./Routes/transactionRoutes'); // עסקאות
+const categoryRoutes = require("./Routes/categoryRoutes");
 
 
 
@@ -20,10 +23,14 @@ mongoose.connect(process.env.MONGO_URI)
   .then(() => console.log('Connected to MongoDB'))
   .catch((err) => console.error('MongoDB connection error:', err));
 
-// Routes
-app.use('/User', userRoutes); // כל הנתיבים של userRoutes יתחילו ב- /User
-app.use('/Example_products', productRoutes);
-app.use('/Stores', storeRoutes); // השתמש ב-storeRoutes כאשר הנתיב הוא /Store
+/// Routes
+app.use('/User', userRoutes); // משתמשים
+app.use('/Example_products', productRoutes); // מוצרים לדוגמא
+app.use('/Stores', storeRoutes); // חנויות
+app.use('/Products', realProductRoutes); // מוצרים אמיתיים
+app.use('/Transactions', transactionRoutes); // 
+app.use("/Category", categoryRoutes);
+
 // User Schema & Model
 const User = require('./models/User');
 // Store Routes
