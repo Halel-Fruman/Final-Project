@@ -137,6 +137,7 @@
 
 "sysadmin": {
     "admin_management": "System Administration",
+    "store_managemnt" : "Srotes Managment",
     "stores": "Stores",
     "store_name": "Store Name",
     "store_address": "Store Address",

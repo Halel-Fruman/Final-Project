@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Icon } from "@iconify/react";
+import ProductManagement from './ProductManagement.jsx';
 
 const StoreManagement = () => {
   const [products, setProducts] = useState([]);
@@ -12,7 +13,7 @@ const StoreManagement = () => {
       case "dashboard":
         return <div className="p-6">📊 סטטיסטיקות מכירות</div>;
       case "products":
-        return <div className="p-6">🛒 ניהול מוצרים</div>;
+        return <ProductManagement/>;
       case "orders":
         return <div className="p-6">📦 ניהול הזמנות</div>;
       case "transactions":

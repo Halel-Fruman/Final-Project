@@ -148,6 +148,7 @@
 
   "sysadmin": {
     "admin_management": "ניהול מערכת",
+    "store_managemnt" : "ניהול חנות",
     "stores": "חנויות",
     "store_name": "שם החנות",
     "store_address": "כתובת החנות",

@@ -19,6 +19,7 @@ import Header from "./components/Header/Header";
 import Footer from "./components/Footer/Footer";
 import { fetchWishlist, updateWishlist } from "./utils/Wishlist"; // ייבוא הפונקציות
 import { AlertProvider } from './components/AlertDialog.jsx';
+import Sidebar from './pages/SysAdmin/Sidebar.jsx'; // ייבוא Sidebar
 
 
 
@@ -62,6 +63,7 @@ const App = () => {
   }, [loadWishlist]);
 
   return (
+    <AlertProvider>
     <Router>
       <Header onLogout={() => setToken(null)} isLoggedIn={!!token} />
       <div className="app-content">
@@ -96,7 +98,7 @@ const App = () => {
             path="/register"
             element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
           />
-          <Route path="/SysAdmin" element={<SysAdmin />} />
+          <Route path="/SysAdmin" element={<Sidebar />} />
           <Route path="/store-management" element={<StoreManagement />} />
 
           <Route
@@ -133,6 +135,7 @@ const App = () => {
       </div>
       <Footer />
     </Router>
+    </AlertProvider>
   );
 };
 

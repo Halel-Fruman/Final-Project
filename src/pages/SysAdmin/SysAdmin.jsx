@@ -23,8 +23,10 @@ const SysAdmin = () => {
         // הפיכת ה-JSON למערך באמצעות Object.values
         setStores(Object.values(res.data));
       })
-      .catch((err) => console.log(err));
-    showAlert("אירעה שגיאה בשרת, אנא נסה שנית.", "error");
+      .catch((err) => {
+        console.log(err);
+        showAlert("אירעה שגיאה בשרת, אנא נסה שנית.", "error");
+    });
 
   }, []);
 
@@ -121,6 +123,11 @@ const SysAdmin = () => {
       showAlert("כתובת המייל של החנות אינה תקינה.", "error");
       return;
     }
+    if (selectedStore.manager.length === 0) {
+      showAlert("על כל חנות להיות עם לפחות מנהל אחד.", "error");
+      return;
+    }
+  
     // בדיקה שכל המנהלים תקינים
     const invalidManagers = selectedStore.manager.filter(
       (manager, index, managers) =>
@@ -185,6 +192,11 @@ const SysAdmin = () => {
   };
 
   const handleRemoveManager = (index) => {
+
+    if (selectedStore.manager.length === 1) {
+      showAlert("לא ניתן למחוק את המנהל האחרון. על כל חנות להיות עם לפחות מנהל אחד.", "error");
+      return;
+    }
     showAlert("האם אתה בטוח שברצונך למחוק את המנהל?",
 
       "warning",
@@ -198,7 +210,7 @@ const SysAdmin = () => {
   return (
     <div className="container mx-auto p-5">
       <header className="text-center mb-8">
-        <h1 className="text-5xl text-primaryColor  font-bold">{t("sysadmin.admin_management")}</h1>
+        <h1 className="text-3xl text-primaryColor  font-bold">{t("sysadmin.store_managemnt")}</h1>
       </header>
 
       <div className="flex justify-end mb-4">
@@ -301,7 +313,7 @@ const SysAdmin = () => {
                     }
                   />
                   <button
-                    className="bg-white text-deleteC px-2 py-2 rounded hover:bg-deleteC hover:text-white "
+                    className="bg-white text-deleteC px-2 py-2 rounded hover:bg-deleteC hover:text-white ring-2 ring-gray-200 hover:ring-deleteC transition duration-200"
                     onClick={() => handleRemoveManager(index)}
                   >
                     <Icon icon="material-symbols:delete-outline" width="24" height="24" />
@@ -317,8 +329,8 @@ const SysAdmin = () => {
             <div className="flex justify-between items-center mt-6">
               {!newStoreMode && (
                 <button
-                  className="bg-deleteC text-white px-4 py-2 border-red-500 rounded hover:bg-red-700"
-                  onClick={handleDeleteStore}
+                className="bg-white text-deleteC px-2 py-2 rounded-full hover:bg-deleteC hover:text-white ring-2 ring-gray-200 hover:ring-deleteC transition duration-200"
+                onClick={handleDeleteStore}
                 >
                   <Icon icon="material-symbols:delete-outline" width="28" height="28" />
                 </button>

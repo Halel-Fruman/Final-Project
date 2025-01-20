@@ -1,0 +1,54 @@
+const mongoose = require('mongoose');
+
+const productSchema = new mongoose.Schema({
+    name: {
+        en: { type: String, required: true },
+        he: { type: String, required: true },
+    },
+    description: {
+        en: { type: String },
+        he: { type: String },
+    },
+    categories: [{
+        en: { type: String, required: true },
+        he: { type: String, required: true },
+    }], // רשימת קטגוריות בכל שפה
+    attributes: {
+        en: { type: Map, of: String },
+        he: { type: Map, of: String },
+    }, // מאפייני מוצר (צבע, גודל וכו')
+    highlight: {
+        en: [String],
+        he: [String],
+    }, // תיאור מקוצר של המוצר
+    price: { type: Number, required: true },
+    stock: { type: Number, default: 0 }, // כמות במלאי
+    allowBackorder: { type: Boolean, default: false }, // האם ניתן להזמין כשהמלאי נגמר
+    discounts: [{
+        percentage: { type: Number, required: true },
+        startDate: { type: Date, required: true },
+        endDate: { type: Date, required: true },
+    }], // מבצעים
+    internationalShipping: { type: Boolean, default: false }, // האם ניתן לשלוח לחו"ל
+    reviews: [{
+        user: { type: mongoose.Schema.Types.ObjectId, ref: 'Users' }, 
+        rating: { type: Number, min: 1, max: 5, required: true },
+        comment: {
+            en: { type: String },
+            he: { type: String },
+        },
+        createdAt: { type: Date, default: Date.now },
+    }], // חוות דעת גולשים
+    manufacturingCost: { type: Number, default: 0 }, // עלות ייצור
+    images: [{ type: String }], // רשימת כתובות תמונות
+    store: { type: mongoose.Schema.Types.ObjectId, ref: 'Stores', required: true }, // מזהה חנות
+    createdAt: { type: Date, default: Date.now },
+}, { timestamps: true });
+
+// חישוב רווח דינמי
+productSchema.virtual('profitMargin').get(function() {
+    return this.price - this.manufacturingCost;
+});
+
+const Products = mongoose.model('Products', productSchema, 'Products');
+module.exports = Products;
