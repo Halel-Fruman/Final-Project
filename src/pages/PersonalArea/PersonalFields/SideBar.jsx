@@ -5,7 +5,7 @@ const Sidebar = ({ currentView, onViewChange }) => {
   const { t } = useTranslation();
 
   return (
-    <div className="col-span-3 bg-white shadow rounded-lg p-4">
+    <div className="col-span-3 bg-white shadow rounded-lg p-4 ">
       <h2 className="text-xl font-bold mb-4">{t("personal_area.myAccount")}</h2>
       <ul className="space-y-2">
         <li

@@ -21,7 +21,8 @@
     "logout": "התנתק",
     "personal_area": "אזור אישי",
     "cart": "עגלת קניות",
-    "search": "חיפוש"
+    "search": "חיפוש",
+    "admin_dashboard": "לוח בקרה למנהל"
   },
   "featured_products": "מוצרים נבחרים",
   "price": "מחיר",
@@ -30,6 +31,7 @@
     "welcome": "ברוך הבא, {{username}}",
     "userInfo": "פרטי משתמש",
     "email": "כתובת מייל ",
+    "phone": "טלפון",
     "firstName": "שם פרטי ",
     "lastName": "שם משפחה ",
     "edit": "ערוך",
@@ -63,6 +65,7 @@
     "passwordManagement": "ניהול סיסמה",
     "Wishlist": "רשימת המשאלות שלי",
     "accountSettings": "הגדרות החשבון",
+    "toggleMenu": "הצגת תפריט",
     "actions": {
       "delete": "מחק",
       "add": "הוסף",
@@ -90,6 +93,7 @@
     "last_name": "שם משפחה",
     "title": "הרשמה",
     "email": "כתובת אימייל",
+    "phoneNumber": "מספר טלפון",
     "password": "סיסמה",
     "confirmPassword": "אשר סיסמה",
     "submit": "הרשם",
@@ -104,6 +108,8 @@
     "email": "אימייל",
     "password": "סיסמה",
     "submit": "התחבר",
+    "notMember": "אין לך חשבון? הרשם כאן",
+    "registerLink": "להרשמה",
     "emailPlaceholder": "הכנס את כתובת האימייל שלך",
     "passwordPlaceholder": "הכנס את הסיסמה שלך",
     "success": "ההתחברות הצליחה!",
@@ -199,6 +205,9 @@
     "shipping": "משלוח ומסים יחושבו בתשלום.",
     "checkout": "לקופה",
     "continueShopping": "המשך בקניות"
+  },
+  "modal": {
+    "close": "סגור"
   }
 
 

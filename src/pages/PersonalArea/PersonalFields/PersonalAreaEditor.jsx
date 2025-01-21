@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
+
 const PersonalAreaEditor = ({ user, setUser, onSave }) => {
   const { t } = useTranslation();
   const [isEditing, setIsEditing] = useState(false);
@@ -64,13 +65,26 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
               className="block w-full rounded-md border border-gray-800 bg-gray-100  px-2 py-1 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
             />
           </div>
+
+          {/* הוספת שדה מספר טלפון */}
+          <div>
+            <label className="block text-gray-700 font-semibold mb-2">
+              {t("personal_area.phone")}
+            </label>
+            <input
+              type="tel"
+              value={editedUser.phoneNumber || ""}
+              onChange={(e) => handleFieldChange("phoneNumber", e.target.value)}
+              className="block w-full rounded-md border border-gray-800 bg-gray-100 px-2 py-1 shadow-sm focus:ring-secondaryColor focus:border-secondaryColor"
+              placeholder={t("personal_area.phonePlaceholder")}
+            />
+          </div>
         </div>
         <div className="mt-6">
-          {" "}
           <button
             onClick={() => setIsEditing(false)}
             aria-label={t("personal_area.cancel")}
-            className="bg-white text-gray-600  border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full ">
+            className="bg-white text-gray-600 border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full">
             <Icon
               icon="material-symbols:cancel-outline-rounded"
               width="36"
@@ -120,6 +134,16 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
           </label>
           <p className="block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm px-2 py-1">
             {user.email}
+          </p>
+        </div>
+
+        {/* הצגת מספר טלפון */}
+        <div>
+          <label className="block text-gray-700 font-semibold mb-2">
+            {t("personal_area.phone")}
+          </label>
+          <p className="block w-full rounded-md border-gray-300 bg-gray-100 shadow-sm px-2 py-1">
+            {user.phoneNumber || t("personal_area.noPhone")}
           </p>
         </div>
       </div>
