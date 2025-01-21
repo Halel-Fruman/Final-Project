@@ -198,6 +198,7 @@ const App = () => {
             />
             <Route path="/SysAdmin" element={token && (role === 'admin') ?
               (<Sidebar
+                token={token}
               />
               ) : (<Navigate to="/login" />)} />
             <Route path="/store-management" element={token && (role === 'storeManager') ?
