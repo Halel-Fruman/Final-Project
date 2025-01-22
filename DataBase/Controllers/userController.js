@@ -83,7 +83,7 @@ const UserController = {
 
       user.role = role;  // עדכון הרול של המשתמש
       await user.save();
-      
+
       res.status(200).json(user); // החזרת המשתמש המעודכן
     } catch (error) {
       res.status(500).send("Error updating user role: " + error.message);
@@ -246,7 +246,7 @@ const UserController = {
   },
 
   register: async (req, res) => {
-    const { email, password, firstName, lastName } = req.body;
+    const { email, password,phoneNumber, first_name, last_name } = req.body;
     console.log(req.body);
 
     try {
@@ -261,8 +261,9 @@ const UserController = {
       const newUser = new User({
         email,
         password: hashedPassword,
-        firstName,
-        lastName,
+        phoneNumber,
+        first_name,
+        last_name,
         addresses: [],
       });
 

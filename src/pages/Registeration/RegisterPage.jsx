@@ -29,8 +29,8 @@ export default function Register({ setToken, setUserId, onClose }) {
           email,
           password,
           phoneNumber,
-          firstName,
-          lastName,
+          first_name:firstName,
+          last_name:lastName,
         }),
       });
 

@@ -25,6 +25,7 @@ import Modal from "./components/Modal"; // ייבוא רכיב המודאל
 import LoginPage from "./pages/PersonalArea/LoginPage";
 import RegisterPage from "./pages/Registeration/RegisterPage";
 import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx"; // ייבוא AddAddressPage
+import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx"; // ייבוא StoreManagement
 
 const App = () => {
   const { i18n } = useTranslation();
