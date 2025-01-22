@@ -1,18 +1,37 @@
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
-    user: { type: mongoose.Schema.Types.ObjectId, ref: 'Users', required: true }, // מזהה משתמש
-    store: { type: mongoose.Schema.Types.ObjectId, ref: 'Stores', required: true }, // מזהה חנות
-    products: [{
-        product: { type: mongoose.Schema.Types.ObjectId, ref: 'Products', required: true }, // מזהה מוצר
-        quantity: { type: Number, required: true },
-        price: { type: Number, required: true }, // מחיר פריט בזמן הרכישה
-    }],
-    totalAmount: { type: Number, required: true },
-    status: { type: String, enum: ['pending', 'completed', 'canceled'], default: 'pending' }, // סטטוס העסקה
-    paymentMethod: { type: String, enum: ['credit_card', 'paypal', 'cash'], required: true }, // שיטת תשלום
-    createdAt: { type: Date, default: Date.now },
+  transactionId: { type: String, required: true, unique: true }, // מזהה ייחודי לעסקה (מהסליקה)
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // מזהה המשתמש שביצע את העסקה
+  status: { type: String, enum: ['pending', 'completed', 'canceled'], default: 'pending' }, // סטטוס העסקה
+  totalAmount: { type: Number, required: true }, // סכום העסקה הכולל לחנות זו
+  createdAt: { type: Date, default: Date.now }, // תאריך העסקה
+  buyerDetails: { // פרטי הקונה
+    fullName: { type: String, required: true },
+    phone: { type: String, required: true },
+    email: { type: String, required: true },
+    address: { type: String, required: true }
+  },
+  products: [
+    {
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product", required: true }, // מזהה מוצר
+      name: { type: String, required: true }, // שם המוצר
+      price: { type: Number, required: true }, // מחיר המוצר
+      quantity: { type: Number, required: true, min: 1 }, // כמות שנרכשה
+    }
+  ],
+  delivery: { // פרטי משלוח
+    deliveryMethod: { type: String, enum: ['pickup', 'courier', 'express'], required: true }, // שיטת משלוח
+    deliveryStatus: { type: String, enum: ['pending', 'shipped', 'delivered', 'canceled'], default: 'pending' }, // סטטוס המשלוח
+    trackingNumber: { type: String, default: '' }, // מספר מעקב אם רלוונטי
+    estimatedDelivery: { type: Date }, // תאריך הגעה משוער
+  }
 });
 
-const Transactions = mongoose.model('Transactions', transactionSchema, 'Transactions');
-module.exports = Transactions;
+const storeTransactionsSchema = new mongoose.Schema({
+  storeId: { type: mongoose.Schema.Types.ObjectId, ref: "Store", required: true, unique: true }, // מזהה החנות
+  storeName: { type: String, required: true }, // שם החנות
+  transactions: [transactionSchema] // מערך עסקאות של החנות
+});
+
+module.exports = mongoose.model('StoreTransactions', storeTransactionsSchema, 'Transactions');
