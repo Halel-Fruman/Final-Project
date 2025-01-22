@@ -28,8 +28,11 @@ const Header = ({
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
   };
+  console.log(isLoggedIn);   // האם המשתמש מחובר?
+  console.log(role);   // מה הערך של ה-role?
 
   return (
+
     <header className="bg-gray-50 shadow border-b-2 border-gray-200">
       <nav className="container mx-auto flex items-center justify-between py-4 px-6">
         {/* לוגו */}
@@ -45,16 +48,16 @@ const Header = ({
             <Link
               to="/SysAdmin"
               className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
-              ניהול מערכת
-            </Link>
+                  איזור ניהול מערכת
+                  </Link>
           )}
 
-          {isLoggedIn && role === "storeManager" && (
+          {isLoggedIn && role === 'storeManager' && (
             <Link
               to="/store-management"
               className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
-              {t("header.store_management")}
-            </Link>
+                  איזור ניהול חנות
+                  </Link>
           )}
 
           {isLoggedIn && (
@@ -137,18 +140,18 @@ const Header = ({
 
               {isLoggedIn && role === "admin" && (
                 <Link
-                  to="/admin-dashboard"
+                  to="/SysAdmin"
                   className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
-                  {t("header.admin_dashboard")}
-                </Link>
+                  איזור ניהול מערכת
+                                 </Link>
               )}
 
               {isLoggedIn && role === "storeManager" && (
                 <Link
                   to="/store-management"
                   className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
-                  {t("header.store_management")}
-                </Link>
+                  איזור ניהול חנות
+                                 </Link>
               )}
 
               {isLoggedIn && (

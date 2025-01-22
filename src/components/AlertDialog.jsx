@@ -14,7 +14,7 @@ export const AlertProvider = ({ children }) => {
   });
 
   const showAlert = (message, type = "info", onConfirm = null, onCancel = null) => {
-    console.log("כשהולכים להציג את האלרט");
+    console.log("כשהולכים להציג את האלר");
 
     setAlert({
       open: true,
@@ -30,7 +30,7 @@ export const AlertProvider = ({ children }) => {
   };
 
   return (
-    
+
     <AlertContext.Provider value={{ showAlert, closeAlert }}>
       {children}
       {alert.open && (

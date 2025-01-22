@@ -8,7 +8,7 @@ import CategoryManagement from './CategoryManagement.jsx'; // הוספנו את 
 import SysAdmin from './SysAdmin.jsx'; // ייבוא רכיב ניהול חנויות
 import UserManagement from './UserManagement.jsx'; // הוספנו את ניהול users
 
-const Sidebar = () => {
+const Sidebar = (token) => {
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState("dashboard");
     const { showAlert } = useAlert();
@@ -22,21 +22,22 @@ const Sidebar = () => {
             case "categories":
                 return <CategoryManagement />; // ניהול קטגוריות
             case "users":
-                return <UserManagement />; // ניהול קטגוריות
+                return <UserManagement token={token}
+                />; // ניהול קטגוריות
             default:
                 return <div className="p-6">בחר קטגוריה מהתפריט</div>;
         }
     };
 
-        
-    
+
+
     return (
         <div className="flex h-screen bg-gray-100">
             {/* תפריט צדדי */}
             <aside className="w-64 bg-white border-r shadow-md">
                 <div className="p-4 bg-gray-200 text-primaryColor font-bold">{t("sysadmin.admin_management")}</div>
                 <nav className="mt-4">
-                    {[ 
+                    {[
                         { id: "dashboard", label: "סטטיסטיקות כלליות", icon: "material-symbols:bar-chart-outline" },
                         { id: "stores", label: "ניהול חנויות", icon: "material-symbols:business-outline" },
                         { id: "categories", label: "ניהול קטגוריות", icon: "material-symbols:bar-chart-outline" },

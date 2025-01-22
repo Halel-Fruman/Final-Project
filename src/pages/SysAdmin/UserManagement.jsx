@@ -3,21 +3,21 @@ import axios from "axios";
 import { useAlert } from '../../components/AlertDialog.jsx';
 import { Icon } from '@iconify/react';
 
-const UserManagement = () => {
+const UserManagement = (token) => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
   const { showAlert } = useAlert();
 
   useEffect(() => {
-    const token = localStorage.getItem("token"); 
-    if (!token) {
+    const storedToken = localStorage.getItem("token");
+    if (!storedToken) {
       showAlert("אין הרשאה. התחבר מחדש.", "error");
       return;
     }
-  
+
     axios
       .get("http://localhost:5000/User/", {
-        headers: { Authorization: `Bearer ${token}` }
+        headers: { Authorization: `Bearer ${storedToken}` }
       })
       .then((res) => {
         const formattedUsers = res.data.map(user => ({
@@ -36,7 +36,7 @@ const UserManagement = () => {
         showAlert("אירעה שגיאה בעת קבלת פרטי המשתמשים", "error");
       });
   }, []);
-  
+
 
   const handleEditUser = (userId) => {
     const userToEdit = users.find(user => user._id === userId);
@@ -52,7 +52,7 @@ const UserManagement = () => {
       showAlert("יש להזין את כל השדות.", "error");
       return;
     }
-  
+
     const updatedUser = {
       first_name: selectedUser.firstName,  // שינוי שם השדה
       last_name: selectedUser.lastName,    // שינוי שם השדה
@@ -61,8 +61,15 @@ const UserManagement = () => {
       addresses: [selectedUser.address],   // הפיכת כתובת למערך
       role: selectedUser.role
     };
-  
-    axios.put(`http://localhost:5000/User/${selectedUser._id}`, updatedUser)
+    const storedToken2 = localStorage.getItem("token");
+    if (!storedToken2) {
+      showAlert("אין הרשאה. התחבר מחדש.", "error");
+      return;
+    }
+
+    axios.put(`http://localhost:5000/User/${selectedUser._id}/edit`, updatedUser, {
+      headers: { Authorization: `Bearer ${storedToken2}` }
+    })
       .then((res) => {
         setUsers(users.map(user => (user._id === selectedUser._id ? {
           ...user,
@@ -73,7 +80,7 @@ const UserManagement = () => {
           address: res.data.addresses?.[0] || "לא צוינה כתובת",
           role: res.data.role
         } : user)));
-  
+
         showAlert("המשתמש עודכן בהצלחה!", "success");
         setSelectedUser(null);
       })
@@ -82,7 +89,7 @@ const UserManagement = () => {
         showAlert("אירעה שגיאה בעת עדכון פרטי המשתמש", "error");
       });
   };
-  
+
   const handleCancelEdit = () => {
     setSelectedUser(null);
   };
@@ -126,11 +133,11 @@ const UserManagement = () => {
       </table>
 
       {selectedUser && (
-       <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
-       <div className="bg-white p-6 rounded shadow-lg w-1/3 max-h-[80vh] overflow-y-auto">
-         <h2 className="text-2xl font-bold mb-4 text-center">ערוך את פרטי המשתמש</h2>
-     
-            {["firstName", "lastName", "email", "phone", "address", "role"].map((field) => (
+        <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center z-10">
+          <div className="bg-white p-6 rounded shadow-lg w-1/3 max-h-[80vh] overflow-y-auto">
+            <h2 className="text-2xl font-bold mb-4 text-center">ערוך את פרטי המשתמש</h2>
+
+            {["firstName", "lastName", "email", "phone", "address"].map((field) => (
               <div key={field} className="mb-4">
                 <label className="block mb-1">{field}</label>
                 <input
@@ -141,6 +148,21 @@ const UserManagement = () => {
                 />
               </div>
             ))}
+
+            {/* Dropdown for role selection */}
+            <div className="mb-4">
+              <label className="block mb-1">תפקיד</label>
+              <select
+                className="w-full border px-3 py-2"
+                value={selectedUser.role || ""}
+                onChange={(e) => handleFieldChange("role", e.target.value)}
+              >
+                <option value="user">User</option>
+                <option value="storeManager">Store Manager</option>
+                <option value="admin">Admin</option>
+              </select>
+            </div>
+
 
             <div className="flex justify-end items-center mt-6">
               <button
