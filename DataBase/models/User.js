@@ -22,8 +22,8 @@ const transactionSchema = new mongoose.Schema({
   ]
 });
 const userSchema = new mongoose.Schema({
-  first_name: String,
-  last_name: String,
+  first_name:{type:String, required:true},
+  last_name:{type:String, required:true},
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   phoneNumber: { type: String, required: true },

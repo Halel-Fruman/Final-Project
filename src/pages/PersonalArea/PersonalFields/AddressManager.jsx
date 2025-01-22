@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-const AddressManager = ({ addresses, userId, onUpdate,token }) => {
+const AddressManager = ({ addresses, userId, onUpdate, token }) => {
   const { t } = useTranslation();
   const [newAddress, setNewAddress] = useState("");
   const [showAddAddress, setShowAddAddress] = useState(false);
@@ -107,17 +107,17 @@ const AddressManager = ({ addresses, userId, onUpdate,token }) => {
           {addresses?.length > 0 ? (
             addresses.map((address, index) => (
               <div key={index} className="card mb-3 p-2">
-                <div className="d-flex justify-content-between align-items-center">
+                <div className="flex justify-content-between align-items-center">
                   {editingIndex === index ? (
                     <>
                       <input
                         type="text"
-                        className="w-1/3 block rounded-md border-4 border-gray-800 bg-gray-100 shadow-sm px-2 py-1"
+                        className="w-1/3 bg-gray-100 p-4 rounded-md flex justify-between items-center shadow-sm"
                         value={editingValue}
                         onChange={(e) => setEditingValue(e.target.value)}
                       />
                       <button
-                        className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white hover:rounded-full"
+                        className="bg-white m-3 text-primaryColor rounded-full hover:bg-primaryColor hover:text-white hover:rounded-full"
                         aria-label={t("personal_area.actions.save")}
                         onClick={handleEditAddress}>
                         <Icon
@@ -127,7 +127,7 @@ const AddressManager = ({ addresses, userId, onUpdate,token }) => {
                         />
                       </button>
                       <button
-                        className="bg-white text-gray-600  border-primaryColor rounded mr-2 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full "
+                        className="bg-white m-3 text-gray-600  border-primaryColor rounded mr-0 rounded hover:bg-gray-600 hover:text-gray-300 hover:rounded-full "
                         aria-label={t("personal_area.actions.cancel")}
                         onClick={() => setEditingIndex(null)}>
                         <Icon
@@ -139,12 +139,13 @@ const AddressManager = ({ addresses, userId, onUpdate,token }) => {
                     </>
                   ) : (
                     <>
-                      <span className="w-1/3 block rounded-md border-2 border-gray-300 bg-gray-100 shadow-sm px-2 py-1">
+
+                      <span className="w-1/3 bg-gray-100 p-4 rounded-md flex justify-between items-center shadow-sm">
                         {address}
                       </span>
                       <div>
                         <button
-                          className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+                          className="bg-white m-3 mr-0 text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white"
                           onClick={() => {
                             setEditingIndex(index);
                             setEditingValue(address);
@@ -156,7 +157,7 @@ const AddressManager = ({ addresses, userId, onUpdate,token }) => {
                           />{" "}
                         </button>
                         <button
-                          className="bg-white text-deleteC  rounded hover:bg-deleteC hover:text-white "
+                          className="bg-white m-3 mr-0 text-deleteC rounded hover:bg-deleteC hover:text-white "
                           onClick={() => handleDeleteAddress(index)}>
                           <Icon
                             icon="material-symbols:delete-outline"
@@ -177,13 +178,13 @@ const AddressManager = ({ addresses, userId, onUpdate,token }) => {
             <div className="d-flex mt-3">
               <input
                 type="text"
-                className="w-1/3 block rounded-md border-4 border-gray-800 bg-gray-100 shadow-sm px-2 py-1"
+                className="bg-gray-100 p-4 rounded-md flex justify-between items-center shadow-sm"
                 placeholder={t("personal_area.actions.addAddress")}
                 value={newAddress}
                 onChange={(e) => setNewAddress(e.target.value)}
               />
               <button
-                className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+                className="bg-white text-primaryColor ring-1 ring-Color rounded-full hover:bg-primaryColor hover:text-white hover:border-primaryColor hover:rounded-full"
                 onClick={handleAddAddress}
                 aria-label={t("personal_area.actions.add")}>
                 <Icon

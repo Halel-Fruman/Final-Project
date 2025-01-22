@@ -6,11 +6,24 @@ import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
 import LanguageSelector from "../LanguageSelector";
 import { Icon } from "@iconify/react";
 import logo from "../../logo-ilan-g.svg";
-import { ShoppingCartIcon } from '@heroicons/react/24/outline';
+import { ShoppingCartIcon } from "@heroicons/react/24/outline";
+import Login from "../..//pages/PersonalArea/LoginPage";
+import Register from "../../pages/Registeration/RegisterPage";
 
-const Header = ({ onLogout, isLoggedIn, onCartClick, cartItems, role }) => {
+const Header = ({
+  onLogout,
+  isLoggedIn,
+  onCartClick,
+  cartItems,
+  role,
+  setToken,
+  setUserId,
+  setUserRole,
+}) => {
   const { i18n, t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
@@ -31,19 +44,19 @@ const Header = ({ onLogout, isLoggedIn, onCartClick, cartItems, role }) => {
 
         {/* ניווט דסקטופ */}
         <div className="hidden lg:flex items-center space-x-2">
-          {isLoggedIn && role === 'admin' && (
+          {isLoggedIn && role === "admin" && (
             <Link
               to="/SysAdmin"
               className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
-                  איזור ניהול מערכת 
+                  איזור ניהול מערכת
                   </Link>
           )}
 
           {isLoggedIn && role === 'storeManager' && (
-            <Link 
+            <Link
               to="/store-management"
               className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
-                  איזור ניהול חנות 
+                  איזור ניהול חנות
                   </Link>
           )}
 
@@ -64,18 +77,18 @@ const Header = ({ onLogout, isLoggedIn, onCartClick, cartItems, role }) => {
             </button>
           ) : (
             <>
-              <Link
-                to="/login"
-                className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800 ">
+              <button
+                onClick={() => setIsLoginModalOpen(true)}
+                className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
                 {t("login.title")}
-              </Link>
+              </button>
               <div className="h-6 border-r border-gray-300"></div>
 
-              <Link
-                to="/register"
+              <button
+                onClick={() => setIsRegisterModalOpen(true)}
                 className="text-sm font-medium text-gray-700 hover:text-gray-800">
                 {t("register.title")}
-              </Link>
+              </button>
             </>
           )}
 
@@ -120,25 +133,24 @@ const Header = ({ onLogout, isLoggedIn, onCartClick, cartItems, role }) => {
           </div>
           <div className="px-4 py-6">
             <div className="space-y-4">
-              {/* בורר שפה */}
               <LanguageSelector
                 changeLanguage={changeLanguage}
                 currentLanguage={i18n.language}
               />
 
-              {isLoggedIn && role === 'admin' && (
+              {isLoggedIn && role === "admin" && (
                 <Link
                   to="/SysAdmin"
                   className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
-                  איזור ניהול מערכת 
+                  איזור ניהול מערכת
                                  </Link>
               )}
 
-              {isLoggedIn && role === 'storeManager' && (
+              {isLoggedIn && role === "storeManager" && (
                 <Link
                   to="/store-management"
                   className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
-                  איזור ניהול חנות 
+                  איזור ניהול חנות
                                  </Link>
               )}
 
@@ -158,20 +170,66 @@ const Header = ({ onLogout, isLoggedIn, onCartClick, cartItems, role }) => {
                 </button>
               ) : (
                 <>
-                  <Link
-                    to="/login"
+                  <button
+                    onClick={() => {
+                      setIsLoginModalOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
                     className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-green-500 rounded hover:bg-green-600">
                     {t("login.title")}
-                  </Link>
-                  <Link
-                    to="/register"
+                  </button>
+                  <button
+                    onClick={() => {
+                      setIsRegisterModalOpen(true);
+                      setMobileMenuOpen(false);
+                    }}
                     className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-blue-500 rounded hover:bg-blue-600">
                     {t("register.title")}
-                  </Link>
+                  </button>
                 </>
               )}
             </div>
           </div>
+        </DialogPanel>
+      </Dialog>
+
+      {/* Login Modal */}
+      <Dialog
+        open={isLoginModalOpen}
+        onClose={() => setIsLoginModalOpen(false)}
+        className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50" />
+        <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+          <button
+            onClick={() => setIsLoginModalOpen(false)}
+            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+            <XMarkIcon className="h-6 w-6" />
+          </button>
+          <Login
+            setToken={setToken}
+            setUserId={setUserId}
+            setUserRole={setUserRole}
+            onClose={() => setIsLoginModalOpen(false)}
+            openRegisterModal={() => {
+              setIsLoginModalOpen(false); // סגור את מודאל ההתחברות
+              setIsRegisterModalOpen(true); // פתח את מודאל ההרשמה
+            }}
+          />
+        </DialogPanel>
+      </Dialog>
+
+      {/* Register Modal */}
+      <Dialog
+        open={isRegisterModalOpen}
+        onClose={() => setIsRegisterModalOpen(false)}
+        className="fixed inset-0 z-50 flex items-center justify-center">
+        <div className="fixed inset-0 bg-black bg-opacity-50" />
+        <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+          <Register
+            setToken={setToken}
+            setUserId={setUserId}
+            onClose={() => setIsRegisterModalOpen(false)}
+          />
         </DialogPanel>
       </Dialog>
     </header>
