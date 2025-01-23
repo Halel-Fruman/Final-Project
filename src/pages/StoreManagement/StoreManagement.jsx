@@ -1,13 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { Icon } from "@iconify/react";
 import ProductManagement from "./ProductManagement.jsx";
+import OrderManagement from "./OrderManagement.jsx";
 import { useTranslation } from "react-i18next";
 
 
 const StoreManagement = () => {
-  const [products, setProducts] = useState([]);
-  const [orders, setOrders] = useState([]);
-  const [managers, setManagers] = useState([]);
+  
   const [activeTab, setActiveTab] = useState("dashboard");
   const [storeId, setStoreId] = useState(null); // Store ID managed by the user
   const [userEmail, setUserEmail] = useState([]); // Assumes email is stored in localStorage
@@ -82,7 +81,7 @@ const StoreManagement = () => {
       case "products":
         return <ProductManagement storeId={storeId} />;
       case "orders":
-        return <div className="p-6">📦 ניהול הזמנות</div>;
+        return <OrderManagement storeId={storeId}/>;
       case "transactions":
         return <div className="p-6">💰 עסקאות</div>;
       case "store-stats":

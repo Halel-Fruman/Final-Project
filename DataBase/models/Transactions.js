@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const transactionSchema = new mongoose.Schema({
   transactionId: { type: String, required: true, unique: true }, // מזהה ייחודי לעסקה (מהסליקה)
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // מזהה המשתמש שביצע את העסקה
-  status: { type: String, enum: ['pending', 'completed', 'canceled'], default: 'pending' }, // סטטוס העסקה
+  status: { type: String, enum: ['pending', 'shipped','completed', 'canceled'], default: 'pending' }, // סטטוס העסקה
   totalAmount: { type: Number, required: true }, // סכום העסקה הכולל לחנות זו
   createdAt: { type: Date, default: Date.now }, // תאריך העסקה
   buyerDetails: { // פרטי הקונה
@@ -22,7 +22,7 @@ const transactionSchema = new mongoose.Schema({
   ],
   delivery: { // פרטי משלוח
     deliveryMethod: { type: String, enum: ['pickup', 'courier', 'express'], required: true }, // שיטת משלוח
-    deliveryStatus: { type: String, enum: ['pending', 'shipped', 'delivered', 'canceled'], default: 'pending' }, // סטטוס המשלוח
+    deliveryStatus: { type: String, enum: ['pending', 'packed', 'shipped', 'completed', 'canceled'], default: 'pending' },
     trackingNumber: { type: String, default: '' }, // מספר מעקב אם רלוונטי
     estimatedDelivery: { type: Date }, // תאריך הגעה משוער
   }
