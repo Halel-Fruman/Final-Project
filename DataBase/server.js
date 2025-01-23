@@ -3,7 +3,6 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const userRoutes = require('./Routes/userRoutes');
-const productRoutes = require('./Routes/productsRoutes');
 const storeRoutes = require('./Routes/storeRoutes'); // ייבוא הנתיבים של החנויות
 const realProductRoutes = require('./Routes/realProductsRoutes'); // מוצרים אמיתיים
 const transactionRoutes = require('./Routes/transactionRoutes'); // עסקאות
@@ -25,10 +24,9 @@ mongoose.connect(process.env.MONGO_URI)
 
 /// Routes
 app.use('/User', userRoutes); // משתמשים
-app.use('/Example_products', productRoutes); // מוצרים לדוגמא
 app.use('/Stores', storeRoutes); // חנויות
 app.use('/Products', realProductRoutes); // מוצרים אמיתיים
-app.use('/Transactions', transactionRoutes); // 
+app.use('/Transactions', transactionRoutes); //
 app.use("/Category", categoryRoutes);
 
 // User Schema & Model

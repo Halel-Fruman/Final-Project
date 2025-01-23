@@ -13,7 +13,7 @@ const WishlistComponent = ({ wishlist, removeFromWishlist, refreshWishlist , add
         const fetchedProducts = await Promise.all(
           wishlist.map(async (item) => {
             const response = await fetch(
-              `http://localhost:5000/Example_products/${item.productId}`
+              `http://localhost:5000/products/${item.productId}`
             );
             if (!response.ok) {
               throw new Error(
@@ -83,7 +83,7 @@ const WishlistComponent = ({ wishlist, removeFromWishlist, refreshWishlist , add
             <tr key={product._id} className="hover:bg-gray-50">
               <td className="p-4 flex items-center ">
                 <img
-                  src={product.picture || "https://placehold.co/50"}
+                  src={product.images[0] || "https://placehold.co/50"}
                   alt={
                     product.name[i18n.language] || t("product.nameUnavailable")
                   }

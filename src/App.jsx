@@ -199,7 +199,7 @@ const App = () => {
               }
             />
             <Route
-              path="/product/:id"
+              path="/Products/:id"
               element={
                 <ProductPage
                   addToWishlist={addToWishlist}

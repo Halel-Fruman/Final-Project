@@ -313,8 +313,8 @@ const UserController = {
     try {
       const user = await User.findById(userId).populate({
         path: "wishlist.productId",
-        model: "Example_products",
-        select: "name price picture",
+        model: "Products",
+        select: "name price images[0]",
       });
 
       if (!user) return res.status(404).json({ error: "User not found" });
@@ -402,8 +402,8 @@ getCart: async (req, res) => {
   try {
     const user = await User.findById(userId).populate({
       path: "cart.productId",
-      model: "Example_products",
-      select: "name price picture",
+      model: "Products",
+      select: "name price images[0]",
     });
 
     if (!user) return res.status(404).json({ error: "User not found" });

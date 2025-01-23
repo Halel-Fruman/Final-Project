@@ -1,6 +1,5 @@
 // utils/Cart.js
 
-import { stringify } from "postcss";
 
 // טעינת עגלה מהדאטה בייס
 export const fetchCart = async (userId, token) => {
@@ -120,7 +119,7 @@ export const fetchCart = async (userId, token) => {
     }
 
     try {
-      const response = await fetch(`http://localhost:5000/Example_products/${productId}`);
+      const response = await fetch(`http://localhost:5000/Products/${productId}`);
       if (!response.ok) {
         throw new Error("Failed to fetch product details.");
       }
