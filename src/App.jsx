@@ -209,20 +209,7 @@ const App = () => {
                 />
               }
             />
-            <Route
-              path="/SysAdmin"
-              element={
-                token ? (
-                  <Navigate to="/" />
-                ) : (
-                  <LoginPage setToken={setToken} setUserId={setUserId} setUserRole={setRole} />
-                )
-              }
-            />
-            <Route
-              path="/register"
-              element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
-            />
+            
             <Route path="/SysAdmin" element={token && (role === 'admin') ?
               (<Sidebar
                 token={token}
