@@ -215,21 +215,40 @@ const App = () => {
                 token ? (
                   <Navigate to="/" />
                 ) : (
-                  <LoginPage setToken={setToken} setUserId={setUserId} setUserRole={setRole} />
+                  <LoginPage
+                    setToken={setToken}
+                    setUserId={setUserId}
+                    setUserRole={setRole}
+                  />
                 )
               }
             />
             <Route
               path="/register"
-              element={<RegisterPage setToken={setToken} setUserId={setUserId} />}
+              element={
+                <RegisterPage setToken={setToken} setUserId={setUserId} />
+              }
             />
-            <Route path="/SysAdmin" element={token && (role === 'admin') ?
-              (<Sidebar
-                token={token}
-              />
-              ) : (<Navigate to="/login" />)} />
-            <Route path="/store-management" element={token && (role === 'storeManager') ?
-              (<StoreManagement />) : (<Navigate to="/login" />)} />
+            <Route
+              path="/SysAdmin"
+              element={
+                token && role === "admin" ? (
+                  <Sidebar token={token} />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
+            <Route
+              path="/store-management"
+              element={
+                token && role === "storeManager" ? (
+                  <StoreManagement />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
 
             <Route
               path="/personal-area"

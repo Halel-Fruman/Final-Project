@@ -333,6 +333,7 @@ const UserController = {
               name: product.name,
               price: product.price,
               image: product.images[0],
+              quantity: product.stock,
               storeId: store._id,
               storeName: store.storeName,
             },
