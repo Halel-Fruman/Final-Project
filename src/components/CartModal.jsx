@@ -81,7 +81,7 @@ const CartModal = ({
                   {detailedCartItems.map((item) => (
                     <li key={item._id} className="py-4 flex items-center">
                       <img
-                        src={item.picture}
+                        src={item.images[0]}
                         alt={item.name[i18n.language]}
                         className="w-16 h-16 m-2 rounded-md object-cover"
                       />

@@ -6,23 +6,28 @@ import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
-  const { id } = useParams();
-  const { t, i18n } = useTranslation(); // שימוש ב-i18n וב-t לצורך תרגום
+  const { id } = useParams(); // מזהה המוצר מה-URL
+  const { t, i18n } = useTranslation();
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [selectedImage, setSelectedImage] = useState(null);
+  const [rating, setRating] = useState(0);
 
+  // Fetch product details
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(
-          `http://localhost:5000/Example_products/${id}`
+        const response = await fetch(`http://localhost:5000/Products/${id}`,
+
         );
         if (!response.ok) {
           throw new Error(t("error.fetchProduct"));
         }
         const data = await response.json();
-        setProduct(data);
+        setProduct(data); // קבלת פרטי המוצר
+        setSelectedImage(data.images[0]); // ברירת מחדל: התמונה הראשונה
+        setRating(data.reviews?.average || 0); // טעינת דירוג מהמוצר
       } catch (err) {
         setError(err.message);
       } finally {
@@ -35,20 +40,43 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
-      (item) =>
-        String(item.productId._id || item.productId) === String(product._id)
+      (item) => String(item.productId) === String(product._id)
     );
 
     addToWishlist(product, isInWishlist);
   };
 
   const handleAddToCart = () => {
-    console.log("Adding to cart:", product._id);
     addToCart({
       productId: product._id,
       quantity: 1,
-    }); // קריאה לפונקציה שמנהלת את העגלה
-    alert(t("cart.added", { name: product.name[i18n.language] }));
+    });
+  };
+
+  const handleImageClick = (image) => {
+    setSelectedImage(image);
+  };
+
+  const handleRating = async (newRating) => {
+    try {
+      const response = await fetch(
+        `http://localhost:5000/products/${id}/rate`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ rating: newRating }),
+        }
+      );
+
+      if (!response.ok) throw new Error("Failed to update rating");
+      const updatedProduct = await response.json();
+      setProduct(updatedProduct.product);
+      setRating(newRating);
+    } catch (err) {
+      console.error("Error updating rating:", err.message);
+    }
   };
 
   if (isLoading) {
@@ -75,17 +103,15 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     );
   }
 
-  const language = i18n.language; // השפה הנוכחית
+  const language = i18n.language;
   const productName = product.name[language] || product.name["en"];
-  const productDetails = product.details[language] || product.details["en"];
+  const productDetails =
+    product.description[language] || product.description["en"];
   const productHighlights =
     product.highlight[language] || product.highlight["en"] || [];
   const productPrice = product.price || t("product.noPrice");
-  const productPicture = product.picture || "https://placehold.co/300";
-  const productReview = product.review || { average: 0, totalCount: 0 };
   const isInWishlist = wishlist?.find(
-    (item) =>
-      String(item.productId._id || item.productId) === String(product._id)
+    (item) => String(item.productId) === String(product._id)
   );
 
   return (
@@ -95,33 +121,49 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
           {/* תמונת המוצר */}
           <div className="flex-shrink-0">
             <img
-              src={productPicture}
+              src={selectedImage || "https://placehold.co/300"}
               alt={productName}
-              className="h-auto max-h-128 w-auto max-w-full rounded-lg shadow-lg"
+              className="h-128 w-176 rounded-lg shadow-lg"
             />
+            <div className="mt-4 flex gap-2">
+              {product.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Thumbnail ${index + 1}`}
+                  onClick={() => handleImageClick(image)}
+                  className={`h-16 w-16 object-cover rounded-lg cursor-pointer shadow ${
+                    selectedImage === image
+                      ? "border-2 border-primaryColor"
+                      : "border"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
 
           {/* פרטי המוצר */}
-          <div className="bg-white rounded-lg shadow-lg p-6 flex-grow min-h-128">
+          <div className="bg-white rounded-lg shadow-lg p-6 flex-grow relative min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {productName}
             </h1>
             <p className="text-xl text-secondaryColor font-semibold mb-4">
               ₪{productPrice}
             </p>
+
+            {/* דירוג כוכבים */}
             <div className="flex items-center mb-4">
               {[...Array(5)].map((_, i) => (
                 <StarIcon
                   key={i}
-                  className={`h-6 w-6 ${
-                    i < Math.round(productReview.average)
-                      ? "text-yellow-400"
-                      : "text-gray-300"
+                  className={`h-6 w-6 cursor-pointer ${
+                    i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"
                   }`}
+                  onClick={() => handleRating(i + 1)}
                 />
               ))}
               <span className="ml-2 text-gray-600">
-                ({productReview.totalCount} {t("product.reviews")})
+                ({product.reviews?.totalCount || 0} {t("product.reviews")})
               </span>
             </div>
 
@@ -143,18 +185,15 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               <p className="text-gray-700">{productDetails}</p>
             </div>
 
-            <div className="flex gap-4">
-              {/* כפתור הוספה לסל */}
+            <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
                 className="w-1/2 bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
-
-              {/* כפתור Wishlist */}
               <button
                 onClick={toggleWishlist}
-                className="bg-white p-2 rounded-full shadow-lg  hover:bg-gray-100 transition">
+                className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition">
                 {isInWishlist ? (
                   <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
                 ) : (

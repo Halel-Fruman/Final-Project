@@ -1,12 +1,21 @@
 const express = require("express");
 const router = express.Router();
-const Product = require("../models/Products"); // חיבור למודל המוצרים האמיתי
+const StoreProducts = require("../models/Products");
+const mongoose = require("mongoose");
+const axios = require("axios");
 
-// קבלת כל המוצרים
+// קבלת כל המוצרים מכל החנויות
 router.get("/", async (req, res) => {
   try {
-    const products = await Product.find();
-    res.json(products);
+    const stores = await StoreProducts.find();
+    const allProducts = stores.flatMap((store) =>
+      store.products.map((product) => ({
+        ...product.toObject(),
+        storeId: store._id,
+        storeName: store.storeName,
+      }))
+    );
+    res.json(allProducts);
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -15,68 +24,95 @@ router.get("/", async (req, res) => {
 // קבלת מוצר לפי ID
 router.get("/:id", async (req, res) => {
   try {
-    const product = await Product.findById(req.params.id);
-    if (!product) return res.status(404).json({ message: "Product not found" });
-    res.json(product);
+    const { id } = req.params;
+
+    // Validate ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ message: "Invalid Product ID" });
+    }
+
+    // Find the store that contains the product
+    const store = await StoreProducts.findOne({ "products._id": id });
+    if (!store) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Find the product inside the store
+    const product = store.products.find(
+      (product) => String(product._id) === id
+    );
+
+    if (!product) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Return the product with store details
+    res.json({
+      ...product.toObject(),
+      storeId: store.storeId, // Include the store's ID
+      storeName: store.storeName, // Include the store's name
+    });
   } catch (err) {
+    console.error("Error fetching product:", err.message);
     res.status(500).json({ message: err.message });
   }
 });
 
-const axios = require("axios");
-
+// יצירת מוצר חדש בחנות
 router.post("/", async (req, res) => {
   try {
-    const { name, price, stock, description, store, categories } = req.body;
+    const { name, price, stock, description, storeId, categories } = req.body;
 
-    // המרת קטגוריות באמצעות axios
-    const categoriesO = await Promise.all(
-      categories.map(async (categoryId) => {
-        try {
-          const response = await axios.get(`http://localhost:5000/Category/${categoryId}`);
-          const category = response.data;
+    const store = await StoreProducts.findById(storeId);
+    if (!store) {
+      return res.status(404).json({ message: "Store not found" });
+    }
 
-          if (!category.name || !category.name.en || !category.name.he) {
-            throw new Error(`Invalid category format for category ${categoryId}`);
-          }
-
-          // השתמש בקטגוריה כפי שהיא
-          return category.name;
-        } catch (err) {
-          console.error(`Error fetching category ${categoryId}:`, err.message);
-          throw new Error(`Failed to fetch category ${categoryId}`);
-        }
-      })
-    );
-
-    const newProduct = new Product({
+    const newProduct = {
       name,
-      price: parseFloat(price), // המרת מחיר למספר
-      stock: parseInt(stock, 10), // המרת מלאי למספר
+      price: parseFloat(price),
+      stock: parseInt(stock, 10),
       description,
-      store: store, // המרת מזהה חנות ל-ObjectId
-      categories: categoriesO, // רשימת קטגוריות בפורמט הנדרש
-    });
+      categories,
+    };
 
-    const savedProduct = await newProduct.save();
-    res.status(201).json(savedProduct);
+    store.products.push(newProduct);
+    await store.save();
+
+    res.status(201).json(newProduct);
   } catch (err) {
     console.error("Error creating product:", err.message);
     res.status(400).json({ message: err.message });
   }
 });
 
-
 // עדכון מוצר
 router.put("/:id", async (req, res) => {
   try {
-    const updatedProduct = await Product.findByIdAndUpdate(
-      req.params.id,
-      req.body,
-      { new: true }
-    );
-    if (!updatedProduct)
+    const { id } = req.params;
+
+    const store = await StoreProducts.findOne({ "products._id": id });
+    if (!store) {
       return res.status(404).json({ message: "Product not found" });
+    }
+
+    const productIndex = store.products.findIndex(
+      (product) => String(product._id) === id
+    );
+
+    if (productIndex === -1) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    const updatedProduct = {
+      ...store.products[productIndex].toObject(),
+      ...req.body,
+    };
+
+    store.products[productIndex] = updatedProduct;
+
+    await store.save();
+
     res.json(updatedProduct);
   } catch (err) {
     res.status(400).json({ message: err.message });
@@ -86,9 +122,19 @@ router.put("/:id", async (req, res) => {
 // מחיקת מוצר
 router.delete("/:id", async (req, res) => {
   try {
-    const deletedProduct = await Product.findByIdAndDelete(req.params.id);
-    if (!deletedProduct)
+    const { id } = req.params;
+
+    const store = await StoreProducts.findOne({ "products._id": id });
+    if (!store) {
       return res.status(404).json({ message: "Product not found" });
+    }
+
+    store.products = store.products.filter(
+      (product) => String(product._id) !== id
+    );
+
+    await store.save();
+
     res.json({ message: "Product deleted successfully" });
   } catch (err) {
     res.status(500).json({ message: err.message });

@@ -7,19 +7,18 @@ import backgroundImage from "../../backgroung.jpg";
 
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
-  const [products, setProducts] = useState([]);
+  const [allProducts, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/Example_products/");
+        const response = await fetch("http://localhost:5000/Products/");
         if (!response.ok) {
           throw new Error("Failed to fetch products");
         }
-        const data = await response.json();
+        const data = await response.json(); // המידע מכיל את כל המוצרים מכל החנויות
         setProducts(data);
       } catch (err) {
         setError(err.message);
@@ -34,7 +33,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
       (item) =>
-        String(item.productId?._id || item.productId) === String(product._id)
+        String( item.productId) === String(product._id)
     );
     addToWishlist(product, isInWishlist);
   };
@@ -97,12 +96,12 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           {t("featured_products")}
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {products.map((product) => {
+          {allProducts.map((product) => {
             const isInWishlist = wishlistLoading
               ? false
               : wishlist?.some(
                   (item) =>
-                    String(item.productId?._id || item.productId) ===
+                    String(item.productId) ===
                     String(product._id)
                 );
 
@@ -126,10 +125,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                   </button>
 
                   {/* Product Image */}
-                  <Link to={`/product/${product._id}`}>
+                  <Link to={`/products/${product._id}`}>
                     <div className="aspect-w-1 aspect-h-1 rounded-lg">
                       <img
-                        src={product.picture}
+                        src={product.images[0]}
                         alt={product.name[i18n.language]}
                         className="object-cover w-full h-56 sm:h-64 lg:h-72"
                       />
