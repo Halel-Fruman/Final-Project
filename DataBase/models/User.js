@@ -30,12 +30,12 @@ const userSchema = new mongoose.Schema({
   role:{type: String, enum: ['user','storeManager','admin'], default:'user'},
   addresses: { type: [String], default: [] },
   cart: [{
-    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Product" },
+    productId: { type: mongoose.Schema.Types.ObjectId, ref: "Products" },
     quantity: { type: Number, min: 1 },
   },],
   wishlist: [
     {
-      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Product' },
+      productId: { type: mongoose.Schema.Types.ObjectId, ref: 'Products' },
       addedAt: { type: Date, default: Date.now },
     },
   ],

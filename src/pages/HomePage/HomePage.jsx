@@ -33,7 +33,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
       (item) =>
-        String(item.productId?._id || item.productId) === String(product._id)
+        String( item.productId) === String(product._id)
     );
     addToWishlist(product, isInWishlist);
   };
@@ -101,7 +101,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
               ? false
               : wishlist?.some(
                   (item) =>
-                    String(item.productId?._id || item.productId) ===
+                    String(item.productId) ===
                     String(product._id)
                 );
 
