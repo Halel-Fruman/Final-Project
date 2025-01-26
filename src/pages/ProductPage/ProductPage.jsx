@@ -51,7 +51,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       productId: product._id,
       quantity: 1,
     });
-    alert(t("cart.added", { name: product.name[i18n.language] }));
   };
 
   const handleImageClick = (image) => {

@@ -370,31 +370,79 @@ const UserController = {
 
   addToCart: async (req, res) => {
     const { userId } = req.params;
-    const { productId } = req.body;
+    const { productId, quantity } = req.body;
 
     try {
       const user = await User.findById(userId);
       if (!user) return res.status(404).json({ error: "User not found" });
 
-      let existingItem = user.cart.find(
-        (item) => item.productId.toString() === productId
+      const existingCartItem = user.cart.find(
+        (item) => String(item.productId) === productId
       );
 
-      if (existingItem) {
-        // אם המוצר כבר קיים, עדכן את הכמות
-        existingItem.quantity += 1;
+      if (existingCartItem) {
+        existingCartItem.quantity += quantity;
       } else {
-        // אחרת, הוסף מוצר חדש לעגלה
-        user.cart.push({ productId, quantity: 1 });
+        user.cart.push({ productId, quantity });
       }
 
       await user.save();
-
-      res.status(200).json(user.cart);
+      res.status(200).json({ cart: user.cart });
     } catch (error) {
       res
         .status(500)
         .json({ error: "Error adding product to cart: " + error.message });
+    }
+  },
+
+  getCart: async (req, res) => {
+    const { userId } = req.params;
+
+    try {
+      const user = await User.findById(userId);
+
+      if (!user) {
+        return res.status(404).json({ error: "User not found" });
+      }
+
+      // טעינת פרטי כל המוצרים מהעגלה
+      const detailedCart = await Promise.all(
+        user.cart.map(async (item) => {
+          const store = await StoreProducts.findOne({
+            "products._id": item.productId,
+          });
+
+          if (!store) {
+            console.warn(`Store not found for productId: ${item.productId}`);
+            return null; // התעלמות מפריטים שלא נמצאו
+          }
+
+          // מציאת המוצר הספציפי תחת החנות
+          const product = store.products.find(
+            (product) => String(product._id) === String(item.productId)
+          );
+
+          if (!product) {
+            console.warn(`Product not found for productId: ${item.productId}`);
+            return null; // התעלמות מפריטים חסרים
+          }
+
+          return {
+            ...item.toObject(),
+            productDetails: product,
+            storeId: store._id,
+            storeName: store.storeName,
+          };
+        })
+      );
+
+      // סינון פריטים לא תקינים
+      const filteredCart = detailedCart.filter((item) => item !== null);
+
+      res.status(200).json(filteredCart);
+    } catch (error) {
+      console.error("Error fetching cart:", error.message);
+      res.status(500).json({ error: "Error fetching cart: " + error.message });
     }
   },
 
@@ -416,23 +464,6 @@ const UserController = {
       res
         .status(500)
         .json({ error: "Error removing product from cart: " + error.message });
-    }
-  },
-  getCart: async (req, res) => {
-    const { userId } = req.params;
-
-    try {
-      const user = await User.findById(userId).populate({
-        path: "cart.productId",
-        model: "StoreProducts",
-        select: "name price images[0]",
-      });
-
-      if (!user) return res.status(404).json({ error: "User not found" });
-
-      res.status(200).json(user.cart);
-    } catch (error) {
-      res.status(500).json({ error: "Error fetching cart: " + error.message });
     }
   },
 

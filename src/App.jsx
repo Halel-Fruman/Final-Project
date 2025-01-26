@@ -103,6 +103,7 @@ const App = () => {
     const updatedCart = await addToCart(userId, token, product);
     if (updatedCart) {
       setCartItems(updatedCart);
+      loadCart();
     }
   };
 
