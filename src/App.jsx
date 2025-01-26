@@ -103,6 +103,7 @@ const App = () => {
     const updatedCart = await addToCart(userId, token, product);
     if (updatedCart) {
       setCartItems(updatedCart);
+      loadCart();
     }
   };
 
@@ -199,7 +200,7 @@ const App = () => {
               }
             />
             <Route
-              path="/product/:id"
+              path="/Products/:id"
               element={
                 <ProductPage
                   addToWishlist={addToWishlist}
