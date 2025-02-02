@@ -1,22 +1,21 @@
 import React from "react";
 
 const Footer = () => {
+  // Footer component
   return (
     <footer id="g-footer" className="bg-gray-100 py-8">
       <div className="g-container mx-auto">
         <div className="g-grid grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* אודותינו */}
           <div className="g-block title-border p-4 lg:pl-16">
             <h3 className="text-xl font-bold mb-4">אודותינו</h3>
             <p>
-              עמותת איל"ן היא מהעמותות הוותיקות בארץ, שפועלת ליצירת מערכי
-              תמיכה לשילוב ילדים ובוגרים עם מוגבלויות, כעצמאיים ושווים בחברה
-              הישראלית הכללית. בחזונה, מאמינה איל"ן במתן חיים משמעותיים ואיכותיים
-              לאנשים עם מוגבלויות פיזית.
+              עמותת איל"ן היא מהעמותות הוותיקות בארץ, שפועלת ליצירת מערכי תמיכה
+              לשילוב ילדים ובוגרים עם מוגבלויות, כעצמאיים ושווים בחברה הישראלית
+              הכללית. בחזונה, מאמינה איל"ן במתן חיים משמעותיים ואיכותיים לאנשים
+              עם מוגבלויות פיזית.
             </p>
           </div>
-
-          {/* עקבו אחרינו */}
+          {/*social media */}
           <div className="g-block title-border p-4">
             <h3 className="text-xl font-bold mb-4">עקבו אחרינו</h3>
             <div className="flex gap-4">
@@ -24,38 +23,34 @@ const Footer = () => {
                 href="https://www.facebook.com/Ilan.Foundation/?locale=he_IL"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Facebook"
-              >
+                aria-label="Facebook">
                 <i className="fa fa-facebook fa-2x text-blue-600"></i>
               </a>
               <a
                 href="https://www.instagram.com/ilan_association/"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Instagram"
-              >
+                aria-label="Instagram">
                 <i className="fa fa-instagram fa-2x text-pink-500"></i>
               </a>
               <a
                 href="https://www.linkedin.com/company/ilan-il/"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="Linkedin"
-              >
+                aria-label="Linkedin">
                 <i className="fa fa-linkedin fa-2x text-blue-800"></i>
               </a>
               <a
                 href="https://www.youtube.com/@ilanisrael"
                 target="_blank"
                 rel="noopener noreferrer"
-                aria-label="YouTube"
-              >
+                aria-label="YouTube">
                 <i className="fa fa-youtube fa-2x text-red-600"></i>
               </a>
             </div>
           </div>
 
-          {/* פרטי קשר */}
+          {/*contact details */}
           <div className="g-block title-border p-4">
             <h3 className="text-xl font-bold mb-4">פרטי קשר</h3>
             <div className="space-y-4">
@@ -63,8 +58,7 @@ const Footer = () => {
                 <a
                   href="mailto:ilan@ilan-israel.co.il"
                   target="_blank"
-                  rel="noopener noreferrer"
-                >
+                  rel="noopener noreferrer">
                   <i className="fa fa-envelope-o"></i> ilan@ilan-israel.co.il
                 </a>
               </div>
@@ -77,8 +71,8 @@ const Footer = () => {
                 <i className="fa fa-fax"></i> 03-5249828
               </div>
               <div>
-                <i className="fa fa-home"></i> רח' מוטה גור 5, ת.ד 3092, פתח תקווה
-                4951623
+                <i className="fa fa-home"></i> רח' מוטה גור 5, ת.ד 3092, פתח
+                תקווה 4951623
               </div>
             </div>
           </div>

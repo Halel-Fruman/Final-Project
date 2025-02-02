@@ -1,26 +1,30 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
+// The Register component is a functional component that takes the setToken, setUserId, and onClose as props
 export default function Register({ setToken, setUserId, onClose }) {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [phoneNumber, setPhoneNumber] = useState("");
-  const [firstName, setFirstName] = useState("");
-  const [lastName, setLastName] = useState("");
-  const [error, setError] = useState(null);
+  const [email, setEmail] = useState(""); // The email state is used to store the email value
+  const [password, setPassword] = useState(""); // The password state is used to store the password value
+  const [confirmPassword, setConfirmPassword] = useState(""); // The confirmPassword state is used to store the confirm password value
+  const [phoneNumber, setPhoneNumber] = useState(""); // The phoneNumber state is used to store the phone number value
+  const [firstName, setFirstName] = useState(""); // The firstName state is used to store the first name value
+  const [lastName, setLastName] = useState(""); // The lastName state is used to store the last name value
+  const [error, setError] = useState(null); // The error state is used to store the error message
 
-  const { t } = useTranslation();
+  const { t } = useTranslation(); // The useTranslation hook is used to access the i18n instance
 
+  // The handleSubmit function is an async function that handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError(null);
 
+    // Validate the password and confirm password
     if (password !== confirmPassword) {
       setError(t("register.errors.passwordMismatch"));
       return;
     }
 
+    // Send a POST request to the server with the user details
     try {
       const response = await fetch("http://localhost:5000/User/register", {
         method: "POST",
@@ -29,32 +33,32 @@ export default function Register({ setToken, setUserId, onClose }) {
           email,
           password,
           phoneNumber,
-          first_name:firstName,
-          last_name:lastName,
+          first_name: firstName,
+          last_name: lastName,
         }),
       });
-
+      // If the response is not ok, throw an error
       if (!response.ok) {
         throw new Error(t("register.errors.failed"));
       }
 
       const data = await response.json();
 
-      // שמירה ב-localStorage ועדכון מצב
+      // Store the token and userId in the local storage
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       setToken(data.token);
       setUserId(data.userId);
 
-      if (onClose) onClose(); // סגור את המודאל לאחר ההרשמה
+      if (onClose) onClose(); // Close the modal
     } catch (err) {
       setError(err.message);
     }
   };
 
+  // The return statement contains the JSX of the Register component
   return (
     <div className="relative bg-white rounded-lg  max-w-md w-full p-4">
-      {/* כפתור סגירה אחד בלבד */}
       {onClose && (
         <button
           onClick={onClose}
@@ -70,7 +74,6 @@ export default function Register({ setToken, setUserId, onClose }) {
 
       <div className="mt-4">
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* שדות טופס */}
           <div>
             <label
               htmlFor="firstName"

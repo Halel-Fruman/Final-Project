@@ -2,14 +2,17 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
+// AddressManager component
 const AddressManager = ({ addresses, userId, onUpdate, token }) => {
-  const { t } = useTranslation();
-  const [newAddress, setNewAddress] = useState("");
-  const [showAddAddress, setShowAddAddress] = useState(false);
-  const [editingIndex, setEditingIndex] = useState(null);
-  const [editingValue, setEditingValue] = useState("");
+  const { t } = useTranslation(); // useTranslation hook to get the t function to translate the text
+  const [newAddress, setNewAddress] = useState(""); // newAddress state to store the new address
+  const [showAddAddress, setShowAddAddress] = useState(false); // showAddAddress state to manage the visibility of the add address input
+  const [editingIndex, setEditingIndex] = useState(null); // editingIndex state to store the index of the address being edited
+  const [editingValue, setEditingValue] = useState(""); // editingValue state to store the value of the address being edited
 
+  // handleAddAddress function to add a new address
   const handleAddAddress = async () => {
+    // send a POST request to the server with the new address
     try {
       const response = await fetch(
         `http://localhost:5000/User/${userId}/add-address`,
@@ -22,24 +25,25 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
           body: JSON.stringify({ address: newAddress }),
         }
       );
-
+      // if the response is not ok, throw an error
       if (!response.ok) {
         throw new Error(t("personal_area.alerts.addError"));
       }
-
+      // get the updated addresses from the response
       const updatedAddresses = await response.json();
-      onUpdate(updatedAddresses);
-      setNewAddress("");
-      setShowAddAddress(false);
+      onUpdate(updatedAddresses); // call the onUpdate function with the updated addresses
+      setNewAddress(""); // clear the new address input
+      setShowAddAddress(false); // hide the add address input
       alert(t("personal_area.alerts.addressAdded"));
     } catch (err) {
       console.error(err.message);
       alert(t("personal_area.alerts.addError"));
     }
   };
-
+  // handleEditAddress function to edit an address
   const handleEditAddress = async () => {
     try {
+      // send a PUT request to the server with the updated address
       const response = await fetch(
         `http://localhost:5000/User/${userId}/edit`,
         {
@@ -54,49 +58,50 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
           }),
         }
       );
-
+      // if the response is not ok, throw an error
       if (!response.ok) {
         throw new Error(t("personal_area.alerts.updateError"));
       }
-
+      // get the updated addresses from the response
       const updatedAddresses = await response.json();
-      onUpdate(updatedAddresses);
-      setEditingIndex(null);
-      setEditingValue("");
+      onUpdate(updatedAddresses); // call the onUpdate function with the updated addresses
+      setEditingIndex(null); // clear the editing index
+      setEditingValue(""); // clear the editing value
       alert(t("personal_area.alerts.updateSuccess"));
     } catch (err) {
       console.error(err.message);
       alert(t("personal_area.alerts.updateError"));
     }
   };
-
+  // handleDeleteAddress function to delete an address
   const handleDeleteAddress = async (index) => {
+    // send a DELETE request to the server with the index of the address to delete
     try {
       const response = await fetch(
         `http://localhost:5000/User/${userId}/delete-address`,
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${token}`, // הוסף את ה-token לכותרות
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ index }),
         }
       );
-
+      // if the response is not ok, throw an error
       if (!response.ok) {
         throw new Error(t("personal_area.alerts.deleteError"));
       }
-
+      // get the updated addresses from the response
       const updatedAddresses = await response.json();
-      onUpdate(updatedAddresses);
+      onUpdate(updatedAddresses); // call the onUpdate function with the updated addresses
       alert(t("personal_area.alerts.deleteSuccess"));
     } catch (err) {
       console.error(err.message);
       alert(t("personal_area.alerts.deleteError"));
     }
   };
-
+  // return the JSX of the AddressManager component
   return (
     <div className="mb-4">
       <div className="card">
@@ -139,7 +144,6 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                     </>
                   ) : (
                     <>
-
                       <span className="w-1/3 bg-gray-100 p-4 rounded-md flex justify-between items-center shadow-sm">
                         {address}
                       </span>

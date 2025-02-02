@@ -1,6 +1,6 @@
 // utils/Cart.js
 
-// טעינת עגלה מהדאטה בייס
+// login function to send a POST request to the server with the email and password
 export const fetchCart = async (userId, token) => {
   try {
     const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
@@ -21,16 +21,16 @@ export const fetchCart = async (userId, token) => {
   }
 };
 
-// שמירת עגלה בדאטה בייס
+// saveCart function to send a PUT request to the server with the updated cart items
 export const saveCart = async (userId, token, cartItems) => {
   try {
     if (cartItems.length === 0) {
       console.log("Cart is empty. Skipping save.");
       return;
     }
-
+    // send a PUT request to the server with the updated cart items
     const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
-      method: "PUT", // עדכון כמות או שמירת פריטים קיימים
+      method: "PUT", // update the cart
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -47,11 +47,10 @@ export const saveCart = async (userId, token, cartItems) => {
     console.error("Error saving cart:", error.message);
   }
 };
-
+// add product to cart function to send a POST request to the server with the product ID
 export const addToCart = async (userId, token, product) => {
-  console.log("Product being sent to cart:", { productId: product.productId });
-
   try {
+    // send a POST request to the server with the product ID
     const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
       method: "POST",
       headers: {
@@ -60,7 +59,7 @@ export const addToCart = async (userId, token, product) => {
       },
       body: JSON.stringify({ productId: product.productId }),
     });
-
+    // if the response is not ok, throw an error
     if (!response.ok) {
       throw new Error("Failed to add to cart.");
     }
@@ -73,9 +72,10 @@ export const addToCart = async (userId, token, product) => {
   }
 };
 
-// הסרת פריט מהעגלה
+// remove product from cart
 export const removeFromCart = async (userId, token, productId) => {
   console.log("Removing product from cart:", { productId });
+  // send a DELETE request to the server to remove the product from the cart
   try {
     const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
       method: "DELETE",
@@ -85,33 +85,33 @@ export const removeFromCart = async (userId, token, productId) => {
       },
       body: JSON.stringify({ productId: productId, quantity: 1 }),
     });
-
+    //  if the response is not ok, throw an error
     if (!response.ok) {
       throw new Error("Failed to remove item from cart.");
     }
-
+    // return the updated cart
     const updatedCart = await response.json();
-    return updatedCart; // החזרת עגלה מעודכנת
+    return updatedCart;
   } catch (error) {
     console.error("Error removing item from cart:", error.message);
     return null;
   }
 };
 
-// חישוב סה"כ העגלה
+// calculate the total price of the cart
 export const calculateCartTotal = (cartItems) => {
   return cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 };
-
+// fetch the product details from the server
 export const fetchProductDetails = async (productId) => {
   if (!productId) {
     console.error("fetchProductDetails called with undefined productId");
     return null;
   }
-
+  // fetch the product details from the server
   try {
     const response = await fetch(`http://localhost:5000/Products/${productId}`);
     if (!response.ok) {

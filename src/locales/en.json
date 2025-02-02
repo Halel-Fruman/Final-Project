@@ -125,19 +125,19 @@
     "loading": "Loading your wishlist..."
   },
 
-    "submit": "Register",
-    "error": "An error occurred during registration, please try again",
-"product":{
-  "addToCart": "Add to Cart",
-  "noPrice": "Price not available",
-  "highlights": "Highlight",
-  "details": "Details",
-  "reviews": "Reviews"
-},
+  "submit": "Register",
+  "error": "An error occurred during registration, please try again",
+  "product": {
+    "addToCart": "Add to Cart",
+    "noPrice": "Price not available",
+    "highlights": "Highlight",
+    "details": "Details",
+    "reviews": "Reviews"
+  },
 
-"sysadmin": {
+  "sysadmin": {
     "admin_management": "System Administration",
-    "store_managemnt" : "Srotes Managment",
+    "store_managemnt": "Srotes Managment",
     "stores": "Stores",
     "store_name": "Store Name",
     "store_address": "Store Address",
@@ -155,18 +155,11 @@
     "delete_manager": "Delete Manager",
     "statistics": "Statistics",
     "statistics_info": "Here, statistical data about store activities will be displayed.",
-    "invalid_email" : "Invalid Email! please enter a valid email",
-    "edit" : "Edit",
+    "invalid_email": "Invalid Email! please enter a valid email",
+    "edit": "Edit",
     "cancel": "Cancel",
 
-
-
     "store_email": "Store Email"
-
-
-
-
-
   },
   "storemanage": {
     "manage_products": "Manage Products",
@@ -178,23 +171,16 @@
     "delete": "Delete"
   },
 
-
-    "cart": {
-      "title": "Shopping Cart",
-      "close": "Close",
-      "price": "Price",
-      "quantity": "Quantity",
-      "remove": "Remove",
-      "empty": "Your cart is empty.",
-      "subtotal": "Subtotal",
-      "shipping": "Shipping and taxes calculated at checkout.",
-      "checkout": "Checkout",
-      "continueShopping": "Continue Shopping"
-    }
-
-
-
-
+  "cart": {
+    "title": "Shopping Cart",
+    "close": "Close",
+    "price": "Price",
+    "quantity": "Quantity",
+    "remove": "Remove",
+    "empty": "Your cart is empty.",
+    "subtotal": "Subtotal",
+    "shipping": "Shipping and taxes calculated at checkout.",
+    "checkout": "Checkout",
+    "continueShopping": "Continue Shopping"
+  }
 }
-
-
