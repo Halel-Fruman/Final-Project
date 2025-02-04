@@ -1,6 +1,6 @@
 import React from "react";
 import { Dialog } from "@headlessui/react";
-
+//  Modal component
 const Modal = ({ isOpen, onClose, children }) => {
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">

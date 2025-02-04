@@ -2,57 +2,69 @@ import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-const WishlistComponent = ({ wishlist, removeFromWishlist, refreshWishlist , addToCart}) => {
-  const { t, i18n } = useTranslation();
-  const [products, setProducts] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+// The WishlistComponent is a functional component that takes the wishlist, removeFromWishlist, refreshWishlist, and addToCart as props.
+const WishlistComponent = ({
+  wishlist,
+  removeFromWishlist,
+  refreshWishlist,
+  addToCart,
+}) => {
+  const { t, i18n } = useTranslation(); // useTranslation hook to access the i18n instance and the translation function t
+  const [products, setProducts] = useState([]); // useState hook to store the products in the wishlist
+  const [isLoading, setIsLoading] = useState(true); // useState hook to store the loading state
 
+  // useEffect hook to fetch the products in the wishlist when the wishlist changes
   useEffect(() => {
     const fetchProducts = async () => {
+      // Use Promise.all to fetch all products in the wishlist
       try {
         const fetchedProducts = await Promise.all(
           wishlist.map(async (item) => {
             const response = await fetch(
               `http://localhost:5000/products/${item.productId}`
             );
+            // if the response is not ok, throw an error
             if (!response.ok) {
               throw new Error(
                 `Failed to fetch product with ID ${item.productId}`
               );
             }
+            // return the product data
             return await response.json();
           })
         );
-        setProducts(fetchedProducts);
+        setProducts(fetchedProducts); // set the fetched products in the state
       } catch (error) {
         console.error("Error fetching products for wishlist:", error.message);
       } finally {
         setIsLoading(false);
       }
     };
-
+    // if the wishlist is not empty, fetch the products
     if (wishlist?.length > 0) {
       fetchProducts();
     } else {
-      setProducts([]); // אם הווישליסט ריק, נעדכן את הרשימה ל-[]
-      setIsLoading(false);
+      setProducts([]); // set the products to an empty array
+      setIsLoading(false); // set the loading state to false
     }
   }, [wishlist]);
 
+  // handleRemoveFromWishlist function to remove a product from the wishlist
   const handleRemoveFromWishlist = async (product) => {
-    await removeFromWishlist(product,true); // מסיר את המוצר
-    console.log("product._id1",product._id);
-    refreshWishlist(); // טוען מחדש את הווישליסט
+    await removeFromWishlist(product, true); // remove the product from the wishlist
+    console.log("product._id1", product._id);
+    refreshWishlist(); // refresh the wishlist
   };
-
+  // if the products are loading, display a loading message
   if (isLoading) {
     return <p>{t("loading")}</p>;
   }
-
+  // if there are no products in the wishlist, display an empty message
   if (!products || products.length === 0) {
     return <p>{t("wishlist.empty")}</p>;
   }
 
+  // return the wishlist table with the products
   return (
     <div className="container mx-auto py-6">
       <h2 className="text-2xl font-bold text-center mb-4">

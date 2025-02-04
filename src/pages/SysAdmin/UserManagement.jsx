@@ -3,18 +3,20 @@ import axios from "axios";
 import { useAlert } from '../../components/AlertDialog.jsx';
 import { Icon } from '@iconify/react';
 
+// The UserManagement component is a functional component that takes the token as a prop
 const UserManagement = (token) => {
-  const [users, setUsers] = useState([]);
-  const [selectedUser, setSelectedUser] = useState(null);
-  const { showAlert } = useAlert();
+  const [users, setUsers] = useState([]); // The users state is used to store the list of users
+  const [selectedUser, setSelectedUser] = useState(null); // The selectedUser state is used to store the selected user
+  const { showAlert } = useAlert(); // The useAlert hook is used to show an alert dialog
 
+  // The useEffect hook is used to fetch the list of users when the component mounts
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (!storedToken) {
-      showAlert("אין הרשאה. התחבר מחדש.", "error");
+    const storedToken = localStorage.getItem("token"); // Get the token from localStorage
+    if (!storedToken) { // If there is no token, show an alert
+      showAlert("אין הרשאה. התחבר מחדש.", "error"); // Show an alert dialog
       return;
     }
-
+    // Send a GET request to the server to fetch the list of users
     axios
       .get("http://localhost:5000/User/", {
         headers: { Authorization: `Bearer ${storedToken}` }
@@ -22,11 +24,11 @@ const UserManagement = (token) => {
       .then((res) => {
         const formattedUsers = res.data.map(user => ({
           _id: user._id,
-          firstName: user.first_name,  // שינוי השם
-          lastName: user.last_name,    // שינוי השם
+          firstName: user.first_name,
+          lastName: user.last_name,
           email: user.email,
-          phone: user.phoneNumber,     // שינוי השם
-          address: user.addresses?.[0] || "לא צוינה כתובת", // לקיחת הכתובת הראשונה אם קיימת
+          phone: user.phoneNumber,
+          address: user.addresses?.[0] || "לא צוינה כתובת",
           role: user.role
         }));
         setUsers(formattedUsers);
@@ -37,16 +39,17 @@ const UserManagement = (token) => {
       });
   }, []);
 
-
+  // The handleEditUser function takes a userId as an argument and sets the selected user
   const handleEditUser = (userId) => {
     const userToEdit = users.find(user => user._id === userId);
     setSelectedUser(userToEdit);
   };
 
+  // The handleFieldChange function takes a field and value as arguments and updates the selected user
   const handleFieldChange = (field, value) => {
     setSelectedUser((prev) => ({ ...prev, [field]: value }));
   };
-
+  // The handleSave function is an async function that handles the save operation
   const handleSave = () => {
     if (!selectedUser.firstName || !selectedUser.lastName || !selectedUser.email) {
       showAlert("יש להזין את כל השדות.", "error");
@@ -54,19 +57,21 @@ const UserManagement = (token) => {
     }
 
     const updatedUser = {
-      first_name: selectedUser.firstName,  // שינוי שם השדה
-      last_name: selectedUser.lastName,    // שינוי שם השדה
+      first_name: selectedUser.firstName,
+      last_name: selectedUser.lastName,
       email: selectedUser.email,
-      phoneNumber: selectedUser.phone,     // שינוי שם השדה
-      addresses: [selectedUser.address],   // הפיכת כתובת למערך
+      phoneNumber: selectedUser.phone,
+      addresses: [selectedUser.address],
       role: selectedUser.role
     };
-    const storedToken2 = localStorage.getItem("token");
+
+    const storedToken2 = localStorage.getItem("token"); // Get the token from localStorage
+    // If there is no token, show an alert
     if (!storedToken2) {
       showAlert("אין הרשאה. התחבר מחדש.", "error");
       return;
     }
-
+    // Send a PUT request to the server to update the user
     axios.put(`http://localhost:5000/User/${selectedUser._id}/edit`, updatedUser, {
       headers: { Authorization: `Bearer ${storedToken2}` }
     })
@@ -89,7 +94,7 @@ const UserManagement = (token) => {
         showAlert("אירעה שגיאה בעת עדכון פרטי המשתמש", "error");
       });
   };
-
+  // The handleCancelEdit function resets the selected user
   const handleCancelEdit = () => {
     setSelectedUser(null);
   };

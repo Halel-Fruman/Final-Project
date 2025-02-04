@@ -3,7 +3,7 @@ import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { DialogPanel } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
-
+// The CartModal component is a custom modal component that displays the cart items
 const CartModal = ({
   isOpen,
   onClose,
@@ -11,20 +11,24 @@ const CartModal = ({
   onRemoveFromCart,
   fetchProductDetails,
 }) => {
+  // The useTranslation hook is used to access the t and i18n functions from the i18next library
   const { t, i18n } = useTranslation();
+  // The detailedCartItems state is used to store the detailed cart items
   const [detailedCartItems, setDetailedCartItems] = useState([]);
-
+  // The useEffect hook is used to load the cart details when the modal is open
   useEffect(() => {
     const loadCartDetails = async () => {
       try {
+        // The detailedCart variable is used to store the detailed cart items
         const detailedCart = await Promise.all(
           Array.isArray(cartItems)
             ? cartItems.map(async (item) => {
                 const productId = item.productId?._id || item.productId;
                 if (!productId) {
                   console.warn("Skipping item with undefined productId:", item);
-                  return null; // התעלם מפריטים עם productId לא מוגדר
+                  return null; // Skip items with undefined productId
                 }
+                // The productDetails variable is used to store the product details
                 const productDetails = await fetchProductDetails(productId);
                 return {
                   ...item,
@@ -33,25 +37,25 @@ const CartModal = ({
               })
             : []
         );
-
+        // The setDetailedCartItems function is used to set the detailed cart items
         setDetailedCartItems(detailedCart.filter((item) => item !== null));
       } catch (error) {
         console.error("Error loading cart details:", error.message);
       }
     };
-
+    // The loadCartDetails function is called when the modal is open
     if (isOpen) {
       loadCartDetails();
     }
   }, [isOpen, cartItems, fetchProductDetails]);
-
+  // The calculateTotal function is used to calculate the total price of the cart items
   const calculateTotal = () => {
     return detailedCartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
   };
-
+  // The CartModal component returns the JSX of the cart modal
   return (
     <Dialog open={isOpen} onClose={onClose} className="relative z-50">
       {/* Overlay */}
@@ -124,6 +128,7 @@ const CartModal = ({
                     {t("cart.checkout")}
                   </button>
                 </div>
+                {/*The continue shopping button is added to the cart modal */}
                 <div className="mt-6 text-sm text-center text-gray-500">
                   <button
                     onClick={onClose}
