@@ -215,7 +215,7 @@ const SysAdmin = () => {
   return (
     <div className="container mx-auto p-5">
       <header className="text-center mb-8">
-        <h1 className="text-3xl text-primaryColor  font-bold">{t("sysadmin.store_managemnt")}</h1>
+        <h1 className="text-3xl text-primaryColor  font-bold">ניהול חנויות</h1>
       </header>
 
       <div className="flex justify-end mb-4">
