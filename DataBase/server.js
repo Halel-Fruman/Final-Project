@@ -28,7 +28,6 @@ app.use('/Stores', storeRoutes); // חנויות
 app.use('/Products', realProductRoutes); // מוצרים אמיתיים
 app.use('/Transactions', transactionRoutes); //
 app.use("/Category", categoryRoutes);
-app.use("/Transactions", transactionRoutes);
 
 // User Schema & Model
 const User = require('./models/User');

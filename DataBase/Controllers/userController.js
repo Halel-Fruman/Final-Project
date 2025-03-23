@@ -1,10 +1,12 @@
 const bcrypt = require("bcrypt");
 const User = require("../models/User");
-const StoreProducts = require("../models/Products"); // נתיב למודל המוצרים
-const jwt = require("jsonwebtoken");
-const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key";
+const StoreProducts = require("../models/Products");
+const jwt = require("jsonwebtoken"); // import jwt
+const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key"; // set the secret key
 
+// UserController.js
 const UserController = {
+  // verifyToken function to check if the token is valid
   verifyToken: (req, res) => {
     const authHeader = req.headers.authorization;
     if (!authHeader)
@@ -23,10 +25,10 @@ const UserController = {
 
   // UserController.js
 
-  // קבלת כל המשתמשים
+  // get all users from the database
   getUsers: async (req, res) => {
     try {
-      const users = await User.find(); // מחפש את כל המשתמשים
+      const users = await User.find();
       if (!users || users.length === 0) {
         return res.status(404).json({ error: "No users found" });
       }
@@ -36,7 +38,7 @@ const UserController = {
     }
   },
 
-  // קבלת פרטי משתמש ספציפי
+  // get a specific user by id
   getUser: async (req, res) => {
     try {
       const { userId } = req.params;
@@ -50,7 +52,7 @@ const UserController = {
     }
   },
 
-  // עריכת פרטי משתמש
+  // edit a user by id and update the fields
   editUser: async (req, res) => {
     const { userId } = req.params;
     const updatedFields = req.body;
@@ -59,7 +61,6 @@ const UserController = {
       const user = await User.findById(userId);
       if (!user) return res.status(404).send("User not found");
 
-      // עדכון שדות ספציפיים
       Object.keys(updatedFields).forEach((field) => {
         user[field] = updatedFields[field];
       });
@@ -71,7 +72,7 @@ const UserController = {
     }
   },
 
-  // שינוי רול של משתמש
+  // change the role of a user by id
   changeRole: async (req, res) => {
     const { userId } = req.params;
     const { role } = req.body;
@@ -80,38 +81,37 @@ const UserController = {
       const user = await User.findById(userId);
       if (!user) return res.status(404).send("User not found");
 
-      user.role = role; // עדכון הרול של המשתמש
+      user.role = role;
       await user.save();
 
-      res.status(200).json(user); // החזרת המשתמש המעודכן
+      res.status(200).json(user);
     } catch (error) {
       res.status(500).send("Error updating user role: " + error.message);
     }
   },
 
-  // פונקציות נוספות כאן (כמו changePassword, addAddress וכו')
-
   ///////
 
+  //  login function to authenticate the user
   login: async (req, res) => {
     const { email, password } = req.body;
     console.log(email);
-
+    // find the user by email
     try {
       const user = await User.findOne({ email });
       console.log(user);
       if (!user) return res.status(404).send("User not found");
-
+      // compare the password with the hashed password
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).send("Invalid credentials");
-
+      // create a token with the user id
       const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
       res.status(200).json({ token, userId: user._id, role: user.role });
     } catch (error) {
       res.status(500).send("Error logging in: " + error.message);
     }
   },
-
+  //
   getUser: async (req, res) => {
     try {
       const { userId } = req.params;
@@ -129,7 +129,7 @@ const UserController = {
   },
   getUsers: async (req, res) => {
     try {
-      const users = await User.find(); // מחפש את כל המשתמשים
+      const users = await User.find();
       if (!users || users.length === 0) {
         console.log("No users found");
         return res.status(404).json({ error: "No users found" });
@@ -150,22 +150,22 @@ const UserController = {
       const user = await User.findById(userId);
       if (!user) return res.status(404).send("User not found");
 
-      // עדכן את השדות שנשלחו
       Object.keys(updatedFields).forEach((field) => {
         user[field] = updatedFields[field];
       });
 
       await user.save();
-      res.status(200).json(user); // החזר את הנתונים המעודכנים
+      res.status(200).json(user);
     } catch (error) {
       res.status(500).send("Error updating user: " + error.message);
     }
   },
 
+  // change the role of a user by id
   changePassword: async (req, res) => {
     const { userId } = req.params;
     const { currentPassword, newPassword } = req.body;
-
+    // find the user by id
     try {
       const user = await User.findById(userId);
       if (!user) return res.status(404).send("User not found");
@@ -183,6 +183,7 @@ const UserController = {
     }
   },
 
+  // add an address to a user by id
   addAddress: async (req, res) => {
     const { userId } = req.params;
     const { address } = req.body;
@@ -201,7 +202,7 @@ const UserController = {
       res.status(500).send("Error adding address: " + error.message);
     }
   },
-
+  // update the addresses of a user by id
   updateAddresses: async (req, res) => {
     const { userId } = req.params;
     const { addresses } = req.body;
@@ -219,6 +220,7 @@ const UserController = {
     }
   },
 
+  // delete an address from a user by id
   deleteAddress: async (req, res) => {
     const { userId } = req.params;
     const { index } = req.body;
@@ -238,19 +240,19 @@ const UserController = {
       res.status(500).send("Error deleting address: " + error.message);
     }
   },
-
+  // register a new user
   register: async (req, res) => {
     const { email, password, phoneNumber, first_name, last_name } = req.body;
     console.log(req.body);
 
     try {
-      // בדוק אם משתמש עם אותו אימייל כבר קיים
+      // check if the email already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
         return res.status(400).json({ message: "Email already exists" });
       }
 
-      // יצירת משתמש חדש עם סיסמה מוצפנת
+      // hash the password before saving the user
       const hashedPassword = await bcrypt.hash(password, 10);
       const newUser = new User({
         email,
@@ -272,6 +274,7 @@ const UserController = {
         .json({ message: "Error registering user: " + error.message });
     }
   },
+  // add a product to the wishlist of a user by id
   addToWishlist: async (req, res) => {
     const { userId } = req.params;
     const { productId } = req.body;
@@ -289,12 +292,12 @@ const UserController = {
           .status(400)
           .json({ error: "Product is already in the wishlist" });
       }
-
+      // find the product in the store
       const store = await StoreProducts.findOne({ "products._id": productId });
       if (!store) {
         return res.status(404).json({ error: "Product not found" });
       }
-
+      // add the product to the wishlist
       user.wishlist.push({ productId });
       await user.save();
 
@@ -305,6 +308,7 @@ const UserController = {
         .json({ error: "Error adding product to wishlist: " + error.message });
     }
   },
+  // get the wishlist of a user by id
   getWishlist: async (req, res) => {
     const { userId } = req.params;
 
@@ -313,7 +317,7 @@ const UserController = {
       if (!user) {
         return res.status(404).json({ error: "User not found" });
       }
-
+      // populate the wishlist with the product details
       const populatedWishlist = await Promise.all(
         user.wishlist.map(async (item) => {
           const store = await StoreProducts.findOne({
@@ -333,6 +337,7 @@ const UserController = {
               name: product.name,
               price: product.price,
               image: product.images[0],
+              quantity: product.stock,
               storeId: store._id,
               storeName: store.storeName,
             },
@@ -347,6 +352,7 @@ const UserController = {
         .json({ error: "Error fetching wishlist: " + error.message });
     }
   },
+  // remove a product from the wishlist of a user by id
   removeFromWishlist: async (req, res) => {
     const { userId } = req.params;
     const { productId } = req.body;
@@ -367,15 +373,15 @@ const UserController = {
       });
     }
   },
-
+  // add a product to the cart of a user by id
   addToCart: async (req, res) => {
     const { userId } = req.params;
     const { productId, quantity } = req.body;
-
+    // find the user by id
     try {
       const user = await User.findById(userId);
       if (!user) return res.status(404).json({ error: "User not found" });
-
+      // check if the product is already in the cart
       const existingCartItem = user.cart.find(
         (item) => String(item.productId) === productId
       );
@@ -394,7 +400,7 @@ const UserController = {
         .json({ error: "Error adding product to cart: " + error.message });
     }
   },
-
+  // get the cart of a user by id
   getCart: async (req, res) => {
     const { userId } = req.params;
 
@@ -405,7 +411,6 @@ const UserController = {
         return res.status(404).json({ error: "User not found" });
       }
 
-      // טעינת פרטי כל המוצרים מהעגלה
       const detailedCart = await Promise.all(
         user.cart.map(async (item) => {
           const store = await StoreProducts.findOne({
@@ -414,17 +419,16 @@ const UserController = {
 
           if (!store) {
             console.warn(`Store not found for productId: ${item.productId}`);
-            return null; // התעלמות מפריטים שלא נמצאו
+            return null;
           }
 
-          // מציאת המוצר הספציפי תחת החנות
           const product = store.products.find(
             (product) => String(product._id) === String(item.productId)
           );
 
           if (!product) {
             console.warn(`Product not found for productId: ${item.productId}`);
-            return null; // התעלמות מפריטים חסרים
+            return null;
           }
 
           return {
@@ -436,7 +440,6 @@ const UserController = {
         })
       );
 
-      // סינון פריטים לא תקינים
       const filteredCart = detailedCart.filter((item) => item !== null);
 
       res.status(200).json(filteredCart);
@@ -446,10 +449,11 @@ const UserController = {
     }
   },
 
+  // remove a product from the cart of a user by id
   removeFromCart: async (req, res) => {
     const { userId } = req.params;
     const { productId } = req.body;
-
+    // find the user by id
     try {
       const user = await User.findById(userId);
       if (!user) return res.status(404).json({ error: "User not found" });
@@ -467,6 +471,7 @@ const UserController = {
     }
   },
 
+  // update the quantity of a product in the cart of a user by id
   updateCartQuantity: async (req, res) => {
     const { userId } = req.params;
     const { cartItems } = req.body;
@@ -475,7 +480,7 @@ const UserController = {
       const user = await User.findById(userId);
       if (!user) return res.status(404).json({ error: "User not found" });
 
-      user.cart = cartItems; // עדכון עגלה חדשה לחלוטין
+      user.cart = cartItems;
       await user.save();
 
       res.status(200).json(user.cart);

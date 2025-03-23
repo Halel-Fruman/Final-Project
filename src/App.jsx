@@ -1,11 +1,11 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback } from "react"; // import the required libraries from react
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
-} from "react-router-dom";
-import { useTranslation } from "react-i18next";
+} from "react-router-dom"; // import the required libraries from react-router-dom
+import { useTranslation } from "react-i18next"; // import the useTranslation hook from react-i18next
 import HomePage from "./pages/HomePage/HomePage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import PersonalArea from "./pages/PersonalArea/PersonalArea.jsx";
@@ -20,25 +20,27 @@ import {
 } from "./utils/Cart";
 import { fetchWishlist, updateWishlist } from "./utils/Wishlist";
 import { AlertProvider } from "./components/AlertDialog.jsx";
-import Sidebar from "./pages/SysAdmin/Sidebar.jsx"; // ייבוא Sidebar
-import Modal from "./components/Modal"; // ייבוא רכיב המודאל
+import Sidebar from "./pages/SysAdmin/Sidebar.jsx";
+import Modal from "./components/Modal";
 import LoginPage from "./pages/PersonalArea/LoginPage";
 import RegisterPage from "./pages/Registeration/RegisterPage";
-import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx"; // ייבוא AddAddressPage
-import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx"; // ייבוא StoreManagement
+import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
+import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 
+//
 const App = () => {
-  const { i18n } = useTranslation();
-  const [token, setToken] = useState(localStorage.getItem("token"));
-  const [userId, setUserId] = useState(localStorage.getItem("userId"));
-  const [role, setRole] = useState(localStorage.getItem("role"));
-  const [wishlist, setWishlist] = useState([]);
-  const [wishlistLoading, setWishlistLoading] = useState(true);
-  const [cartItems, setCartItems] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
-  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const { i18n } = useTranslation(); // use the useTranslation hook to get the i18n object
+  const [token, setToken] = useState(localStorage.getItem("token")); // use the useState hook to create a token state variable and set it to the token stored in the local storage
+  const [userId, setUserId] = useState(localStorage.getItem("userId")); // use the useState hook to create a userId state variable and set it to the userId stored in the local storage
+  const [role, setRole] = useState(localStorage.getItem("role")); // use the useState hook to create a role state variable and set it to the role stored in the local storage
+  const [wishlist, setWishlist] = useState([]); // use the useState hook to create a wishlist state variable and set it to an empty array
+  const [wishlistLoading, setWishlistLoading] = useState(true); // use the useState hook to create a wishlistLoading state variable and set it to true
+  const [cartItems, setCartItems] = useState([]); // use the useState hook to create a cartItems state variable and set it to an empty array
+  const [isCartOpen, setIsCartOpen] = useState(false); // use the useState hook to create an isCartOpen state variable and set it to false
+  const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // use the useState hook to create an isLoginModalOpen state variable and set it to false
+  const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false); // use the useState hook to create an isRegisterModalOpen state variable and set it to false
 
+  // handleLogout function to remove the token, userId, and role from the local storage and set them to null
   const handleLogout = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
@@ -48,14 +50,16 @@ const App = () => {
     setUserId(null);
     setRole(null);
   };
-
+  // verifyToken function to check if the token is stored in the local storage and if it is,
+  // it sends a request to the server to verify the token
   const verifyToken = async () => {
     const storedToken = localStorage.getItem("token");
     const storedUserId = localStorage.getItem("userId");
     const storedUserRole = localStorage.getItem("role");
-
+    // check if the token is stored in the local storage
     if (storedToken && storedUserId) {
       try {
+        // send a request to the server to verify the token
         const response = await fetch(
           "http://localhost:5000/User/verify-token",
           {
@@ -64,7 +68,7 @@ const App = () => {
             },
           }
         );
-
+        // check if the response is ok
         if (response.ok) {
           setToken(storedToken);
           setUserId(storedUserId);
@@ -72,6 +76,7 @@ const App = () => {
         } else {
           handleLogout();
         }
+        // catch any errors and log them to the console
       } catch (error) {
         console.error("Error verifying token:", error);
         handleLogout();
@@ -81,24 +86,25 @@ const App = () => {
   useEffect(() => {
     verifyToken();
   }, []);
-
+  // handleOpenCart function to open the cart modal
   const handleOpenCart = () => setIsCartOpen(true);
+  // handleCloseCart function to close the cart modal
   const handleCloseCart = () => setIsCartOpen(false);
-
+  // loadCart function to fetch the cart items from the server
   const loadCart = useCallback(async () => {
     if (userId && token) {
       const data = await fetchCart(userId, token);
       setCartItems(data);
     }
   }, [userId, token]);
-
+  // handleRemoveFromCart function to remove a product from the cart
   const handleRemoveFromCart = async (productId) => {
     const updatedCart = await removeFromCart(userId, token, productId);
     if (updatedCart) {
       setCartItems(updatedCart);
     }
   };
-
+  // handleAddToCart function to add a product to the cart
   const handleAddToCart = async (product) => {
     const updatedCart = await addToCart(userId, token, product);
     if (updatedCart) {
@@ -106,11 +112,11 @@ const App = () => {
       loadCart();
     }
   };
-
+  // useEffect hook to change the direction of the page based on the selected language
   useEffect(() => {
     document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
   }, [i18n.language]);
-
+  // loadWishlist function to fetch the wishlist items from the server
   const loadWishlist = useCallback(async () => {
     setWishlistLoading(true);
     if (!userId || !token) {
@@ -118,7 +124,7 @@ const App = () => {
       setWishlistLoading(false);
       return;
     }
-
+    // fetchWishlist function to fetch the wishlist items from the server
     const data = await fetchWishlist(userId, token);
     setWishlist(data);
     setWishlistLoading(false);
@@ -127,24 +133,27 @@ const App = () => {
   useEffect(() => {
     verifyToken();
   }, []);
-
+  // useEffect hook to load the cart and wishlist items when the token and userId change
   useEffect(() => {
     if (token && userId) {
       loadCart();
       loadWishlist();
     }
   }, [token, userId, loadWishlist, loadCart]);
-
+  // addToWishlist function to add a product to the wishlist
   const addToWishlist = async (product, isInWishlist) => {
-    const success = await updateWishlist(userId, token, product, isInWishlist);
+    const success = await updateWishlist(userId, token, product, isInWishlist); // updateWishlist function to add or remove a product from the wishlist
     if (success) {
       loadWishlist();
     }
   };
-
+  // return the JSX of the App component
   return (
+    // AlertProvider component to wrap the entire application and provide the alert context to all components
     <AlertProvider>
+      {/*Router component to wrap the entire application and provide the routing context to all components */}
       <Router>
+        {/*Header component to display the header of the application         */}
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onRegisterClick={() => setIsRegisterModalOpen(true)}
@@ -157,6 +166,7 @@ const App = () => {
           isLoggedIn={!!token}
           role={role}
         />
+        {/*CartModal component to display the cart modal */}
         <CartModal
           isOpen={isCartOpen}
           onClose={handleCloseCart}
@@ -165,7 +175,7 @@ const App = () => {
           fetchProductDetails={fetchProductDetails}
         />
 
-        {/* Modals */}
+        {/*Modal component to display the login modal */}
         <Modal
           isOpen={isLoginModalOpen}
           onClose={() => setIsLoginModalOpen(false)}>
@@ -176,6 +186,8 @@ const App = () => {
             onClose={() => setIsLoginModalOpen(false)}
           />
         </Modal>
+
+        {/*Modal component to display the register modal */}
         <Modal
           isOpen={isRegisterModalOpen}
           onClose={() => setIsRegisterModalOpen(false)}>
@@ -185,8 +197,9 @@ const App = () => {
             onClose={() => setIsRegisterModalOpen(false)}
           />
         </Modal>
-
+        {/*div element to wrap the content of the application */}
         <div className="app-content">
+          {/*Routes component to define the routes of the application */}
           <Routes>
             <Route
               path="/"
@@ -209,17 +222,33 @@ const App = () => {
                 />
               }
             />
-            
-            <Route path="/SysAdmin" element={token && (role === 'admin') ?
-              (<Sidebar
-                token={token}
-              />
-              ) : (<Navigate to="/login" />)} />
-            <Route path="/store-management" element={token && (role === 'storeManager') ?
-              (<StoreManagement />) : (<Navigate to="/login" />)} />
+
+            <Route
+              path="/SysAdmin"
+              // check if the user is logged in and has the role of admin
+              element={
+                token && role === "admin" ? (
+                  <Sidebar token={token} />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/store-management"
+              // check if the user is logged in and has the role of storeManager
+              element={
+                token && role === "storeManager" ? (
+                  <StoreManagement />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
 
             <Route
               path="/personal-area"
+              // check if the user is logged in
               element={
                 token ? (
                   <PersonalArea

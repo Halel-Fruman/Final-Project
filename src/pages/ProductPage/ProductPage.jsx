@@ -4,30 +4,29 @@ import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
-
+//  The ProductPage component is a functional component that takes the addToWishlist, wishlist, and addToCart as props.
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
-  const { id } = useParams(); // מזהה המוצר מה-URL
-  const { t, i18n } = useTranslation();
-  const [product, setProduct] = useState(null);
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
-  const [selectedImage, setSelectedImage] = useState(null);
-  const [rating, setRating] = useState(0);
+  const { id } = useParams(); // The useParams hook is used to access the URL parameters
+  const { t, i18n } = useTranslation(); // The useTranslation hook is used to access the i18n instance
+  const [product, setProduct] = useState(null); // The product state is used to store the product details
+  const [isLoading, setIsLoading] = useState(true); // The isLoading state is used to track the loading state
+  const [error, setError] = useState(null); // The error state is used to store the error message
+  const [selectedImage, setSelectedImage] = useState(null); // The selectedImage state is used to store the selected image
+  const [rating, setRating] = useState(0); // The rating state is used to store the product rating
 
-  // Fetch product details
+  // The useEffect hook is used to fetch the product details based on the product ID
   useEffect(() => {
+    // The fetchProduct function is an async function that fetches the product details from the server
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/Products/${id}`,
-
-        );
+        const response = await fetch(`http://localhost:5000/Products/${id}`);
         if (!response.ok) {
           throw new Error(t("error.fetchProduct"));
         }
         const data = await response.json();
-        setProduct(data); // קבלת פרטי המוצר
-        setSelectedImage(data.images[0]); // ברירת מחדל: התמונה הראשונה
-        setRating(data.reviews?.average || 0); // טעינת דירוג מהמוצר
+        setProduct(data); // Set the product state with the fetched data
+        setSelectedImage(data.images[0]); // Set the selected image to the first image
+        setRating(data.reviews?.average || 0); // Set the rating state with the average rating
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,26 +36,27 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
     fetchProduct();
   }, [id, t]);
-
+  // The toggleWishlist function is used to add or remove a product from the wishlist
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
     );
-
+    // Call the addToWishlist function with the product and isInWishlist parameters
     addToWishlist(product, isInWishlist);
   };
-
+  // The handleAddToCart function is used to add the product to the cart
   const handleAddToCart = () => {
+    // Call the addToCart function with the product ID and quantity parameters
     addToCart({
       productId: product._id,
       quantity: 1,
     });
   };
-
+  // The handleImageClick function is used to set the selected image
   const handleImageClick = (image) => {
     setSelectedImage(image);
   };
-
+  // The handleRating function is used to update the product rating
   const handleRating = async (newRating) => {
     try {
       const response = await fetch(
@@ -86,7 +86,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       </div>
     );
   }
-
+  // If an error occurs while fetching the product, display the error message
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -94,7 +94,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       </div>
     );
   }
-
+  // If the product is not found, display a message
   if (!product) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -118,13 +118,13 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     <div className="bg-gray-50">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
-          {/* תמונת המוצר */}
           <div className="flex-shrink-0">
             <img
               src={selectedImage || "https://placehold.co/300"}
               alt={productName}
               className="h-128 w-176 rounded-lg shadow-lg"
             />
+            {/*The product images are displayed as thumbnails below the main image */}
             <div className="mt-4 flex gap-2">
               {product.images.map((image, index) => (
                 <img
@@ -142,7 +142,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             </div>
           </div>
 
-          {/* פרטי המוצר */}
+          {/* The product details are displayed on the right side of the page */}
           <div className="bg-white rounded-lg shadow-lg p-6 flex-grow relative min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {productName}
@@ -150,8 +150,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <p className="text-xl text-secondaryColor font-semibold mb-4">
               ₪{productPrice}
             </p>
-
-            {/* דירוג כוכבים */}
+            {/*The product rating is displayed as stars with the average rating */}
             <div className="flex items-center mb-4">
               {[...Array(5)].map((_, i) => (
                 <StarIcon
@@ -166,7 +165,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                 ({product.reviews?.totalCount || 0} {t("product.reviews")})
               </span>
             </div>
-
+            {/*The product highlights are displayed as a list */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {t("product.highlights")}
@@ -177,20 +176,21 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                 ))}
               </ul>
             </div>
-
+            {/*The product details are displayed below the highlights */}
             <div className="mb-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {t("product.details")}
               </h3>
               <p className="text-gray-700">{productDetails}</p>
             </div>
-
+            {/*The Add to Cart and Add to Wishlist buttons are displayed at the bottom of the page */}
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
                 className="w-1/2 bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
+              {/*The toggleWishlist function is called when the wishlist button is clicked */}
               <button
                 onClick={toggleWishlist}
                 className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition">

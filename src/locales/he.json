@@ -7,9 +7,8 @@
     "clothing": "ביגוד",
     "home_garden": "בית וגינה",
     "beauty_health": "יופי ובריאות"
-
   },
-  "add_to_wishlist ":"הוסף לרשימת המשאלות",
+  "add_to_wishlist ": "הוסף לרשימת המשאלות",
   "remove_from_wishlist": "הסר מרשימת המשאלות",
   "loading": "טוען...",
   "view_products": "צפה במוצרים",
@@ -129,7 +128,6 @@
       "updateError": "שגיאה בעדכון כתובת",
       "updateSuccess": "כתובת עודכנה בהצלחה!",
       "noAddresses": "אין כתובות זמינות"
-
     }
   },
   "wishlist": {
@@ -156,7 +154,7 @@
 
   "sysadmin": {
     "admin_management": "ניהול מערכת",
-    "store_managemnt" : "ניהול חנות",
+    "store_managemnt": "ניהול חנות",
     "stores": "חנויות",
     "store_name": "שם החנות",
     "store_address": "כתובת החנות",
@@ -175,13 +173,9 @@
     "statistics_info": "כאן יוצגו נתונים סטטיסטיים על פעילות החנויות.",
     "invalid_email": "כתובת מייל לא חוקית! הכנס בבקשה כתובת מייל חוקית.",
     "cancel": "ביטול",
-    "edit" : "ערוך",
-
-
+    "edit": "ערוך",
 
     "store_email": "מייל החנות"
-
-
   },
 
   "storemanage": {
@@ -194,7 +188,7 @@
     "delete": "מחק"
   },
 
-    "cart": {
+  "cart": {
     "title": "עגלת קניות",
     "close": "סגור",
     "price": "מחיר",
@@ -209,9 +203,4 @@
   "modal": {
     "close": "סגור"
   }
-
-
-
-
-
 }

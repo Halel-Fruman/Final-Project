@@ -5,39 +5,51 @@ import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import backgroundImage from "../../backgroung.jpg";
 
+// HomePage component
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
+  // useTranslation hook to get the t function to translate the text
   const { t, i18n } = useTranslation();
+  // allProducts state to store the products fetched from the server
   const [allProducts, setProducts] = useState([]);
+  // isLoading and error states to manage the loading state and error state of the component
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-
+  // useEffect hook to fetch the products from the server when the component mounts
   useEffect(() => {
+    // fetchProducts function to fetch the products from the server
     const fetchProducts = async () => {
       try {
+        // fetch request to get the products from the server
         const response = await fetch("http://localhost:5000/Products/");
+        // throw an error if the response is not ok
         if (!response.ok) {
           throw new Error("Failed to fetch products");
         }
-        const data = await response.json(); // המידע מכיל את כל המוצרים מכל החנויות
+        // get the data from the response
+        const data = await response.json();
+        // set the products state with the data
         setProducts(data);
       } catch (err) {
+        // catch block to catch any errors and set the error state with the error message
         setError(err.message);
       } finally {
+        // finally block to set the isLoading state to false
         setIsLoading(false);
       }
     };
-
+    // call the fetchProducts function
     fetchProducts();
   }, []);
-
+  // toggleWishlist function to add or remove a product from the wishlist
   const toggleWishlist = (product) => {
+    // check if the product is in the wishlist
     const isInWishlist = wishlist?.some(
-      (item) =>
-        String( item.productId) === String(product._id)
+      (item) => String(item.productId) === String(product._id)
     );
+    // call the addToWishlist function with the product and the isInWishlist value
     addToWishlist(product, isInWishlist);
   };
-
+  // if there is an error, return an error message
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -47,7 +59,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       </div>
     );
   }
-
+  // if the component is loading, return a loading message
   if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -55,11 +67,11 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       </div>
     );
   }
-
+  // return the JSX of the HomePage component
   return (
     <div className="bg-gray-50">
-      {/* Header Section */}
       <header
+        // header section with a background image
         className="relative bg-primaryColor text-white"
         style={{
           backgroundImage: `url(${backgroundImage})`,
@@ -78,6 +90,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           <p
             className="mt-4 text-xl sm:text-2xl md:text-5xl text-secondaryColor"
             dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
+          {/*button to scroll to the products section */}
           <button
             className="mt-6 bg-white text-black py-2 px-6 rounded-lg font-semibold shadow-lg hover:bg-gray-200 transition"
             onClick={() => {
@@ -89,22 +102,20 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           </button>
         </div>
       </header>
-
-      {/* Products Section */}
+      {/* main section with the products */}
       <main id="products-section" className="py-10 px-4 sm:px-6 lg:px-12">
         <h2 className="text-center text-2xl font-bold mb-8">
           {t("featured_products")}
         </h2>
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {/*map through the allProducts array and return a product card for each product */}
           {allProducts.map((product) => {
             const isInWishlist = wishlistLoading
               ? false
               : wishlist?.some(
-                  (item) =>
-                    String(item.productId) ===
-                    String(product._id)
+                  (item) => String(item.productId) === String(product._id)
                 );
-
+            // return the product card
             return (
               <div key={product._id} className="flex flex-col">
                 <article className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
@@ -116,6 +127,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                         ? t("remove_from_wishlist")
                         : t("add_to_wishlist")
                     }
+                    // button to add or remove a product from the wishlist
                     className="absolute top-2 right-2 z-10 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100">
                     {isInWishlist ? (
                       <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
@@ -124,7 +136,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                     )}
                   </button>
 
-                  {/* Product Image */}
+                  {/*Link to the product details page */}
                   <Link to={`/products/${product._id}`}>
                     <div className="aspect-w-1 aspect-h-1 rounded-lg">
                       <img

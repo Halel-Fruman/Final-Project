@@ -1,40 +1,42 @@
 import React, { useState } from "react";
 
 const EditableField = ({ title, field, value, userId, onSave }) => {
-  const [editing, setEditing] = useState(false); // מצב העריכה
-  const [newValue, setNewValue] = useState(value); // ערך חדש לשדה
+  const [editing, setEditing] = useState(false); // editing state to manage the editing mode
+  const [newValue, setNewValue] = useState(value); // newValue state to store the new value
 
+  // handleSave function to save the changes
   const handleSave = async () => {
+    // send a PUT request to the server with the updated field value
     try {
       const response = await fetch(
         `http://localhost:5000/User/${userId}/edit`,
         {
           method: "PUT",
           headers: {
-            Authorization: `Bearer ${token}`, // הוסף את ה-token לכותרות
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ field, value: newValue }),
         }
       );
-
+      // if the response is not ok, throw an error
       if (!response.ok) {
         throw new Error("Failed to update field");
       }
 
-      onSave(field, newValue); // עדכון השדה ברמת המשתמש
-      setEditing(false); // סיום מצב העריכה
+      onSave(field, newValue); // call the onSave function with the updated field and value
+      setEditing(false); // exit the editing mode
     } catch (err) {
       console.error(err.message);
       alert("Failed to save changes.");
     }
   };
-
+  // handleCancel function to cancel the editing
   const handleCancel = () => {
-    setEditing(false); // יציאה ממצב עריכה
-    setNewValue(value); // איפוס הערך החדש לערך הנוכחי
+    setEditing(false); // exit the editing mode
+    setNewValue(value); // reset the new value
   };
-
+  // return the JSX for the EditableField component
   return (
     <div className="mb-3">
       <h5>{title}</h5>
