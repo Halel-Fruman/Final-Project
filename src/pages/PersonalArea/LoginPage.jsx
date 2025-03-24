@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Dialog } from "@headlessui/react";
+
 //  The Login component is a functional component that takes setToken, setUserId, setUserRole, onClose, and openRegisterModal as props.
 const Login = ({
   setToken,
@@ -58,9 +60,14 @@ const Login = ({
   // Return the login form with the email, password, and submit button
   return (
     <div className="p-6 bg-white rounded-md w-full max-w-md mx-auto">
-      <h2 className="text-2xl font-bold text-center text-gray-900">
-        {t("login.title")}
-      </h2>
+      <Dialog.Title
+        as="h2"
+        className="text-2xl font-bold text-center text-gray-900">
+        <h2 className="text-2xl font-bold text-center text-gray-900">
+          {t("login.title")}
+        </h2>
+      </Dialog.Title>
+
       {/*The form element with the email and password input fields */}
       <form onSubmit={handleSubmit} className="mt-6 space-y-6">
         <div>
@@ -102,7 +109,7 @@ const Login = ({
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 px-4 text-white font-semibold rounded-md shadow-sm ${
+          className={`w-full py-2 px-4 text-white font-bold text-xl rounded-md shadow-sm ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-primaryColor hover:bg-secondaryColor"
@@ -111,14 +118,15 @@ const Login = ({
         </button>
       </form>
       {/*If the user is not a member, display a message with a link to the register modal */}
-      <p className="mt-6 text-center text-sm text-gray-500">
+      <p className="mt-6 text-center text-m font-bold text-black">
         {t("login.notMember")}{" "}
         <button
           onClick={() => {
             onClose();
             openRegisterModal();
           }}
-          className="font-semibold text-primaryColor hover:text-secondaryColor">
+          className="font-bold text-primaryColor text-xl hover:text-secondaryColor"
+          arial-label={t("login.registerLink")}>
           {t("login.registerLink")}
         </button>
       </p>

@@ -57,7 +57,11 @@ const CartModal = ({
   };
   // The CartModal component returns the JSX of the cart modal
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      className="relative z-50"
+      aria-label={t("cart.title")}>
       {/* Overlay */}
       <div className="fixed inset-0 bg-gray-800 bg-opacity-75 transition-opacity" />
 

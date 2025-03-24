@@ -106,16 +106,21 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
     <div className="mb-4">
       <div className="card">
         <div className="card-body">
-          <h5 className="text-xl font-bold mb-4">
+        <label htmlFor="address" >
+          <h2 className="text-xl font-bold mb-4">
             {t("personal_area.fields.addresses")}
-          </h5>
+          </h2>
+          </label>
           {addresses?.length > 0 ? (
             addresses.map((address, index) => (
               <div key={index} className="card mb-3 p-2">
                 <div className="flex justify-content-between align-items-center">
                   {editingIndex === index ? (
                     <>
+
                       <input
+                        id="address"
+                        name="address"
                         type="text"
                         className="w-1/3 bg-gray-100 p-4 rounded-md flex justify-between items-center shadow-sm"
                         value={editingValue}
@@ -150,6 +155,8 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                       <div>
                         <button
                           className="bg-white m-3 mr-0 text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+                          aria-label="Edit"
+
                           onClick={() => {
                             setEditingIndex(index);
                             setEditingValue(address);
@@ -162,7 +169,9 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                         </button>
                         <button
                           className="bg-white m-3 mr-0 text-deleteC rounded hover:bg-deleteC hover:text-white "
+                          aria-label="Delete"
                           onClick={() => handleDeleteAddress(index)}>
+
                           <Icon
                             icon="material-symbols:delete-outline"
                             width="36"

@@ -57,7 +57,7 @@ export const addToCart = async (userId, token, product) => {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ productId: product.productId }),
+      body: JSON.stringify({ productId: product.productId, quantity: product.quantity }),
     });
     // if the response is not ok, throw an error
     if (!response.ok) {
