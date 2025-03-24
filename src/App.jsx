@@ -6,6 +6,7 @@ import {
   Navigate,
 } from "react-router-dom"; // import the required libraries from react-router-dom
 import { useTranslation } from "react-i18next"; // import the useTranslation hook from react-i18next
+import { Toaster } from "react-hot-toast";
 import HomePage from "./pages/HomePage/HomePage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import PersonalArea from "./pages/PersonalArea/PersonalArea.jsx";
@@ -26,6 +27,7 @@ import LoginPage from "./pages/PersonalArea/LoginPage";
 import RegisterPage from "./pages/Registeration/RegisterPage";
 import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
+import WishlistModal from "./components/WishlistModal";
 
 //
 const App = () => {
@@ -37,6 +39,7 @@ const App = () => {
   const [wishlistLoading, setWishlistLoading] = useState(true); // use the useState hook to create a wishlistLoading state variable and set it to true
   const [cartItems, setCartItems] = useState([]); // use the useState hook to create a cartItems state variable and set it to an empty array
   const [isCartOpen, setIsCartOpen] = useState(false); // use the useState hook to create an isCartOpen state variable and set it to false
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false); // חדש
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // use the useState hook to create an isLoginModalOpen state variable and set it to false
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false); // use the useState hook to create an isRegisterModalOpen state variable and set it to false
 
@@ -91,6 +94,9 @@ const App = () => {
   // handleCloseCart function to close the cart modal
   const handleCloseCart = () => setIsCartOpen(false);
   // loadCart function to fetch the cart items from the server
+  const handleOpenWishlist = () => setIsWishlistOpen(true);
+const handleCloseWishlist = () => setIsWishlistOpen(false);
+
   const loadCart = useCallback(async () => {
     if (userId && token) {
       const data = await fetchCart(userId, token);
@@ -150,15 +156,20 @@ const App = () => {
   // return the JSX of the App component
   return (
     // AlertProvider component to wrap the entire application and provide the alert context to all components
-    <AlertProvider>
+    
+   <AlertProvider>
       {/*Router component to wrap the entire application and provide the routing context to all components */}
       <Router>
+            <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
+
         {/*Header component to display the header of the application         */}
         <Header
           onLoginClick={() => setIsLoginModalOpen(true)}
           onRegisterClick={() => setIsRegisterModalOpen(true)}
           onCartClick={handleOpenCart}
           cartItems={cartItems}
+          wishlist={wishlist}
+          onWishlistClick={handleOpenWishlist}
           setToken={setToken}
           setUserId={setUserId}
           setUserRole={setRole}
@@ -174,7 +185,16 @@ const App = () => {
           onRemoveFromCart={handleRemoveFromCart}
           fetchProductDetails={fetchProductDetails}
         />
-
+        <WishlistModal
+          isOpen={isWishlistOpen}
+          onClose={handleCloseWishlist}
+          wishlist={wishlist}
+          fetchProductDetails={fetchProductDetails}
+          onAddToCart={handleAddToCart}
+          onRemoveFromWishlist={(product) =>
+            addToWishlist(product, true /* isInWishlist */)
+          }
+        />
         {/*Modal component to display the login modal */}
         <Modal
           isOpen={isLoginModalOpen}
@@ -277,6 +297,8 @@ const App = () => {
         <Footer />
       </Router>
     </AlertProvider>
+   
+
   );
 };
 
