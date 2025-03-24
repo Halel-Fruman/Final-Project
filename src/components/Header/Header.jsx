@@ -8,6 +8,7 @@ import { Icon } from "@iconify/react";
 import logo from "../../logo-ilan-g.svg";
 import { ShoppingCartIcon } from "@heroicons/react/24/outline";
 import Login from "../..//pages/PersonalArea/LoginPage";
+import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import Register from "../../pages/Registeration/RegisterPage";
 // The Header component is a functional component that takes the onLogout, isLoggedIn, onCartClick, cartItems, role, setToken, setUserId, and setUserRole as props.
 const Header = ({
@@ -19,6 +20,8 @@ const Header = ({
   setToken,
   setUserId,
   setUserRole,
+  wishlist,
+onWishlistClick,
 }) => {
   // The useTranslation hook is used to access the i18n instance and the t function
   const { i18n, t } = useTranslation();
@@ -107,6 +110,10 @@ const Header = ({
               {cartItems?.length || 0}
             </span>
           </button>
+          {/* Wishlist Button */}
+            <button onClick={onWishlistClick}>
+              <HeartIconSolid className="h-6 w-6 text-primaryColor" />
+            </button>
         </div>
         {/*Mobile Menu */}
         <div className="lg:hidden">
