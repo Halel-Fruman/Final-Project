@@ -97,7 +97,7 @@ const WishlistComponent = ({
                 <img
                   src={product.images[0] || "https://placehold.co/50"}
                   alt={
-                    product.name[i18n.language] || t("product.nameUnavailable")
+                    (product.name[i18n.language]) +t("product.img") || t("product.nameUnavailable")
                   }
                   className="w-12 h-12 rounded-full ml-2"
                 />
@@ -106,7 +106,7 @@ const WishlistComponent = ({
                 </span>
               </td>
               <td className="p-4 text-center">
-                <span className="font-semibold text-primaryColor">
+                <span className="font-bold text-xl text-primaryColor">
                   ₪{product.price}
                 </span>
               </td>
@@ -118,7 +118,8 @@ const WishlistComponent = ({
               <td className="p-4 text-center flex justify-center items-center space-x-2">
                 <button
                   onClick={() => addToCart(product)}
-                  className="bg-secondaryColor text-gray-100 py-2 px-2 ml-2 rounded-full shadow-lg hover:bg-primaryColor transition">
+                  className="bg-secondaryColor text-gray-100 py-2 px-2 ml-2 rounded-full shadow-lg hover:bg-primaryColor transition"
+                  aria-label={t("wishlist.addToCart")}>
                   <Icon
                     icon="material-symbols:add-shopping-cart-rounded"
                     width="24"
@@ -127,7 +128,8 @@ const WishlistComponent = ({
                 </button>
                 <button
                   onClick={() => handleRemoveFromWishlist(product)}
-                  className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white">
+                  className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white"
+                  aria-label={t("wishlist.removeFromWishlist")}>
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="24"

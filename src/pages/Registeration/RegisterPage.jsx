@@ -1,3 +1,4 @@
+import { DialogTitle } from "@headlessui/react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 
@@ -62,14 +63,17 @@ export default function Register({ setToken, setUserId, onClose }) {
       {onClose && (
         <button
           onClick={onClose}
-          className="absolute top-3 right-3 text-secondaryColor hover:text-primaryColor">
+          className="absolute top-3 right-3 text-secondaryColor hover:text-primaryColor"
+          aria-label="Close Modal">
           ✕
         </button>
       )}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
+        <DialogTitle>
         <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           {t("register.title")}
         </h2>
+        </DialogTitle>
       </div>
 
       <div className="mt-4">
@@ -193,7 +197,8 @@ export default function Register({ setToken, setUserId, onClose }) {
           <div>
             <button
               type="submit"
-              className="flex w-full justify-center rounded-md bg-primaryColor px-3 py-1.5 text-sm font-semibold text-white shadow-sm hover:bg-primaryColor focus:outline-primaryColor">
+              className="flex w-full justify-center rounded-md bg-primaryColor px-3 py-1.5 text-xl font-bold text-white shadow-sm hover:bg-primaryColor focus:outline-primaryColor"
+              aria-label="Submit">
               {t("register.submit")}
             </button>
           </div>

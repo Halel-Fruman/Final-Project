@@ -83,7 +83,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
       <div className="container mx-auto py-8 px-4 lg:px-0">
         <div className="lg:grid lg:grid-cols-12 gap-6 h-full">
           {/* Sidebar */}
-          <div className="lg:col-span-3">
+          <aside className="lg:col-span-3">
             <button
               onClick={() => setIsSidebarOpen(!isSidebarOpen)}
               className="lg:hidden mb-4 bg-primaryColor text-white py-2 px-4 rounded-md w-full">
@@ -101,10 +101,10 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
                 }}
               />
             </div>
-          </div>
+          </aside>
 
           {/* Main Content */}
-          <div className="lg:col-span-9 bg-white shadow rounded-lg p-4 sm:p-6">
+          <main className="lg:col-span-9 bg-white shadow rounded-lg p-4 sm:p-6">
             {currentView === "details" && (
               <div className="flex flex-col space-y-4">
                 <PersonalAreaEditor
@@ -141,7 +141,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
                 />
               </div>
             )}
-          </div>
+          </main>
         </div>
       </div>
     </div>

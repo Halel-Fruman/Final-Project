@@ -34,10 +34,14 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
         </h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="firstName"
+              className="block text-gray-700 font-semibold mb-2">
               {t("personal_area.firstName")}
             </label>
             <input
+              id="firstName"
+              name="firstName"
               type="text"
               value={editedUser.first_name}
               onChange={(e) => handleFieldChange("first_name", e.target.value)}
@@ -46,10 +50,14 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="lastName"
+              className="block text-gray-700 font-semibold mb-2">
               {t("personal_area.lastName")}
             </label>
             <input
+              id="lastName"
+              name="lastName"
               type="text"
               value={editedUser.last_name}
               onChange={(e) => handleFieldChange("last_name", e.target.value)}
@@ -58,10 +66,14 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="email"
+              className="block text-gray-700 font-semibold mb-2">
               {t("personal_area.email")}
             </label>
             <input
+              id="email"
+              name="email"
               type="email"
               value={editedUser.email}
               onChange={(e) => handleFieldChange("email", e.target.value)}

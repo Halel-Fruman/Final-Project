@@ -212,8 +212,11 @@ onWishlistClick,
         <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6">
           <button
             onClick={() => setIsLoginModalOpen(false)}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            aria-label="Close Login Modal"
+            >
             <XMarkIcon className="h-6 w-6" />
+
           </button>
           <Login
             setToken={setToken}

@@ -150,10 +150,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
                 {/* Product Details */}
                 <div className="p-4 text-center">
-                  <h3 className="text-base font-medium text-gray-900">
+                  <h3 className="text-base text-xl text-gray-900">
                     {product.name[i18n.language]}
                   </h3>
-                  <p className="mt-1 text-sm text-gray-500">₪{product.price}</p>
+                  <p className="mt-1 text-xl text-primaryColor font-bold">₪{product.price}</p>
                 </div>
               </div>
             );

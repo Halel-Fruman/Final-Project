@@ -115,7 +115,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   );
 
   return (
-    <div className="bg-gray-50">
+    <main className="bg-gray-50">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           <div className="flex-shrink-0">
@@ -147,7 +147,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {productName}
             </h1>
-            <p className="text-xl text-secondaryColor font-semibold mb-4">
+            <p className="text-xl text-primaryColor font-bold mb-4">
               ₪{productPrice}
             </p>
             {/*The product rating is displayed as stars with the average rating */}
@@ -167,9 +167,9 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             </div>
             {/*The product highlights are displayed as a list */}
             <div className="mb-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
                 {t("product.highlights")}
-              </h3>
+              </h2>
               <ul className="list-disc pl-5 text-gray-700">
                 {productHighlights.map((highlight, index) => (
                   <li key={index}>{highlight}</li>
@@ -187,13 +187,15 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
-                className="w-1/2 bg-secondaryColor text-white py-2 px-4 rounded-lg text-lg font-semibold hover:bg-primaryColor transition">
+                className="w-1/2 bg-primaryColor text-white py-2 px-4 rounded-lg text-xl font-bold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
               {/*The toggleWishlist function is called when the wishlist button is clicked */}
               <button
                 onClick={toggleWishlist}
-                className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition">
+                className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition"
+                aria-label={isInWishlist ? "Remove from wishlist" : "Add to wishlist"}
+>
                 {isInWishlist ? (
                   <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
                 ) : (
@@ -204,7 +206,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
           </div>
         </div>
       </div>
-    </div>
+    </main>
   );
 };
 

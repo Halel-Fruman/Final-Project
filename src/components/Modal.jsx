@@ -12,6 +12,7 @@ const Modal = ({ isOpen, onClose, children }) => {
         <Dialog.Panel className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
           <button
             onClick={onClose}
+            aria-label="Close Modal"
             className="absolute top-2 right-2 text-gray-500 hover:text-gray-800">
             ✕
           </button>
