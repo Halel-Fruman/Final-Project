@@ -42,14 +42,25 @@ const Sidebar = ({ currentView, onViewChange }) => {
         </li>
         <li
           className={`cursor-pointer ${
-            currentView === "cart"
+            currentView === "wishlist"
               ? "text-primaryColor text-xl font-bold"
               : "text-gray-600 hover:text-secondaryColor"
           }`}
           // onClick event handler to call the onViewChange function with the "cart" view
-          onClick={() => onViewChange("cart")}>
+          onClick={() => onViewChange("wishlist")}>
           {t("personal_area.Wishlist")}
         </li>
+        <li
+          className={`cursor-pointer ${
+            currentView === "orders"
+              ? "text-primaryColor text-xl font-bold"
+              : "text-gray-600 hover:text-secondaryColor"
+          }`}
+          // onClick event handler to call the onViewChange function with the "cart" view
+          onClick={() => onViewChange("orders")}>
+          {t("personal_area.orders")}
+        </li>
+
       </ul>
     </div>
   );

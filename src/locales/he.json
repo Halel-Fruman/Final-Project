@@ -203,5 +203,26 @@
   },
   "modal": {
     "close": "סגור"
+  },
+  "orders": {
+    "title": "היסטוריית הזמנות",
+    "subtitle": "כאן תוכל לצפות בכל ההזמנות שביצעת במערכת",
+    "order": "הזמנה",
+    "date": "תאריך הזמנה",
+    "store": "חנות",
+    "total": "סכום כולל",
+    "status": "סטטוס",
+    "quantity": "כמות",
+    "buyAgain": "קנה שוב",
+    "shopSimilar": "מוצרים דומים",
+    "noOrders": "לא נמצאו הזמנות קודמות",
+    "viewInvoice": "צפה בחשבונית"
+  },
+  "status": {
+    "pending": "ממתין",
+    "packed": "נארז",
+    "shipped": "נשלח",
+    "completed": "הושלם",
+    "canceled": "בוטל"
   }
 }

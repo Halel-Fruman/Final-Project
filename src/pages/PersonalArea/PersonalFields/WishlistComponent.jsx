@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
+import toast from "react-hot-toast";
 
 // The WishlistComponent is a functional component that takes the wishlist, removeFromWishlist, refreshWishlist, and addToCart as props.
 const WishlistComponent = ({
@@ -97,7 +98,8 @@ const WishlistComponent = ({
                 <img
                   src={product.images[0] || "https://placehold.co/50"}
                   alt={
-                    (product.name[i18n.language]) +t("product.img") || t("product.nameUnavailable")
+                    product.name[i18n.language] + t("product.img") ||
+                    t("product.nameUnavailable")
                   }
                   className="w-12 h-12 rounded-full ml-2"
                 />
@@ -117,7 +119,10 @@ const WishlistComponent = ({
               </td>
               <td className="p-4 text-center flex justify-center items-center space-x-2">
                 <button
-                  onClick={() => addToCart(product)}
+                  onClick={() => {
+                    addToCart({ productId: product._id, quantity: 1 });
+                    toast.success(t("wishlist.addToCart") + " ✅");
+                  }} // add the product to the cart
                   className="bg-secondaryColor text-gray-100 py-2 px-2 ml-2 rounded-full shadow-lg hover:bg-primaryColor transition"
                   aria-label={t("wishlist.addToCart")}>
                   <Icon
@@ -127,7 +132,10 @@ const WishlistComponent = ({
                   />{" "}
                 </button>
                 <button
-                  onClick={() => handleRemoveFromWishlist(product)}
+                  onClick={() => {
+                    handleRemoveFromWishlist(product);
+                    toast.success(t("wishlist.remove") + " ❌");
+                  }}
                   className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white"
                   aria-label={t("wishlist.removeFromWishlist")}>
                   <Icon

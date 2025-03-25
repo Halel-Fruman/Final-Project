@@ -33,8 +33,7 @@ onWishlistClick,
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
   };
-  console.log(isLoggedIn);
-  console.log(role);
+
 
   return (
     <header className="bg-gray-50 shadow border-b-2 border-gray-200">
