@@ -158,6 +158,7 @@ const SysAdmin = () => {
       .then((res) => {
         if (newStoreMode) {
           setStores([...stores, res.data]); // Add the new store to the list
+
           showAlert("החנות נוספה בהצלחה!", "success"); // show success message for adding store
         } else {
           setStores(
