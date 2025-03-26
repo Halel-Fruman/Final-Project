@@ -110,7 +110,10 @@ onWishlistClick,
             </span>
           </button>
           {/* Wishlist Button */}
-            <button onClick={onWishlistClick}>
+            <button
+            onClick={onWishlistClick}
+            aria-label="Wishlist"
+            >
               <HeartIconSolid className="h-6 w-6 text-primaryColor" />
             </button>
         </div>

@@ -37,7 +37,9 @@ const WishlistModal = ({
   }, [isOpen, wishlist, fetchProductDetails]);
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50"
+    aria-label="Wishlist modal"
+    >
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
@@ -45,7 +47,9 @@ const WishlistModal = ({
       <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl p-6 overflow-y-auto">
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <h2 className="text-lg font-semibold">❤️ {t("wishlist.title")}</h2>
-          <button onClick={onClose}>
+          <button onClick={onClose}
+          aria-label="Close wishlist modal"
+          >
             <XMarkIcon className="w-6 h-6 text-gray-600" />
           </button>
         </div>
