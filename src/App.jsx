@@ -156,7 +156,7 @@ const handleCloseWishlist = () => setIsWishlistOpen(false);
   // return the JSX of the App component
   return (
     // AlertProvider component to wrap the entire application and provide the alert context to all components
-    
+
    <AlertProvider>
       {/*Router component to wrap the entire application and provide the routing context to all components */}
       <Router>
@@ -274,7 +274,7 @@ const handleCloseWishlist = () => setIsWishlistOpen(false);
                   <PersonalArea
                     userId={userId}
                     addToWishlist={addToWishlist}
-                    wishlist={wishlist}
+                    addToCart={handleAddToCart}
                     token={token}
                   />
                 ) : (
@@ -297,7 +297,7 @@ const handleCloseWishlist = () => setIsWishlistOpen(false);
         <Footer />
       </Router>
     </AlertProvider>
-   
+
 
   );
 };

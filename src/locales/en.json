@@ -182,5 +182,26 @@
     "shipping": "Shipping and taxes calculated at checkout.",
     "checkout": "Checkout",
     "continueShopping": "Continue Shopping"
+  },
+  "orders": {
+    "title": "Order History",
+    "subtitle": "Here you can view all your past orders in the system",
+    "order": "Order",
+    "date": "Order Date",
+    "store": "Store",
+    "total": "Total Amount",
+    "status": "Status",
+    "quantity": "Quantity",
+    "buyAgain": "Buy Again",
+    "shopSimilar": "Shop Similar",
+    "noOrders": "No previous orders found",
+    "viewInvoice": "View Invoice"
+  },
+  "status": {
+    "pending": "Pending",
+    "packed": "Packed",
+    "shipped": "Shipped",
+    "completed": "Completed",
+    "canceled": "Canceled"
   }
 }

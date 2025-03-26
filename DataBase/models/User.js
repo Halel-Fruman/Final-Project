@@ -39,7 +39,7 @@ const userSchema = new mongoose.Schema({
       addedAt: { type: Date, default: Date.now },
     },
   ],
-  transactions: [transactionSchema] // מערך העסקאות
+  transactions: {type: [String], default: []}  // מערך העסקאות
 
 });
 

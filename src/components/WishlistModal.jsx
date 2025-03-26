@@ -27,7 +27,9 @@ const WishlistModal = ({
         wishlist.map((item) => fetchProductDetails(item.productId))
       );
 
-      const validProducts = productData.filter((p) => p !== null && p !== undefined);
+      const validProducts = productData.filter(
+        (p) => p !== null && p !== undefined
+      );
       setProducts(validProducts);
     };
 
@@ -35,7 +37,9 @@ const WishlistModal = ({
   }, [isOpen, wishlist, fetchProductDetails]);
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50">
+    <Dialog open={isOpen} onClose={onClose} className="relative z-50"
+    aria-label="Wishlist modal"
+    >
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
@@ -43,7 +47,9 @@ const WishlistModal = ({
       <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl p-6 overflow-y-auto">
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <h2 className="text-lg font-semibold">❤️ {t("wishlist.title")}</h2>
-          <button onClick={onClose}>
+          <button onClick={onClose}
+          aria-label="Close wishlist modal"
+          >
             <XMarkIcon className="w-6 h-6 text-gray-600" />
           </button>
         </div>
@@ -55,8 +61,7 @@ const WishlistModal = ({
             {products.map((product) => (
               <li
                 key={product._id}
-                className="flex items-center gap-4 border p-3 rounded-xl shadow-sm hover:bg-gray-50 transition"
-              >
+                className="flex items-center gap-4 border p-3 rounded-xl shadow-sm hover:bg-gray-50 transition">
                 <img
                   src={product.images?.[0] || "https://placehold.co/60"}
                   alt={product.name[i18n.language]}
@@ -67,28 +72,36 @@ const WishlistModal = ({
                   <h3 className="text-sm font-medium text-gray-800">
                     {product.name[i18n.language]}
                   </h3>
-                  <p className="text-xs text-gray-600">
-                    ₪{product.price}
-                  </p>
+                  <p className="text-xs text-gray-600">₪{product.price}</p>
                 </div>
 
                 <div className="flex gap-2">
                   <button
-                    onClick={() => {onAddToCart({productId: product._id,
-      quantity: 1}); toast.success(t("wishlist.addToCart") + " ✅");onRemoveFromWishlist(product);}}
+                    onClick={() => {
+                      onAddToCart({ productId: product._id, quantity: 1 });
+                      toast.success(t("wishlist.addToCart") + " ✅");
+                      onRemoveFromWishlist(product);
+                    }}
                     className="bg-secondaryColor text-white p-2 rounded-full shadow hover:bg-primaryColor transition"
-                    title={t("wishlist.addToCart")}
-                  >
-                    <Icon icon="material-symbols:add-shopping-cart-rounded" width="20" height="20" />
+                    title={t("wishlist.addToCart")}>
+                    <Icon
+                      icon="material-symbols:add-shopping-cart-rounded"
+                      width="20"
+                      height="20"
+                    />
                   </button>
                   <button
                     onClick={() => {
-                        onRemoveFromWishlist(product);
-                        toast.success(t("wishlist.remove") + " ❌");
-                    }}                    className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white transition"
-                    title={t("wishlist.remove")}
-                  >
-                    <Icon icon="material-symbols:delete-outline" width="20" height="20" />
+                      onRemoveFromWishlist(product);
+                      toast.success(t("wishlist.remove") + " ❌");
+                    }}
+                    className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white transition"
+                    title={t("wishlist.remove")}>
+                    <Icon
+                      icon="material-symbols:delete-outline"
+                      width="20"
+                      height="20"
+                    />
                   </button>
                 </div>
               </li>
