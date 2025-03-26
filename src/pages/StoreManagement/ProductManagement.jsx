@@ -26,9 +26,10 @@ const ProductManagement = ({ storeId }) => {
   });
   
 
-  useEffect(() => {
-    axios
-      .get(`http://localhost:5000/products?store=${storeId}`)
+  useEffect(() => {  
+    console.log("📦 storeId לשליפת מוצרים:", storeId); // בדוק מה נשלח
+
+axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       .then((res) => setProducts(res.data))
       .catch(() => showAlert("אירעה שגיאה בעת קבלת המוצרים", "error"));
 
@@ -43,33 +44,37 @@ const ProductManagement = ({ storeId }) => {
       showAlert("יש למלא את כל השדות החיוניים", "error");
       return;
     }
+    console.log("🚀 שולח קטגוריות:", newProduct.selectedCategories);
 
     axios
-      .post("http://localhost:5000/products", {
+      .post(`http://localhost:5000/products/${storeId}`, {
         name: { en: newProduct.nameEn, he: newProduct.nameHe },
-        price: newProduct.price,
-        stock: newProduct.stock,
+        price: Number(newProduct.price),
+        stock: Number(newProduct.stock),
+        manufacturingCost: Number(newProduct.manufacturingCost),
         description: {
           en: newProduct.descriptionEn,
           he: newProduct.descriptionHe,
         },
         categories: newProduct.selectedCategories,
-        store: storeId,
+        allowBackorder: newProduct.allowBackorder,
+        internationalShipping: newProduct.internationalShipping,
+        images: newProduct.images,
       })
       .then((res) => {
         setProducts([...products, res.data]);
         setIsAddingProduct(false);
-        showAlert("המוצר נוסף בהצלחה!", "success");
         resetNewProductForm();
-
+        showAlert("המוצר נוסף בהצלחה!", "success");
       })
       .catch(() => showAlert("אירעה שגיאה בעת הוספת המוצר", "error"));
   };
+  
 
   const handleDelete = (productId) => {
     if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {
       axios
-        .delete(`http://localhost:5000/products/${productId}`)
+        .delete(`http://localhost:5000/products/${storeId}/${productId}`)
         .then(() => {
           setProducts(products.filter((p) => p._id !== productId));
           showAlert("המוצר נמחק בהצלחה", "success");
@@ -103,13 +108,17 @@ const ProductManagement = ({ storeId }) => {
 
   const handleCategoryChange = (e) => {
     const { value, checked } = e.target;
+
     setNewProduct((prev) => {
       let selected = [...prev.selectedCategories];
-      if (checked) selected.push(value);
+
+      if (checked) selected.push(value); // value הוא _id
       else selected = selected.filter((id) => id !== value);
       return { ...prev, selectedCategories: selected };
     });
   };
+  
+  
 
   const handleCancel = () => {
     showAlert(
@@ -283,12 +292,13 @@ const ProductManagement = ({ storeId }) => {
         <div className="grid grid-cols-2 gap-2">
           {categories.map((category) => (
             <label key={category._id} className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                value={category._id}
-                checked={newProduct.selectedCategories.includes(category._id)}
-                onChange={handleCategoryChange}
+            <input
+                    type="checkbox"
+                    value={category._id}
+                    checked={newProduct.selectedCategories.includes(category._id)}
+                    onChange={handleCategoryChange}
               />
+
               {category.name.he} / {category.name.en}
             </label>
           ))}

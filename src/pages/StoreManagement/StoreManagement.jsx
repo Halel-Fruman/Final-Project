@@ -6,80 +6,95 @@ import { useTranslation } from "react-i18next";
 
 const StoreManagement = () => {
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [storeId, setStoreId] = useState(null); // Store ID managed by the user
-  const [userEmail, setUserEmail] = useState([]); // Assumes email is stored in localStorage
-  const { t } = useTranslation(); // The useTranslation hook is used to access the i18n instance
-  const userId = localStorage.getItem("userId"); // Get the user ID from localStorage
-  const token = localStorage.getItem("token"); // Get the token from localStorage
-  const [storeName, setStoreName] = useState(null); // Store ID managed by the user
-  // Function to fetch the user's email from the server
+  const [storeId, setStoreId] = useState(null);
+  const [userEmail, setUserEmail] = useState(null);
+  const [storeName, setStoreName] = useState(null);
+
+  const { t } = useTranslation();
+  const userId = localStorage.getItem("userId");
+  const token = localStorage.getItem("token");
+
+  // שליפת אימייל לפי userId
   const fetchUserEmail = async (userId) => {
-    // Send a GET request to the server to fetch the user data
     try {
       const response = await fetch(`http://localhost:5000/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      // If the response is not ok, throw an error
-      if (!response.ok) {
-        throw new Error("Failed to fetch user data");
-      }
+      if (!response.ok) throw new Error("Failed to fetch user data");
+
       const userData = await response.json();
       return userData.email;
     } catch (error) {
-      console.error(error.message);
+      console.error("שגיאה בשליפת אימייל:", error.message);
       return null;
     }
   };
 
-  // Use the useEffect hook to fetch the user's email when the component mounts
+  // קבלת האימייל מהשרת
   useEffect(() => {
+    if (!userId) {
+      console.warn("❌ לא נמצא userId ב-localStorage");
+      return;
+    }
+
     const fetchEmail = async () => {
       const email = await fetchUserEmail(userId);
+      console.log("✅ userEmail מהשרת:", email);
       setUserEmail(email);
     };
 
     fetchEmail();
   }, [userId]);
 
-  // Use the useEffect hook to fetch the store ID when the user email is set
+  // חיפוש החנות לפי אימייל מנהל
   useEffect(() => {
     const fetchStoreId = async () => {
-      // Fetch the list of stores from the server
       try {
         const response = await fetch("http://localhost:5000/Stores");
-        if (!response.ok) {
-          throw new Error("Failed to fetch stores");
-        }
+        if (!response.ok) throw new Error("Failed to fetch stores");
+
         const stores = await response.json();
 
-        // Find the store where the user is a manager
         const store = stores.find((store) =>
-          store.manager.some(
-            (manager) =>
-              manager.emailAddress.toLowerCase() === userEmail.toLowerCase()
+          Array.isArray(store.manager) &&
+          store.manager.some((manager) =>
+            String(manager?.emailAddress || "")
+              .trim()
+              .toLowerCase() === String(userEmail || "").trim().toLowerCase()
           )
         );
-        // If the store is found, set the store ID
+
+        // הדפסה לבדיקה
+        console.log("📨 userEmail:", `"${userEmail}"`);
+        stores.forEach((store) => {
+          console.log("🔍 Checking store:", store.name);
+          store.manager?.forEach((manager) => {
+            console.log("   - manager:", `"${manager.emailAddress}"`);
+          });
+        });
+
         if (store) {
-          setStoreId(store._id);
+          setStoreId(store._id.toString());
           setStoreName(store.name);
+          console.log("✅ חנות שנמצאה:", store.name);
         } else {
-          console.warn("User is not a manager of any store");
+          console.warn("❌ המשתמש לא מוגדר כמנהל באף חנות");
         }
       } catch (err) {
-        console.error("Error fetching store data:", err);
+        console.error("שגיאה בשליפת חנויות:", err);
       }
     };
-    // Fetch the store ID when the user email is set
-    if (userEmail) {
+
+    if (userEmail && userEmail.trim() !== "") {
       fetchStoreId();
     } else {
-      console.warn("User email not found in localStorage");
+      console.warn("⏳ userEmail עדיין לא נטען");
     }
   }, [userEmail]);
-  // Function to render the content based on the active tab
+
+  // תוכן הטאב
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
@@ -101,7 +116,9 @@ const StoreManagement = () => {
     <div className="flex h-screen bg-gray-100">
       {/* Sidebar */}
       <aside className="w-64 bg-white border-r shadow-md">
-        <div className="p-4 text-lg font-bold">ניהול חנות: "{storeName}"</div>
+        <div className="p-4 text-lg font-bold">
+          ניהול חנות: {storeName ? `"${storeName}"` : "לא נטען"}
+        </div>
         <nav className="mt-4">
           {[
             {
@@ -139,9 +156,8 @@ const StoreManagement = () => {
           ))}
         </nav>
       </aside>
-  
-      {/* Main content */}
-      
+
+      {/* Main */}
       <main className="flex-1 p-6 overflow-y-auto">
         <div className="bg-white shadow-md rounded-lg p-2 h-full min-h-[80vh]">
           {storeId ? (
@@ -155,7 +171,6 @@ const StoreManagement = () => {
       </main>
     </div>
   );
-  
 };
 
 export default StoreManagement;
