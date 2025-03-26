@@ -6,7 +6,7 @@ import {
   Navigate,
 } from "react-router-dom"; // import the required libraries from react-router-dom
 import { useTranslation } from "react-i18next"; // import the useTranslation hook from react-i18next
-import { Toaster } from "react-hot-toast";
+import { Toaster,toast } from "react-hot-toast";
 import HomePage from "./pages/HomePage/HomePage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import PersonalArea from "./pages/PersonalArea/PersonalArea.jsx";
@@ -31,7 +31,7 @@ import WishlistModal from "./components/WishlistModal";
 
 //
 const App = () => {
-  const { i18n } = useTranslation(); // use the useTranslation hook to get the i18n object
+  const { t,i18n } = useTranslation(); // use the useTranslation hook to get the i18n object
   const [token, setToken] = useState(localStorage.getItem("token")); // use the useState hook to create a token state variable and set it to the token stored in the local storage
   const [userId, setUserId] = useState(localStorage.getItem("userId")); // use the useState hook to create a userId state variable and set it to the userId stored in the local storage
   const [role, setRole] = useState(localStorage.getItem("role")); // use the useState hook to create a role state variable and set it to the role stored in the local storage
@@ -55,47 +55,47 @@ const App = () => {
   };
   // verifyToken function to check if the token is stored in the local storage and if it is,
   // it sends a request to the server to verify the token
-  const verifyToken = async () => {
-    const storedToken = localStorage.getItem("token");
-    const storedUserId = localStorage.getItem("userId");
-    const storedUserRole = localStorage.getItem("role");
-    // check if the token is stored in the local storage
-    if (storedToken && storedUserId) {
-      try {
-        // send a request to the server to verify the token
-        const response = await fetch(
-          "http://localhost:5000/User/verify-token",
-          {
-            headers: {
-              Authorization: `Bearer ${storedToken}`,
-            },
+  useEffect(() => {
+    const verifyToken = async () => {
+      const storedToken = localStorage.getItem("token");
+      const storedUserId = localStorage.getItem("userId");
+      const storedUserRole = localStorage.getItem("role");
+
+      if (storedToken && storedUserId) {
+        try {
+          const response = await fetch(
+            "http://localhost:5000/User/verify-token",
+            {
+              headers: {
+                Authorization: `Bearer ${storedToken}`,
+              },
+            }
+          );
+
+          if (response.ok) {
+            setToken(storedToken);
+            setUserId(storedUserId);
+            setRole(storedUserRole);
+          } else {
+            handleLogout();
           }
-        );
-        // check if the response is ok
-        if (response.ok) {
-          setToken(storedToken);
-          setUserId(storedUserId);
-          setRole(storedUserRole);
-        } else {
+        } catch (error) {
+          console.error("Error verifying token:", error);
           handleLogout();
         }
-        // catch any errors and log them to the console
-      } catch (error) {
-        console.error("Error verifying token:", error);
-        handleLogout();
       }
-    }
-  };
-  useEffect(() => {
+    };
+
     verifyToken();
   }, []);
+
   // handleOpenCart function to open the cart modal
   const handleOpenCart = () => setIsCartOpen(true);
   // handleCloseCart function to close the cart modal
   const handleCloseCart = () => setIsCartOpen(false);
   // loadCart function to fetch the cart items from the server
   const handleOpenWishlist = () => setIsWishlistOpen(true);
-const handleCloseWishlist = () => setIsWishlistOpen(false);
+  const handleCloseWishlist = () => setIsWishlistOpen(false);
 
   const loadCart = useCallback(async () => {
     if (userId && token) {
@@ -136,9 +136,6 @@ const handleCloseWishlist = () => setIsWishlistOpen(false);
     setWishlistLoading(false);
   }, [userId, token]);
 
-  useEffect(() => {
-    verifyToken();
-  }, []);
   // useEffect hook to load the cart and wishlist items when the token and userId change
   useEffect(() => {
     if (token && userId) {
@@ -150,17 +147,18 @@ const handleCloseWishlist = () => setIsWishlistOpen(false);
   const addToWishlist = async (product, isInWishlist) => {
     const success = await updateWishlist(userId, token, product, isInWishlist); // updateWishlist function to add or remove a product from the wishlist
     if (success) {
+      toast.success(isInWishlist? t("remove_from_wishlist") + " ❌":t("add_to_wishlist") + " ✅");
       loadWishlist();
     }
   };
   // return the JSX of the App component
   return (
     // AlertProvider component to wrap the entire application and provide the alert context to all components
-    
-   <AlertProvider>
+
+    <AlertProvider>
       {/*Router component to wrap the entire application and provide the routing context to all components */}
       <Router>
-            <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
+        <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
 
         {/*Header component to display the header of the application         */}
         <Header
@@ -274,7 +272,7 @@ const handleCloseWishlist = () => setIsWishlistOpen(false);
                   <PersonalArea
                     userId={userId}
                     addToWishlist={addToWishlist}
-                    wishlist={wishlist}
+                    addToCart={handleAddToCart}
                     token={token}
                   />
                 ) : (
@@ -297,8 +295,6 @@ const handleCloseWishlist = () => setIsWishlistOpen(false);
         <Footer />
       </Router>
     </AlertProvider>
-   
-
   );
 };
 

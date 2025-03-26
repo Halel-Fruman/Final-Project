@@ -33,8 +33,7 @@ onWishlistClick,
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
   };
-  console.log(isLoggedIn);
-  console.log(role);
+
 
   return (
     <header className="bg-gray-50 shadow border-b-2 border-gray-200">
@@ -111,7 +110,10 @@ onWishlistClick,
             </span>
           </button>
           {/* Wishlist Button */}
-            <button onClick={onWishlistClick}>
+            <button
+            onClick={onWishlistClick}
+            aria-label="Wishlist"
+            >
               <HeartIconSolid className="h-6 w-6 text-primaryColor" />
             </button>
         </div>

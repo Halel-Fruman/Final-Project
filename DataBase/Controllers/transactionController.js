@@ -1,5 +1,5 @@
 const Transaction = require("../models/Transactions");
-//const StoreTransaction = require("../models/StoreTransactions");
+// const StoreTransactions = require("../models/StoreTransactions");
 
 const getStoreTransaction = async (req, res) => {
   try {
@@ -23,6 +23,45 @@ const getTransactions = async (req, res) => {
     res.status(500).json({ message: "שגיאה בקבלת העסקאות", error });
   }
 };
+
+// Get all transactions
+
+
+const getTransactionsByID = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+
+    // חיפוש במסמך שיש בו את העסקה עם transactionId תואם
+    const storeTransaction = await Transaction.findOne({
+      "transactions.transactionId": transactionId,
+    });
+
+    if (!storeTransaction) {
+      return res.status(404).json({ message: "העסקה לא נמצאה" });
+    }
+
+    // שליפת העסקה הספציפית מתוך המערך
+    const transaction = storeTransaction.transactions.find(
+      (t) => t.transactionId === transactionId
+    );
+
+    if (!transaction) {
+      return res.status(404).json({ message: "העסקה לא נמצאה בתוך המסמך" });
+    }
+
+    // הוספת שם החנות למידע (כדי שיהיה זמין ב-frontend)
+    res.status(200).json({
+      ...transaction.toObject?.() || transaction,
+      storeName: storeTransaction.storeName,
+    });
+
+  } catch (error) {
+    console.error("שגיאה ב-getTransactionsByID:", error);
+    res.status(500).json({ message: "שגיאה בקבלת העסקאות", error });
+  }
+};
+
+
 // Update product status
 const updateProductStatus = async (req, res) => {
   const { transactionId } = req.params;
@@ -51,4 +90,4 @@ const updateProductStatus = async (req, res) => {
 };
 
 // Export the functions
-module.exports = { getTransactions, updateProductStatus, getStoreTransaction };
+module.exports = { getTransactions, updateProductStatus, getStoreTransaction, getTransactionsByID };

@@ -1,78 +1,76 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
+import toast from "react-hot-toast";
 
-// The WishlistComponent is a functional component that takes the wishlist, removeFromWishlist, refreshWishlist, and addToCart as props.
 const WishlistComponent = ({
   wishlist,
   removeFromWishlist,
   refreshWishlist,
   addToCart,
 }) => {
-  const { t, i18n } = useTranslation(); // useTranslation hook to access the i18n instance and the translation function t
-  const [products, setProducts] = useState([]); // useState hook to store the products in the wishlist
-  const [isLoading, setIsLoading] = useState(true); // useState hook to store the loading state
+  const { t, i18n } = useTranslation();
+  const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [missingCount, setMissingCount] = useState(0); // חדש
 
-  // useEffect hook to fetch the products in the wishlist when the wishlist changes
   useEffect(() => {
     const fetchProducts = async () => {
-      // Use Promise.all to fetch all products in the wishlist
-      try {
-        const fetchedProducts = await Promise.all(
-          wishlist.map(async (item) => {
-            const response = await fetch(
-              `http://localhost:5000/products/${item.productId}`
-            );
-            // if the response is not ok, throw an error
-            if (!response.ok) {
-              throw new Error(
-                `Failed to fetch product with ID ${item.productId}`
-              );
-            }
-            // return the product data
-            return await response.json();
-          })
-        );
-        setProducts(fetchedProducts); // set the fetched products in the state
-      } catch (error) {
-        console.error("Error fetching products for wishlist:", error.message);
-      } finally {
-        setIsLoading(false);
+      setIsLoading(true);
+      setMissingCount(0);
+      const validProducts = [];
+
+      for (const item of wishlist) {
+        try {
+          const response = await fetch(
+            `http://localhost:5000/products/${item.productId}`
+          );
+          if (!response.ok) throw new Error("Not found");
+          const product = await response.json();
+          validProducts.push(product);
+        } catch (error) {
+          console.warn(`מוצר לא נטען: ${item.productId}`);
+          setMissingCount((prev) => prev + 1);
+        }
       }
+
+      setProducts(validProducts);
+      setIsLoading(false);
     };
-    // if the wishlist is not empty, fetch the products
+
     if (wishlist?.length > 0) {
       fetchProducts();
     } else {
-      setProducts([]); // set the products to an empty array
-      setIsLoading(false); // set the loading state to false
+      setProducts([]);
+      setIsLoading(false);
     }
   }, [wishlist]);
 
-  // handleRemoveFromWishlist function to remove a product from the wishlist
   const handleRemoveFromWishlist = async (product) => {
-    await removeFromWishlist(product, true); // remove the product from the wishlist
-    console.log("product._id1", product._id);
-    refreshWishlist(); // refresh the wishlist
+    await removeFromWishlist(product, true);
+    refreshWishlist();
   };
-  // if the products are loading, display a loading message
-  if (isLoading) {
-    return <p>{t("loading")}</p>;
-  }
-  // if there are no products in the wishlist, display an empty message
+
+  if (isLoading) return <p>{t("loading")}</p>;
+
   if (!products || products.length === 0) {
     return <p>{t("wishlist.empty")}</p>;
   }
 
-  // return the wishlist table with the products
   return (
     <div className="container mx-auto py-6">
       <h2 className="text-2xl font-bold text-center mb-4">
         {t("wishlist.title")}
       </h2>
-      <p className="text-center text-gray-600 mb-6">
+      <p className="text-center text-gray-600 mb-2">
         {t("wishlist.subtitle", { count: products.length })}
       </p>
+      {missingCount > 0 && (
+        <p className="text-center text-sm text-red-500 mb-4">
+          {t("wishlist.partialLoad", { count: missingCount })}
+        </p>
+      )}
+
       <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg table-fixed">
         <thead className="bg-gray-100">
           <tr>
@@ -93,11 +91,12 @@ const WishlistComponent = ({
         <tbody>
           {products.map((product) => (
             <tr key={product._id} className="hover:bg-gray-50">
-              <td className="p-4 flex items-center ">
+              <td className="p-4 flex items-center">
                 <img
                   src={product.images[0] || "https://placehold.co/50"}
                   alt={
-                    (product.name[i18n.language]) +t("product.img") || t("product.nameUnavailable")
+                    product.name[i18n.language] + t("product.img") ||
+                    t("product.nameUnavailable")
                   }
                   className="w-12 h-12 rounded-full ml-2"
                 />
@@ -117,19 +116,25 @@ const WishlistComponent = ({
               </td>
               <td className="p-4 text-center flex justify-center items-center space-x-2">
                 <button
-                  onClick={() => addToCart(product)}
+                  onClick={() => {
+                    addToCart({ productId: product._id, quantity: 1 });
+                    toast.success(t("wishlist.addToCart") + " ✅");
+                  }}
                   className="bg-secondaryColor text-gray-100 py-2 px-2 ml-2 rounded-full shadow-lg hover:bg-primaryColor transition"
                   aria-label={t("wishlist.addToCart")}>
                   <Icon
                     icon="material-symbols:add-shopping-cart-rounded"
                     width="24"
                     height="24"
-                  />{" "}
+                  />
                 </button>
                 <button
-                  onClick={() => handleRemoveFromWishlist(product)}
+                  onClick={() => {
+                    handleRemoveFromWishlist(product);
+                    toast.success(t("wishlist.remove") + " ❌");
+                  }}
                   className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white"
-                  aria-label={t("wishlist.removeFromWishlist")}>
+                  aria-label={t("wishlist.remove_from_wishlist")}>
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="24"

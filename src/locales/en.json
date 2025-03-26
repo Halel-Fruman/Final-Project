@@ -8,7 +8,13 @@
     "home_garden": "Home & Garden",
     "beauty_health": "Beauty & Health"
   },
+  "modal":{
+    "close": "Close"
+  },
+  "add_to_wishlist": "Add to Wishlist",
+  "remove_from_wishlist": "Remove from Wishlist",
   "header": {
+    "admin_dashboard": "Admin Dashboard",
     "home": "Home",
     "products": "Products",
     "login": "Login",
@@ -21,6 +27,7 @@
   "featured_products": "Featured Products",
   "price": "Price",
   "view_details": "View Details",
+  "view_products": "View Products",
   "personal_area": {
     "welcome": "Welcome, {{username}}",
     "myAccount": "My Account",
@@ -53,8 +60,14 @@
     "noItemsCart": "No items in cart",
     "yourWishlist": "Your Wishlist",
     "noItemsWishlist": "No items in wishlist",
+    "orders": "Orders",
+    "passwordManagement": "Password Management",
+    "phone": "Phone",
+    "toggleMenu": "Toggle Menu",
+    "Wishlist": "Wishlist",
 
     "loading": "Loading...",
+    "accountSettings": "Account Settings",
     "actions": {
       "delete": "Delete",
       "add": "Add",
@@ -82,19 +95,25 @@
     "last_name": "Last Name",
     "title": "Register",
     "email": "Email",
+    "phoneNumber": "Phone",
     "password": "Password",
     "confirmPassword": "Confirm Password",
     "submit": "Sign Up",
     "success": "Registration successful!",
+
     "errors": {
       "passwordMismatch": "Passwords do not match!",
       "failed": "Registration failed."
     }
   },
+  "loading": "Loading...",
   "login": {
     "title": "Login",
     "email": "Email",
+    "loading": "Logging in...",
     "password": "Password",
+    "notMember": "Not a member?",
+    "registerLink": "Register now",
     "submit": "Log In",
     "emailPlaceholder": "Enter your email address",
     "passwordPlaceholder": "Enter your password",
@@ -107,7 +126,14 @@
     "submit": "Submit",
     "success": "Address added successfully!",
     "errors": {
-      "failed": "Failed to add the address."
+      "failed": "Failed to add the address.",
+      "addError": "Failed to add the address.",
+      "deleteSuccess": "Address deleted successfully!",
+      "deleteError": "Error while deleting the address.",
+      "addressAdded": "Address added successfully!",
+      "updateError": "Error updating address",
+      "updateSuccess": "Address updated successfully!",
+      "noAddresses": "No available addresses"
     }
   },
   "wishlist": {
@@ -116,20 +142,22 @@
     "productName": "Product Name",
     "unitPrice": "Unit Price",
     "stockStatus": "Stock Status",
+    "partialLoad": "{{count}} could not be loaded",
     "actions": "Action",
     "addToCart": "Add to Cart",
     "remove": "Remove",
+    "remove_from_wishlist": "Remove from Wishlist",
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
     "empty": "Your wishlist is empty",
     "loading": "Loading your wishlist..."
   },
 
-  "submit": "Register",
   "error": "An error occurred during registration, please try again",
   "product": {
     "addToCart": "Add to Cart",
     "noPrice": "Price not available",
+    "img": "Image",
     "highlights": "Highlight",
     "details": "Details",
     "reviews": "Reviews"
@@ -182,5 +210,26 @@
     "shipping": "Shipping and taxes calculated at checkout.",
     "checkout": "Checkout",
     "continueShopping": "Continue Shopping"
+  },
+  "orders": {
+    "title": "Order History",
+    "subtitle": "Here you can view all your past orders in the system",
+    "order": "Order",
+    "date": "Order Date",
+    "store": "Store",
+    "total": "Total Amount",
+    "status": "Status",
+    "quantity": "Quantity",
+    "buyAgain": "Buy Again",
+    "shopSimilar": "Shop Similar",
+    "noOrders": "No previous orders found",
+    "viewInvoice": "View Invoice"
+  },
+  "status": {
+    "pending": "Pending",
+    "packed": "Packed",
+    "shipped": "Shipped",
+    "completed": "Completed",
+    "canceled": "Canceled"
   }
 }

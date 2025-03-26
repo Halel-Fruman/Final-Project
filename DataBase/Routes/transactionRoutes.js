@@ -1,5 +1,5 @@
 const express = require("express");
-const { getTransactions, updateProductStatus, getStoreTransaction } = require("../Controllers/transactionController");
+const { getTransactions, updateProductStatus, getStoreTransaction,getTransactionsByID } = require("../Controllers/transactionController");
 
 const router = express.Router();
 
@@ -10,11 +10,11 @@ router.get('/transactions/:storeId', getStoreTransaction);
 // קבלת כל העסקאות
 router.get("/", getTransactions);
 
+router.get("/by-id/:transactionId", getTransactionsByID);
 // עדכון סטטוס של מוצר בתוך עסקה
     router.put("/:transactionId/updateProductStatus", updateProductStatus);
 
 
-    
 // עדכון סטטוס משלוח
 router.put('/transactions/:storeId/:transactionId /delivery/deliveryStatus', async (req, res) => {
     try {
