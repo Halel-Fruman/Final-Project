@@ -3,6 +3,8 @@ import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { DialogPanel } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
+
 // The CartModal component is a custom modal component that displays the cart items
 const CartModal = ({
   isOpen,
@@ -105,7 +107,7 @@ const CartModal = ({
                         </p>
                       </div>
                       <button
-                        onClick={() => onRemoveFromCart(item._id)}
+                        onClick={() =>{ onRemoveFromCart(item._id); toast.success(t("cart.removed"));}}
                         className="text-red-600 hover:text-red-800">
                         {t("cart.remove")}
                       </button>

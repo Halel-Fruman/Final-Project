@@ -141,7 +141,8 @@
     "stockStatus": "סטטוס מלאי",
     "actions": "פעולות",
     "addToCart": "הוסף לעגלת הקניות",
-    "remove": "הסר",
+    "added": "הפריט נוסף לרשימת המשאלות",
+    "removed": "הפריט הוסר מרשימת המשאלות",
     "inStock": "במלאי",
     "outOfStock": "אין במלאי",
     "empty": "רשימת המשאלות שלך ריקה",
@@ -206,7 +207,8 @@
     "subtotal": "סכום ביניים",
     "shipping": "משלוח ומסים יחושבו בתשלום.",
     "checkout": "לקופה",
-    "continueShopping": "המשך בקניות"
+    "continueShopping": "המשך בקניות",
+    "removed": "הפריט הוסר מהעגלה"
   },
   "modal": {
     "close": "סגור"

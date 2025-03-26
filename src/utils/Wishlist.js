@@ -27,6 +27,7 @@ export const fetchWishlist = async (userId, token) => {
 export const updateWishlist = async (userId, token, product, isInWishlist) => {
   // send a POST request to add a product to the wishlist or a DELETE request to remove it
   try {
+      console.log("product", product)
     // determine the HTTP method based on whether the product is already in the wishlist
     const method = isInWishlist ? "DELETE" : "POST";
     // send the request to the server

@@ -4,6 +4,8 @@ import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
+import toast from "react-hot-toast";
+
 //  The ProductPage component is a functional component that takes the addToWishlist, wishlist, and addToCart as props.
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams(); // The useParams hook is used to access the URL parameters
@@ -51,6 +53,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       productId: product._id,
       quantity: 1,
     });
+    toast.success(t("wishlist.addToCart") + " ✅");
+
   };
   // The handleImageClick function is used to set the selected image
   const handleImageClick = (image) => {
