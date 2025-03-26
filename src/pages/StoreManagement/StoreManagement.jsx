@@ -11,7 +11,7 @@ const StoreManagement = () => {
   const { t } = useTranslation(); // The useTranslation hook is used to access the i18n instance
   const userId = localStorage.getItem("userId"); // Get the user ID from localStorage
   const token = localStorage.getItem("token"); // Get the token from localStorage
-
+  const [storeName, setStoreName] = useState(null); // Store ID managed by the user
   // Function to fetch the user's email from the server
   const fetchUserEmail = async (userId) => {
     // Send a GET request to the server to fetch the user data
@@ -64,6 +64,7 @@ const StoreManagement = () => {
         // If the store is found, set the store ID
         if (store) {
           setStoreId(store._id);
+          setStoreName(store.name);
         } else {
           console.warn("User is not a manager of any store");
         }
@@ -98,8 +99,9 @@ const StoreManagement = () => {
 
   return (
     <div className="flex h-screen bg-gray-100">
+      {/* Sidebar */}
       <aside className="w-64 bg-white border-r shadow-md">
-        <div className="p-4 text-lg font-bold">🏪 ניהול חנות</div>
+        <div className="p-4 text-lg font-bold">ניהול חנות: "{storeName}"</div>
         <nav className="mt-4">
           {[
             {
@@ -126,28 +128,34 @@ const StoreManagement = () => {
           ].map((tab) => (
             <button
               key={tab.id}
-              className={`flex items-center w-full p-3 text-left hover:bg-gray-200 ${
+              className={`flex items-center w-full p-3 text-right hover:bg-gray-200 ${
                 activeTab === tab.id ? "bg-gray-300 font-semibold" : ""
               }`}
-              onClick={() => setActiveTab(tab.id)}>
-              <Icon icon={tab.icon} className="w-5 h-5 mr-3" />
+              onClick={() => setActiveTab(tab.id)}
+            >
+              <Icon icon={tab.icon} className="w-5 h-5 ml-3" />
               {tab.label}
             </button>
           ))}
         </nav>
       </aside>
-
-      <main className="flex-1 p-6 bg-white shadow-md m-4 rounded-lg">
-        {storeId ? (
-          renderContent()
-        ) : (
-          <div className="text-center text-red-600">
-            {t("store_management.no_store")}
-          </div>
-        )}
+  
+      {/* Main content */}
+      
+      <main className="flex-1 p-6 overflow-y-auto">
+        <div className="bg-white shadow-md rounded-lg p-2 h-full min-h-[80vh]">
+          {storeId ? (
+            renderContent()
+          ) : (
+            <div className="text-center text-red-600">
+              {t("store_management.no_store")}
+            </div>
+          )}
+        </div>
       </main>
     </div>
   );
+  
 };
 
 export default StoreManagement;
