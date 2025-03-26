@@ -1,73 +1,125 @@
-// CheckoutPage.jsx
+// File: CheckoutPage.jsx
 import React from "react";
 import { useTranslation } from "react-i18next";
 
-const CheckoutPage = ({ cartItems, totalAmount, onCheckout }) => {
+const CheckoutPage = ({ cartItems = [], fetchProductDetails }) => {
   const { t, i18n } = useTranslation();
+  const [detailedCart, setDetailedCart] = React.useState([]);
+
+  React.useEffect(() => {
+    const loadDetails = async () => {
+      const enriched = await Promise.all(
+        cartItems.map(async (item) => {
+          const productId = item.productId?._id || item.productId;
+          const product = await fetchProductDetails(productId);
+          return { ...item, ...product };
+        })
+      );
+      setDetailedCart(enriched);
+    };
+    if (cartItems.length > 0) loadDetails();
+  }, [cartItems, fetchProductDetails]);
+
+  const total = detailedCart.reduce(
+    (sum, item) => sum + item.price * item.quantity,
+    0
+  );
 
   return (
-    <div className="w-10/12 mx-auto py-10 px-4 sm:px-6 lg:px-8">
-      <h1 className="text-5xl font-bold text-gray-900 mb-4 text-center">
-        {t("cart.title")}
+    <div className="w-11/12 max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
+      <h1 className="text-5xl font-bold text-center text-gray-900 mb-2">
+        {t("checkout.title")}
       </h1>
-      <h2 className="text-lg text-gray-600 mb-12 text-center">
-        {t("cart.subtitle") || t("cart.shipping")}
-      </h2>
+      <p className="text-xl text-gray-600 mb-10 text-center">
+        {t("checkout.subtitle")}
+      </p>
 
-      {cartItems?.length > 0 ? (
-        <>
-          <div className="divide-y bg-white rounded-lg shadow-sm mb-8">
-            {cartItems.map((item, index) => (
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+        {/* Form Section */}
+        <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+          <h2 className="text-2xl font-semibold text-gray-900">{t("checkout.contactInformation")}</h2>
+          <input
+            placeholder={t("checkout.email")}
+            className="w-full border rounded-md p-2"
+          />
+
+          <h3 className="text-xl font-semibold">{t("checkout.shippingAddress")}</h3>
+          <input
+            placeholder={t("checkout.address")}
+            className="w-full border rounded-md p-2"
+          />
+          <div className="grid grid-cols-3 gap-4">
+            <input
+              placeholder={t("checkout.city")}
+              className="border p-2 rounded-md"
+            />
+            <input
+              placeholder={t("checkout.state")}
+              className="border p-2 rounded-md"
+            />
+            <input
+              placeholder={t("checkout.zip")}
+              className="border p-2 rounded-md"
+            />
+          </div>
+
+          <h3 className="text-xl font-semibold">{t("checkout.paymentDetails")}</h3>
+          <input
+            placeholder={t("checkout.cardNumber")}
+            className="w-full border rounded-md p-2"
+          />
+          <div className="grid grid-cols-2 gap-2">
+            <input
+              placeholder={t("checkout.expiry")}
+              className="border rounded-md p-2"
+            />
+            <input
+              placeholder={t("checkout.cvc")}
+              className="border rounded-md p-2"
+            />
+          </div>
+
+          <button className="w-full bg-primaryColor text-white py-2 rounded-md font-bold hover:bg-secondaryColor">
+            {t("checkout.payNow")}
+          </button>
+        </div>
+
+        {/* Summary Section */}
+        <div className="bg-white p-8 shadow-md rounded-lg">
+          <h2 className="text-2xl font-bold mb-6">{t("checkout.summary")}</h2>
+          <div className="space-y-4">
+            {detailedCart.map((item, index) => (
               <div
                 key={index}
-                className="flex flex-col md:flex-row items-start gap-6 py-6 px-6"
+                className="flex items-center justify-between border-b pb-4"
               >
-                <img
-                  src={item.image || "https://placehold.co/100"}
-                  alt={item.name}
-                  className="w-28 h-28 object-cover rounded-md border"
-                />
-                <div className="flex-1">
-                  <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                    {item.name}
-                  </h3>
-                  <div className="flex flex-wrap gap-3 text-md text-gray-700 mb-2">
-                    {item.highlight?.[i18n.language]?.map((h, idx) => (
-                      <span
-                        key={idx}
-                        className="bg-gray-100 px-3 py-1 rounded-md"
-                      >
-                        {h}
-                      </span>
-                    ))}
+                <div className="flex gap-4 items-center">
+                  <img
+                    src={item.images?.[0] || "https://placehold.co/60"}
+                    alt={item.name?.[i18n.language]}
+                    className="w-16 h-16 object-cover rounded"
+                  />
+                  <div>
+                    <p className="font-medium text-gray-900">
+                      {item.name?.[i18n.language]}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {t("checkout.quantity")}: {item.quantity}
+                    </p>
                   </div>
-                  <p className="text-md text-gray-700 mb-1">
-                    {t("cart.quantity")}: {item.quantity}
-                  </p>
-                  <p className="text-lg font-medium text-gray-900">
-                    ₪{item.price}
-                  </p>
                 </div>
+                <p className="font-semibold text-lg text-primaryColor">
+                  ₪{item.price}
+                </p>
               </div>
             ))}
           </div>
 
-          <div className="text-right text-xl font-semibold text-gray-800 mb-6">
-            {t("cart.subtotal")}: ₪{totalAmount}
+          <div className="mt-6 border-t pt-4 text-right text-lg font-semibold text-gray-900">
+            {t("checkout.subtotal")}: ₪{total.toFixed(2)}
           </div>
-
-          <div className="flex justify-center">
-            <button
-              onClick={onCheckout}
-              className="bg-primaryColor hover:bg-secondaryColor text-white font-bold py-3 px-6 rounded-md text-xl"
-            >
-              {t("cart.checkout")}
-            </button>
-          </div>
-        </>
-      ) : (
-        <p className="text-gray-600 text-center text-lg">{t("cart.empty")}</p>
-      )}
+        </div>
+      </div>
     </div>
   );
 };
