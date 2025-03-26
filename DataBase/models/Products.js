@@ -1,8 +1,7 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
-  {
-    _id: { type: String, required: true, unique: true },
+  { 
     name: {
       en: { type: String, required: true },
       he: { type: String, required: true },
@@ -11,12 +10,8 @@ const productSchema = new mongoose.Schema(
       en: { type: String },
       he: { type: String },
     },
-    categories: [
-      {
-        en: { type: String, required: true },
-        he: { type: String, required: true },
-      },
-    ], // רשימת קטגוריות בכל שפה
+    categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
+ // רשימת קטגוריות בכל שפה
     attributes: {
       en: { type: Map, of: String },
       he: { type: Map, of: String },
