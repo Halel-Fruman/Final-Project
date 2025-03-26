@@ -134,7 +134,7 @@ const WishlistComponent = ({
                     toast.success(t("wishlist.remove") + " ❌");
                   }}
                   className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white"
-                  aria-label={t("wishlist.removeFromWishlist")}>
+                  aria-label={t("wishlist.remove_from_wishlist")}>
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="24"

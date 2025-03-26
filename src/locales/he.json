@@ -8,6 +8,7 @@
     "home_garden": "בית וגינה",
     "beauty_health": "יופי ובריאות"
   },
+  "error": "שגיאה",
   "add_to_wishlist": "הוסף לרשימת המשאלות",
   "remove_from_wishlist": "הסר מרשימת המשאלות",
   "loading": "טוען...",
@@ -26,6 +27,7 @@
   "featured_products": "מוצרים נבחרים",
   "price": "מחיר",
   "view_details": "צפה בפרטים",
+
   "personal_area": {
     "welcome": "ברוך הבא, {{username}}",
     "userInfo": "פרטי משתמש",
@@ -112,7 +114,8 @@
     "emailPlaceholder": "הכנס את כתובת האימייל שלך",
     "passwordPlaceholder": "הכנס את הסיסמה שלך",
     "success": "ההתחברות הצליחה!",
-    "failed": "ההתחברות נכשלה. אנא בדוק את הפרטים."
+    "failed": "ההתחברות נכשלה. אנא בדוק את הפרטים.",
+    "loading": "מתחבר..."
   },
   "addAddress": {
     "title": "הוספת כתובת",
@@ -142,8 +145,11 @@
     "inStock": "במלאי",
     "outOfStock": "אין במלאי",
     "empty": "רשימת המשאלות שלך ריקה",
-    "loading": "טוען את רשימת המשאלות שלך..."
+    "loading": "טוען את רשימת המשאלות שלך...",
+    "remove_from_wishlist": "הסר מרשימת המשאלות",
+    "partialLoad": "לא ניתן היה לטעון {{count}} מוצרים"
   },
+
   "product": {
     "addToCart": "הוסף לעגלת הקניות",
     "noPrice": "מחיר לא זמין",
@@ -164,6 +170,7 @@
     "manager_email": "אימייל של המנהל",
     "actions": "פעולות",
     "add_store": "הוסף חנות",
+    "edit_store": "ערוך חנות",
     "add_manager": "+",
     "save": "שמור",
     "save_managers": "שמור מנהלים",
