@@ -23,13 +23,12 @@ const storeSchema = new mongoose.Schema({
         emailAddress: {
           type: String,
           required: true,
-          match: /[a-z0-9._%+-]+@[a-z0-9.-]+\.[a-z]{2,4}/, // אימות כתובת מייל
+          match: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/, // אימות כתובת מייל
         },
       },
     ],
   }, { timestamps: true });  // שדות תאריך עדכון
-  
+
   const Stores = mongoose.model('Stores', storeSchema, 'Stores');
   module.exports = Stores;
 
-  

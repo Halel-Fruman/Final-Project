@@ -147,7 +147,7 @@ const App = () => {
   const addToWishlist = async (product, isInWishlist) => {
     const success = await updateWishlist(userId, token, product, isInWishlist); // updateWishlist function to add or remove a product from the wishlist
     if (success) {
-      toast.success(isInWishlist? t("remove_from_wishlist") + " ❌":t("add_to_wishlist") + " ✅");
+      toast.success(isInWishlist? t("wishlist.removed") + " ❌":t("wishlist.added") + " ✅");
       loadWishlist();
     }
   };

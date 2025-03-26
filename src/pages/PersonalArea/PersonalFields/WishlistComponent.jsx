@@ -14,7 +14,15 @@ const WishlistComponent = ({
   const [isLoading, setIsLoading] = useState(true);
   const [missingCount, setMissingCount] = useState(0); // חדש
 
+  const handleRemoveFromWishlist = async (product) => {
+    console.log("Removing from wishlist:", product);
+    await removeFromWishlist(product, true);
+    refreshWishlist();
+  };
+
   useEffect(() => {
+    let hasCleaned = false;
+
     const fetchProducts = async () => {
       setIsLoading(true);
       setMissingCount(0);
@@ -26,16 +34,25 @@ const WishlistComponent = ({
             `http://localhost:5000/products/${item.productId}`
           );
           if (!response.ok) throw new Error("Not found");
+
           const product = await response.json();
           validProducts.push(product);
         } catch (error) {
-          console.warn(`מוצר לא נטען: ${item.productId}`);
+          console.warn(`מוצר לא נמצא, מסירים: ${item.productId}`);
+          if (!hasCleaned) {
+            let toDelete={_id: item.productId}
+            handleRemoveFromWishlist(toDelete);
+            hasCleaned = true;
+          }
           setMissingCount((prev) => prev + 1);
         }
       }
 
       setProducts(validProducts);
       setIsLoading(false);
+      if (hasCleaned) {
+        // refreshWishlist(); // ✅ רענון רק פעם אחת
+      }
     };
 
     if (wishlist?.length > 0) {
@@ -45,11 +62,6 @@ const WishlistComponent = ({
       setIsLoading(false);
     }
   }, [wishlist]);
-
-  const handleRemoveFromWishlist = async (product) => {
-    await removeFromWishlist(product, true);
-    refreshWishlist();
-  };
 
   if (isLoading) return <p>{t("loading")}</p>;
 
@@ -131,7 +143,6 @@ const WishlistComponent = ({
                 <button
                   onClick={() => {
                     handleRemoveFromWishlist(product);
-                    toast.success(t("wishlist.remove") + " ❌");
                   }}
                   className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white"
                   aria-label={t("wishlist.remove_from_wishlist")}>

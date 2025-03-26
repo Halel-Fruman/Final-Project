@@ -1,6 +1,7 @@
 const express = require('express');
 const Store = require('../models/Stores'); // ייבוא המודל של החנויות
 const router = express.Router();
+const Products = require('../models/Products');
 
 // נתיב לשליפת כל החנויות
 router.get('/', async (req, res) => {
@@ -8,7 +9,6 @@ router.get('/', async (req, res) => {
     const stores = await Store.find(); // שליפת כל החנויות מה-DB
     res.status(200).json(stores); // החזרת החנויות ב-json
   } catch (error) {
-    console.log("hi");
     res.status(500).json({ message: 'שגיאה בשרת' });
   }
 });
@@ -19,8 +19,12 @@ router.post('/', async (req, res) => {
 
   try {
     const newStore = new Store({ name, address, email, manager });
+    console.log(newStore);
     await newStore.save(); // שמירת החנות החדשה ב-DB
+    const newStoreProducts = new Products({ storeId: newStore._id, storeName: newStore.name, products: [] });
+    await newStoreProducts.save();
     res.status(201).json(newStore); // החזרת החנות החדשה כ-json
+
   } catch (error) {
     res.status(500).json({ message: 'שגיאה בהוספת החנות' });
   }

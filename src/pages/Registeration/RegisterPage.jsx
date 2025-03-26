@@ -69,10 +69,8 @@ export default function Register({ setToken, setUserId, onClose }) {
         </button>
       )}
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <DialogTitle>
-        <h2 className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
+        <DialogTitle className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           {t("register.title")}
-        </h2>
         </DialogTitle>
       </div>
 
@@ -88,6 +86,7 @@ export default function Register({ setToken, setUserId, onClose }) {
               <input
                 id="firstName"
                 name="firstName"
+                autoComplete="given-name"
                 type="text"
                 required
                 value={firstName}
@@ -107,10 +106,33 @@ export default function Register({ setToken, setUserId, onClose }) {
               <input
                 id="lastName"
                 name="lastName"
+                autoComplete="family-name"
                 type="text"
                 required
                 value={lastName}
                 onChange={(e) => setLastName(e.target.value)}
+                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
+              />
+            </div>
+          </div>
+
+
+
+          <div>
+            <label
+              htmlFor="phoneNumber"
+              className="block text-sm font-medium text-gray-900">
+              {t("register.phoneNumber")}
+            </label>
+            <div className="mt-2">
+              <input
+                id="phoneNumber"
+                name="phoneNumber"
+                autoComplete="tel"
+                type="text"
+                required
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
                 className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
               />
             </div>
@@ -127,29 +149,11 @@ export default function Register({ setToken, setUserId, onClose }) {
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 className="block w-full rounded-md bg-white px-3 py-1 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="phoneNumber"
-              className="block text-sm font-medium text-gray-900">
-              {t("register.phoneNumber")}
-            </label>
-            <div className="mt-2">
-              <input
-                id="phoneNumber"
-                name="phoneNumber"
-                type="text"
-                required
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
               />
             </div>
           </div>
@@ -165,6 +169,7 @@ export default function Register({ setToken, setUserId, onClose }) {
                 id="password"
                 name="password"
                 type="password"
+                autoComplete="new-password"
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
@@ -184,6 +189,7 @@ export default function Register({ setToken, setUserId, onClose }) {
                 id="confirmPassword"
                 name="confirmPassword"
                 type="password"
+                autoComplete="new-password"
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
