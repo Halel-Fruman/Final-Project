@@ -9,7 +9,13 @@ const ProductManagement = ({ storeId }) => {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const { showAlert } = useAlert();
+  const [editingProduct, setEditingProduct] = useState(null);
 
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setIsAddingProduct(true); // נשתמש באותו מודאל של הוספה
+  };
+  
   const [newProduct, setNewProduct] = useState({
     nameEn: "",
     nameHe: "",
@@ -22,12 +28,14 @@ const ProductManagement = ({ storeId }) => {
     allowBackorder: false,
     internationalShipping: false,
     images: [],
-    newImageUrl: "", // קישור זמני לתמונה לפני שמוסיפים אותה
+    newImageUrl: "",
+    discountPercentage: "",
+    discountStart: "",
+    discountEnd: "",
   });
   
 
   useEffect(() => {  
-    console.log("📦 storeId לשליפת מוצרים:", storeId); // בדוק מה נשלח
 
 axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       .then((res) => setProducts(res.data))
@@ -39,51 +47,81 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
   }, [storeId]);
 
-  const handleAddProduct = () => {
+  const handleSaveProduct = () => {
     if (!newProduct.nameEn || !newProduct.nameHe || !newProduct.price || newProduct.selectedCategories.length === 0) {
       showAlert("יש למלא את כל השדות החיוניים", "error");
       return;
     }
-    console.log("🚀 שולח קטגוריות:", newProduct.selectedCategories);
 
-    axios
-      .post(`http://localhost:5000/products/${storeId}`, {
-        name: { en: newProduct.nameEn, he: newProduct.nameHe },
-        price: Number(newProduct.price),
-        stock: Number(newProduct.stock),
-        manufacturingCost: Number(newProduct.manufacturingCost),
-        description: {
-          en: newProduct.descriptionEn,
-          he: newProduct.descriptionHe,
-        },
-        categories: newProduct.selectedCategories,
-        allowBackorder: newProduct.allowBackorder,
-        internationalShipping: newProduct.internationalShipping,
-        images: newProduct.images,
-      })
+    const payload = {
+      name: { en: newProduct.nameEn, he: newProduct.nameHe },
+      price: Number(newProduct.price),
+      stock: Number(newProduct.stock),
+      manufacturingCost: Number(newProduct.manufacturingCost),
+      description: {
+        en: newProduct.descriptionEn,
+        he: newProduct.descriptionHe,
+      },
+      categories: newProduct.selectedCategories,
+      allowBackorder: newProduct.allowBackorder,
+      internationalShipping: newProduct.internationalShipping,
+      images: newProduct.images,
+    };
+
+    if (newProduct.discountPercentage && newProduct.discountStart && newProduct.discountEnd) {
+      payload.discounts = [{
+        percentage: Number(newProduct.discountPercentage),
+        startDate: newProduct.discountStart,
+        endDate: newProduct.discountEnd
+      }];
+    }
+
+    const url = editingProduct
+      ? `http://localhost:5000/products/${storeId}/${editingProduct._id}`
+      : `http://localhost:5000/products/${storeId}`;
+
+    const method = editingProduct ? axios.put : axios.post;
+
+    method(url, payload)
       .then((res) => {
-        setProducts([...products, res.data]);
+        if (editingProduct) {
+          setProducts(products.map((p) => (p._id === editingProduct._id ? res.data : p)));
+        } else {
+          setProducts([...products, res.data]);
+        }
         setIsAddingProduct(false);
         resetNewProductForm();
-        showAlert("המוצר נוסף בהצלחה!", "success");
+        showAlert(editingProduct ? "המוצר עודכן בהצלחה!" : "המוצר נוסף בהצלחה!", "success");
+        setEditingProduct(null);
       })
-      .catch(() => showAlert("אירעה שגיאה בעת הוספת המוצר", "error"));
+      .catch(() => showAlert("אירעה שגיאה בשמירת המוצר", "error"));
   };
-  
 
-  const handleDelete = (productId) => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {
-      axios
-        .delete(`http://localhost:5000/products/${storeId}/${productId}`)
-        .then(() => {
-          setProducts(products.filter((p) => p._id !== productId));
-          showAlert("המוצר נמחק בהצלחה", "success");
-        })
-        .catch(() => {
-          showAlert("אירעה שגיאה במחיקת המוצר", "error");
-        });
+ 
+
+  useEffect(() => {
+    if (editingProduct) {
+      const discount = editingProduct.discounts?.[0];
+      setNewProduct({
+        nameEn: editingProduct.name.en,
+        nameHe: editingProduct.name.he,
+        price: editingProduct.price,
+        stock: editingProduct.stock,
+        manufacturingCost: editingProduct.manufacturingCost,
+        descriptionEn: editingProduct.description?.en || "",
+        descriptionHe: editingProduct.description?.he || "",
+        selectedCategories: editingProduct.categories || [],
+        allowBackorder: editingProduct.allowBackorder || false,
+        internationalShipping: editingProduct.internationalShipping || false,
+        images: editingProduct.images || [],
+        newImageUrl: "",
+        discountPercentage: discount?.percentage || "",
+        discountStart: discount?.startDate?.slice(0, 10) || "",
+        discountEnd: discount?.endDate?.slice(0, 10) || "",
+      });
     }
-  };
+  }, [editingProduct]);
+
   const resetNewProductForm = () => {
     setNewProduct({
       nameEn: "",
@@ -98,13 +136,28 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       internationalShipping: false,
       images: [],
       newImageUrl: "",
+      discountPercentage: "",
+      discountStart: "",
+      discountEnd: "",
     });
   };
-  
-  const handleEdit = (product) => {
-    console.log("עריכת מוצר:", product);
-    // פתח כאן מודאל עריכה בעתיד
+
+
+  const handleDelete = (productId) => {
+    if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {
+      axios
+        .delete(`http://localhost:5000/products/${storeId}/${productId}`)
+        .then(() => {
+          setProducts(products.filter((p) => p._id !== productId));
+          showAlert("המוצר נמחק בהצלחה", "success");
+        })
+        .catch(() => {
+          showAlert("אירעה שגיאה במחיקת המוצר", "error");
+        });
+    }
   };
+ 
+  
 
   const handleCategoryChange = (e) => {
     const { value, checked } = e.target;
@@ -371,7 +424,7 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
         </button>
         <button
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-          onClick={handleAddProduct}
+          onClick={handleSaveProduct}
         >
           הוסף מוצר
         </button>
