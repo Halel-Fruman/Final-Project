@@ -251,8 +251,8 @@ const App = () => {
              <CheckoutPage
               cartItems={cartItems}
               fetchProductDetails={fetchProductDetails}
-              onCheckout={handleCloseCart}
-
+              userId={userId}
+              token={token}
              />} />
 
             <Route

@@ -236,21 +236,23 @@
   },
   "checkout": {
   "title": "Checkout",
-  "subtitle": "Please enter your details to complete the order",
+  "subtitle": "Please confirm your details to complete the order",
   "contactInformation": "Contact Information",
-  "email": "Email Address",
   "shippingAddress": "Shipping Address",
-  "address": "Address",
-  "city": "City",
-  "state": "State / Province",
-  "zip": "Postal Code",
   "paymentDetails": "Payment Details",
   "cardNumber": "Card Number",
-  "expiry": "Expiration Date (MM/YY)",
-  "cvc": "CVC",
+  "expiry": "Expiry",
+  "cvc": "CVV",
   "payNow": "Pay Now",
   "summary": "Order Summary",
   "quantity": "Quantity",
-  "subtotal": "Subtotal"
+  "subtotal": "Subtotal",
+  "email": "Email",
+  "city": "City",
+  "address": "Address",
+  "addNewAddress": "Add New Address",
+  "cancelNewAddress": "Cancel New Address",
+  "saveNewAddress": "Save New Address"
 }
+
 }
