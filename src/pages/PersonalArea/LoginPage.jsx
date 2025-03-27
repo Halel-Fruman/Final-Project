@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Dialog } from "@headlessui/react";
+import { DialogTitle } from "@headlessui/react";
 
 //  The Login component is a functional component that takes setToken, setUserId, setUserRole, onClose, and openRegisterModal as props.
 const Login = ({
@@ -60,13 +60,11 @@ const Login = ({
   // Return the login form with the email, password, and submit button
   return (
     <div className="p-6 bg-white rounded-md w-full max-w-md mx-auto">
-      <Dialog.Title
+      <DialogTitle
         as="h2"
         className="text-2xl font-bold text-center text-gray-900">
-        <h2 className="text-2xl font-bold text-center text-gray-900">
-          {t("login.title")}
-        </h2>
-      </Dialog.Title>
+        {t("login.title")}
+      </DialogTitle>
 
       {/*The form element with the email and password input fields */}
       <form onSubmit={handleSubmit} className="mt-6 space-y-6">
@@ -80,6 +78,7 @@ const Login = ({
             id="email"
             name="email"
             type="email"
+            autoComplete="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
@@ -97,6 +96,7 @@ const Login = ({
             id="password"
             name="password"
             type="password"
+            autoComplete="current-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required

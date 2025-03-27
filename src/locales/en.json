@@ -145,7 +145,8 @@
     "partialLoad": "{{count}} could not be loaded",
     "actions": "Action",
     "addToCart": "Add to Cart",
-    "remove": "Remove",
+    "added": "Item added to wishlist",
+    "removed": "Item removed from wishlist",
     "remove_from_wishlist": "Remove from Wishlist",
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
@@ -209,7 +210,8 @@
     "subtotal": "Subtotal",
     "shipping": "Shipping and taxes calculated at checkout.",
     "checkout": "Checkout",
-    "continueShopping": "Continue Shopping"
+    "continueShopping": "Continue Shopping",
+    "removed": "Item removed from cart"
   },
   "orders": {
     "title": "Order History",
@@ -231,5 +233,24 @@
     "shipped": "Shipped",
     "completed": "Completed",
     "canceled": "Canceled"
-  }
+  },
+  "checkout": {
+  "title": "Checkout",
+  "subtitle": "Please enter your details to complete the order",
+  "contactInformation": "Contact Information",
+  "email": "Email Address",
+  "shippingAddress": "Shipping Address",
+  "address": "Address",
+  "city": "City",
+  "state": "State / Province",
+  "zip": "Postal Code",
+  "paymentDetails": "Payment Details",
+  "cardNumber": "Card Number",
+  "expiry": "Expiration Date (MM/YY)",
+  "cvc": "CVC",
+  "payNow": "Pay Now",
+  "summary": "Order Summary",
+  "quantity": "Quantity",
+  "subtotal": "Subtotal"
+}
 }

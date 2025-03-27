@@ -6,7 +6,7 @@ import {
   Navigate,
 } from "react-router-dom"; // import the required libraries from react-router-dom
 import { useTranslation } from "react-i18next"; // import the useTranslation hook from react-i18next
-import { Toaster,toast } from "react-hot-toast";
+import { Toaster, toast } from "react-hot-toast";
 import HomePage from "./pages/HomePage/HomePage";
 import ProductPage from "./pages/ProductPage/ProductPage";
 import PersonalArea from "./pages/PersonalArea/PersonalArea.jsx";
@@ -28,10 +28,11 @@ import RegisterPage from "./pages/Registeration/RegisterPage";
 import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
+import CheckoutPage from "./pages/Checkout/Checkout";
 
 //
 const App = () => {
-  const { t,i18n } = useTranslation(); // use the useTranslation hook to get the i18n object
+  const { t, i18n } = useTranslation(); // use the useTranslation hook to get the i18n object
   const [token, setToken] = useState(localStorage.getItem("token")); // use the useState hook to create a token state variable and set it to the token stored in the local storage
   const [userId, setUserId] = useState(localStorage.getItem("userId")); // use the useState hook to create a userId state variable and set it to the userId stored in the local storage
   const [role, setRole] = useState(localStorage.getItem("role")); // use the useState hook to create a role state variable and set it to the role stored in the local storage
@@ -147,7 +148,11 @@ const App = () => {
   const addToWishlist = async (product, isInWishlist) => {
     const success = await updateWishlist(userId, token, product, isInWishlist); // updateWishlist function to add or remove a product from the wishlist
     if (success) {
-      toast.success(isInWishlist? t("remove_from_wishlist") + " ❌":t("add_to_wishlist") + " ✅");
+      toast.success(
+        isInWishlist
+          ? t("wishlist.removed") + " ❌"
+          : t("wishlist.added") + " ✅"
+      );
       loadWishlist();
     }
   };
@@ -240,6 +245,15 @@ const App = () => {
                 />
               }
             />
+            <Route
+             path="/checkout"
+             element={
+             <CheckoutPage
+              cartItems={cartItems}
+              fetchProductDetails={fetchProductDetails}
+              onCheckout={handleCloseCart}
+
+             />} />
 
             <Route
               path="/SysAdmin"

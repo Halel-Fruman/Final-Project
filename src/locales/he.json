@@ -141,7 +141,8 @@
     "stockStatus": "סטטוס מלאי",
     "actions": "פעולות",
     "addToCart": "הוסף לעגלת הקניות",
-    "remove": "הסר",
+    "added": "הפריט נוסף לרשימת המשאלות",
+    "removed": "הפריט הוסר מרשימת המשאלות",
     "inStock": "במלאי",
     "outOfStock": "אין במלאי",
     "empty": "רשימת המשאלות שלך ריקה",
@@ -206,7 +207,8 @@
     "subtotal": "סכום ביניים",
     "shipping": "משלוח ומסים יחושבו בתשלום.",
     "checkout": "לקופה",
-    "continueShopping": "המשך בקניות"
+    "continueShopping": "המשך בקניות",
+    "removed": "הפריט הוסר מהעגלה"
   },
   "modal": {
     "close": "סגור"
@@ -231,5 +233,26 @@
     "shipped": "נשלח",
     "completed": "הושלם",
     "canceled": "בוטל"
-  }
+  },
+  "checkout": {
+  "title": "קופה",
+  "subtitle": "אנא הזן את פרטיך להשלמת ההזמנה",
+  "contactInformation": "פרטי קשר",
+  "email": "כתובת אימייל",
+  "shippingAddress": "כתובת משלוח",
+  "address": "כתובת",
+  "city": "עיר",
+  "state": "אזור / מחוז",
+  "zip": "מיקוד",
+  "paymentDetails": "פרטי תשלום",
+  "cardNumber": "מספר כרטיס",
+  "expiry": "תוקף (חודש/שנה)",
+  "cvc": "קוד אבטחה (CVC)",
+  "payNow": "שלם עכשיו",
+  "summary": "סיכום הזמנה",
+  "quantity": "כמות",
+  "subtotal": "סכום ביניים"
+}
+
+
 }

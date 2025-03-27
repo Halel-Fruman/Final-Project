@@ -3,6 +3,10 @@ import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
 import { DialogPanel } from "@headlessui/react";
 import { useTranslation } from "react-i18next";
+import { useNavigate } from "react-router-dom";
+
+import toast from "react-hot-toast";
+
 // The CartModal component is a custom modal component that displays the cart items
 const CartModal = ({
   isOpen,
@@ -15,6 +19,8 @@ const CartModal = ({
   const { t, i18n } = useTranslation();
   // The detailedCartItems state is used to store the detailed cart items
   const [detailedCartItems, setDetailedCartItems] = useState([]);
+  const navigate = useNavigate();
+
   // The useEffect hook is used to load the cart details when the modal is open
   useEffect(() => {
     const loadCartDetails = async () => {
@@ -105,7 +111,10 @@ const CartModal = ({
                         </p>
                       </div>
                       <button
-                        onClick={() => onRemoveFromCart(item._id)}
+                        onClick={() => {
+                          onRemoveFromCart(item._id);
+                          toast.success(t("cart.removed"));
+                        }}
                         className="text-red-600 hover:text-red-800">
                         {t("cart.remove")}
                       </button>
@@ -128,7 +137,12 @@ const CartModal = ({
                   {t("cart.shipping")}
                 </p>
                 <div className="mt-6">
-                  <button className="w-full bg-secondaryColor text-white py-2 px-4 rounded-md shadow hover:bg-primaryColor">
+                  <button
+                    onClick={() => {
+                      onClose(); // סגור את המודאל קודם
+                      navigate("/checkout"); // ניווט לעמוד התשלום
+                    }}
+                    className="w-full bg-secondaryColor text-white py-2 px-4 rounded-md shadow hover:bg-primaryColor">
                     {t("cart.checkout")}
                   </button>
                 </div>
