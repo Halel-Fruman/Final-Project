@@ -233,5 +233,26 @@
     "shipped": "נשלח",
     "completed": "הושלם",
     "canceled": "בוטל"
-  }
+  },
+  "checkout": {
+  "title": "קופה",
+  "subtitle": "אנא הזן את פרטיך להשלמת ההזמנה",
+  "contactInformation": "פרטי קשר",
+  "email": "כתובת אימייל",
+  "shippingAddress": "כתובת משלוח",
+  "address": "כתובת",
+  "city": "עיר",
+  "state": "אזור / מחוז",
+  "zip": "מיקוד",
+  "paymentDetails": "פרטי תשלום",
+  "cardNumber": "מספר כרטיס",
+  "expiry": "תוקף (חודש/שנה)",
+  "cvc": "קוד אבטחה (CVC)",
+  "payNow": "שלם עכשיו",
+  "summary": "סיכום הזמנה",
+  "quantity": "כמות",
+  "subtotal": "סכום ביניים"
+}
+
+
 }
