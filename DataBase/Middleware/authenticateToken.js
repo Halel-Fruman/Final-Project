@@ -8,6 +8,8 @@ const authenticateToken = (req, res, next) => {
   const token = authHeader.split(" ")[1];
   jwt.verify(token, SECRET_KEY, (err, decoded) => {
     if (err) {
+      console.log("req.headers.authorization:", req.headers.authorization);
+
       console.error("Invalid token:", err.message);
       return res.status(403).json({ error: "Invalid or expired token" });
     }

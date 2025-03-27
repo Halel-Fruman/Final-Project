@@ -90,7 +90,6 @@ const UserController = {
     }
   },
 
-
   ///////
 
   //  login function to authenticate the user
@@ -188,14 +187,26 @@ const UserController = {
   addAddress: async (req, res) => {
     const { userId } = req.params;
     const { address } = req.body;
+
     console.log("params", req.params);
     console.log("body", req.body);
+
+    // Basic validation
+    if (!address || !address.city || !address.streetAddress) {
+      return res.status(400).json({
+        message: "Missing city or streetAddress in address object",
+      });
+    }
 
     try {
       const user = await User.findById(userId);
       if (!user) return res.status(404).send("User not found");
 
-      user.addresses.push(address);
+      user.addresses.push({
+        city: address.city,
+        streetAddress: address.streetAddress,
+      });
+
       await user.save();
 
       res.status(200).json(user.addresses);
@@ -203,10 +214,21 @@ const UserController = {
       res.status(500).send("Error adding address: " + error.message);
     }
   },
-  // update the addresses of a user by id
   updateAddresses: async (req, res) => {
     const { userId } = req.params;
     const { addresses } = req.body;
+
+    if (!Array.isArray(addresses)) {
+      return res.status(400).send("Addresses should be an array");
+    }
+
+    const isValid = addresses.every((addr) => addr.city && addr.streetAddress);
+
+    if (!isValid) {
+      return res
+        .status(400)
+        .send("Each address must have 'city' and 'streetAddress'");
+    }
 
     try {
       const user = await User.findById(userId);
@@ -221,7 +243,6 @@ const UserController = {
     }
   },
 
-  // delete an address from a user by id
   deleteAddress: async (req, res) => {
     const { userId } = req.params;
     const { index } = req.body;
@@ -230,8 +251,13 @@ const UserController = {
       const user = await User.findById(userId);
       if (!user) return res.status(404).send("User not found");
 
-      if (!user.addresses[index])
-        return res.status(400).send("Address not found");
+      if (
+        typeof index !== "number" ||
+        index < 0 ||
+        index >= user.addresses.length
+      ) {
+        return res.status(400).send("Invalid address index");
+      }
 
       user.addresses.splice(index, 1);
       await user.save();

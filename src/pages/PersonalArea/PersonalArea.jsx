@@ -122,6 +122,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
       addresses={user.addresses}
       userId={userId}
       onUpdate={handleSave}
+      token={token}
       />
       </div>
     )}

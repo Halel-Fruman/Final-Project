@@ -236,23 +236,25 @@
   },
   "checkout": {
   "title": "קופה",
-  "subtitle": "אנא הזן את פרטיך להשלמת ההזמנה",
+  "subtitle": "אנא אשר את הפרטים שלך להשלמת ההזמנה",
   "contactInformation": "פרטי קשר",
-  "email": "כתובת אימייל",
-  "shippingAddress": "כתובת משלוח",
-  "address": "כתובת",
-  "city": "עיר",
-  "state": "אזור / מחוז",
-  "zip": "מיקוד",
+  "shippingAddress": "כתובת למשלוח",
   "paymentDetails": "פרטי תשלום",
-  "cardNumber": "מספר כרטיס",
-  "expiry": "תוקף (חודש/שנה)",
-  "cvc": "קוד אבטחה (CVC)",
-  "payNow": "שלם עכשיו",
+  "cardNumber": "מספר כרטיס אשראי",
+  "expiry": "תוקף",
+  "cvc": "CVV",
+  "payNow": "בצע תשלום",
   "summary": "סיכום הזמנה",
   "quantity": "כמות",
-  "subtotal": "סכום ביניים"
+  "subtotal": "סה״כ",
+  "email": "דוא\"ל",
+  "city": "עיר",
+  "address": "כתובת",
+  "addNewAddress": "הוסף כתובת חדשה",
+  "cancelNewAddress": "ביטול הוספת כתובת",
+  "saveNewAddress": "שמור כתובת "
 }
+
 
 
 }
