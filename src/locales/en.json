@@ -8,7 +8,7 @@
     "home_garden": "Home & Garden",
     "beauty_health": "Beauty & Health"
   },
-  "modal":{
+  "modal": {
     "close": "Close"
   },
   "add_to_wishlist": "Add to Wishlist",
@@ -147,6 +147,8 @@
     "addToCart": "Add to Cart",
     "added": "Item added to wishlist",
     "removed": "Item removed from wishlist",
+    "remove": "Remove",
+    "add": "Add",
     "remove_from_wishlist": "Remove from Wishlist",
     "inStock": "In Stock",
     "outOfStock": "Out of Stock",
@@ -235,22 +237,41 @@
     "canceled": "Canceled"
   },
   "checkout": {
-  "title": "Checkout",
-  "subtitle": "Please enter your details to complete the order",
-  "contactInformation": "Contact Information",
-  "email": "Email Address",
-  "shippingAddress": "Shipping Address",
-  "address": "Address",
-  "city": "City",
-  "state": "State / Province",
-  "zip": "Postal Code",
-  "paymentDetails": "Payment Details",
-  "cardNumber": "Card Number",
-  "expiry": "Expiration Date (MM/YY)",
-  "cvc": "CVC",
-  "payNow": "Pay Now",
-  "summary": "Order Summary",
-  "quantity": "Quantity",
-  "subtotal": "Subtotal"
-}
+    "title": "Checkout",
+    "subtitle": "Please confirm your details to complete the order",
+    "contactInformation": "Contact Information",
+    "shippingAddress": "Shipping Address",
+    "paymentDetails": "Payment Details",
+    "cardNumber": "Card Number",
+    "expiry": "Expiry",
+    "cvc": "CVV",
+    "payNow": "Pay Now",
+    "summary": "Order Summary",
+    "quantity": "Quantity",
+    "subtotal": "Subtotal",
+    "email": "Email",
+    "city": "City",
+    "address": "Address",
+    "addNewAddress": "Add New Address",
+    "cancelNewAddress": "Cancel New Address",
+    "saveNewAddress": "Save New Address",
+    "deliveryMethod":{
+      "title": "Delivery Method",
+      "pickup": "Pickup",
+      "delivery": "Delivery",
+      "storePickup": "Store Pickup",
+      "homeDelivery": "Home Delivery"
+    }
+  },
+  "confirmation": {
+    "title": "Order Confirmed!",
+    "successMessage": "Your order has been placed and is being processed. Order details below.",
+    "transactionId": "Transaction ID",
+    "deliveryMethod": "Delivery Method",
+    "store": "Store",
+    "unknownStore": "Unknown Store",
+    "viewOrders": "View My Orders",
+    "backHome": "Back to Home",
+    "noTransactions": "No transactions to display"
+  }
 }

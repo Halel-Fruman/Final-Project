@@ -1,4 +1,4 @@
-const Transaction = require("../models/Transactions");
+const StoreTransactions  = require("../models/Transactions");
 // const StoreTransactions = require("../models/StoreTransactions");
 
 const getStoreTransaction = async (req, res) => {
@@ -17,7 +17,7 @@ const getStoreTransaction = async (req, res) => {
 // Get all transactions
 const getTransactions = async (req, res) => {
   try {
-    const transactions = await Transaction.find();
+    const transactions = await StoreTransactions.find();
     res.status(200).json(transactions);
   } catch (error) {
     res.status(500).json({ message: "שגיאה בקבלת העסקאות", error });
@@ -32,7 +32,7 @@ const getTransactionsByID = async (req, res) => {
     const { transactionId } = req.params;
 
     // חיפוש במסמך שיש בו את העסקה עם transactionId תואם
-    const storeTransaction = await Transaction.findOne({
+    const storeTransaction = await StoreTransactions.findOne({
       "transactions.transactionId": transactionId,
     });
 
@@ -88,6 +88,38 @@ const updateProductStatus = async (req, res) => {
     res.status(500).json({ message: "שגיאה בעדכון הסטטוס", error });
   }
 };
+const addTransaction = async (req, res) => {
+  const {
+    storeId,
+    storeName,
+    transaction,
+  } = req.body;
 
+  if (!storeId || !storeName || !transaction) {
+    return res.status(400).json({ message: "Missing required fields" });
+  }
+
+  try {
+    let storeDoc = await StoreTransactions.findOne({ storeId });
+
+    if (!storeDoc) {
+      // If store document doesn't exist, create it with the transaction
+      storeDoc = new StoreTransactions({
+        storeId,
+        storeName,
+        transactions: [transaction],
+      });
+    } else {
+      // Otherwise, just push the transaction
+      storeDoc.transactions.push(transaction);
+    }
+    console.log("🚀 Transaction before save:", JSON.stringify(transaction, null, 2));
+
+    await storeDoc.save();
+    res.status(201).json({ message: "Transaction added successfully", storeTransactions: storeDoc });
+  } catch (error) {
+    res.status(500).json({ message: "Error adding transaction", error: error.message });
+  }
+};
 // Export the functions
-module.exports = { getTransactions, updateProductStatus, getStoreTransaction, getTransactionsByID };
+module.exports = { getTransactions, updateProductStatus, getStoreTransaction, getTransactionsByID, addTransaction };
