@@ -6,7 +6,6 @@ import PasswordManager from "./PersonalFields/PasswordManager";
 import AddressManager from "./PersonalFields/AddressManager";
 import WishlistComponent from "./PersonalFields/WishlistComponent";
 import OrderHistory from "./PersonalFields/OrdersHistory";
-// import OrderHistory from "./PersonalFiels/OrdersHistory";
 // The PersonalArea component is a functional component that takes the userId, addToWishlist, addToCart, and token as props.
 const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
   const { t } = useTranslation(); // useTranslation hook to access the i18n instance and the translation function t

@@ -1,8 +1,9 @@
 const express = require("express");
-const { getTransactions, updateProductStatus, getStoreTransaction,getTransactionsByID } = require("../Controllers/transactionController");
+const { getTransactions, updateProductStatus, getStoreTransaction,getTransactionsByID , addTransaction} = require("../Controllers/transactionController");
 
 const router = express.Router();
 
+router.post("/add", addTransaction);
 
 // קבלת כל העסקאות של חנות מסוימת
 router.get('/transactions/:storeId', getStoreTransaction);
@@ -38,6 +39,8 @@ router.put('/transactions/:storeId/:transactionId /delivery/deliveryStatus', asy
         res.status(500).json({ message: error.message });
     }
 });
+
+
 
 
 

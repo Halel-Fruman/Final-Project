@@ -515,6 +515,27 @@ const UserController = {
       res.status(500).json({ error: "Error updating cart: " + error.message });
     }
   },
+
+   addTransactionToUser : async (req, res) => {
+    const { userId } = req.params;
+    const { transactionId } = req.body;
+
+    if (!transactionId) {
+      return res.status(400).json({ message: "Missing transaction ID" });
+    }
+
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ message: "User not found" });
+
+      user.transactions.push(transactionId);
+      await user.save();
+
+      res.status(200).json({ message: "Transaction added to user", transactions: user.transactions });
+    } catch (error) {
+      res.status(500).json({ message: "Error adding transaction to user", error: error.message });
+    }
+  },
 };
 
 module.exports = UserController;
