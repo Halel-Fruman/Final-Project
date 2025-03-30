@@ -7,6 +7,8 @@ const storeRoutes = require('./Routes/storeRoutes'); // ייבוא הנתיבי�
 const realProductRoutes = require('./Routes/realProductsRoutes'); // מוצרים אמיתיים
 const transactionRoutes = require('./Routes/transactionRoutes'); // עסקאות
 const categoryRoutes = require("./Routes/categoryRoutes");
+const emailRoutes = require("./Routes/emailRoutes"); // דוא"ל
+// const { sendConfirmationEmail } = require("./emailController");
 
 
 
@@ -28,9 +30,11 @@ app.use('/Stores', storeRoutes); // חנויות
 app.use('/Products', realProductRoutes); // מוצרים אמיתיים
 app.use('/Transactions', transactionRoutes); //
 app.use("/Category", categoryRoutes);
+app.use("/email", emailRoutes); // דוא"ל
 
 // User Schema & Model
 const User = require('./models/User');
+const e = require('express');
 // Store Routes
 
 

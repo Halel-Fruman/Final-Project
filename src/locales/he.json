@@ -143,6 +143,8 @@
     "addToCart": "הוסף לעגלת הקניות",
     "added": "הפריט נוסף לרשימת המשאלות",
     "removed": "הפריט הוסר מרשימת המשאלות",
+    "remove": "הסר",
+    "add": "הוסף",
     "inStock": "במלאי",
     "outOfStock": "אין במלאי",
     "empty": "רשימת המשאלות שלך ריקה",
@@ -235,26 +237,44 @@
     "canceled": "בוטל"
   },
   "checkout": {
-  "title": "קופה",
-  "subtitle": "אנא אשר את הפרטים שלך להשלמת ההזמנה",
-  "contactInformation": "פרטי קשר",
-  "shippingAddress": "כתובת למשלוח",
-  "paymentDetails": "פרטי תשלום",
-  "cardNumber": "מספר כרטיס אשראי",
-  "expiry": "תוקף",
-  "cvc": "CVV",
-  "payNow": "בצע תשלום",
-  "summary": "סיכום הזמנה",
-  "quantity": "כמות",
-  "subtotal": "סה״כ",
-  "email": "דוא\"ל",
-  "city": "עיר",
-  "address": "כתובת",
-  "addNewAddress": "הוסף כתובת חדשה",
-  "cancelNewAddress": "ביטול הוספת כתובת",
-  "saveNewAddress": "שמור כתובת "
-}
+    "title": "קופה",
+    "subtitle": "אנא אשר את הפרטים שלך להשלמת ההזמנה",
+    "contactInformation": "פרטי קשר",
+    "shippingAddress": "כתובת למשלוח",
+    "paymentDetails": "פרטי תשלום",
+    "cardNumber": "מספר כרטיס אשראי",
+    "expiry": "תוקף",
+    "cvc": "CVV",
+    "payNow": "בצע תשלום",
+    "summary": "סיכום הזמנה",
+    "quantity": "כמות",
+    "subtotal": "סה״כ",
+    "email": "דוא\"ל",
+    "city": "עיר",
+    "address": "כתובת",
+    "addNewAddress": "הוסף כתובת חדשה",
+    "cancelNewAddress": "ביטול הוספת כתובת",
+    "saveNewAddress": "שמור כתובת ",
+    "deliveryMethods": {
+      "title": "שיטת משלוח",
+      "pickup": "איסוף עצמי",
+      "express": "משלוח מהיר",
+      "courier": "משלוח רגיל",
 
+      "selectDeliveryMethod": "בחר שיטת משלוח",
+      "selectAddress": "בחר כתובת"
+    }
+  },
 
-
+  "confirmation": {
+    "title": "הזמנה בוצעה בהצלחה!",
+    "successMessage": "הזמנתך התקבלה ונשלחה לעיבוד. פרטי ההזמנה מופיעים למטה.",
+    "transactionId": "מספר עסקה",
+    "deliveryMethod": "שיטת משלוח",
+    "store": "חנות",
+    "unknownStore": "חנות לא ידועה",
+    "viewOrders": "לצפייה בהזמנות",
+    "backHome": "חזרה לדף הבית",
+    "noTransactions": "אין עסקאות להצגה"
+  }
 }

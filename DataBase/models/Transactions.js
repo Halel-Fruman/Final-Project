@@ -1,7 +1,7 @@
 const mongoose = require('mongoose');
 
 const transactionSchema = new mongoose.Schema({
-  transactionId: { type: String, required: true, unique: true }, // מזהה ייחודי לעסקה (מהסליקה)
+  transactionId: { type: String, required: true }, // מזהה ייחודי לעסקה (מהסליקה)
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // מזהה המשתמש שביצע את העסקה
   status: { type: String, enum: ['pending', 'shipped','completed', 'canceled'], default: 'pending' }, // סטטוס העסקה
   totalAmount: { type: Number, required: true }, // סכום העסקה הכולל לחנות זו

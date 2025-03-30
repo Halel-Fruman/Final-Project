@@ -29,6 +29,7 @@ import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
+import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
 
 //
 const App = () => {
@@ -246,14 +247,17 @@ const App = () => {
               }
             />
             <Route
-             path="/checkout"
-             element={
-             <CheckoutPage
-              cartItems={cartItems}
-              fetchProductDetails={fetchProductDetails}
-              userId={userId}
-              token={token}
-             />} />
+              path="/checkout"
+              element={
+                <CheckoutPage
+                  cartItems={cartItems}
+                  fetchProductDetails={fetchProductDetails}
+                  userId={userId}
+                  token={token}
+                />
+              }
+            />
+            <Route path="/confirmation" element={<ConfirmationPage />} />
 
             <Route
               path="/SysAdmin"

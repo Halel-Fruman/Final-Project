@@ -1,7 +1,9 @@
 // File: CheckoutPage.jsx
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { addAddress } from "../../../utils/addressHelpers"; // נתיב לפי הפרויקט שלך
+import { addAddress } from "../../utils/Address"; // נתיב לפי הפרויקט שלך
+import { processCheckout } from "../../utils/checkoutHandler";
+import { useNavigate } from "react-router-dom";
 
 const CheckoutPage = ({
   cartItems = [],
@@ -15,6 +17,7 @@ const CheckoutPage = ({
   const [selectedAddressIndex, setSelectedAddressIndex] = useState(0);
   const [newAddress, setNewAddress] = useState({ city: "", streetAddress: "" });
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const loadDetails = async () => {
@@ -70,6 +73,23 @@ const CheckoutPage = ({
       setSelectedAddressIndex(updatedAddresses.length - 1);
     } catch (err) {
       console.error(err.message);
+    }
+  };
+
+  const handleCheckout = async () => {
+    try {
+      const result = await processCheckout({
+        cartItems: detailedCart,
+        userData,
+        selectedAddress,
+        token,
+      });
+
+      // נווט לדף אישור ההזמנה עם פרטי העסקאות
+      navigate("/confirmation", { state: { transactions: result, detailedCart } });
+    } catch (error) {
+      console.error("Checkout failed:", error);
+      alert("אירעה שגיאה במהלך ביצוע ההזמנה");
     }
   };
 
@@ -200,7 +220,9 @@ const CheckoutPage = ({
             />
           </div>
 
-          <button className="w-full bg-primaryColor text-xl text-white py-2 rounded-md font-bold hover:bg-secondaryColor">
+          <button
+            className="w-full bg-primaryColor text-xl text-white py-2 rounded-md font-bold hover:bg-secondaryColor"
+            onClick={handleCheckout}>
             {t("checkout.payNow")}
           </button>
         </div>
