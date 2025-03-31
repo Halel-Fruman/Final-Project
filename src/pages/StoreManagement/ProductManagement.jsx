@@ -301,6 +301,45 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
         </div>
       </div>
 
+
+            {/* שדות מבצע */}
+<div className="mb-4 grid grid-cols-3 gap-4">
+  <div>
+    <label className="block mb-1">אחוז מבצע</label>
+    <input
+      type="number"
+      className="w-full border px-3 py-2 rounded-md"
+      value={newProduct.discountPercentage}
+      onChange={(e) =>
+        setNewProduct({ ...newProduct, discountPercentage: e.target.value })
+      }
+    />
+  </div>
+  <div>
+    <label className="block mb-1">תאריך התחלה</label>
+    <input
+      type="date"
+      className="w-full border px-3 py-2 rounded-md"
+      value={newProduct.discountStart}
+      onChange={(e) =>
+        setNewProduct({ ...newProduct, discountStart: e.target.value })
+      }
+    />
+  </div>
+  <div>
+    <label className="block mb-1">תאריך סיום</label>
+    <input
+      type="date"
+      className="w-full border px-3 py-2 rounded-md"
+      value={newProduct.discountEnd}
+      onChange={(e) =>
+        setNewProduct({ ...newProduct, discountEnd: e.target.value })
+      }
+    />
+  </div>
+</div>
+
+
       {/* מלאי + Backorder + משלוח */}
       <div className="mb-4 grid grid-cols-3 gap-4">
         <div>
@@ -426,7 +465,7 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
           className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
           onClick={handleSaveProduct}
         >
-          הוסף מוצר
+            {editingProduct ? "שמור שינויים" : "הוסף מוצר"}
         </button>
       </div>
     </div>
