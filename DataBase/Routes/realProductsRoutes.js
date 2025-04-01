@@ -29,7 +29,9 @@ router.get("/by-store", async (req, res) => {
   }
 
   try {
-    const store = await StoreProducts.findOne({ storeId: new mongoose.Types.ObjectId(storeId) });
+    const store = await StoreProducts.findOne({
+      storeId: new mongoose.Types.ObjectId(storeId),
+    });
     if (!store) return res.status(404).json({ message: "Store not found" });
 
     const products = store.products.map((product) => ({
@@ -63,8 +65,8 @@ router.post("/:storeId", async (req, res) => {
 
     // ✅ המרה של הקטגוריות ל-ObjectId
     if (Array.isArray(productData.categories)) {
-      productData.categories = productData.categories.map((id) =>
-        new mongoose.Types.ObjectId(id)
+      productData.categories = productData.categories.map(
+        (id) => new mongoose.Types.ObjectId(id)
       );
     }
 
@@ -78,16 +80,6 @@ router.post("/:storeId", async (req, res) => {
   }
 });
 
-
-
-
-
-
-
-
-
-
-
 // ✅ עדכון מוצר לפי חנות ומזהה מוצר
 router.put("/:storeId/:productId", async (req, res) => {
   const { storeId, productId } = req.params;
@@ -97,8 +89,11 @@ router.put("/:storeId/:productId", async (req, res) => {
 
     if (!store) return res.status(404).json({ message: "Store not found" });
 
-    const productIndex = store.products.findIndex((p) => String(p._id) === productId);
-    if (productIndex === -1) return res.status(404).json({ message: "Product not found" });
+    const productIndex = store.products.findIndex(
+      (p) => String(p._id) === productId
+    );
+    if (productIndex === -1)
+      return res.status(404).json({ message: "Product not found" });
 
     store.products[productIndex] = {
       ...store.products[productIndex].toObject(),
@@ -135,7 +130,6 @@ router.delete("/:storeId/:productId", async (req, res) => {
   }
 });
 
-
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -163,11 +157,59 @@ router.get("/:id", async (req, res) => {
     // Return the product with store details
     res.json({
       ...product.toObject(),
-      storeId: store.storeId, // Include the store's ID
-      storeName: store.storeName, // Include the store's name
+      storeId: store.storeId,
+      storeName: store.storeName,
+      averageRating:
+        product.reviews?.length > 0
+          ? product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+            product.reviews.length
+          : 0,
+      totalReviews: product.reviews?.length || 0,
     });
   } catch (err) {
     console.error("Error fetching product:", err.message);
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post("/:id/rate", async (req, res) => {
+  const { id } = req.params;
+  const { rating } = req.body;
+
+  if (!rating || rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Rating must be between 1 and 5" });
+  }
+
+  try {
+    const store = await StoreProducts.findOne({ "products._id": id });
+    if (!store) return res.status(404).json({ message: "Product not found" });
+
+    const product = store.products.find((p) => String(p._id) === id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    // הוסף ביקורת חדשה למערך
+    product.reviews.push({
+      user: null, // או req.user._id אם יש לך auth
+      rating,
+    });
+
+    await store.save();
+
+    // חישוב ממוצע חדש
+    const averageRating =
+      product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+      product.reviews.length;
+
+    res.json({
+      message: "Rating submitted successfully",
+      product: {
+        ...product.toObject(),
+        averageRating,
+        totalReviews: product.reviews.length,
+      },
+    });
+  } catch (err) {
+    console.error("Error updating rating:", err.message);
     res.status(500).json({ message: err.message });
   }
 });
