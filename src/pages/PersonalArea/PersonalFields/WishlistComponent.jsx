@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
@@ -12,13 +12,14 @@ const WishlistComponent = ({
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [missingCount, setMissingCount] = useState(0); // חדש
+  const [missingCount, setMissingCount] = useState(0);
 
-  const handleRemoveFromWishlist = async (product) => {
+  // עטיפה ב-useCallback
+  const handleRemoveFromWishlist = useCallback(async (product) => {
     console.log("Removing from wishlist:", product);
     await removeFromWishlist(product, true);
     refreshWishlist();
-  };
+  }, [removeFromWishlist, refreshWishlist]);
 
   useEffect(() => {
     let hasCleaned = false;
@@ -40,7 +41,7 @@ const WishlistComponent = ({
         } catch (error) {
           console.warn(`מוצר לא נמצא, מסירים: ${item.productId}`);
           if (!hasCleaned) {
-            let toDelete={_id: item.productId}
+            const toDelete = { _id: item.productId };
             handleRemoveFromWishlist(toDelete);
             hasCleaned = true;
           }
@@ -50,9 +51,6 @@ const WishlistComponent = ({
 
       setProducts(validProducts);
       setIsLoading(false);
-      if (hasCleaned) {
-        // refreshWishlist(); // ✅ רענון רק פעם אחת
-      }
     };
 
     if (wishlist?.length > 0) {
@@ -61,7 +59,7 @@ const WishlistComponent = ({
       setProducts([]);
       setIsLoading(false);
     }
-  }, [wishlist]);
+  }, [wishlist, handleRemoveFromWishlist]);
 
   if (isLoading) return <p>{t("loading")}</p>;
 
@@ -105,7 +103,7 @@ const WishlistComponent = ({
             <tr key={product._id} className="hover:bg-gray-50">
               <td className="p-4 flex items-center">
                 <img
-                  src={product.images[0] || "https://placehold.co/50"}
+                  src={product.images?.[0] || "https://placehold.co/50"}
                   alt={
                     product.name[i18n.language] + t("product.img") ||
                     t("product.nameUnavailable")
@@ -133,7 +131,8 @@ const WishlistComponent = ({
                     toast.success(t("wishlist.addToCart") + " ✅");
                   }}
                   className="bg-secondaryColor text-gray-100 py-2 px-2 ml-2 rounded-full shadow-lg hover:bg-primaryColor transition"
-                  aria-label={t("wishlist.addToCart")}>
+                  aria-label={t("wishlist.addToCart")}
+                >
                   <Icon
                     icon="material-symbols:add-shopping-cart-rounded"
                     width="24"
@@ -145,7 +144,8 @@ const WishlistComponent = ({
                     handleRemoveFromWishlist(product);
                   }}
                   className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC transition hover:text-white"
-                  aria-label={t("wishlist.remove_from_wishlist")}>
+                  aria-label={t("wishlist.remove_from_wishlist")}
+                >
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="24"
