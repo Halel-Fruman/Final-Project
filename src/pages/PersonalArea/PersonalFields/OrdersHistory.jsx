@@ -139,7 +139,7 @@ const OrderHistory = ({ user, addToCart }) => {
                             });
                             toast.success(t("wishlist.addToCart") + " ✅");
                           }}
-                          className="bg-primaryColor text-white font-bold px-4 py-2 rounded hover:bg-secondaryColor">
+                          className="bg-primaryColor text-white text-xl font-bold px-4 py-2 rounded hover:bg-secondaryColor">
                           {t("orders.buyAgain")}
                         </button>
                         <button className="border border-gray-300 text-md px-4 py-2 rounded text-gray-700 hover:bg-gray-100">
@@ -151,7 +151,7 @@ const OrderHistory = ({ user, addToCart }) => {
                 })}
               </div>
 
-              <div className="text-right text-green-700 font-bold text-lg pr-6 pt-2">
+              <div className="text-right text-primaryColor font-bold text-xl pr-6 pt-2">
                 {t("checkout.subtotal")}: ₪{order.totalAmount?.toFixed(2)}
               </div>
             </div>

@@ -270,14 +270,17 @@
   },
 
   "confirmation": {
-    "title": "הזמנה בוצעה בהצלחה!",
-    "successMessage": "הזמנתך התקבלה ונשלחה לעיבוד. פרטי ההזמנה מופיעים למטה.",
+    "title": "תודה על ההזמנה!",
+    "successMessage": "ההזמנה שלך התקבלה בהצלחה.",
     "transactionId": "מספר עסקה",
+    "orderId": "מספר הזמנה",
     "deliveryMethod": "שיטת משלוח",
-    "store": "חנות",
-    "unknownStore": "חנות לא ידועה",
-    "viewOrders": "לצפייה בהזמנות",
+    "noTransactions": "לא נמצאו פרטי הזמנה",
     "backHome": "חזרה לדף הבית",
-    "noTransactions": "אין עסקאות להצגה"
+    "unknownStore": "חנות לא ידועה",
+    "noDeliveryInfo": "אין מידע על משלוח",
+    "viewOrders": "מעבר להיסטוריית הזמנות",
+    "totalSum": "סכום כולל"
+
   }
 }
