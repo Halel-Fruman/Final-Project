@@ -32,6 +32,7 @@ const transactionSchema = new mongoose.Schema({
 const storeTransactionsSchema = new mongoose.Schema({
   storeId: { type: mongoose.Schema.Types.ObjectId, ref: "Store", required: true, unique: true }, // מזהה החנות
   storeName: { type: String, required: true }, // שם החנות
+  orderCounter: { type: Number, default: 0 },
   transactions: [transactionSchema] // מערך עסקאות של החנות
 });
 
