@@ -218,18 +218,20 @@
     "removed": "Item removed from cart"
   },
   "orders": {
-    "title": "Order History",
-    "subtitle": "Here you can view all your past orders in the system",
-    "order": "Order",
-    "date": "Order Date",
-    "store": "Store",
-    "total": "Total Amount",
-    "status": "Status",
-    "quantity": "Quantity",
-    "buyAgain": "Buy Again",
-    "shopSimilar": "Shop Similar",
-    "noOrders": "No previous orders found",
-    "viewInvoice": "View Invoice"
+    "title": "My Orders",
+  "subtitle": "Here you can view your order history",
+  "orderGroup": "Order Group ID",
+  "order": "Order",
+  "orderId": "Order ID",
+  "store": "Store",
+  "date": "Order Date",
+  "status": "Status",
+  "total": "Total",
+  "viewInvoice": "View Invoice",
+  "quantity": "Quantity",
+  "buyAgain": "Buy Again",
+  "shopSimilar": "Similar Products",
+  "noOrders": "No previous orders found"
   },
   "status": {
     "pending": "Pending",

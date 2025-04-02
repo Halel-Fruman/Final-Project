@@ -46,8 +46,7 @@ router.get("/by-store", async (req, res) => {
   }
 });
 
-// ✅ הוספת מוצר לחנות עם המרת מזהי קטגוריות ל־ObjectId
-// ✅ הוספת מוצר לחנות
+
 router.post("/:storeId", async (req, res) => {
   const { storeId } = req.params;
 
@@ -63,7 +62,6 @@ router.post("/:storeId", async (req, res) => {
 
     const productData = req.body;
 
-    // ✅ המרה של הקטגוריות ל-ObjectId
     if (Array.isArray(productData.categories)) {
       productData.categories = productData.categories.map(
         (id) => new mongoose.Types.ObjectId(id)
@@ -80,7 +78,7 @@ router.post("/:storeId", async (req, res) => {
   }
 });
 
-// ✅ עדכון מוצר לפי חנות ומזהה מוצר
+//update product by id
 router.put("/:storeId/:productId", async (req, res) => {
   const { storeId, productId } = req.params;
 
@@ -108,7 +106,7 @@ router.put("/:storeId/:productId", async (req, res) => {
   }
 });
 
-// ✅ מחיקת מוצר לפי חנות ומזהה מוצר
+// delete product from store by storeId and productId
 router.delete("/:storeId/:productId", async (req, res) => {
   const { storeId, productId } = req.params;
 
@@ -187,9 +185,8 @@ router.post("/:id/rate", async (req, res) => {
     const product = store.products.find((p) => String(p._id) === id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    // הוסף ביקורת חדשה למערך
     product.reviews.push({
-      user: null, // או req.user._id אם יש לך auth
+      user: null,
       rating,
     });
 

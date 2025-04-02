@@ -64,7 +64,7 @@ const OrderManagement = ({ storeId }) => {
       })
       .catch(() => showAlert("שגיאה בעדכון סטטוס המשלוח", "error"));
   };
-  
+
 
   const updateTransactionStatus = (transactionId, newStatus) => {
     axios
@@ -83,7 +83,7 @@ const OrderManagement = ({ storeId }) => {
       })
       .catch(() => showAlert("שגיאה בעדכון סטטוס העסקה", "error"));
   };
-  
+
 
   const getStatusIcon = (status) => {
     switch (status) {
@@ -205,7 +205,6 @@ const OrderManagement = ({ storeId }) => {
                 className="border px-2 py-1 rounded-md text-sm shadow-sm mt-1"
               >
                 <option value="pending">ממתין</option>
-                <option value="packed">נארז</option>
                 <option value="shipped">נשלח</option>
                 <option value="completed">נמסר</option>
                 <option value="canceled">בוטל</option>
