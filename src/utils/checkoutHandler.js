@@ -54,7 +54,7 @@ export const processCheckout = async ({
       },
     };
 
-    // הוסף עסקה לחנות
+    // שליחת העסקה לשרת – יחזור רק העסקה האחרונה
     const storeRes = await fetch("http://localhost:5000/Transactions/add", {
       method: "POST",
       headers: {
@@ -67,9 +67,12 @@ export const processCheckout = async ({
         transaction,
       }),
     });
+
     if (!storeRes.ok) throw new Error("Failed to add transaction to store");
 
-    // הוסף עסקה למשתמש
+    const { newTransaction } = await storeRes.json(); // כאן נשלפת רק העסקה האחרונה שנוספה
+
+    // הוספת מזהה עסקה למשתמש
     const userRes = await fetch(
       `http://localhost:5000/User/${userData._id}/add-transaction`,
       {
@@ -83,7 +86,7 @@ export const processCheckout = async ({
     );
     if (!userRes.ok) throw new Error("Failed to add transaction to user");
 
-    // שלח מייל למשתמש ולחנות
+    // שליחת מייל
     await fetch("http://localhost:5000/email/send-confirmation", {
       method: "POST",
       headers: {
@@ -93,13 +96,17 @@ export const processCheckout = async ({
       body: JSON.stringify({
         userEmail: userData.email,
         userName: commonBuyerDetails.fullName,
-        storeEmail: storeData.storeEmail, // ודא שהשדה הזה קיים בפריט
+        storeEmail: storeData.storeEmail,
         storeName: storeData.storeName,
-        transaction,
+        transaction: newTransaction,
       }),
     });
 
-    results.push({ transaction, storeId: storeData.storeId, storeName: storeData.storeName });
+    results.push({
+      transaction: newTransaction,
+      storeId: storeData.storeId,
+      storeName: storeData.storeName,
+    });
   }
 
   return results;
