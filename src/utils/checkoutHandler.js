@@ -16,7 +16,7 @@ export const processCheckout = async ({
       groupedByStore[storeId] = {
         storeId,
         storeName: item.storeName,
-        storeEmail: item.storeEmail, // ודא שיש לך את זה
+        storeEmail: item.storeEmail,
         products: [],
         totalAmount: 0,
       };
