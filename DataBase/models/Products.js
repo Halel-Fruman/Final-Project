@@ -19,7 +19,7 @@ const productSchema = new mongoose.Schema(
     highlight: {
       en: [String],
       he: [String],
-    }, // תיאור מקוצר של המוצר
+    }, // תיאור מקוצר של המוצר - מאפיינים
     price: { type: Number, required: true },
     stock: { type: Number, default: 0 }, // כמות במלאי
     allowBackorder: { type: Boolean, default: false }, // האם ניתן להזמין כשהמלאי נגמר

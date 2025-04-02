@@ -32,6 +32,8 @@ const ProductManagement = ({ storeId }) => {
     discountPercentage: "",
     discountStart: "",
     discountEnd: "",
+    highlightHe: [],
+  highlightEn: [],
   });
   
 
@@ -47,9 +49,21 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
   }, [storeId]);
 
+
+
+
   const handleSaveProduct = () => {
     if (!newProduct.nameEn || !newProduct.nameHe || !newProduct.price || newProduct.selectedCategories.length === 0) {
       showAlert("יש למלא את כל השדות החיוניים", "error");
+      return;
+    }
+    if (
+      newProduct.discountStart &&
+      newProduct.discountEnd &&
+      new Date(newProduct.discountEnd) < new Date(newProduct.discountStart)
+    ) {
+        
+      showAlert("תאריך הסיום לא יכול להיות לפני תאריך ההתחלה", "error");
       return;
     }
 
@@ -58,6 +72,10 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       price: Number(newProduct.price),
       stock: Number(newProduct.stock),
       manufacturingCost: Number(newProduct.manufacturingCost),
+      highlight: {
+        he: newProduct.highlightHe.filter((s) => s.trim() !== ""),
+        en: newProduct.highlightEn.filter((s) => s.trim() !== ""),
+      },
       description: {
         en: newProduct.descriptionEn,
         he: newProduct.descriptionHe,
@@ -98,6 +116,7 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
   };
 
  
+  
 
   useEffect(() => {
     if (editingProduct) {
@@ -118,6 +137,8 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
         discountPercentage: discount?.percentage || "",
         discountStart: discount?.startDate?.slice(0, 10) || "",
         discountEnd: discount?.endDate?.slice(0, 10) || "",
+        highlightHe: editingProduct.highlight?.he || [],
+        highlightEn: editingProduct.highlight?.en || [],
       });
     }
   }, [editingProduct]);
@@ -139,7 +160,9 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       discountPercentage: "",
       discountStart: "",
       discountEnd: "",
-    });
+      highlightHe: [],
+      highlightEn: [],
+          });
   };
 
 
@@ -221,7 +244,9 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
 {isAddingProduct && (
   <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
     <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-      <h2 className="text-2xl font-bold mb-4 text-center">הוסף מוצר</h2>
+    <h2 className="text-2xl font-bold mb-4 text-center">
+  {editingProduct ? "עריכת מוצר" : "הוסף מוצר"}
+</h2>
 
       {/* שם מוצר */}
       <div className="mb-4 grid grid-cols-2 gap-4">
@@ -271,6 +296,28 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
           }
         />
       </div>
+      <div className="mb-4">
+  <label className="block font-bold mb-1">מאפיינים בעברית (שורה לכל מאפיין)</label>
+  <textarea
+    className="w-full border px-3 py-2 rounded-md shadow-sm"
+    value={newProduct.highlightHe.join("\n")}
+    onChange={(e) =>
+      setNewProduct({ ...newProduct, highlightHe: e.target.value.split("\n") })
+    }
+  />
+</div>
+
+<div className="mb-4">
+  <label className="block font-bold mb-1">מאפיינים באנגלית (שורה לכל מאפיין)</label>
+  <textarea
+    className="w-full border px-3 py-2 rounded-md shadow-sm"
+    value={newProduct.highlightEn.join("\n")}
+    onChange={(e) =>
+      setNewProduct({ ...newProduct, highlightEn: e.target.value.split("\n") })
+    }
+  />
+</div>
+
 
       {/* מחיר + עלות ייצור */}
       <div className="mb-4 grid grid-cols-2 gap-4">
@@ -510,10 +557,20 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
                     {product.name.he} / {product.name.en}
                   </td>
                   <td className="p-2 border w-[10%]">{product.price}₪</td>
-                  <td className="p-2 border w-[10%]">
-                    {product.manufacturingCost ? `${product.manufacturingCost}₪` : "-"}
+                                    <td className="p-2 border w-[10%]">
+                    {product.manufacturingCost ? (
+                      <span className="text-red-600">
+                        {product.manufacturingCost}₪
+                      </span>
+                    ) : (
+                      "-"
+                    )}
                   </td>
-                  <td className="p-2 border w-[10%]">{profit}₪</td>
+                                    <td className="p-2 border w-[10%]">
+                    <span className={profit > 0 ? "text-green-600" : "text-red-600"}>
+                      {profit}₪
+                    </span>
+                  </td>
                   <td className="p-2 border w-[10%]">{product.stock}</td>
                   <td className="p-2 border w-[10%]">
                     {product.internationalShipping ? (
@@ -522,9 +579,23 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
                       <span className="text-pink-600 text-lg">✖</span>
                     )}
                   </td>
-                  <td className="p-2 border w-[10%]">
-                    {discount ? `${discount.percentage}%` : "-"}
+                   <td className="p-2 border w-[10%] text-sm">
+                    {discount ? (
+                      <div className="flex flex-col">
+                        <span className={new Date(discount.endDate) < new Date() ? "text-red-500" : "text-green-600"}>
+                          {discount.percentage}%
+                        </span>
+                        <span className="text-gray-500 text-xs">
+                          עד {new Date(discount.endDate).toLocaleDateString("he-IL")}
+                        </span>
+                      </div>
+                    ) : (
+                      "-"
+                    )}
                   </td>
+
+
+
                   <td className="p-2 border w-[14%]">
                     <div className="flex justify-center gap-3">
                       <button title="ערוך" onClick={() => handleEdit(product)}>
