@@ -88,6 +88,30 @@ const updateProductStatus = async (req, res) => {
     res.status(500).json({ message: "שגיאה בעדכון הסטטוס", error });
   }
 };
+
+const updateTransactionStatus = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const { status } = req.body;
+
+    const updated = await StoreTransactions.findOneAndUpdate(
+      { "transactions.transactionId": transactionId },
+      { $set: { "transactions.$.status": status } },
+      { new: true }
+    );
+
+    if (!updated) {
+      return res.status(404).json({ message: "עסקה לא נמצאה" });
+    }
+
+    res.status(200).json({ message: "סטטוס עודכן בהצלחה" });
+  } catch (error) {
+    res.status(500).json({ message: "שגיאה בעדכון הסטטוס", error });
+  }
+};
+
+  
+
 const addTransaction = async (req, res) => {
   const {
     storeId,
@@ -122,4 +146,11 @@ const addTransaction = async (req, res) => {
   }
 };
 // Export the functions
-module.exports = { getTransactions, updateProductStatus, getStoreTransaction, getTransactionsByID, addTransaction };
+module.exports = {
+  getTransactions,
+  updateProductStatus,
+  getStoreTransaction,
+  getTransactionsByID,
+  addTransaction,
+  updateTransactionStatus  // ← הוספנו
+};
