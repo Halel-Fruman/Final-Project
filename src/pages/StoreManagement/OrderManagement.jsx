@@ -128,17 +128,17 @@ const OrderManagement = ({ storeId }) => {
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow border overflow-hidden">
-      <div className="max-h-[480px] overflow-y-auto">
-  <table className="w-full table-fixed text-sm text-right">
-    <thead className="bg-gray-100 font-bold sticky top-0 z-10">
+      <div className="bg-white rounded-lg shadow overflow-x-auto max-w-full">
+      <div className="bg-white p-4 rounded-lg shadow overflow-x-auto max-w-full">
+      <table className="w-full min-w-[800px] text-sm text-right border border-gray-300 rounded-lg">
+      <thead className="bg-gray-100 font-bold sticky top-0 z-10">
       <tr>
-        <th className="p-2 border w-[12%]">תאריך</th>
-        <th className="p-2 border w-[12%]">מזהה</th>
-        <th className="p-2 border w-[18%]">פרטי קונה</th>
-        <th className="p-2 border w-[18%]">סטטוס עסקה</th>
-        <th className="p-2 border w-[20%]">משלוח</th>
-        <th className="p-2 border w-[20%]">מוצרים</th>
+        <th className="p-2 border w-[20%] md:w-[12%]">תאריך</th>
+        <th className="p-2 border w-[20%] md:w-[12%]">מזהה</th>
+        <th className="p-2 border w-[20%] md:w-[18%]">פרטי קונה</th>
+        <th className="p-2 border w-[20%] md:w-[18%]">סטטוס עסקה</th>
+        <th className="p-2 border w-[20%] md:w-[20%]">משלוח</th>
+        <th className="p-2 border w-[20%] md:w-[20%]">מוצרים</th>
       </tr>
     </thead>
     <tbody className="text-sm">
