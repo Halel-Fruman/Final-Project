@@ -51,7 +51,7 @@ const CheckoutPage = ({
     };
 
     if (userId) fetchUser();
-  }, [userId]);
+  }, [userId, token]);
 
   const total = detailedCart.reduce(
     (sum, item) => sum + item.price * item.quantity,

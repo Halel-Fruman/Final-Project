@@ -159,7 +159,9 @@
     "highlights": "מאפיינים",
     "details": "פרטים",
     "reviews": "דירוג",
-    "img": "תמונה"
+    "img": "תמונה",
+    "onSale": "מחיר מבצע"
+
   },
 
   "sysadmin": {
