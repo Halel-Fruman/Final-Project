@@ -8,8 +8,9 @@ const LanguageSelector = ({ changeLanguage, currentLanguage }) => {
     { code: "en", label: "EN", icon: "twemoji:flag-for-flag-united-kingdom" },
     { code: "he", label: "HE", icon: "twemoji:flag-for-flag-israel" },
   ];
+
   // Find the current language
-  const currentLang = languages.find((lang) => lang.code === currentLanguage);
+  const currentLang = languages.find((lang) => lang.code === currentLanguage) || languages[1];
 
   return (
     // for the language selector

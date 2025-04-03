@@ -65,7 +65,7 @@ const OrderManagement = ({ storeId }) => {
       })
       .catch(() => showAlert("שגיאה בעדכון סטטוס המשלוח", "error"));
   };
-  
+
 
   const updateTransactionStatus = (transactionId, newStatus) => {
     axios
@@ -84,7 +84,7 @@ const OrderManagement = ({ storeId }) => {
       })
       .catch(() => showAlert("שגיאה בעדכון סטטוס העסקה", "error"));
   };
-  
+
 
   const getStatusIcon = (status) => {
     switch (status) {

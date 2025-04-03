@@ -33,6 +33,8 @@ const transactionSchema = new mongoose.Schema({
 const storeTransactionsSchema = new mongoose.Schema({
   storeId: { type: mongoose.Schema.Types.ObjectId, ref: "Store", required: true, unique: true }, // מזהה החנות
   storeName: { type: String, required: true }, // שם החנות
+  ordersStart:{type: String, default: 'NS'},// code for store to make orders id unique for each store
+  orderCounter: { type: Number, default: 0 }, // counter for orders of the store
   transactions: [transactionSchema] // מערך עסקאות של החנות
 });
 

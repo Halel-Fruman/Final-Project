@@ -218,18 +218,20 @@
     "removed": "Item removed from cart"
   },
   "orders": {
-    "title": "Order History",
-    "subtitle": "Here you can view all your past orders in the system",
+    "title": "My Orders",
+    "subtitle": "Here you can view your order history",
+    "orderGroup": "Order Group ID",
     "order": "Order",
-    "date": "Order Date",
+    "orderId": "Order ID",
     "store": "Store",
-    "total": "Total Amount",
+    "date": "Order Date",
     "status": "Status",
+    "total": "Total",
+    "viewInvoice": "View Invoice",
     "quantity": "Quantity",
     "buyAgain": "Buy Again",
-    "shopSimilar": "Shop Similar",
-    "noOrders": "No previous orders found",
-    "viewInvoice": "View Invoice"
+    "shopSimilar": "Similar Products",
+    "noOrders": "No previous orders found"
   },
   "status": {
     "pending": "Pending",
@@ -257,7 +259,7 @@
     "addNewAddress": "Add New Address",
     "cancelNewAddress": "Cancel New Address",
     "saveNewAddress": "Save New Address",
-    "deliveryMethod":{
+    "deliveryMethod": {
       "title": "Delivery Method",
       "pickup": "Pickup",
       "delivery": "Delivery",
@@ -266,14 +268,15 @@
     }
   },
   "confirmation": {
-    "title": "Order Confirmed!",
-    "successMessage": "Your order has been placed and is being processed. Order details below.",
+    "title": "Thank you for your order!",
+    "successMessage": "Your order has been successfully received.",
     "transactionId": "Transaction ID",
+    "orderId": "Order ID",
     "deliveryMethod": "Delivery Method",
-    "store": "Store",
-    "unknownStore": "Unknown Store",
-    "viewOrders": "View My Orders",
+    "noTransactions": "No transaction details found",
     "backHome": "Back to Home",
-    "noTransactions": "No transactions to display"
+    "unknownStore": "Unknown Store",
+    "noDeliveryInfo": "No delivery information",
+    "viewOrders": "Go to Order History"
   }
 }

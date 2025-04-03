@@ -1,4 +1,4 @@
-const StoreTransactions  = require("../models/Transactions");
+const StoreTransactions = require("../models/Transactions");
 // const StoreTransactions = require("../models/StoreTransactions");
 
 const getStoreTransaction = async (req, res) => {
@@ -26,7 +26,6 @@ const getTransactions = async (req, res) => {
 
 // Get all transactions
 
-
 const getTransactionsByID = async (req, res) => {
   try {
     const { transactionId } = req.params;
@@ -51,16 +50,55 @@ const getTransactionsByID = async (req, res) => {
 
     // הוספת שם החנות למידע (כדי שיהיה זמין ב-frontend)
     res.status(200).json({
-      ...transaction.toObject?.() || transaction,
+      ...(transaction.toObject?.() || transaction),
       storeName: storeTransaction.storeName,
     });
-
   } catch (error) {
     console.error("שגיאה ב-getTransactionsByID:", error);
     res.status(500).json({ message: "שגיאה בקבלת העסקאות", error });
   }
 };
+const getOrdersByTransactionId = async (req, res) => {
+  const { transactionId } = req.params;
 
+  if (!transactionId) {
+    return res.status(400).json({ message: "Missing transactionId" });
+  }
+
+  try {
+    const storeDocs = await StoreTransactions.find({
+      "transactions.transactionId": transactionId,
+    });
+
+    if (!storeDocs || storeDocs.length === 0) {
+      return res
+        .status(404)
+        .json({ message: "No transactions found for this transactionId" });
+    }
+
+    const matchingOrders = storeDocs.flatMap((storeDoc) =>
+      storeDoc.transactions
+        .filter((tx) => tx.transactionId === transactionId)
+        .map((tx) => ({
+          ...tx.toObject(),
+          storeId: storeDoc.storeId,
+          storeName: storeDoc.storeName,
+        }))
+    );
+
+    res.status(200).json(matchingOrders);
+  } catch (error) {
+    console.error(
+      "Error fetching transactions by transactionId:",
+      error.message
+    );
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+};
+
+module.exports = {
+  getOrdersByTransactionId,
+};
 
 // Update product status
 const updateProductStatus = async (req, res) => {
@@ -68,7 +106,7 @@ const updateProductStatus = async (req, res) => {
   const { productId, status } = req.body;
 
   try {
-    const transaction = await Transaction.findById(transactionId);
+    const transaction = await transaction.findById(transactionId);
     if (!transaction) {
       return res.status(404).json({ message: "עסקה לא נמצאה" });
     }
@@ -110,41 +148,53 @@ const updateTransactionStatus = async (req, res) => {
   }
 };
 
-  
-
 const addTransaction = async (req, res) => {
-  const {
-    storeId,
-    storeName,
-    transaction,
-  } = req.body;
+  const { storeId, storeName, transaction } = req.body;
 
-  if (!storeId || !storeName || !transaction) {
+  if (!storeId || !storeName || !transaction || !transaction.transactionId) {
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
     let storeDoc = await StoreTransactions.findOne({ storeId });
+    let newTransaction;
 
     if (!storeDoc) {
-      // If store document doesn't exist, create it with the transaction
+      const orderCounter = 1;
+      const orderId = `${transaction.transactionId}-${storeName
+        .slice(0, 3)
+        .toUpperCase()}-${orderCounter}`;
+      newTransaction = { ...transaction, orderId };
+
       storeDoc = new StoreTransactions({
         storeId,
         storeName,
-        transactions: [transaction],
+        orderCounter,
+        ordersStart: "NS",
+        transactions: [newTransaction],
       });
     } else {
-      // Otherwise, just push the transaction
-      storeDoc.transactions.push(transaction);
+      storeDoc.orderCounter = storeDoc.orderCounter + 1;
+      const orderId = `${storeDoc.ordersStart}-${storeDoc.orderCounter}`;
+      newTransaction = { ...transaction, orderId };
+
+      storeDoc.transactions.push(newTransaction);
     }
-    console.log("🚀 Transaction before save:", JSON.stringify(transaction, null, 2));
 
     await storeDoc.save();
-    res.status(201).json({ message: "Transaction added successfully", storeTransactions: storeDoc });
+
+    res.status(201).json({
+      message: "Transaction added successfully",
+      newTransaction,
+    });
   } catch (error) {
-    res.status(500).json({ message: "Error adding transaction", error: error.message });
+    console.error("Error saving transaction:", error);
+    res
+      .status(500)
+      .json({ message: "Error adding transaction", error: error.message });
   }
 };
+
 // Export the functions
 module.exports = {
   getTransactions,
@@ -152,5 +202,6 @@ module.exports = {
   getStoreTransaction,
   getTransactionsByID,
   addTransaction,
-  updateTransactionStatus  // ← הוספנו
+  updateTransactionStatus,
+  getOrdersByTransactionId,
 };

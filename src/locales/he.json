@@ -161,7 +161,6 @@
     "reviews": "דירוג",
     "img": "תמונה",
     "onSale": "מחיר מבצע"
-
   },
 
   "sysadmin": {
@@ -218,18 +217,23 @@
     "close": "סגור"
   },
   "orders": {
-    "title": "היסטוריית הזמנות",
-    "subtitle": "כאן תוכל לצפות בכל ההזמנות שביצעת במערכת",
+    "title": "ההזמנות שלי",
+    "subtitle": "כאן תוכל לצפות בהיסטוריית ההזמנות שלך",
+    "orderGroup": "מספר עסקה כולל",
     "order": "הזמנה",
-    "date": "תאריך הזמנה",
+    "orderId": "מספר הזמנה",
     "store": "חנות",
-    "total": "סכום כולל",
+    "date": "תאריך הזמנה",
     "status": "סטטוס",
+    "total": "סכום כולל",
+    "viewInvoice": "צפה בקבלה",
     "quantity": "כמות",
     "buyAgain": "קנה שוב",
     "shopSimilar": "מוצרים דומים",
     "noOrders": "לא נמצאו הזמנות קודמות",
-    "viewInvoice": "צפה בחשבונית"
+    "subtotal": "סה״כ לחנות זו",
+    "totalForTransaction": "סך הכל לעסקה"
+
   },
   "status": {
     "pending": "ממתין",
@@ -269,14 +273,17 @@
   },
 
   "confirmation": {
-    "title": "הזמנה בוצעה בהצלחה!",
-    "successMessage": "הזמנתך התקבלה ונשלחה לעיבוד. פרטי ההזמנה מופיעים למטה.",
+    "title": "תודה על ההזמנה!",
+    "successMessage": "ההזמנה שלך התקבלה בהצלחה.",
     "transactionId": "מספר עסקה",
+    "orderId": "מספר הזמנה",
     "deliveryMethod": "שיטת משלוח",
-    "store": "חנות",
-    "unknownStore": "חנות לא ידועה",
-    "viewOrders": "לצפייה בהזמנות",
+    "noTransactions": "לא נמצאו פרטי הזמנה",
     "backHome": "חזרה לדף הבית",
-    "noTransactions": "אין עסקאות להצגה"
+    "unknownStore": "חנות לא ידועה",
+    "noDeliveryInfo": "אין מידע על משלוח",
+    "viewOrders": "מעבר להיסטוריית הזמנות",
+    "totalSum": "סכום כולל"
+
   }
 }
