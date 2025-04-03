@@ -210,5 +210,37 @@ router.post("/:id/rate", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
+router.get('/filter-by-categories', async (req, res) => {
+  try {
+    const { categories } = req.query;
+
+    if (!categories) {
+      return res.status(400).json({ error: 'No category ids provided' });
+    }
+
+    const categoryIds = categories.split(',').map(id => new mongoose.Types.ObjectId(id));
+
+    // שליפה של כל החנויות שמכילות לפחות מוצר אחד עם אחת מהקטגוריות
+    const stores = await ProductCollection.find({
+      'products.categories': { $in: categoryIds }
+    });
+
+    // סינון מוצרים בכל חנות לפי הקטגוריות שנבחרו
+    const filtered = stores.map(store => ({
+      storeId: store.storeId,
+      storeName: store.storeName,
+      products: store.products.filter(product =>
+        product.categories.some(catId =>
+          categoryIds.some(cid => catId.equals(cid))
+        )
+      )
+    })).filter(store => store.products.length > 0);
+
+    res.json(filtered);
+  } catch (err) {
+    console.error('Error filtering products by categories:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
 
 module.exports = router;

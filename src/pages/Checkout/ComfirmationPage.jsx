@@ -106,9 +106,9 @@ const ConfirmationPage = () => {
                 })}
               </div>
 
-              {/* <div className="text-right mt-4 text-xl font-bold text-primaryColor">
-                {t("checkout.subtotal")}: ₪{transaction.totalAmount.toFixed(2)}
-              </div> */}
+              <div className="text-right mt-4 text-xl font-bold text-primaryColor">
+                {t("orders.subtotal")}: ₪{transaction.totalAmount.toFixed(2)}
+              </div>
             </div>
           ))}
           <div className="text-right m-4 font-bold text-2xl text-primaryColor">
