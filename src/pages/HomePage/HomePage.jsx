@@ -4,24 +4,23 @@ import { Link } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import backgroundImage from "../../backgroung.jpg";
-import CategoryFilter from "../../components/Category/CategoryFilter";
+import FilterBar from "../../components/Category/FilterBar";
+
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
   const [allProducts, setAllProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedStores, setSelectedStores] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Fetch products
   useEffect(() => {
     const fetchProducts = async () => {
       try {
         const response = await fetch("http://localhost:5000/Products/");
         if (!response.ok) throw new Error("Failed to fetch products");
         const data = await response.json();
-        console.log("Raw product data from server:", data); // <-- הוסף את זה
-
         setAllProducts(data);
       } catch (err) {
         setError(err.message);
@@ -32,7 +31,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchProducts();
   }, []);
 
-  // Fetch categories
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -46,18 +44,22 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchCategories();
   }, []);
 
-  // Filter logic
-  const productsToShow =
-    selectedCategories.length === 0
-      ? allProducts
-      : allProducts.filter((product) =>
-          product.categories?.some((catId) =>
-            selectedCategories.includes(catId)
-          )
-        );
-  console.log("selectedCategories:", selectedCategories);
-  console.log("allProducts:", allProducts);
-  console.log("productsToShow:", productsToShow);
+  const storeOptions = Array.from(
+    new Set(
+      allProducts.map((p) =>
+        JSON.stringify({ id: p.storeId, name: p.storeName })
+      )
+    )
+  ).map((str) => JSON.parse(str));
+
+  const productsToShow = allProducts.filter((product) => {
+    const categoryMatch =
+      selectedCategories.length === 0 ||
+      product.categories?.some((catId) => selectedCategories.includes(catId));
+    const storeMatch =
+      selectedStores.length === 0 || selectedStores.includes(product.storeId);
+    return categoryMatch && storeMatch;
+  });
 
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
@@ -121,13 +123,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           {t("featured_products")}
         </h2>
 
-        <div className="mb-6">
-          <CategoryFilter
-            categories={categories}
-            selectedCategories={selectedCategories}
-            setSelectedCategories={setSelectedCategories}
-          />
-        </div>
+        <FilterBar
+          categories={categories}
+          stores={storeOptions}
+          selectedCategories={selectedCategories}
+          setSelectedCategories={setSelectedCategories}
+          selectedStores={selectedStores}
+          setSelectedStores={setSelectedStores}
+        />
 
         {productsToShow.length === 0 ? (
           <p className="text-center text-gray-500">{t("no_products_found")}</p>

@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 const ConfirmationPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t,  } = useTranslation();
 
   const transactions = state?.transactions || [];
   const detailedCart = state?.detailedCart || [];

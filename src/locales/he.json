@@ -1,17 +1,19 @@
 {
   "welcome": "ברוכים הבאים לחנות איל''ן",
   "welcome_subtitle": " אנו מזמינים אתכם להיות שותפים למטרה <br> ולרכוש מוצרים ומתנות שמייצרים באהבה אנשים עם מוגבלות.",
-  "categories": {
-    "title": "קניות לפי קטגוריה",
-    "electronics": "אלקטרוניקה",
-    "clothing": "ביגוד",
-    "home_garden": "בית וגינה",
-    "beauty_health": "יופי ובריאות"
-  },
+  "show_filters": "הצג סינון",
+  "hide_filters": "הסתר סינון",
+  "clear_filters": "נקה סינון",
   "error": "שגיאה",
   "add_to_wishlist": "הוסף לרשימת המשאלות",
   "remove_from_wishlist": "הסר מרשימת המשאלות",
   "loading": "טוען...",
+  "store": "חנות",
+  "category": "קטגוריה",
+  "no_products_found": "לא נמצאו מוצרים מתאימים",
+  "filters": "סינון",
+  "remove_filter": "הסר סינון",
+
   "view_products": "צפה במוצרים",
   "header": {
     "home": "בית",
@@ -24,7 +26,7 @@
     "search": "חיפוש",
     "admin_dashboard": "לוח בקרה למנהל"
   },
-  "featured_products": "מוצרים נבחרים",
+  "featured_products": "המוצרים שלנו",
   "price": "מחיר",
   "view_details": "צפה בפרטים",
 
@@ -233,7 +235,6 @@
     "noOrders": "לא נמצאו הזמנות קודמות",
     "subtotal": "סה״כ לחנות זו",
     "totalForTransaction": "סך הכל לעסקה"
-
   },
   "status": {
     "pending": "ממתין",
@@ -284,6 +285,5 @@
     "noDeliveryInfo": "אין מידע על משלוח",
     "viewOrders": "מעבר להיסטוריית הזמנות",
     "totalSum": "סכום כולל"
-
   }
 }
