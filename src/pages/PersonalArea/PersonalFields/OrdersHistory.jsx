@@ -72,7 +72,7 @@ const OrderHistory = ({ user, addToCart }) => {
 
       {Object.entries(transactionGroups).map(([transactionId, orders], idx) => (
         <div key={idx} className="mb-12 bg-blue-50 border rounded shadow-md">
-          <div className="bg-blue-100 text-blue-800 px-6 py-3 font-bold text-lg border-b">
+          <div className="bg-primaryColor bg-opacity-10 text-primaryColor px-6 py-3 font-bold text-xl border-b">
             {t("orders.orderGroup")}:{" "}
             <span className="font-mono">{transactionId}</span>
           </div>
@@ -100,6 +100,8 @@ const OrderHistory = ({ user, addToCart }) => {
                     fullProduct?.images?.[0] || "https://placehold.co/100";
                   const highlights =
                     fullProduct?.highlight?.[i18n.language] || [];
+                  const name =
+                    fullProduct?.name?.[i18n.language] || item.name;
 
                   return (
                     <div
@@ -107,12 +109,12 @@ const OrderHistory = ({ user, addToCart }) => {
                       className="flex flex-col md:flex-row items-start gap-6 py-6">
                       <img
                         src={image}
-                        alt={item.name}
+                        alt={name}
                         className="w-28 h-28 object-cover rounded-md border"
                       />
                       <div className="flex-1">
                         <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {item.name}
+                          {name}
                         </h3>
                         <div className="flex flex-wrap gap-2 text-sm text-gray-700 mb-2">
                           {highlights.map((h, idx) => (
@@ -151,11 +153,18 @@ const OrderHistory = ({ user, addToCart }) => {
                 })}
               </div>
 
-              <div className="text-right text-primaryColor font-bold text-xl pr-6 pt-2">
-                {t("checkout.subtotal")}: ₪{order.totalAmount?.toFixed(2)}
+              <div className="text-right text-primaryColor font-bold text-xl pr-6 pt-2 pb-4">
+                {t("orders.subtotal")}: ₪{order.totalAmount?.toFixed(2)}
               </div>
             </div>
           ))}
+          {/* סכום כולל לקבוצת ההזמנות */}
+          <div className="text-right text-xl font-bold text-primaryColor px-6 py-4 border-t bg-secondaryColor bg-opacity-10">
+            {t("orders.totalForTransaction")}: ₪
+            {orders
+              .reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+              .toFixed(2)}
+          </div>
         </div>
       ))}
 

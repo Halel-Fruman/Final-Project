@@ -230,7 +230,10 @@
     "quantity": "כמות",
     "buyAgain": "קנה שוב",
     "shopSimilar": "מוצרים דומים",
-    "noOrders": "לא נמצאו הזמנות קודמות"
+    "noOrders": "לא נמצאו הזמנות קודמות",
+    "subtotal": "סה״כ לחנות זו",
+    "totalForTransaction": "סך הכל לעסקה"
+
   },
   "status": {
     "pending": "ממתין",
