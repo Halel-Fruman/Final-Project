@@ -5,7 +5,7 @@ const transactionSchema = new mongoose.Schema({
   orderId: { type: String, required: true }, // מזהה ייחודי להזמנה (מהסליקה)
 
   userId: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true }, // מזהה המשתמש שביצע את העסקה
-  status: { type: String, enum: ['pending', 'shipped','completed', 'canceled'], default: 'pending' }, // סטטוס העסקה
+  status: { type: String, enum: ['pending', 'packed','shipped','completed', 'canceled'], default: 'pending' }, // סטטוס העסקה
   totalAmount: { type: Number, required: true }, // סכום העסקה הכולל לחנות זו
   createdAt: { type: Date, default: Date.now }, // תאריך העסקה
   buyerDetails: { // פרטי הקונה
