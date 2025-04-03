@@ -15,6 +15,7 @@ const OrderManagement = ({ storeId }) => {
   const [sortStatus, setSortStatus] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const { showAlert } = useAlert();
+  const [expandedOrderId, setExpandedOrderId] = useState(null);
 
   useEffect(() => {
     axios
@@ -128,103 +129,115 @@ const OrderManagement = ({ storeId }) => {
         </select>
       </div>
 
-      <div className="bg-white rounded-lg shadow overflow-x-auto max-w-full">
-      <div className="bg-white p-4 rounded-lg shadow overflow-x-auto max-w-full">
-      <table className="w-full min-w-[800px] text-sm text-right border border-gray-300 rounded-lg">
-      <thead className="bg-gray-100 font-bold sticky top-0 z-10">
-      <tr>
-        <th className="p-2 border w-[20%] md:w-[12%]">תאריך</th>
-        <th className="p-2 border w-[20%] md:w-[12%]">מזהה</th>
-        <th className="p-2 border w-[20%] md:w-[18%]">פרטי קונה</th>
-        <th className="p-2 border w-[20%] md:w-[18%]">סטטוס עסקה</th>
-        <th className="p-2 border w-[20%] md:w-[20%]">משלוח</th>
-        <th className="p-2 border w-[20%] md:w-[20%]">מוצרים</th>
-      </tr>
-    </thead>
-    <tbody className="text-sm">
-      {orders
-        .sort((a, b) => {
-          if (sortStatus) {
-            const aHasStatus = a.status === sortStatus;
-            const bHasStatus = b.status === sortStatus;
-            if (aHasStatus && !bHasStatus) return -1;
-            if (!aHasStatus && bHasStatus) return 1;
-          }
-          return sortOrder === "asc"
-            ? new Date(a.createdAt) - new Date(b.createdAt)
-            : new Date(b.createdAt) - new Date(a.createdAt);
-        })
-        .map((order) => (
-          <tr key={order._id} className="even:bg-gray-50 hover:bg-gray-100">
-            <td className="p-2 border text-center">
-              {new Date(order.createdAt).toLocaleDateString("he-IL")}
-            </td>
-            <td className="p-2 border text-center">
-              {order.orderId?.slice(-6)}
-              <div>
-                <button
-                  onClick={() => setSelectedOrder(order)}
-                  className="text-blue-600 underline text-xs mt-1"
-                >
-                  פרטים
-                </button>
-              </div>
-            </td>
-            <td className="p-2 border">
-              <p className="font-semibold">{order.buyerDetails.fullName}</p>
-              <p className="text-sm text-gray-600">📞 {order.buyerDetails.phone}</p>
-              <p className="text-sm text-gray-600">✉ {order.buyerDetails.email}</p>
-            </td>
-            <td className="p-2 border text-center">
-              <div className="flex flex-col items-center gap-1">
-                <span className="flex items-center gap-1">
-                  {getStatusIcon(order.status)}
-                  <span className="text-sm font-bold">{order.status}</span>
-                </span>
-                <select
-  value={order.status}
-  onChange={(e) => updateTransactionStatus(order.transactionId, e.target.value)}
-  className="border px-2 py-1 rounded-md text-sm shadow-sm"
->
 
-                  <option value="pending">ממתין</option>
-                  <option value="packed">נארז</option>
-                  <option value="shipped">נשלח</option>
-                  <option value="completed">נמסר</option>
-                  <option value="canceled">בוטל</option>
-                </select>
-              </div>
-            </td>
-            <td className="p-2 border text-sm text-gray-700">
-              <p><strong>סטטוס:</strong> {order.delivery.deliveryStatus}</p>
-              <p><strong>ת.משוער:</strong> {order.delivery.estimatedDelivery ? new Date(order.delivery.estimatedDelivery).toLocaleDateString("he-IL") : "לא זמין"}</p>
-              <p><strong>מעקב:</strong> {order.delivery.trackingNumber || "לא זמין"}</p>
-              <select
-                onChange={(e) => updateDeliveryStatus(order.transactionId, e.target.value)}
-                value={order.delivery.deliveryStatus}
-                className="border px-2 py-1 rounded-md text-sm shadow-sm mt-1"
+
+      <div className="max-h-[500px] rounded-lg shadow w-full overflow-x-auto bg-transparent">
+      <div className="w-full overflow-x-auto max-h-[480px]">
+      <table className="min-w-full text-sm text-right border border-gray-300 rounded-lg">
+      <thead className="bg-gray-100 font-bold sticky top-0 z-10 hidden md:table-header-group">
+        <tr>
+          <th className="p-2 border w-1/10">תאריך</th>
+          <th className="p-2 border w-1/10">מזהה</th>
+          <th className="p-2 border w-1/5">פרטי קונה</th>
+          <th className="p-2 border w-1/5">סטטוס עסקה</th>
+          <th className="p-2 border w-1/5">משלוח</th>
+          <th className="p-2 border w-1/5">מוצרים</th>
+        </tr>
+      </thead>
+      <tbody className="block md:table-row-group">
+        {orders
+          .sort((a, b) => {
+            if (sortStatus) {
+              const aHasStatus = a.status === sortStatus;
+              const bHasStatus = b.status === sortStatus;
+              if (aHasStatus && !bHasStatus) return -1;
+              if (!aHasStatus && bHasStatus) return 1;
+            }
+            return sortOrder === "asc"
+              ? new Date(a.createdAt) - new Date(b.createdAt)
+              : new Date(b.createdAt) - new Date(a.createdAt);
+          })
+          .map((order) => {
+            const isExpanded = expandedOrderId === order._id;
+            return (
+              <tr
+                key={order._id}
+                className="even:bg-gray-50 hover:bg-gray-100 block md:table-row border border-b md:border-none mb-4 md:mb-0 rounded md:rounded-none"
               >
-                <option value="pending">ממתין</option>
-                <option value="packed">נארז</option>
-                <option value="shipped">נשלח</option>
-                <option value="completed">נמסר</option>
-                <option value="canceled">בוטל</option>
-              </select>
-            </td>
-            <td className="p-2 border">
-              {order.products.map((product) => (
-                <div key={product.productId} className="border-b py-1">
-                  <p className="font-semibold text-sm">
-                    {product.name} - {product.quantity} יח'
-                  </p>
-                </div>
-              ))}
-            </td>
-          </tr>
-        ))}
-    </tbody>
-  </table>
-</div>
+                <td className="p-2 border text-center md:w-1/10">
+                  <span className="md:hidden font-bold">תאריך: </span>
+                  {new Date(order.createdAt).toLocaleDateString("he-IL")}
+                </td>
+                <td className="p-2 border text-center md:w-1/10">
+                  <span className="md:hidden font-bold">מזהה: </span>
+                  {order.orderId?.slice(-6)}
+                  <div>
+                    <button
+                      onClick={() => setSelectedOrder(order)}
+                      className="text-blue-600 underline text-xs mt-1"
+                    >
+                      פרטים
+                    </button>
+                    <button
+                      className="md:hidden text-blue-600 underline text-xs mt-1"
+                      onClick={() => setExpandedOrderId(isExpanded ? null : order._id)}
+                    >
+                      {isExpanded ? "הסתר פרטים" : "הצג פרטים"}
+                    </button>
+                  </div>
+                </td>
+                {isExpanded || window.innerWidth >= 768 ? (
+                  <>
+                    <td className="p-2 border md:w-1/5">
+                      <span className="md:hidden font-bold">קונה: </span>
+                      <p className="font-semibold">{order.buyerDetails.fullName}</p>
+                      <p className="text-sm text-gray-600">📞 {order.buyerDetails.phone}</p>
+                      <p className="text-sm text-gray-600">✉ {order.buyerDetails.email}</p>
+                    </td>
+                    <td className="p-2 border text-center md:w-1/5">
+                      <span className="md:hidden font-bold">סטטוס עסקה: </span>
+                      <div className="flex flex-col items-center gap-1">
+                        <span className="flex items-center gap-1">
+                          {getStatusIcon(order.status)}
+                          <span className="text-sm font-bold">{order.status}</span>
+                        </span>
+                        <select
+                          value={order.status}
+                          onChange={(e) => updateTransactionStatus(order.transactionId, e.target.value)}
+                          className="border px-2 py-1 rounded-md text-sm shadow-sm"
+                        >
+                          <option value="pending">ממתין</option>
+                          <option value="packed">נארז</option>
+                          <option value="shipped">נשלח</option>
+                          <option value="completed">נמסר</option>
+                          <option value="canceled">בוטל</option>
+                        </select>
+                      </div>
+                    </td>
+                    <td className="p-2 border text-sm text-gray-700 md:w-1/5">
+                      <span className="md:hidden font-bold">משלוח: </span>
+                      <p><strong>ת.משוער:</strong> {order.delivery.estimatedDelivery ? new Date(order.delivery.estimatedDelivery).toLocaleDateString("he-IL") : "לא זמין"}</p>
+                      <p><strong>מס.מעקב:</strong> {order.delivery.trackingNumber || "לא זמין"}</p>
+                      
+                    </td>
+                    <td className="p-2 border md:w-1/5">
+                      <span className="md:hidden font-bold">מוצרים: </span>
+                      {order.products.map((product) => (
+                        <div key={product.productId} className="border-b py-1">
+                          <p className="font-semibold text-sm">
+                            {product.name} - {product.quantity} יח'
+                          </p>
+                        </div>
+                      ))}
+                    </td>
+                  </>
+                ) : null}
+              </tr>
+            );
+          })}
+      </tbody>
+    </table>
+  </div>
 </div>
 
 
