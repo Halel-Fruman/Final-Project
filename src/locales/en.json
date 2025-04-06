@@ -12,6 +12,8 @@
   "remove_from_wishlist": "Remove from Wishlist",
   "header": {
     "admin_dashboard": "Admin Dashboard",
+    "admin_area": "Admin Area",
+    "store_area": "Store Management",
     "home": "Home",
     "products": "Products",
     "login": "Login",
