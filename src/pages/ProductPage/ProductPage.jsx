@@ -105,7 +105,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             />
           </div>
 
-          <div className="bg-white rounded-lg shadow-lg p-6 flex-grow relative min-h-128">
+          <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {productName}
             </h1>
@@ -146,7 +146,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               </span>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-12 items-center">
+            <div className="flex flex-col lg:flex-row gap-12 ">
               <div className="mb-6">
                 <h2 className="text-lg font-semibold text-gray-900 mb-2">
                   {t("product.highlights")}
