@@ -1,4 +1,5 @@
 import React, { useEffect, useState, useCallback } from "react";
+import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Sidebar from "./PersonalFields/SideBar";
 import PersonalAreaEditor from "./PersonalFields/PersonalAreaEditor";
@@ -13,6 +14,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
   const [isLoading, setIsLoading] = useState(true); // useState hook to store the loading state
   const [currentView, setCurrentView] = useState("details"); // useState hook to store the current view
   const [isSidebarOpen, setIsSidebarOpen] = useState(false); // useState hook to store the sidebar open state
+  const location = useLocation(); // useLocation hook to get the current location object
   // fetchUser function to send a request to the server to fetch the user data based on the userId and token
   const fetchUser = useCallback(async () => {
     setIsLoading(true);
@@ -41,6 +43,13 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
   useEffect(() => {
     fetchUser();
   }, [fetchUser]);
+  // useEffect hook to set the current view based on the location state when the component mounts
+  useEffect(() => {
+    if (location.state?.selectedTab) {
+      setCurrentView(location.state.selectedTab);
+    }
+  }, [location.state]);
+
   // handleSave function to send a request to the server to update the user data
   const handleSave = async (updatedUser) => {
     try {
