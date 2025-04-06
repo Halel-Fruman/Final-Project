@@ -213,7 +213,9 @@
     "shipping": "משלוח ומסים יחושבו בתשלום.",
     "checkout": "לקופה",
     "continueShopping": "המשך בקניות",
-    "removed": "הפריט הוסר מהעגלה"
+    "removed": "הפריט הוסר מהעגלה",
+    "quantity_updated": "הכמות עודכנה בהצלחה",
+    "quantity_update_failed": "אירעה שגיאה בעדכון הכמות"
   },
   "modal": {
     "close": "סגור"
@@ -234,6 +236,7 @@
     "shopSimilar": "מוצרים דומים",
     "noOrders": "לא נמצאו הזמנות קודמות",
     "subtotal": "סה״כ לחנות זו",
+    "loading": "טוען עסקאות...",
     "totalForTransaction": "סך הכל לעסקה"
   },
   "status": {

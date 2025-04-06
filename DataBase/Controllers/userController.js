@@ -516,7 +516,36 @@ const UserController = {
     }
   },
 
-   addTransactionToUser : async (req, res) => {
+  updateCartItemQuantity: async (req, res) => {
+    const { userId } = req.params;
+    const { productId, quantity } = req.body;
+
+    if (!productId || !quantity || quantity < 1) {
+      return res.status(400).json({ error: "Missing or invalid data" });
+    }
+
+    try {
+      const user = await User.findById(userId);
+      if (!user) return res.status(404).json({ error: "User not found" });
+
+      const item = user.cart.find(
+        (item) => String(item.productId) === String(productId)
+      );
+      if (!item) {
+        return res.status(404).json({ error: "Product not found in cart" });
+      }
+
+      item.quantity = quantity;
+      await user.save();
+
+      res.status(200).json({ cart: user.cart });
+    } catch (error) {
+      res
+        .status(500)
+        .json({ error: "Error updating product quantity: " + error.message });
+    }
+  },
+  addTransactionToUser: async (req, res) => {
     const { userId } = req.params;
     const { transactionId } = req.body;
 
@@ -531,9 +560,19 @@ const UserController = {
       user.transactions.push(transactionId);
       await user.save();
 
-      res.status(200).json({ message: "Transaction added to user", transactions: user.transactions });
+      res
+        .status(200)
+        .json({
+          message: "Transaction added to user",
+          transactions: user.transactions,
+        });
     } catch (error) {
-      res.status(500).json({ message: "Error adding transaction to user", error: error.message });
+      res
+        .status(500)
+        .json({
+          message: "Error adding transaction to user",
+          error: error.message,
+        });
     }
   },
 };

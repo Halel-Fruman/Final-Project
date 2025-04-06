@@ -212,7 +212,9 @@
     "shipping": "Shipping and taxes calculated at checkout.",
     "checkout": "Checkout",
     "continueShopping": "Continue Shopping",
-    "removed": "Item removed from cart"
+    "removed": "Item removed from cart",
+    "quantity_updated": "Quantity updated successfully",
+    "quantity_update_failed": "Error updating quantity"
   },
   "orders": {
     "title": "My Orders",
