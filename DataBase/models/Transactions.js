@@ -24,7 +24,6 @@ const transactionSchema = new mongoose.Schema({
   ],
   delivery: { // פרטי משלוח
     deliveryMethod: { type: String, enum: ['pickup', 'courier', 'express'], required: true }, // שיטת משלוח
-    deliveryStatus: { type: String, enum: ['pending', 'packed', 'shipped', 'completed', 'canceled'], default: 'pending' },
     trackingNumber: { type: String, default: '' }, // מספר מעקב אם רלוונטי
     estimatedDelivery: { type: Date }, // תאריך הגעה משוער
   }
