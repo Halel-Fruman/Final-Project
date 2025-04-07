@@ -1,17 +1,19 @@
 {
   "welcome": "ברוכים הבאים לחנות איל''ן",
   "welcome_subtitle": " אנו מזמינים אתכם להיות שותפים למטרה <br> ולרכוש מוצרים ומתנות שמייצרים באהבה אנשים עם מוגבלות.",
-  "categories": {
-    "title": "קניות לפי קטגוריה",
-    "electronics": "אלקטרוניקה",
-    "clothing": "ביגוד",
-    "home_garden": "בית וגינה",
-    "beauty_health": "יופי ובריאות"
-  },
+  "show_filters": "הצג סינון",
+  "hide_filters": "הסתר סינון",
+  "clear_filters": "נקה סינון",
   "error": "שגיאה",
   "add_to_wishlist": "הוסף לרשימת המשאלות",
   "remove_from_wishlist": "הסר מרשימת המשאלות",
   "loading": "טוען...",
+  "store": "חנות",
+  "category": "קטגוריה",
+  "no_products_found": "לא נמצאו מוצרים מתאימים",
+  "filters": "סינון",
+  "remove_filter": "הסר סינון",
+
   "view_products": "צפה במוצרים",
   "header": {
     "home": "בית",
@@ -22,9 +24,11 @@
     "personal_area": "אזור אישי",
     "cart": "עגלת קניות",
     "search": "חיפוש",
+    "admin_area": "איזור ניהול מערכת",
+    "store_area": "איזור ניהול חנות",
     "admin_dashboard": "לוח בקרה למנהל"
   },
-  "featured_products": "מוצרים נבחרים",
+  "featured_products": "המוצרים שלנו",
   "price": "מחיר",
   "view_details": "צפה בפרטים",
 
@@ -211,7 +215,9 @@
     "shipping": "משלוח ומסים יחושבו בתשלום.",
     "checkout": "לקופה",
     "continueShopping": "המשך בקניות",
-    "removed": "הפריט הוסר מהעגלה"
+    "removed": "הפריט הוסר מהעגלה",
+    "quantity_updated": "הכמות עודכנה בהצלחה",
+    "quantity_update_failed": "אירעה שגיאה בעדכון הכמות"
   },
   "modal": {
     "close": "סגור"
@@ -232,8 +238,8 @@
     "shopSimilar": "מוצרים דומים",
     "noOrders": "לא נמצאו הזמנות קודמות",
     "subtotal": "סה״כ לחנות זו",
+    "loading": "טוען עסקאות...",
     "totalForTransaction": "סך הכל לעסקה"
-
   },
   "status": {
     "pending": "ממתין",
@@ -284,6 +290,5 @@
     "noDeliveryInfo": "אין מידע על משלוח",
     "viewOrders": "מעבר להיסטוריית הזמנות",
     "totalSum": "סכום כולל"
-
   }
 }

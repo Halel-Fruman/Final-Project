@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 const ConfirmationPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { t, i18n } = useTranslation();
+  const { t } = useTranslation();
 
   const transactions = state?.transactions || [];
   const detailedCart = state?.detailedCart || [];
@@ -113,15 +113,18 @@ const ConfirmationPage = () => {
           ))}
           <div className="text-right m-4 font-bold text-2xl text-primaryColor">
             {t("confirmation.totalSum")}: ₪
-            {group.reduce((sum, tx) => sum + tx.transaction.totalAmount, 0).toFixed(2)}
-            </div>
-
+            {group
+              .reduce((sum, tx) => sum + tx.transaction.totalAmount, 0)
+              .toFixed(2)}
+          </div>
         </div>
       ))}
 
       <div className="text-center mt-6">
         <button
-          onClick={() => navigate("/orders")}
+          onClick={() =>
+            navigate("/personal-area", { state: { selectedTab: "orders" } })
+          }
           className="px-6 py-2 bg-primaryColor text-white text-xl font-bold rounded-md hover:bg-secondaryColor">
           {t("confirmation.viewOrders")}
         </button>

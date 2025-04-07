@@ -1,13 +1,10 @@
 {
   "welcome": "Welcome to Ilan's Store",
   "welcome_subtitle": "Find the best products at unbeatable prices!",
-  "categories": {
-    "title": "Shop by Category",
-    "electronics": "Electronics",
-    "clothing": "Clothing",
-    "home_garden": "Home & Garden",
-    "beauty_health": "Beauty & Health"
-  },
+  "show_filters": "Show Filters",
+  "hide_filters": "Hide Filters",
+  "clear_filters": "Clear Filters",
+
   "modal": {
     "close": "Close"
   },
@@ -15,6 +12,8 @@
   "remove_from_wishlist": "Remove from Wishlist",
   "header": {
     "admin_dashboard": "Admin Dashboard",
+    "admin_area": "Admin Area",
+    "store_area": "Store Management",
     "home": "Home",
     "products": "Products",
     "login": "Login",
@@ -215,7 +214,9 @@
     "shipping": "Shipping and taxes calculated at checkout.",
     "checkout": "Checkout",
     "continueShopping": "Continue Shopping",
-    "removed": "Item removed from cart"
+    "removed": "Item removed from cart",
+    "quantity_updated": "Quantity updated successfully",
+    "quantity_update_failed": "Error updating quantity"
   },
   "orders": {
     "title": "My Orders",

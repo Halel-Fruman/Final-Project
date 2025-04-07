@@ -99,6 +99,31 @@ export const removeFromCart = async (userId, token, productId) => {
     return null;
   }
 };
+// utils/cartHelpers.js
+
+export const updateCartItemQuantity = async (userId, productId, quantity, token) => {
+  try {
+    const res = await fetch(`http://localhost:5000/User/${userId}/cart/update-quantity`, {
+      method: "PATCH",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ productId, quantity }),
+    });
+
+    if (!res.ok) {
+      throw new Error("Failed to update cart quantity");
+    }
+
+    const data = await res.json();
+    return data; // מחזיר את העגלה המעודכנת
+  } catch (err) {
+    console.error("Error updating cart quantity:", err.message);
+    throw err;
+  }
+};
+
 
 // calculate the total price of the cart
 export const calculateCartTotal = (cartItems) => {

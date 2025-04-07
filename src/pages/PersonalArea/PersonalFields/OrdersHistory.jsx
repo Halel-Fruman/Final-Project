@@ -1,4 +1,3 @@
-// File: OrderHistory.jsx
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
@@ -7,9 +6,11 @@ const OrderHistory = ({ user, addToCart }) => {
   const { t, i18n } = useTranslation();
   const [transactionGroups, setTransactionGroups] = useState([]);
   const [productDetails, setProductDetails] = useState({});
+  const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
 
   useEffect(() => {
     const fetchGroupedTransactions = async () => {
+      setIsLoadingTransactions(true);
       try {
         const groups = {};
         for (const txId of user.transactions) {
@@ -26,6 +27,8 @@ const OrderHistory = ({ user, addToCart }) => {
         setTransactionGroups(groups);
       } catch (err) {
         console.error("Failed to fetch grouped transactions:", err);
+      } finally {
+        setIsLoadingTransactions(false);
       }
     };
 
@@ -100,8 +103,7 @@ const OrderHistory = ({ user, addToCart }) => {
                     fullProduct?.images?.[0] || "https://placehold.co/100";
                   const highlights =
                     fullProduct?.highlight?.[i18n.language] || [];
-                  const name =
-                    fullProduct?.name?.[i18n.language] || item.name;
+                  const name = fullProduct?.name?.[i18n.language] || item.name;
 
                   return (
                     <div
@@ -158,7 +160,7 @@ const OrderHistory = ({ user, addToCart }) => {
               </div>
             </div>
           ))}
-          {/* סכום כולל לקבוצת ההזמנות */}
+
           <div className="text-right text-xl font-bold text-primaryColor px-6 py-4 border-t bg-secondaryColor bg-opacity-10">
             {t("orders.totalForTransaction")}: ₪
             {orders
@@ -168,10 +170,17 @@ const OrderHistory = ({ user, addToCart }) => {
         </div>
       ))}
 
-      {!Object.keys(transactionGroups).length && (
-        <p className="text-gray-600 text-center text-lg">
-          {t("orders.noOrders")}
-        </p>
+      {isLoadingTransactions ? (
+        <div className="text-center py-10">
+          <div className="inline-block w-10 h-10 border-4 border-blue-300 border-t-transparent rounded-full animate-spin" />
+          <p className="mt-4 text-gray-600">{t("orders.loading")}</p>
+        </div>
+      ) : (
+        !Object.keys(transactionGroups).length && (
+          <p className="text-gray-600 text-center text-lg">
+            {t("orders.noOrders")}
+          </p>
+        )
       )}
     </div>
   );

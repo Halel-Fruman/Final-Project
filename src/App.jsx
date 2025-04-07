@@ -188,6 +188,7 @@ const App = () => {
           cartItems={cartItems}
           onRemoveFromCart={handleRemoveFromCart}
           fetchProductDetails={fetchProductDetails}
+          userId={userId}
         />
         <WishlistModal
           isOpen={isWishlistOpen}

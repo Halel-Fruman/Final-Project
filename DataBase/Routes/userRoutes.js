@@ -76,6 +76,8 @@ router.post("/:userId/cart", UserController.addToCart);
 router.get("/:userId/cart", UserController.getCart);
 // update cart quantity
 router.put("/:userId/cart", UserController.updateCartQuantity);
+router.patch("/:userId/cart/update-quantity", UserController.updateCartItemQuantity);
+
 // remove from cart
 router.delete("/:userId/cart", UserController.removeFromCart);
 router.post("/:userId/add-transaction", UserController.addTransactionToUser);
