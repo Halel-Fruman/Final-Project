@@ -18,7 +18,7 @@ const UserManagement = (token) => {
     }
     // Send a GET request to the server to fetch the list of users
     axios
-      .get("http://localhost:5000/User/", {
+      .get("/api/User/", {
         headers: { Authorization: `Bearer ${storedToken}` }
       })
       .then((res) => {
@@ -72,7 +72,7 @@ const UserManagement = (token) => {
       return;
     }
     // Send a PUT request to the server to update the user
-    axios.put(`http://localhost:5000/User/${selectedUser._id}/edit`, updatedUser, {
+    axios.put(`/api/User/${selectedUser._id}/edit`, updatedUser, {
       headers: { Authorization: `Bearer ${storedToken2}` }
     })
       .then((res) => {

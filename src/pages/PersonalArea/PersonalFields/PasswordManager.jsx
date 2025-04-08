@@ -16,7 +16,7 @@ const PasswordManager = ({ userId, token }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/User/${userId}/change-password`,
+        `/api/User/${userId}/change-password`,
         {
           method: "PUT",
           headers: {

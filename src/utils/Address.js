@@ -1,5 +1,5 @@
 export const addAddress = async ({ userId, token, address }) => {
-    const res = await fetch(`http://localhost:5000/User/${userId}/add-address`, {
+    const res = await fetch(`/api/User/${userId}/add-address`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -13,7 +13,7 @@ export const addAddress = async ({ userId, token, address }) => {
   };
 
   export const editAddress = async ({ userId, token, addresses }) => {
-    const res = await fetch(`http://localhost:5000/User/${userId}/update-addresses`, {
+    const res = await fetch(`/api/User/${userId}/update-addresses`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -27,7 +27,7 @@ export const addAddress = async ({ userId, token, address }) => {
   };
 
   export const deleteAddress = async ({ userId, token, index }) => {
-    const res = await fetch(`http://localhost:5000/User/${userId}/delete-address`, {
+    const res = await fetch(`/api/User/${userId}/delete-address`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

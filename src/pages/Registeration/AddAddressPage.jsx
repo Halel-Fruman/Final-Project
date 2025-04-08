@@ -14,7 +14,7 @@ const AddAddressPage = ({ userId }) => {
     // Send a POST request to the server with the address
     try {
       const response = await fetch(
-        `http://localhost:5000/User/${userId}/add-address`,
+        `/api/User/${userId}/add-address`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },

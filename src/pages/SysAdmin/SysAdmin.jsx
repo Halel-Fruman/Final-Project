@@ -16,7 +16,7 @@ const SysAdmin = () => {
   // The useEffect hook is used to fetch the list of stores when the component mounts
   useEffect(() => {
     axios
-      .get("http://localhost:5000/Stores/")
+      .get("/api/Stores/")
       .then((res) => {
         console.log("Stores fetched:", res.data);
 
@@ -150,8 +150,8 @@ const SysAdmin = () => {
 
     // Send a POST request to the server with the store data if new store mode is enabled
     const url = newStoreMode
-      ? "http://localhost:5000/Stores/"
-      : `http://localhost:5000/Stores/${selectedStore._id}`;
+      ? "/api/Stores/"
+      : `/api/Stores/${selectedStore._id}`;
     const method = newStoreMode ? "post" : "put";
 
     axios[method](url, selectedStore)
@@ -184,7 +184,7 @@ const SysAdmin = () => {
       "warning",
       () => {
         axios
-          .delete(`http://localhost:5000/Stores/${selectedStore._id}`)
+          .delete(`/api/Stores/${selectedStore._id}`)
           .then(() => {
             setStores(
               stores.filter((store) => store._id !== selectedStore._id)

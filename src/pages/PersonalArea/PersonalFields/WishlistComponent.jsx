@@ -32,7 +32,7 @@ const WishlistComponent = ({
       for (const item of wishlist) {
         try {
           const response = await fetch(
-            `http://localhost:5000/products/${item.productId}`
+            `/api/products/${item.productId}`
           );
           if (!response.ok) throw new Error("Not found");
 

@@ -15,7 +15,7 @@ const ProductManagement = ({ storeId }) => {
     setEditingProduct(product);
     setIsAddingProduct(true); // נשתמש באותו מודאל של הוספה
   };
-  
+
   const [newProduct, setNewProduct] = useState({
     nameEn: "",
     nameHe: "",
@@ -35,16 +35,16 @@ const ProductManagement = ({ storeId }) => {
     highlightHe: [],
   highlightEn: [],
   });
-  
 
-  useEffect(() => {  
 
-axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
+  useEffect(() => {
+
+axios.get(`/api/products/by-store?store=${storeId}`)
       .then((res) => setProducts(res.data))
       .catch(() => showAlert("אירעה שגיאה בעת קבלת המוצרים", "error"));
 
     axios
-      .get(`http://localhost:5000/Category`)
+      .get(`/api/Category`)
       .then((res) => setCategories(res.data))
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
   }, [storeId]);
@@ -62,7 +62,7 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       newProduct.discountEnd &&
       new Date(newProduct.discountEnd) < new Date(newProduct.discountStart)
     ) {
-        
+
       showAlert("תאריך הסיום לא יכול להיות לפני תאריך ההתחלה", "error");
       return;
     }
@@ -95,8 +95,8 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
     }
 
     const url = editingProduct
-      ? `http://localhost:5000/products/${storeId}/${editingProduct._id}`
-      : `http://localhost:5000/products/${storeId}`;
+      ? `/api/products/${storeId}/${editingProduct._id}`
+      : `/api/products/${storeId}`;
 
     const method = editingProduct ? axios.put : axios.post;
 
@@ -115,8 +115,8 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       .catch(() => showAlert("אירעה שגיאה בשמירת המוצר", "error"));
   };
 
- 
-  
+
+
 
   useEffect(() => {
     if (editingProduct) {
@@ -169,7 +169,7 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
   const handleDelete = (productId) => {
     if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {
       axios
-        .delete(`http://localhost:5000/products/${storeId}/${productId}`)
+        .delete(`/api/products/${storeId}/${productId}`)
         .then(() => {
           setProducts(products.filter((p) => p._id !== productId));
           showAlert("המוצר נמחק בהצלחה", "success");
@@ -179,8 +179,8 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
         });
     }
   };
- 
-  
+
+
 
   const handleCategoryChange = (e) => {
     const { value, checked } = e.target;
@@ -193,8 +193,8 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       return { ...prev, selectedCategories: selected };
     });
   };
-  
-  
+
+
 
   const handleCancel = () => {
     showAlert(
@@ -218,7 +218,7 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-4 text-center">ניהול מוצרים</h1>
 
-     
+
 
 
       <div className="mb-4 mr-4 flex justify">
@@ -228,8 +228,8 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
         >
           הוסף מוצר
         </button>
-      
-      
+
+
   <div className="flex w-full max-w-md gap-2">
     <input
       type="text"
@@ -238,7 +238,7 @@ axios.get(`http://localhost:5000/products/by-store?store=${storeId}`)
       value={searchQuery}
       onChange={(e) => setSearchQuery(e.target.value)}
     />
-    
+
 </div>
 </div>
 {isAddingProduct && (

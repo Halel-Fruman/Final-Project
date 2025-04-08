@@ -17,7 +17,7 @@ const StoreManagement = () => {
   // שליפת אימייל לפי userId
   const fetchUserEmail = async (userId) => {
     try {
-      const response = await fetch(`http://localhost:5000/user/${userId}`, {
+      const response = await fetch(`/api/user/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -52,7 +52,7 @@ const StoreManagement = () => {
   useEffect(() => {
     const fetchStoreId = async () => {
       try {
-        const response = await fetch("http://localhost:5000/Stores");
+        const response = await fetch("/api/Stores");
         if (!response.ok) throw new Error("Failed to fetch stores");
 
         const stores = await response.json();

@@ -24,7 +24,7 @@ const Login = ({
     setLoading(true);
     // Try to send a POST request to the server to log in the user
     try {
-      const response = await fetch("http://localhost:5000/User/login", {
+      const response = await fetch("/api/User/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),

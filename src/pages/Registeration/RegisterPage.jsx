@@ -27,7 +27,7 @@ export default function Register({ setToken, setUserId, onClose }) {
 
     // Send a POST request to the server with the user details
     try {
-      const response = await fetch("http://localhost:5000/User/register", {
+      const response = await fetch("/api/User/register", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({

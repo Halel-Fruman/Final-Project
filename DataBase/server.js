@@ -8,7 +8,6 @@ const realProductRoutes = require('./Routes/realProductsRoutes'); // מוצרי�
 const transactionRoutes = require('./Routes/transactionRoutes'); // עסקאות
 const categoryRoutes = require("./Routes/categoryRoutes");
 const emailRoutes = require("./Routes/emailRoutes"); // דוא"ל
-// const { sendConfirmationEmail } = require("./emailController");
 
 
 
@@ -20,22 +19,23 @@ app.use(cors());
 app.use(express.json());
 
 // MongoDB Connection
-mongoose.connect(process.env.MONGO_URI)
-  .then(() => console.log('Connected to MongoDB'))
-  .catch((err) => console.error('MongoDB connection error:', err));
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true,
+})
+  .then(() => console.log(`✅ Connected to MongoDB`))
+  .catch((err) => console.error('❌ MongoDB connection error:', err));
 
-/// Routes
-app.use('/User', userRoutes); // משתמשים
-app.use('/Stores', storeRoutes); // חנויות
-app.use('/Products', realProductRoutes); // מוצרים אמיתיים
-app.use('/Transactions', transactionRoutes); //
-app.use("/Category", categoryRoutes);
-app.use("/email", emailRoutes); // דוא"ל
+// Routes
+app.use('/api/User', userRoutes);
+app.use('/api/Stores', storeRoutes);
+app.use('/api/Products', realProductRoutes);
+app.use('/api/Transactions', transactionRoutes);
+app.use('/api/Category', categoryRoutes);
+app.use('/api/email', emailRoutes);
 
-// User Schema & Model
-const User = require('./models/User');
-const e = require('express');
-// Store Routes
+
+
 
 
 
@@ -43,4 +43,4 @@ const e = require('express');
 
 
 // Start Server
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT,'0.0.0.0', () => console.log(`Server running on port ${PORT}`));

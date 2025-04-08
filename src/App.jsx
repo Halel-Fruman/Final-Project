@@ -66,7 +66,7 @@ const App = () => {
       if (storedToken && storedUserId) {
         try {
           const response = await fetch(
-            "http://localhost:5000/User/verify-token",
+            "/api/User/verify-token",
             {
               headers: {
                 Authorization: `Bearer ${storedToken}`,
