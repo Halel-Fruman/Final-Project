@@ -163,8 +163,8 @@ const App = () => {
 
     <AlertProvider>
       {/*Router component to wrap the entire application and provide the routing context to all components */}
-      <Router>
-        <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
+      <Router basename="/shop">
+      <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
 
         {/*Header component to display the header of the application         */}
         <Header
