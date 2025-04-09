@@ -3,7 +3,7 @@
 // login function to send a POST request to the server with the email and password
 export const fetchCart = async (userId, token) => {
   try {
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
+    const response = await fetch(`/api/User/${userId}/cart`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -29,7 +29,7 @@ export const saveCart = async (userId, token, cartItems) => {
       return;
     }
     // send a PUT request to the server with the updated cart items
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
+    const response = await fetch(`/api/User/${userId}/cart`, {
       method: "PUT", // update the cart
       headers: {
         "Content-Type": "application/json",
@@ -51,7 +51,7 @@ export const saveCart = async (userId, token, cartItems) => {
 export const addToCart = async (userId, token, product) => {
   try {
     // send a POST request to the server with the product ID
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
+    const response = await fetch(`/api/User/${userId}/cart`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -79,7 +79,7 @@ export const removeFromCart = async (userId, token, productId) => {
   console.log("Removing product from cart:", { productId });
   // send a DELETE request to the server to remove the product from the cart
   try {
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
+    const response = await fetch(`/api/User/${userId}/cart`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
@@ -103,7 +103,7 @@ export const removeFromCart = async (userId, token, productId) => {
 
 export const updateCartItemQuantity = async (userId, productId, quantity, token) => {
   try {
-    const res = await fetch(`http://localhost:5000/User/${userId}/cart/update-quantity`, {
+    const res = await fetch(`/api/User/${userId}/cart/update-quantity`, {
       method: "PATCH",
       headers: {
         "Content-Type": "application/json",
@@ -140,7 +140,7 @@ export const fetchProductDetails = async (productId) => {
   }
   // fetch the product details from the server
   try {
-    const response = await fetch(`http://localhost:5000/Products/${productId}`);
+    const response = await fetch(`/api/Products/${productId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch product details.");
     }

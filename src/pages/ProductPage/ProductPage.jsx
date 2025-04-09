@@ -19,7 +19,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:5000/Products/${id}`);
+        const response = await fetch(`/api/Products/${id}`);
         if (!response.ok) throw new Error(t("error.fetchProduct"));
         const data = await response.json();
         setProduct(data);
@@ -54,7 +54,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const handleRating = async (newRating) => {
     try {
       const response = await fetch(
-        `http://localhost:5000/products/${id}/rate`,
+        `/api/products/${id}/rate`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -184,7 +184,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
-                className="w-1/2 bg-primaryColor text-white py-2 px-4 rounded-lg text-xl font-bold hover:bg-primaryColor transition">
+                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-lg text-xl font-bold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
               <button

@@ -19,7 +19,7 @@ const OrderManagement = ({ storeId }) => {
 
   useEffect(() => {
     axios
-      .get(`http://localhost:5000/Transactions?store=${storeId}`)
+      .get(`/api/Transactions?store=${storeId}`)
       .then((res) => {
         const storeData = res.data.find((store) => store.storeId === storeId);
         if (!storeData) return;
@@ -42,7 +42,7 @@ const OrderManagement = ({ storeId }) => {
   const updateDeliveryStatus = (transactionId, newStatus) => {
     axios
       .put(
-        `http://localhost:5000/Transactions/${transactionId}/updateDeliveryStatus`,
+        `/api/Transactions/${transactionId}/updateDeliveryStatus`,
         {
           deliveryStatus: newStatus, // השם הנכון!
         }
@@ -69,7 +69,7 @@ const OrderManagement = ({ storeId }) => {
 
   const updateTransactionStatus = (transactionId, newStatus) => {
     axios
-      .put(`http://localhost:5000/Transactions/${transactionId}/updateTransactionStatus`, {
+      .put(`/api/Transactions/${transactionId}/updateTransactionStatus`, {
         status: newStatus
       })
       .then(() => {
@@ -218,7 +218,7 @@ const OrderManagement = ({ storeId }) => {
                       <span className="md:hidden font-bold">משלוח: </span>
                       <p><strong>ת.משוער:</strong> {order.delivery.estimatedDelivery ? new Date(order.delivery.estimatedDelivery).toLocaleDateString("he-IL") : "לא זמין"}</p>
                       <p><strong>מס.מעקב:</strong> {order.delivery.trackingNumber || "לא זמין"}</p>
-                      
+
                     </td>
                     <td className="p-2 border md:w-1/5">
                       <span className="md:hidden font-bold">מוצרים: </span>

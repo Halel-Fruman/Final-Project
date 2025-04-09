@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 
 const PasswordManager = ({ userId, token }) => {
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -16,7 +15,7 @@ const PasswordManager = ({ userId, token }) => {
 
     try {
       const response = await fetch(
-        `http://localhost:5000/User/${userId}/change-password`,
+        `/api/User/${userId}/change-password`,
         {
           method: "PUT",
           headers: {
@@ -34,7 +33,6 @@ const PasswordManager = ({ userId, token }) => {
           field: t("personal_area.passwordManagement"),
         })
       );
-      setIsEditing(false);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");

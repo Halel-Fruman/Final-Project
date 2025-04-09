@@ -20,7 +20,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
     setIsLoading(true);
     // Try to send a request to the server to fetch the user data
     try {
-      const response = await fetch(`http://localhost:5000/User/${userId}`, {
+      const response = await fetch(`/api/User/${userId}`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },
@@ -55,7 +55,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
     try {
       // Try to send a PUT request to the server to update the user data
       const response = await fetch(
-        `http://localhost:5000/User/${userId}/edit`,
+        `/api/User/${userId}/edit`,
         {
           method: "PUT",
           headers: {
@@ -101,7 +101,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
     <div
     className={`lg:block ${
       isSidebarOpen ? "block" : "hidden"
-    } bg-white shadow-lg rounded-lg lg:rounded-none`}>
+    } bg-white shadow-lg rounded-lg mb-2 lg:rounded-none`}>
     <Sidebar
     currentView={currentView}
     onViewChange={(view) => {

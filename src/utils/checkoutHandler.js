@@ -55,7 +55,7 @@ export const processCheckout = async ({
     };
 
     // שליחת העסקה לשרת – יחזור רק העסקה האחרונה
-    const storeRes = await fetch("http://localhost:5000/Transactions/add", {
+    const storeRes = await fetch("/api/Transactions/add", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -74,7 +74,7 @@ export const processCheckout = async ({
 
     // הוספת מזהה עסקה למשתמש
     const userRes = await fetch(
-      `http://localhost:5000/User/${userData._id}/add-transaction`,
+      `/api/User/${userData._id}/add-transaction`,
       {
         method: "POST",
         headers: {
@@ -87,7 +87,7 @@ export const processCheckout = async ({
     if (!userRes.ok) throw new Error("Failed to add transaction to user");
 
     // שליחת מייל
-    await fetch("http://localhost:5000/email/send-confirmation", {
+    await fetch("/api/email/send-confirmation", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,

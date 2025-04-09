@@ -4,7 +4,7 @@ export const fetchWishlist = async (userId, token) => {
   try {
     // send the request to the server
     const response = await fetch(
-      `http://localhost:5000/User/${userId}/wishlist`,
+      `/api/User/${userId}/wishlist`,
       {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -32,7 +32,7 @@ export const updateWishlist = async (userId, token, product, isInWishlist) => {
     const method = isInWishlist ? "DELETE" : "POST";
     // send the request to the server
     const response = await fetch(
-      `http://localhost:5000/User/${userId}/wishlist`,
+      `/api/User/${userId}/wishlist`,
       {
         method,
         headers: {

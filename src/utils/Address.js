@@ -1,5 +1,5 @@
 export const addAddress = async ({ userId, token, address }) => {
-    const res = await fetch(`http://localhost:5000/User/${userId}/add-address`, {
+    const res = await fetch(`/api/User/${userId}/add-address`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -12,14 +12,15 @@ export const addAddress = async ({ userId, token, address }) => {
     return res.json();
   };
 
-  export const editAddress = async ({ userId, token, addresses }) => {
-    const res = await fetch(`http://localhost:5000/User/${userId}/update-addresses`, {
+  export const editAddress = async ({ userId, token, updated }) => {
+    console.log("Editing address:",  updated );
+    const res = await fetch(`/api/User/${userId}/update-addresses`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ addresses }),
+      body: JSON.stringify({addresses: updated }),
     });
 
     if (!res.ok) throw new Error("Failed to update addresses");
@@ -27,7 +28,7 @@ export const addAddress = async ({ userId, token, address }) => {
   };
 
   export const deleteAddress = async ({ userId, token, index }) => {
-    const res = await fetch(`http://localhost:5000/User/${userId}/delete-address`, {
+    const res = await fetch(`/api/User/${userId}/delete-address`, {
       method: "DELETE",
       headers: {
         Authorization: `Bearer ${token}`,

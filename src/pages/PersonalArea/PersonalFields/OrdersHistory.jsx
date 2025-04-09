@@ -15,7 +15,7 @@ const OrderHistory = ({ user, addToCart }) => {
         const groups = {};
         for (const txId of user.transactions) {
           const res = await fetch(
-            `http://localhost:5000/Transactions/by-transactionId/${txId}`
+            `/api/Transactions/by-transactionId/${txId}`
           );
           if (res.ok) {
             const txs = await res.json();
@@ -49,7 +49,7 @@ const OrderHistory = ({ user, addToCart }) => {
       const detailsMap = {};
       for (const id of Object.keys(allProducts)) {
         try {
-          const res = await fetch(`http://localhost:5000/Products/${id}`);
+          const res = await fetch(`/api/Products/${id}`);
           const data = await res.json();
           detailsMap[id] = data;
         } catch {
@@ -65,7 +65,7 @@ const OrderHistory = ({ user, addToCart }) => {
   }, [transactionGroups]);
 
   return (
-    <div className="w-10/12 mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div className="lg:w-10/12 mx-auto py-10 px-4 sm:px-6 lg:px-8">
       <h1 className="text-5xl font-bold text-gray-900 mb-4 text-center">
         {t("orders.title")}
       </h1>

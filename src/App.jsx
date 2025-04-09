@@ -66,7 +66,7 @@ const App = () => {
       if (storedToken && storedUserId) {
         try {
           const response = await fetch(
-            "http://localhost:5000/User/verify-token",
+            "/api/User/verify-token",
             {
               headers: {
                 Authorization: `Bearer ${storedToken}`,
@@ -163,8 +163,8 @@ const App = () => {
 
     <AlertProvider>
       {/*Router component to wrap the entire application and provide the routing context to all components */}
-      <Router>
-        <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
+      <Router basename="/shop">
+      <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
 
         {/*Header component to display the header of the application         */}
         <Header

@@ -13,7 +13,7 @@ const CategoryManagement = () => {
   // useEffect hook to fetch categories from the server
   useEffect(() => {
     axios
-      .get("http://localhost:5000/Category/")
+      .get("/api/Category/")
       .then((res) => {
         setCategories(res.data);
       })
@@ -32,7 +32,7 @@ const CategoryManagement = () => {
     }
     // send a POST request to the server to add a new category
     axios
-      .post("http://localhost:5000/Category/", {
+      .post("/api/Category/", {
         name: { en: categoryNameEn, he: categoryNameHe },
       })
       .then((res) => {
@@ -52,7 +52,7 @@ const CategoryManagement = () => {
     showAlert("האם אתה בטוח שברצונך למחוק את הקטגוריה?", "warning", () => {
       // send a DELETE request to the server to delete the category
       axios
-        .delete(`http://localhost:5000/Category/${categoryId}`)
+        .delete(`/api/Category/${categoryId}`)
         .then(() => {
           setCategories(
             categories.filter((category) => category._id !== categoryId)

@@ -37,7 +37,7 @@ const CheckoutPage = ({
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const res = await fetch(`http://localhost:5000/User/${userId}`, {
+        const res = await fetch(`/api/User/${userId}`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },

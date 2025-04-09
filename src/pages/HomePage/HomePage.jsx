@@ -18,7 +18,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:5000/Products/");
+        const response = await fetch("/api/Products/");
         if (!response.ok) throw new Error("Failed to fetch products");
         const data = await response.json();
         setAllProducts(data);
@@ -34,7 +34,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const res = await fetch("http://localhost:5000/Category/");
+        const res = await fetch("/api/Category/");
         const data = await res.json();
         setCategories(data);
       } catch (err) {

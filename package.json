@@ -1,6 +1,10 @@
 {
   "name": "final-project",
-  "version": "0.1.0",
+  "version": "0.1.1",
+  "proxy": "https://ilan-israel.co.il",
+
+  "homepage": "/shop"
+,
   "private": true,
   "dependencies": {
     "@fontsource-utils/cli": "^0.6.1",

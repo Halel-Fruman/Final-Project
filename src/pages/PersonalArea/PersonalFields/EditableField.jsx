@@ -9,7 +9,7 @@ const EditableField = ({ title, field, value, userId, onSave }) => {
     // send a PUT request to the server with the updated field value
     try {
       const response = await fetch(
-        `http://localhost:5000/User/${userId}/edit`,
+        `/api/User/${userId}/edit`,
         {
           method: "PUT",
           headers: {
