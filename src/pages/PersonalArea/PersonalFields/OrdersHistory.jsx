@@ -65,7 +65,7 @@ const OrderHistory = ({ user, addToCart }) => {
   }, [transactionGroups]);
 
   return (
-    <div className="w-10/12 mx-auto py-10 px-4 sm:px-6 lg:px-8">
+    <div className="lg:w-10/12 mx-auto py-10 px-4 sm:px-6 lg:px-8">
       <h1 className="text-5xl font-bold text-gray-900 mb-4 text-center">
         {t("orders.title")}
       </h1>

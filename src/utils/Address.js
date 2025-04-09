@@ -12,14 +12,15 @@ export const addAddress = async ({ userId, token, address }) => {
     return res.json();
   };
 
-  export const editAddress = async ({ userId, token, addresses }) => {
+  export const editAddress = async ({ userId, token, updated }) => {
+    console.log("Editing address:",  updated );
     const res = await fetch(`/api/User/${userId}/update-addresses`, {
       method: "PUT",
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ addresses }),
+      body: JSON.stringify({addresses: updated }),
     });
 
     if (!res.ok) throw new Error("Failed to update addresses");

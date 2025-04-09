@@ -3,7 +3,6 @@ import { useTranslation } from "react-i18next";
 
 const PasswordManager = ({ userId, token }) => {
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -34,7 +33,6 @@ const PasswordManager = ({ userId, token }) => {
           field: t("personal_area.passwordManagement"),
         })
       );
-      setIsEditing(false);
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");

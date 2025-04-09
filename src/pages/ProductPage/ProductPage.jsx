@@ -184,7 +184,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
-                className="w-1/2 bg-primaryColor text-white py-2 px-4 rounded-lg text-xl font-bold hover:bg-primaryColor transition">
+                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-lg text-xl font-bold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
               <button
