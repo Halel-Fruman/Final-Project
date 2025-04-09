@@ -195,6 +195,31 @@ const addTransaction = async (req, res) => {
   }
 };
 
+
+
+/////
+exports.updateTransaction = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const updatedData = req.body;
+
+    const updatedTransaction = await Transaction.findOneAndUpdate(
+      { transactionId },
+      updatedData,
+      { new: true }
+    );
+
+    if (!updatedTransaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    res.json(updatedTransaction);
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
 // Export the functions
 module.exports = {
   getTransactions,

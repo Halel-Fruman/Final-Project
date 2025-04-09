@@ -131,7 +131,7 @@ const OrderManagement = ({ storeId }) => {
 
 
 
-      <div className="max-h-[500px] rounded-lg shadow w-full overflow-x-auto bg-transparent">
+      <div className="max-h-[480px] rounded-lg shadow w-full overflow-x-auto bg-transparent">
       <div className="w-full overflow-x-auto max-h-[480px]">
       <table className="min-w-full text-sm text-right border border-gray-300 rounded-lg">
       <thead className="bg-gray-100 font-bold sticky top-0 z-10 hidden md:table-header-group">
@@ -243,7 +243,7 @@ const OrderManagement = ({ storeId }) => {
 
 
       {selectedOrder && (
-        <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} />
+        <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} showAlert={showAlert}/>
       )}
     </div>
   );
