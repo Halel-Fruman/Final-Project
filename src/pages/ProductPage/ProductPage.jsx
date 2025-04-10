@@ -17,6 +17,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const [rating, setRating] = useState(0);
 
   useEffect(() => {
+    window.scrollTo({ top: 0, behavior: "instant" });
+
     const fetchProduct = async () => {
       try {
         const response = await fetch(`/api/Products/${id}`);
@@ -25,7 +27,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
         setProduct(data);
         setSelectedImage(data.images[0]);
         setRating(data.averageRating || 0);
-
       } catch (err) {
         setError(err.message);
       } finally {
@@ -53,14 +54,11 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
   const handleRating = async (newRating) => {
     try {
-      const response = await fetch(
-        `/api/products/${id}/rate`,
-        {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ rating: newRating }),
-        }
-      );
+      const response = await fetch(`/api/products/${id}/rate`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ rating: newRating }),
+      });
       if (!response.ok) throw new Error("Failed to update rating");
       const updatedProduct = await response.json();
       setProduct(updatedProduct.product);
@@ -71,7 +69,65 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   };
 
   if (isLoading)
-    return <div className="flex justify-center p-10">{t("loading")}</div>;
+    return (
+      <main className="bg-gray-50 ">
+        <div className="container mx-auto py-12 animate-pulse">
+          <div className="flex flex-col lg:flex-row gap-12 items-start">
+            {/* חלק שמאל - תמונה */}
+            <div className="w-full lg:w-1/2 flex justify-center">
+              <div className="h-[400px] w-[350px] bg-gray-200 rounded-lg" />
+            </div>
+
+            {/* חלק ימין - מידע על המוצר */}
+            <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow w-full lg:min-h-128">
+              <div className="h-8 bg-gray-200 rounded mb-4 w-2/3" />
+
+              <div className="flex items-center gap-4 mb-4">
+                <div className="h-6 w-20 bg-gray-200 rounded" />
+                <div className="h-6 w-16 bg-gray-300 rounded" />
+                <div className="h-5 w-10 bg-gray-100 rounded" />
+              </div>
+
+              <div className="flex items-center gap-2 mb-6">
+                {[...Array(5)].map((_, i) => (
+                  <div
+                    key={i}
+                    className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                ))}
+                <div className="h-4 w-16 bg-gray-200 rounded" />
+              </div>
+
+              <div className="grid lg:grid-cols-2 gap-6 mb-6">
+                <div>
+                  <div className="h-5 bg-gray-200 w-32 mb-2 rounded" />
+                  <div className="space-y-2">
+                    {[...Array(3)].map((_, i) => (
+                      <div key={i} className="h-3 bg-gray-100 rounded w-3/4" />
+                    ))}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {[...Array(4)].map((_, i) => (
+                    <div key={i} className="w-20 h-20 bg-gray-200 rounded-md" />
+                  ))}
+                </div>
+              </div>
+
+              <div className="mb-6">
+                <div className="h-5 bg-gray-200 w-40 mb-2 rounded" />
+                <div className="h-20 bg-gray-100 rounded" />
+              </div>
+
+              <div className="flex gap-4 mt-6">
+                <div className="h-12 w-1/2 bg-gray-300 rounded-lg" />
+                <div className="h-12 w-12 bg-gray-200 rounded-full" />
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+
   if (error) return <div className="text-red-500">{error}</div>;
   if (!product) return <div>{t("product.notFound")}</div>;
 
@@ -142,7 +198,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               ))}
               <span className="ml-2 text-gray-600">
                 ({product.totalReviews || 0} {t("product.reviews")})
-
               </span>
             </div>
 
@@ -189,7 +244,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               </button>
               <button
                 onClick={toggleWishlist}
-                className="bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition"
+                className="self-center bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition"
                 aria-label={
                   isInWishlist ? "Remove from wishlist" : "Add to wishlist"
                 }>

@@ -15,11 +15,14 @@ const WishlistModal = ({
 }) => {
   const { t, i18n } = useTranslation();
   const [products, setProducts] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const loadProducts = async () => {
+      setIsLoading(true); // ← התחלת טעינה
       if (!wishlist || wishlist.length === 0) {
         setProducts([]);
+        setIsLoading(false);
         return;
       }
 
@@ -31,15 +34,18 @@ const WishlistModal = ({
         (p) => p !== null && p !== undefined
       );
       setProducts(validProducts);
+      setIsLoading(false); // ← סיום טעינה
     };
 
     if (isOpen) loadProducts();
   }, [isOpen, wishlist, fetchProductDetails]);
 
   return (
-    <Dialog open={isOpen} onClose={onClose} className="relative z-50"
-    aria-label="Wishlist modal"
-    >
+    <Dialog
+      open={isOpen}
+      onClose={onClose}
+      className="relative z-50"
+      aria-label="Wishlist modal">
       {/* Overlay */}
       <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
 
@@ -47,14 +53,19 @@ const WishlistModal = ({
       <div className="fixed inset-y-0 right-0 w-full max-w-md bg-white shadow-xl p-6 overflow-y-auto">
         <div className="flex justify-between items-center border-b pb-2 mb-4">
           <h2 className="text-lg font-semibold">❤️ {t("wishlist.title")}</h2>
-          <button onClick={onClose}
-          aria-label="Close wishlist modal"
-          >
+          <button onClick={onClose} aria-label="Close wishlist modal">
             <XMarkIcon className="w-6 h-6 text-gray-600" />
           </button>
         </div>
 
-        {products.length === 0 ? (
+        {isLoading ? (
+          <div className="flex justify-center items-center py-12">
+            <Icon
+              icon="eos-icons:loading"
+              className="w-10 h-10 animate-spin text-primaryColor"
+            />
+          </div>
+        ) : products.length === 0 ? (
           <p className="text-gray-500">{t("wishlist.empty")}</p>
         ) : (
           <ul className="space-y-4">

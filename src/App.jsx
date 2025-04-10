@@ -31,7 +31,8 @@ import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
 
-//
+import NotFound from "./pages/NotFound";
+
 const App = () => {
   const { t, i18n } = useTranslation(); // use the useTranslation hook to get the i18n object
   const [token, setToken] = useState(localStorage.getItem("token")); // use the useState hook to create a token state variable and set it to the token stored in the local storage
@@ -309,6 +310,8 @@ const App = () => {
                 )
               }
             />
+            <Route path="*" element={<NotFound />} />
+
           </Routes>
         </div>
         <Footer />
