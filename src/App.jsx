@@ -31,7 +31,8 @@ import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
 
-import NotFound from "./pages/NotFound";
+import NotFound from "./pages/Erorrs/NotFound.jsx";
+import ServiceUnavailablePage from "./pages/Erorrs/Service.jsx"; // import the ServiceUnavailablePage component
 
 const App = () => {
   const { t, i18n } = useTranslation(); // use the useTranslation hook to get the i18n object
@@ -310,6 +311,8 @@ const App = () => {
                 )
               }
             />
+            <Route path="/503" element={<ServiceUnavailablePage />} />
+
             <Route path="*" element={<NotFound />} />
 
           </Routes>

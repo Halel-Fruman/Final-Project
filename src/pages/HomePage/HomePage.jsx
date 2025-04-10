@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import backgroundImage from "../../backgroung.jpg";
@@ -14,6 +14,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [selectedStores, setSelectedStores] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -30,6 +32,11 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     };
     fetchProducts();
   }, []);
+  useEffect(() => {
+      if (error) {
+        navigate("/503");
+      }
+    }, [error, navigate]);
 
   useEffect(() => {
     const fetchCategories = async () => {
