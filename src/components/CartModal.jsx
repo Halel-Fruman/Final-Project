@@ -6,6 +6,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { updateCartItemQuantity } from "../utils/Cart";
+import { Icon } from "@iconify/react";
 
 const CartModal = ({
   isOpen,
@@ -17,10 +18,12 @@ const CartModal = ({
 }) => {
   const { t, i18n } = useTranslation();
   const [detailedCartItems, setDetailedCartItems] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
     const loadCartDetails = async () => {
+      setIsLoading(true);
       try {
         const detailedCart = await Promise.all(
           Array.isArray(cartItems)
@@ -38,6 +41,8 @@ const CartModal = ({
         setDetailedCartItems(detailedCart.filter((item) => item !== null));
       } catch (error) {
         console.error("Error loading cart details:", error.message);
+      } finally {
+        setIsLoading(false);
       }
     };
 
@@ -90,7 +95,14 @@ const CartModal = ({
             </div>
 
             <div className="p-4 overflow-y-auto max-h-[65vh]">
-              {detailedCartItems.length > 0 ? (
+              {isLoading ? (
+                <div className="flex justify-center items-center py-12">
+                  <Icon
+                    icon="eos-icons:loading"
+                    className="w-10 h-10 text-primaryColor animate-spin"
+                  />
+                </div>
+              ) : detailedCartItems.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                   {detailedCartItems.map((item) => (
                     <li key={item._id} className="py-4 flex items-center">
@@ -141,7 +153,7 @@ const CartModal = ({
               )}
             </div>
 
-            {detailedCartItems.length > 0 && (
+            {!isLoading && detailedCartItems.length > 0 && (
               <div className="border-t border-gray-200 p-4">
                 <div className="flex justify-between text-lg font-medium text-gray-900">
                   <p>{t("cart.subtotal")}</p>

@@ -95,7 +95,7 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                       />
                       <div className="flex gap-2 mt-2 lg:mt-0 w-full ">
                         <button
-                          className="bg-white text-primaryColor rounded-full hover:bg-primaryColor hover:text-white p-2"
+                          className="self-center bg-white text-primaryColor rounded-full hover:bg-primaryColor hover:text-white "
                           aria-label={t("personal_area.actions.save")}
                           onClick={handleEditAddress}>
                           <Icon
@@ -105,7 +105,7 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                           />
                         </button>
                         <button
-                          className="bg-white text-gray-600 rounded hover:bg-gray-600 hover:text-white p-2"
+                          className="self-center bg-white text-gray-600 rounded-full hover:bg-gray-600 hover:text-white "
                           aria-label={t("personal_area.actions.cancel")}
                           onClick={() => setEditingIndex(null)}>
                           <Icon
@@ -123,7 +123,7 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                       </span>
                       <div className="flex gap-2 mt-2 lg:mt-0">
                         <button
-                          className="bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white p-2"
+                          className="self-center bg-white text-primaryColor border-primaryColor rounded hover:bg-primaryColor hover:text-white p-2"
                           aria-label="Edit"
                           onClick={() => {
                             setEditingIndex(index);
@@ -137,7 +137,7 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                           />
                         </button>
                         <button
-                          className="bg-white text-deleteC rounded hover:bg-deleteC hover:text-white p-2"
+                          className="self-center bg-white text-deleteC rounded hover:bg-deleteC hover:text-white p-2"
                           aria-label="Delete"
                           onClick={() => handleDeleteAddress(index)}>
                           <Icon
@@ -157,17 +157,17 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
           )}
 
           {showAddAddress ? (
-            <div className="card text-lg mt-3  flex flex-col lg:flex-row gap-4">
+            <div className="card text-lg mt-3 flex flex-col lg:flex-row gap-4">
               <input
                 type="text"
-                className="w-full lg:w-1/4 bg-gray-100 p-4 rounded-md shadow-sm"
+                className="w-full  lg:w-1/4 bg-gray-100 p-4 rounded-md shadow-sm"
                 placeholder={t("addAddress.city")}
                 value={newCity}
                 onChange={(e) => setNewCity(e.target.value)}
               />
               <input
                 type="text"
-                className="w-full lg:w-1/4 bg-gray-100 p-4 rounded-md shadow-sm"
+                className="w-full  lg:w-1/4 bg-gray-100 p-4 rounded-md shadow-sm"
                 placeholder={t("addAddress.address")}
                 value={newStreetAddress}
                 onChange={(e) => setNewStreetAddress(e.target.value)}
@@ -175,7 +175,7 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
               <div className="flex gap-2">
                 <button
 
-                  className="bg-white text-primaryColor rounded-full hover:bg-primaryColor hover:text-white  "
+                  className="self-center bg-white  text-primaryColor rounded-full hover:bg-primaryColor hover:text-white  "
                   onClick={handleAddAddress}
                   aria-label={t("personal_area.actions.add")}>
                   <Icon
@@ -186,7 +186,7 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                 </button>
                 <button
 
-                  className="bg-white text-gray-600 rounded hover:bg-gray-600 hover:text-white "
+                  className="self-center bg-white text-gray-600  rounded-full rounded hover:bg-gray-600 hover:text-white "
                   aria-label={t("personal_area.actions.cancel")}
                   onClick={() => setShowAddAddress(false)}>
                   <Icon

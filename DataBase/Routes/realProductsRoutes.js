@@ -1,9 +1,22 @@
 const express = require("express");
 const router = express.Router();
+const multer = require("multer");
+const path = require("path");
+
+// storage setting
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname)); 
+  },
+});
+
+const upload = multer({ storage });
 const mongoose = require("mongoose");
 const StoreProducts = require("../models/Products");
 
-// ✅ שליפת כל המוצרים מכל החנויות (למנהל מערכת)
 router.get("/", async (req, res) => {
   try {
     const stores = await StoreProducts.find();
@@ -20,7 +33,13 @@ router.get("/", async (req, res) => {
   }
 });
 
-// ✅ שליפת מוצרים לפי חנות (עבור מנהל חנות)
+router.post("/upload-image", upload.single("image"), (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+  const imageUrl = `/uploads/${req.file.filename}`;
+  res.json({ imageUrl });
+});
+
 router.get("/by-store", async (req, res) => {
   const storeId = req.query.store;
 
@@ -221,7 +240,7 @@ router.get('/filter-by-categories', async (req, res) => {
     const categoryIds = categories.split(',').map(id => new mongoose.Types.ObjectId(id));
 
     // שליפה של כל החנויות שמכילות לפחות מוצר אחד עם אחת מהקטגוריות
-    const stores = await ProductCollection.find({
+    const stores = await StoreProducts.find({
       'products.categories': { $in: categoryIds }
     });
 
