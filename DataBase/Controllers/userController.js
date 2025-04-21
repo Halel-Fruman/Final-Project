@@ -276,7 +276,7 @@ const UserController = {
       // check if the email already exists
       const existingUser = await User.findOne({ email });
       if (existingUser) {
-        return res.status(400).json({ message: "Email already exists" });
+        return res.status(409).json({ message: "Email already exists" });
       }
 
       // hash the password before saving the user

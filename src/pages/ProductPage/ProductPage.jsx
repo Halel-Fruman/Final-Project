@@ -1,6 +1,5 @@
-// File: ProductPage.jsx
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -10,6 +9,8 @@ import toast from "react-hot-toast";
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -35,6 +36,12 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     };
     fetchProduct();
   }, [id, t]);
+
+  useEffect(() => {
+    if (error) {
+      navigate("/503");
+    }
+  }, [error, navigate]);
 
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
@@ -70,33 +77,25 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
   if (isLoading)
     return (
-      <main className="bg-gray-50 ">
+      <main className="bg-gray-50">
         <div className="container mx-auto py-12 animate-pulse">
           <div className="flex flex-col lg:flex-row gap-12 items-start">
-            {/* חלק שמאל - תמונה */}
             <div className="w-full lg:w-1/2 flex justify-center">
               <div className="h-[400px] w-[350px] bg-gray-200 rounded-lg" />
             </div>
-
-            {/* חלק ימין - מידע על המוצר */}
             <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow w-full lg:min-h-128">
               <div className="h-8 bg-gray-200 rounded mb-4 w-2/3" />
-
               <div className="flex items-center gap-4 mb-4">
                 <div className="h-6 w-20 bg-gray-200 rounded" />
                 <div className="h-6 w-16 bg-gray-300 rounded" />
                 <div className="h-5 w-10 bg-gray-100 rounded" />
               </div>
-
               <div className="flex items-center gap-2 mb-6">
                 {[...Array(5)].map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-5 w-5 bg-gray-200 rounded-full"></div>
+                  <div key={i} className="h-5 w-5 bg-gray-200 rounded-full" />
                 ))}
                 <div className="h-4 w-16 bg-gray-200 rounded" />
               </div>
-
               <div className="grid lg:grid-cols-2 gap-6 mb-6">
                 <div>
                   <div className="h-5 bg-gray-200 w-32 mb-2 rounded" />
@@ -112,12 +111,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   ))}
                 </div>
               </div>
-
               <div className="mb-6">
                 <div className="h-5 bg-gray-200 w-40 mb-2 rounded" />
                 <div className="h-20 bg-gray-100 rounded" />
               </div>
-
               <div className="flex gap-4 mt-6">
                 <div className="h-12 w-1/2 bg-gray-300 rounded-lg" />
                 <div className="h-12 w-12 bg-gray-200 rounded-full" />
@@ -128,7 +125,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       </main>
     );
 
-  if (error) return <div className="text-red-500">{error}</div>;
   if (!product) return <div>{t("product.notFound")}</div>;
 
   const language = i18n.language;
@@ -141,10 +137,16 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const isInWishlist = wishlist?.find(
     (item) => String(item.productId) === String(product._id)
   );
-  const isOnSale = product.discounts?.length > 0;
-  const discountPercentage = isOnSale
-    ? product.discounts[0].percentage || 0
-    : 0;
+  const currentDate = new Date();
+
+  const activeDiscount = product.discounts?.find((discount) => {
+    const start = new Date(discount.startDate);
+    const end = new Date(discount.endDate);
+    return start <= currentDate && currentDate <= end;
+  });
+
+  const isOnSale = !!activeDiscount;
+  const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
   const discountedPrice = isOnSale
     ? productPrice - productPrice * (discountPercentage / 100)
     : productPrice;
@@ -160,7 +162,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               className="h-128 w-176 rounded-lg shadow-lg"
             />
           </div>
-
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {productName}

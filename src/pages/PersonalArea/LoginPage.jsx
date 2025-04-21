@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DialogTitle } from "@headlessui/react";
+import toast from "react-hot-toast";
 
-//  The Login component is a functional component that takes setToken, setUserId, setUserRole, onClose, and openRegisterModal as props.
 const Login = ({
   setToken,
   setUserId,
@@ -10,54 +10,55 @@ const Login = ({
   onClose,
   openRegisterModal,
 }) => {
-  // useState hooks to store the email, password, error, and loading state
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(null);
   const [loading, setLoading] = useState(false);
-  // useTranslation hook to access the i18n instance and the translation function t
-  const { t } = useTranslation();
-  // handleSubmit function to handle the form submission
+
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
     setLoading(true);
-    // Try to send a POST request to the server to log in the user
+
     try {
       const response = await fetch("/api/User/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
       });
-      // If the response is not ok, throw an error
+
       if (!response.ok) {
-        // If the status code is 401, throw an error with the message "Invalid credentials"
         if (response.status === 401) {
-          throw new Error(t("login.invalidCredentials"));
+          toast.error(t("login.invalidCredentials"));
+          return;
+        } else if (response.status === 503) {
+          toast.error(t("login.serverUnavailable"));
+          return;
         } else {
-          // Otherwise, throw an error with the message "An error occurred"
-          throw new Error(t("login.genericError"));
+          toast.error(t("login.genericError"));
+          return;
         }
       }
-      // Parse the response to JSON
+
       const data = await response.json();
-      // Store the token, userId, and role in the local storage
+
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       localStorage.setItem("role", data.role);
-      // Set the token, userId, and role state with the fetched data
+
       setToken(data.token);
       setUserId(data.userId);
       setUserRole(data.role);
 
-      onClose(); // Close the login modal
+      toast.success(t("login.success"));
+      onClose();
     } catch (err) {
-      setError(err.message);
+      console.error("Login failed:", err);
+      toast.error(t("login.networkError"));
     } finally {
       setLoading(false);
     }
   };
-  // Return the login form with the email, password, and submit button
+
   return (
     <div className="p-6 bg-white rounded-md w-full max-w-md mx-auto">
       <DialogTitle
@@ -66,7 +67,6 @@ const Login = ({
         {t("login.title")}
       </DialogTitle>
 
-      {/*The form element with the email and password input fields */}
       <form onSubmit={handleSubmit} className="mt-6 space-y-6">
         <div>
           <label
@@ -104,8 +104,7 @@ const Login = ({
             className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor"
           />
         </div>
-        {/*If there is an error, display the error message */}
-        {error && <p className="text-sm text-red-600">{error}</p>}
+
         <button
           type="submit"
           disabled={loading}
@@ -117,7 +116,7 @@ const Login = ({
           {loading ? t("login.loading") : t("login.submit")}
         </button>
       </form>
-      {/*If the user is not a member, display a message with a link to the register modal */}
+
       <p className="mt-6 text-center text-m font-bold text-black">
         {t("login.notMember")}{" "}
         <button
@@ -130,6 +129,7 @@ const Login = ({
           {t("login.registerLink")}
         </button>
       </p>
+
       <button
         onClick={onClose}
         className="mt-4 w-full py-2 text-sm text-gray-600 hover:text-gray-800">

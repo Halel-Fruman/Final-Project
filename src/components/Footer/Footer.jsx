@@ -18,34 +18,34 @@ const Footer = () => {
           {/*social media */}
           <div className="g-block title-border p-4">
             <h3 className="text-xl font-bold mb-4">עקבו אחרינו</h3>
-            <div className="flex gap-4">
+            <div className="flex gap-4 space-x-4 ">
               <a
                 href="https://www.facebook.com/Ilan.Foundation/?locale=he_IL"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Facebook">
-                <i className="fa fa-facebook fa-2x text-blue-600"></i>
+                <i className="fa fa-facebook fa-5x text-blue-600"></i>
               </a>
               <a
                 href="https://www.instagram.com/ilan_association/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Instagram">
-                <i className="fa fa-instagram fa-2x text-pink-500"></i>
+                <i className="fa fa-instagram fa-5x text-pink-500"></i>
               </a>
               <a
                 href="https://www.linkedin.com/company/ilan-il/"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="Linkedin">
-                <i className="fa fa-linkedin fa-2x text-blue-800"></i>
+                <i className="fa fa-linkedin fa-5x text-blue-800"></i>
               </a>
               <a
                 href="https://www.youtube.com/@ilanisrael"
                 target="_blank"
                 rel="noopener noreferrer"
                 aria-label="YouTube">
-                <i className="fa fa-youtube fa-2x text-red-600"></i>
+                <i className="fa fa-youtube fa-5x text-red-600"></i>
               </a>
             </div>
           </div>
