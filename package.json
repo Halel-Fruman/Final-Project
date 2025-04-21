@@ -2,9 +2,7 @@
   "name": "final-project",
   "version": "0.1.1",
   "proxy": "https://ilan-israel.co.il",
-
-  "homepage": "/shop"
-,
+  "homepage": "/shop",
   "private": true,
   "dependencies": {
     "@fontsource-utils/cli": "^0.6.1",
@@ -24,6 +22,7 @@
     "cra-template": "1.2.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "font-awesome": "^4.7.0",
     "google-font-metadata": "^6.0.2",
     "i18next": "^23.2.0",
     "i18next-browser-languagedetector": "^8.0.2",

@@ -137,10 +137,16 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const isInWishlist = wishlist?.find(
     (item) => String(item.productId) === String(product._id)
   );
-  const isOnSale = product.discounts?.length > 0;
-  const discountPercentage = isOnSale
-    ? product.discounts[0].percentage || 0
-    : 0;
+  const currentDate = new Date();
+
+  const activeDiscount = product.discounts?.find((discount) => {
+    const start = new Date(discount.startDate);
+    const end = new Date(discount.endDate);
+    return start <= currentDate && currentDate <= end;
+  });
+
+  const isOnSale = !!activeDiscount;
+  const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
   const discountedPrice = isOnSale
     ? productPrice - productPrice * (discountPercentage / 100)
     : productPrice;
