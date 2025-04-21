@@ -10,15 +10,19 @@ const FilterBar = ({
   setSelectedCategories,
   selectedStores,
   setSelectedStores,
+  isOnSaleOnly,
+  setIsOnSaleOnly,
 }) => {
   const { i18n, t } = useTranslation();
 
   const clearAll = () => {
     setSelectedCategories([]);
     setSelectedStores([]);
+    setIsOnSaleOnly(false);
   };
 
-  const hasFilters = selectedCategories.length > 0 || selectedStores.length > 0;
+  const hasFilters =
+    selectedCategories.length > 0 || selectedStores.length > 0 || isOnSaleOnly;
 
   const FilterDropdown = ({ label, options, selected, onChange }) => {
     const toggleOption = (id) => {
@@ -106,6 +110,21 @@ const FilterBar = ({
           selected={selectedStores}
           onChange={setSelectedStores}
         />
+
+        {/* On Sale filter */}
+        <div className="flex items-center">
+          <input
+            id="filter-sale"
+            type="checkbox"
+            checked={isOnSaleOnly}
+            onChange={(e) => setIsOnSaleOnly(e.target.checked)}
+            className="mr-2"
+          />
+          <label htmlFor="filter-sale" className="text-sm text-gray-700 mr-2">
+            {t("on_sale_only")}
+          </label>
+        </div>
+
         {hasFilters && (
           <button
             onClick={clearAll}
@@ -143,6 +162,7 @@ const FilterBar = ({
               </span>
             );
           })}
+
           {selectedStores.map((id) => {
             const store = stores.find((s) => s.id === id);
             return (
@@ -161,6 +181,18 @@ const FilterBar = ({
               </span>
             );
           })}
+
+          {isOnSaleOnly && (
+            <span className="bg-white border rounded px-2 py-1 text-sm flex items-center">
+              {t("on_sale_only")}
+              <button
+                onClick={() => setIsOnSaleOnly(false)}
+                className="ml-1 text-gray-500 hover:text-red-500"
+                aria-label={t("remove_filter") + " " + t("on_sale_only")}>
+                ×
+              </button>
+            </span>
+          )}
         </div>
       )}
     </div>
