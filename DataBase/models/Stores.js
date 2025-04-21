@@ -1,11 +1,10 @@
 const mongoose = require('mongoose');
 
 const storeSchema = new mongoose.Schema({
-    name: {
-      type: String,
-      required: true,
-      unique: true,
-    },
+  name: {
+    he: { type: String, required: true, unique: true },
+    en: { type: String, required: true, unique: true },
+  },
     address: {
       type: String,
       required: true,

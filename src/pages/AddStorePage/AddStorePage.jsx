@@ -2,39 +2,47 @@ import React, { useState } from "react";
 import axios from "axios";
 
 const AddStorePage = () => {
-  // create state variables for store data
-  const [storeName, setStoreName] = useState("");
+  const [storeNameHe, setStoreNameHe] = useState("");
+  const [storeNameEn, setStoreNameEn] = useState("");
   const [storeAddress, setStoreAddress] = useState("");
   const [managerName, setManagerName] = useState("");
   const [managerEmail, setManagerEmail] = useState("");
   const [managers, setManagers] = useState([]);
 
-  //  function to add a manager to the list of managers
   const handleAddManager = () => {
-    setManagers([...managers, { name: managerName, email: managerEmail }]);
-    setManagerName("");
-    setManagerEmail("");
+    if (managerName && managerEmail) {
+      setManagers([
+        ...managers,
+        { name: managerName, emailAddress: managerEmail },
+      ]);
+      setManagerName("");
+      setManagerEmail("");
+    }
   };
 
-  //  function to add a store to the database
   const handleAddStore = () => {
     const storeData = {
-      name: storeName,
+      name: {
+        he: storeNameHe,
+        en: storeNameEn,
+      },
       address: storeAddress,
-      managers: managers,
+      email: managers[0]?.emailAddress || "", // אפשר להוסיף שדה מייל לחנות לפי מנהל ראשון (אם רלוונטי)
+      manager: managers,
     };
-    // send a POST request to the server with the store data
+
     axios
       .post("/api/stores", storeData)
       .then((res) => {
         console.log("החנות נוספה:", res.data);
-        setStoreName("");
+        setStoreNameHe("");
+        setStoreNameEn("");
         setStoreAddress("");
         setManagers([]);
       })
       .catch((err) => console.log(err));
   };
-  // render the form to add a store
+
   return (
     <div>
       <h1>הוספת חנות חדשה</h1>
@@ -44,11 +52,20 @@ const AddStorePage = () => {
           handleAddStore();
         }}>
         <div>
-          <label>שם החנות:</label>
+          <label>שם החנות בעברית:</label>
           <input
             type="text"
-            value={storeName}
-            onChange={(e) => setStoreName(e.target.value)}
+            value={storeNameHe}
+            onChange={(e) => setStoreNameHe(e.target.value)}
+            required
+          />
+        </div>
+        <div>
+          <label>שם החנות באנגלית:</label>
+          <input
+            type="text"
+            value={storeNameEn}
+            onChange={(e) => setStoreNameEn(e.target.value)}
             required
           />
         </div>
@@ -87,7 +104,7 @@ const AddStorePage = () => {
         <ul>
           {managers.map((manager, index) => (
             <li key={index}>
-              {manager.name} - {manager.email}
+              {manager.name} - {manager.emailAddress}
             </li>
           ))}
         </ul>

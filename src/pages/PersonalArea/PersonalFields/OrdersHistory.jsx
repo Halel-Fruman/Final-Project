@@ -84,7 +84,7 @@ const OrderHistory = ({ user, addToCart }) => {
             <div key={i} className="bg-white border-b">
               <div className="flex flex-col md:flex-row justify-between items-center bg-gray-100 px-6 py-3 text-lg text-gray-900 border-b">
                 <span>
-                  {t("orders.store")}: <strong>{order.storeName}</strong>
+                  {t("orders.store")}: <strong>{order.storeName[i18n.language]}</strong>
                 </span>
                 <span>
                   {t("orders.date")}:{" "}

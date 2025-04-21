@@ -1,6 +1,7 @@
 const express = require("express");
 const {
   getTransactions,
+  updateTransaction, 
   updateProductStatus,
   getStoreTransaction,
   getTransactionsByID,
@@ -19,6 +20,10 @@ router.get("/transactions/:storeId", getStoreTransaction);
 
 // קבלת כל העסקאות
 router.get("/", getTransactions);
+
+router.put('/:transactionId/updateTransaction', updateTransaction);
+
+
 
 router.get("/by-id/:transactionId", getTransactionsByID);
 router.get("/by-transactionId/:transactionId", getOrdersByTransactionId);

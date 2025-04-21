@@ -53,9 +53,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
   const storeOptions = Array.from(
     new Set(
-      allProducts.map((p) =>
-        JSON.stringify({ id: p.storeId, name: p.storeName })
-      )
+      allProducts.map((p) => {
+        const name =
+          p.storeName?.[i18n.language] ||
+          p.storeName?.he ||
+          p.storeName ||
+          "Unknown";
+        return JSON.stringify({ id: p.storeId, name });
+      })
     )
   ).map((str) => JSON.parse(str));
 

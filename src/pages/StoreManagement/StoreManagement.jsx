@@ -9,9 +9,9 @@ const StoreManagement = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [storeId, setStoreId] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
-  const [storeName, setStoreName] = useState(null);
+  const [storeName, setStoreName] = useState("לא נטען"); // מחרוזת בלבד
 
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
 
@@ -42,7 +42,6 @@ const StoreManagement = () => {
     const fetchStoreId = async () => {
       try {
         const response = await fetch("/api/Stores");
-        if (!response.ok) throw new Error("Failed to fetch stores");
         const stores = await response.json();
 
         const store = stores.find(
@@ -61,17 +60,19 @@ const StoreManagement = () => {
 
         if (store) {
           setStoreId(store._id.toString());
-          setStoreName(store.name);
+          const name =
+            store.name?.[i18n.language] || store.name?.he || store.name?.en;
+          setStoreName(typeof name === "string" ? name : "לא זמין");
         }
       } catch (err) {
         console.error("שגיאה בשליפת חנויות:", err);
       }
     };
 
-    if (userEmail && userEmail.trim() !== "") {
+    if (userEmail) {
       fetchStoreId();
     }
-  }, [userEmail]);
+  }, [userEmail, i18n.language]); // מתעדכן גם כשהשפה משתנה
 
   const renderContent = () => {
     switch (activeTab) {
@@ -123,7 +124,7 @@ const StoreManagement = () => {
       {/* Top bar for mobile */}
       <div className="lg:hidden flex justify-between items-center bg-white p-4 shadow">
         <span className="font-bold">
-          {storeName ? `ניהול "${storeName}"` : "ניהול חנות"}
+          {storeId ? `ניהול "${storeName}"` : "ניהול חנות"}
         </span>
         <button onClick={() => setMenuOpen(!menuOpen)} className="text-xl">
           <Icon icon="material-symbols:menu" width="28" />
@@ -136,7 +137,7 @@ const StoreManagement = () => {
           menuOpen ? "block" : "hidden"
         } lg:block`}>
         <div className="text-lg font-bold hidden lg:block">
-          ניהול חנות: {storeName ? `"${storeName}"` : "לא נטען"}
+          ניהול חנות: {storeId ? `"${storeName}"` : "לא נטען"}
         </div>
         <nav className="mt-4 flex flex-col gap-1">
           {tabs.map((tab) => (
@@ -147,7 +148,7 @@ const StoreManagement = () => {
               }`}
               onClick={() => {
                 setActiveTab(tab.id);
-                setMenuOpen(false); // close menu on mobile
+                setMenuOpen(false);
               }}>
               <Icon icon={tab.icon} className="w-5 h-5 ml-3" />
               {tab.label}
