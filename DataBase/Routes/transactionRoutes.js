@@ -31,6 +31,13 @@ router.get("/by-transactionId/:transactionId", getOrdersByTransactionId);
 // עדכון סטטוס של מוצר בתוך עסקה
 router.put("/:transactionId/updateProductStatus", updateProductStatus);
 
+
+//
+router.put('/:transactionId/updateTransaction', updateTransaction);
+   
+
+
+
 // עדכון סטטוס משלוח
 router.put("/:transactionId/updateDeliveryStatus", async (req, res) => {
   try {

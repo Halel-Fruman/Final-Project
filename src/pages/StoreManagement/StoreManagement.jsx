@@ -77,15 +77,23 @@ const StoreManagement = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <div className="p-6">📊 סטטיסטיקות מכירות</div>;
+        return <div key="dashboard" className="p-6">📊 סטטיסטיקות מכירות</div>;
       case "products":
-        return <ProductManagement storeId={storeId} />;
+        return <ProductManagement key="products" storeId={storeId} />;
       case "orders":
-        return <OrderManagement storeId={storeId} />;
+        return <OrderManagement key="orders" storeId={storeId} title="ניהול הזמנות"
+/>;
       case "transactions":
-        return <div className="p-6">💰 עסקאות</div>;
+        return (
+          <OrderManagement
+            key="transactions"
+            storeId={storeId}
+            statusFilter={["completed", "canceled"]}
+            title="רשימת עסקאות"
+          />
+        );
       case "store-stats":
-        return <div className="p-6">📈 סטטיסטיקות כלליות</div>;
+        return <div key="store-stats" className="p-6">📈 סטטיסטיקות כלליות</div>;
       default:
         return <div className="p-6">בחר קטגוריה מהתפריט</div>;
     }
