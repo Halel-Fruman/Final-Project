@@ -57,7 +57,13 @@ const WishlistComponent = ({
     }
   }, [wishlist, handleRemoveFromWishlist]);
 
-  if (isLoading) return <p>{t("loading")}</p>;
+  if (isLoading)
+    return (
+      <div className="text-center py-10">
+        <div className="inline-block w-10 h-10 border-4 border-blue-300 border-t-transparent rounded-full animate-spin" />
+        <p className="mt-4 text-gray-600">{t("wishlist.loading")}</p>
+      </div>
+    );
   if (!products || products.length === 0) return <p>{t("wishlist.empty")}</p>;
 
   return (

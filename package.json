@@ -23,6 +23,7 @@
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "framer-motion": "^12.6.3",
+    "font-awesome": "^4.7.0",
     "google-font-metadata": "^6.0.2",
     "i18next": "^23.2.0",
     "i18next-browser-languagedetector": "^8.0.2",

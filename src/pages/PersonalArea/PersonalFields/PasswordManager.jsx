@@ -49,12 +49,13 @@ const PasswordManager = ({ userId, token }) => {
       </h2>
 
       {
-        <div className="space-y-4">
+        <form className="space-y-4">
           <input
             type="password"
             placeholder={t("personal_area.currentPassword")}
             className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200"
             value={currentPassword}
+            autoComplete="current-password"
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <input
@@ -62,6 +63,7 @@ const PasswordManager = ({ userId, token }) => {
             placeholder={t("personal_area.newPassword")}
             className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200"
             value={newPassword}
+            autoComplete="new-password"
             onChange={(e) => setNewPassword(e.target.value)}
           />
           <input
@@ -69,6 +71,7 @@ const PasswordManager = ({ userId, token }) => {
             placeholder={t("personal_area.confirmPassword")}
             className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200"
             value={confirmPassword}
+            autoComplete="new-password"
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
           <div className="flex justify-end gap-3 mt-2">
@@ -79,7 +82,7 @@ const PasswordManager = ({ userId, token }) => {
             </button>
 
           </div>
-        </div>
+        </form>
       }
     </div>
   );

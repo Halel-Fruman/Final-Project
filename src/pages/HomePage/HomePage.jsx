@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import backgroundImage from "../../backgroung.jpg";
 import FilterBar from "../../components/Category/FilterBar";
+import { getActiveDiscount } from "../../utils/discountHelpers";
 
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
@@ -12,8 +13,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedStores, setSelectedStores] = useState([]);
+  const [isOnSaleOnly, setIsOnSaleOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -30,6 +33,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     };
     fetchProducts();
   }, []);
+
+  useEffect(() => {
+    if (error) navigate("/503");
+  }, [error, navigate]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -58,7 +65,9 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       product.categories?.some((catId) => selectedCategories.includes(catId));
     const storeMatch =
       selectedStores.length === 0 || selectedStores.includes(product.storeId);
-    return categoryMatch && storeMatch;
+    const activeDiscount = getActiveDiscount(product.discounts);
+    const onSaleMatch = !isOnSaleOnly || !!activeDiscount;
+    return categoryMatch && storeMatch && onSaleMatch;
   });
 
   const toggleWishlist = (product) => {
@@ -67,7 +76,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
     addToWishlist(product, isInWishlist);
   };
-
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -80,9 +88,19 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p>{t("loading")}</p>
-      </div>
+      <main className="px-4 py-10 sm:px-6 lg:px-12">
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+          {Array.from({ length: 10 }).map((_, index) => (
+            <div
+              key={index}
+              className="bg-white rounded-lg p-4 animate-pulse shadow">
+              <div className="h-48 sm:h-56 lg:h-64 bg-gray-300 rounded mb-4" />
+              <div className="h-4 bg-gray-300 rounded w-3/4 mb-2" />
+              <div className="h-4 bg-gray-200 rounded w-1/2" />
+            </div>
+          ))}
+        </div>
+      </main>
     );
   }
 
@@ -130,6 +148,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           setSelectedCategories={setSelectedCategories}
           selectedStores={selectedStores}
           setSelectedStores={setSelectedStores}
+          isOnSaleOnly={isOnSaleOnly}
+          setIsOnSaleOnly={setIsOnSaleOnly}
         />
 
         {productsToShow.length === 0 ? (
@@ -142,6 +162,15 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                 : wishlist?.some(
                     (item) => String(item.productId) === String(product._id)
                   );
+
+              const activeDiscount = getActiveDiscount(product.discounts);
+              const isOnSale = !!activeDiscount;
+              const discountPercentage = isOnSale
+                ? activeDiscount.percentage || 0
+                : 0;
+              const discountedPrice = isOnSale
+                ? product.price - product.price * (discountPercentage / 100)
+                : product.price;
 
               return (
                 <div key={product._id} className="flex flex-col">
@@ -176,9 +205,24 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                     <h3 className="text-base text-xl text-gray-900">
                       {product.name[i18n.language]}
                     </h3>
-                    <p className="mt-1 text-xl text-primaryColor font-bold">
-                      ₪{product.price}
-                    </p>
+
+                    {isOnSale ? (
+                      <div className="mt-1 text-xl font-bold">
+                        <p className="text-red-600">
+                          ₪{discountedPrice.toFixed(2)}
+                          <span className="text-sm text-gray-500 line-through ml-2">
+                            ₪{product.price.toFixed(2)}
+                          </span>
+                          <span className="text-green-600 text-sm ml-2">
+                            -{discountPercentage}%
+                          </span>
+                        </p>
+                      </div>
+                    ) : (
+                      <p className="mt-1 text-xl text-primaryColor font-bold">
+                        ₪{product.price.toFixed(2)}
+                      </p>
+                    )}
                   </div>
                 </div>
               );

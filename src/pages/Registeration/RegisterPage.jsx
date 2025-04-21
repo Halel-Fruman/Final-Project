@@ -1,31 +1,29 @@
 import { DialogTitle } from "@headlessui/react";
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import toast from "react-hot-toast";
 
-// The Register component is a functional component that takes the setToken, setUserId, and onClose as props
 export default function Register({ setToken, setUserId, onClose }) {
-  const [email, setEmail] = useState(""); // The email state is used to store the email value
-  const [password, setPassword] = useState(""); // The password state is used to store the password value
-  const [confirmPassword, setConfirmPassword] = useState(""); // The confirmPassword state is used to store the confirm password value
-  const [phoneNumber, setPhoneNumber] = useState(""); // The phoneNumber state is used to store the phone number value
-  const [firstName, setFirstName] = useState(""); // The firstName state is used to store the first name value
-  const [lastName, setLastName] = useState(""); // The lastName state is used to store the last name value
-  const [error, setError] = useState(null); // The error state is used to store the error message
+  const { t } = useTranslation();
 
-  const { t } = useTranslation(); // The useTranslation hook is used to access the i18n instance
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  // The handleSubmit function is an async function that handles the form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setError(null);
 
-    // Validate the password and confirm password
     if (password !== confirmPassword) {
-      setError(t("register.errors.passwordMismatch"));
+      toast.error(t("register.errors.passwordMismatch"));
       return;
     }
 
-    // Send a POST request to the server with the user details
+    setLoading(true);
+
     try {
       const response = await fetch("/api/User/register", {
         method: "POST",
@@ -38,28 +36,36 @@ export default function Register({ setToken, setUserId, onClose }) {
           last_name: lastName,
         }),
       });
-      // If the response is not ok, throw an error
+
       if (!response.ok) {
-        throw new Error(t("register.errors.failed"));
+        if (response.status === 409) {
+          toast.error(t("register.errors.emailExists"));
+        } else if (response.status === 503) {
+          toast.error(t("register.errors.serverUnavailable"));
+        } else {
+          toast.error(t("register.errors.failed"));
+        }
+        return;
       }
 
       const data = await response.json();
-
-      // Store the token and userId in the local storage
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       setToken(data.token);
       setUserId(data.userId);
 
-      if (onClose) onClose(); // Close the modal
+      toast.success(t("register.success"));
+      if (onClose) onClose();
     } catch (err) {
-      setError(err.message);
+      console.error(err);
+      toast.error(t("register.errors.network"));
+    } finally {
+      setLoading(false);
     }
   };
 
-  // The return statement contains the JSX of the Register component
   return (
-    <div className="relative bg-white rounded-lg  max-w-md w-full p-4">
+    <div className="relative bg-white rounded-lg max-w-md w-full p-4">
       {onClose && (
         <button
           onClick={onClose}
@@ -68,148 +74,127 @@ export default function Register({ setToken, setUserId, onClose }) {
           ✕
         </button>
       )}
+
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
         <DialogTitle className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
           {t("register.title")}
         </DialogTitle>
       </div>
 
-      <div className="mt-4">
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="firstName"
-              className="block text-sm font-medium text-gray-900">
-              {t("register.first_name")}
-            </label>
-            <div className="mt-2">
-              <input
-                id="firstName"
-                name="firstName"
-                autoComplete="given-name"
-                type="text"
-                required
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
-              />
-            </div>
-          </div>
+      <form onSubmit={handleSubmit} className="mt-4 space-y-6">
+        {/* First name */}
+        <div>
+          <label htmlFor="firstName" className="block text-sm font-medium text-gray-900">
+            {t("register.first_name")}
+          </label>
+          <input
+            id="firstName"
+            name="firstName"
+            type="text"
+            required
+            value={firstName}
+            onChange={(e) => setFirstName(e.target.value)}
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
 
-          <div>
-            <label
-              htmlFor="lastName"
-              className="block text-sm font-medium text-gray-900">
-              {t("register.last_name")}
-            </label>
-            <div className="mt-2">
-              <input
-                id="lastName"
-                name="lastName"
-                autoComplete="family-name"
-                type="text"
-                required
-                value={lastName}
-                onChange={(e) => setLastName(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
-              />
-            </div>
-          </div>
+        {/* Last name */}
+        <div>
+          <label htmlFor="lastName" className="block text-sm font-medium text-gray-900">
+            {t("register.last_name")}
+          </label>
+          <input
+            id="lastName"
+            name="lastName"
+            type="text"
+            required
+            value={lastName}
+            onChange={(e) => setLastName(e.target.value)}
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
 
+        {/* Phone */}
+        <div>
+          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-900">
+            {t("register.phoneNumber")}
+          </label>
+          <input
+            id="phoneNumber"
+            name="phoneNumber"
+            type="text"
+            required
+            value={phoneNumber}
+            onChange={(e) => setPhoneNumber(e.target.value)}
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
 
+        {/* Email */}
+        <div>
+          <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+            {t("register.email")}
+          </label>
+          <input
+            id="email"
+            name="email"
+            type="email"
+            required
+            value={email}
+            autoComplete="email"
+            onChange={(e) => setEmail(e.target.value)}
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
 
-          <div>
-            <label
-              htmlFor="phoneNumber"
-              className="block text-sm font-medium text-gray-900">
-              {t("register.phoneNumber")}
-            </label>
-            <div className="mt-2">
-              <input
-                id="phoneNumber"
-                name="phoneNumber"
-                autoComplete="tel"
-                type="text"
-                required
-                value={phoneNumber}
-                onChange={(e) => setPhoneNumber(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
-              />
-            </div>
-          </div>
+        {/* Password */}
+        <div>
+          <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+            {t("register.password")}
+          </label>
+          <input
+            id="password"
+            name="password"
+            type="password"
+            required
+            autoComplete="new-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
 
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-medium text-gray-900">
-              {t("register.email")}
-            </label>
-            <div className="mt-2">
-              <input
-                id="email"
-                name="email"
-                type="email"
-                autoComplete="email"
-                required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
-              />
-            </div>
-          </div>
+        {/* Confirm Password */}
+        <div>
+          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-900">
+            {t("register.confirmPassword")}
+          </label>
+          <input
+            id="confirmPassword"
+            name="confirmPassword"
+            type="password"
+            required
+            value={confirmPassword}
+            autoComplete="new-password"
+            onChange={(e) => setConfirmPassword(e.target.value)}
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+          />
+        </div>
 
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-medium text-gray-900">
-              {t("register.password")}
-            </label>
-            <div className="mt-2">
-              <input
-                id="password"
-                name="password"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label
-              htmlFor="confirmPassword"
-              className="block text-sm font-medium text-gray-900">
-              {t("register.confirmPassword")}
-            </label>
-            <div className="mt-2">
-              <input
-                id="confirmPassword"
-                name="confirmPassword"
-                type="password"
-                autoComplete="new-password"
-                required
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                className="block w-full rounded-md bg-white px-3 py-1.5 text-base text-gray-900 outline outline-1 -outline-offset-1 outline-gray-300 placeholder:text-gray-400 focus:outline-primaryColor sm:text-sm"
-              />
-            </div>
-          </div>
-
-          {error && <p className="text-sm text-red-600">{error}</p>}
-
-          <div>
-            <button
-              type="submit"
-              className="flex w-full justify-center rounded-md bg-primaryColor px-3 py-1.5 text-xl font-bold text-white shadow-sm hover:bg-primaryColor focus:outline-primaryColor"
-              aria-label="Submit">
-              {t("register.submit")}
-            </button>
-          </div>
-        </form>
-      </div>
+        {/* Submit */}
+        <div>
+          <button
+            type="submit"
+            disabled={loading}
+            className={`w-full py-2 text-white font-bold text-xl rounded-md shadow-sm ${
+              loading
+                ? "bg-gray-400 cursor-not-allowed"
+                : "bg-primaryColor hover:bg-secondaryColor"
+            }`}>
+            {loading ? t("register.loading") : t("register.submit")}
+          </button>
+        </div>
+      </form>
     </div>
   );
 }
