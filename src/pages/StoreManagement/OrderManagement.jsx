@@ -9,13 +9,14 @@ import {
 } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
 
-const OrderManagement = ({ storeId }) => {
+const OrderManagement = ({ storeId, statusFilter = [] , title}) => {
   const [orders, setOrders] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc");
   const [sortStatus, setSortStatus] = useState("");
   const [selectedOrder, setSelectedOrder] = useState(null);
   const { showAlert } = useAlert();
   const [expandedOrderId, setExpandedOrderId] = useState(null);
+  const [pagetitle, setpagetitle] = useState(title);
 
   useEffect(() => {
     axios
@@ -23,13 +24,21 @@ const OrderManagement = ({ storeId }) => {
       .then((res) => {
         const storeData = res.data.find((store) => store.storeId === storeId);
         if (!storeData) return;
-        const filteredOrders = storeData.transactions.filter(
-          (order) => order.status !== "completed" && order.status !== "canceled"
-        );
+
+         const filteredOrders = storeData.transactions.filter((order) => {
+          // אם נשלח סטטוסים לסינון – נציג רק אותם
+          if (statusFilter.length > 0) {
+            return statusFilter.includes(order.status);
+          }
+          // אחרת – ברירת מחדל: לא להציג הזמנות שהושלמו או בוטלו
+          return order.status !== "completed" && order.status !== "canceled";
+        });
         setOrders(filteredOrders);
       })
       .catch(() => showAlert("אירעה שגיאה בעת קבלת העסקאות", "error"));
   }, [storeId]);
+
+  
 
   const toggleSortOrder = () => {
     setSortOrder(sortOrder === "asc" ? "desc" : "asc");
@@ -38,6 +47,17 @@ const OrderManagement = ({ storeId }) => {
   const handleSortStatusChange = (e) => {
     setSortStatus(e.target.value);
   };
+
+
+  const handleOrderUpdate = (updatedOrder) => {
+    setOrders((prevOrders) =>
+      prevOrders.map((order) =>
+        order.transactionId === updatedOrder.transactionId ? updatedOrder : order
+      )
+    );
+    setSelectedOrder(null); // סוגר את המודל עם עדכון מיידי בטבלה
+  };
+  
 
   const updateDeliveryStatus = (transactionId, newStatus) => {
     axios
@@ -105,7 +125,7 @@ const OrderManagement = ({ storeId }) => {
 
   return (
     <div className="w-full p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">ניהול הזמנות</h1>
+      <h1 className="text-2xl font-bold mb-4 text-center">{pagetitle}</h1>
 
       <div className="mb-4 flex flex-wrap gap-4 items-center">
         <button
@@ -243,7 +263,12 @@ const OrderManagement = ({ storeId }) => {
 
 
       {selectedOrder && (
-        <OrderDetailsModal order={selectedOrder} onClose={() => setSelectedOrder(null)} showAlert={showAlert}/>
+        <OrderDetailsModal
+          order={selectedOrder}
+          onClose={() => setSelectedOrder(null)}
+          showAlert={showAlert}
+          onUpdate={handleOrderUpdate}
+/>
       )}
     </div>
   );

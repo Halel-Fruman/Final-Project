@@ -5,8 +5,16 @@ import { motion } from "framer-motion";
 import axios from "axios";
 import { toast } from "react-hot-toast";
 
-const statusOptions = ["ממתין לאישור", "בתהליך", "נשלח", "הושלם", "בוטל"];
-const deliveryFields = ["deliveryMethod", "deliveryStatus", "trackingNumber", "estimatedDelivery", "deliveryDate"];
+const statusOptions = ["pending", "packed", "shipped", "completed", "canceled"];
+const statusTranslations = {
+  pending: "ממתין",
+  packed: "נארז",
+  shipped: "נשלח",
+  completed: "נמסר",
+  canceled: "בוטל",
+};
+
+const deliveryFields = ["deliveryMethod", "trackingNumber", "estimatedDelivery", "deliveryDate"];
 
 const formatDate = (date) => {
   if (!date) return "";
@@ -36,7 +44,7 @@ const OrderDetailsModal = ({ order, onClose, showAlert }) => {
   if (!order) return null;
 
   const handleChange = (section, field, value) => {
-    const isDate = field.includes("Date");
+    const isDate = field.includes("Date") || field.includes("estimatedDelivery");
     setEditableOrder((prev) => ({
       ...prev,
       [section]: {
@@ -58,10 +66,6 @@ const OrderDetailsModal = ({ order, onClose, showAlert }) => {
   };
 
   const handleSaveChanges = async () => {
-    if (!editableOrder.delivery.estimatedDelivery || !editableOrder.delivery.deliveryDate) {
-      toast.error("אנא מלא את כל תאריכי המשלוח לפני שמירה");
-      return;
-    }
     setIsSaving(true);
     try {
       await axios.put(`/api/Transactions/${editableOrder.transactionId}/updateTransaction`, editableOrder);
@@ -148,15 +152,27 @@ const OrderDetailsModal = ({ order, onClose, showAlert }) => {
                   onChange={(e) => handleFieldChange("status", e.target.value)}
                 >
                   {statusOptions.map((option) => (
-                    <option key={option} value={option}>{option}</option>
+                    <option key={option} value={option}>{statusTranslations[option]}</option>
                   ))}
                 </select>
               ) : (
-                <span> {status}</span>
+                <span> {statusTranslations[status] || status}</span>
               )}
             </div>
             <div><strong>תאריך יצירה:</strong> {formatDisplayDate(createdAt)}</div>
             <div><strong>סכום כולל:</strong> {totalAmount}₪</div>
+          </div>
+
+          <hr />
+
+          <div>
+            <h3 className="font-bold text-lg mb-3">👤 פרטי לקוח</h3>
+            <div className="space-y-2">
+              <div><strong>שם:</strong> {buyerDetails.fullName}</div>
+              <div><strong>אימייל:</strong> {buyerDetails.email}</div>
+              <div><strong>טלפון:</strong> {buyerDetails.phone}</div>
+              <div><strong>כתובת למשלוח:</strong> {buyerDetails.address}</div>
+            </div>
           </div>
 
           <hr />
@@ -170,13 +186,13 @@ const OrderDetailsModal = ({ order, onClose, showAlert }) => {
                   {isEditing ? (
                     <input
                       className="border rounded-lg p-2 w-full mt-1"
-                      type={key.includes("Date") ? "date" : "text"}
+                      type={key.includes("Date") || key === "estimatedDelivery" ? "date" : "text"}
                       placeholder={key.includes("Date") ? "בחר תאריך" : "הזן פרטים"}
-                      value={key.includes("Date") ? formatDate(delivery[key]) : delivery[key] || ""}
+                      value={key.includes("Date") || key === "estimatedDelivery" ? formatDate(delivery[key]) : delivery[key] || ""}
                       onChange={(e) => handleChange("delivery", key, e.target.value)}
                     />
                   ) : (
-                    <span>{key.includes("Date") ? formatDisplayDate(delivery[key]) : delivery[key] || "לא זמין"}</span>
+                    <span>{key.includes("Date") || key === "estimatedDelivery" ? formatDisplayDate(delivery[key]) : delivery[key] || "לא זמין"}</span>
                   )}
                 </div>
               ))}
@@ -214,7 +230,6 @@ const getBuyerLabel = (key) => {
 const getDeliveryLabel = (key) => {
   switch (key) {
     case "deliveryMethod": return "שיטה";
-    case "deliveryStatus": return "סטטוס";
     case "trackingNumber": return "מספר מעקב";
     case "estimatedDelivery": return "תאריך משוער";
     case "deliveryDate": return "תאריך משלוח";
