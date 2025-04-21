@@ -1,7 +1,7 @@
 const mongoose = require("mongoose");
 
 const productSchema = new mongoose.Schema(
-  { 
+  {
     name: {
       en: { type: String, required: true },
       he: { type: String, required: true },
@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema(
       he: { type: String },
     },
     categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
- // רשימת קטגוריות בכל שפה
+    // רשימת קטגוריות בכל שפה
     attributes: {
       en: { type: Map, of: String },
       he: { type: Map, of: String },
@@ -61,7 +61,10 @@ const storeProductsSchema = new mongoose.Schema({
     required: true,
     unique: true,
   }, // מזהה החנות
-  storeName: { type: String, required: true }, // שם החנות
+  storeName: {
+    he: { type: String, required: true },
+    en: { type: String, required: true },
+  }, // שם החנות
   products: [productSchema], // מערך מוצרים של החנות
 });
 

@@ -14,6 +14,31 @@ const getStoreTransaction = async (req, res) => {
   }
 };
 
+
+// editing transactions
+const updateTransaction = async (req, res) => {
+  try {
+    const { transactionId } = req.params;
+    const updatedData = req.body;
+    console.log(transactionId);
+    const updatedTransaction = await StoreTransactions.findOneAndUpdate(
+  { "transactions.transactionId": transactionId },
+  { $set: { "transactions.$": updatedData } },
+  { new: true }
+);
+
+    if (!updatedTransaction) {
+      return res.status(404).json({ message: 'Transaction not found' });
+    }
+
+    res.json(updatedTransaction);
+  } catch (error) {
+    console.error('Error updating transaction:', error);
+    res.status(500).json({ message: 'Server error' });
+  }
+};
+
+
 // Get all transactions
 const getTransactions = async (req, res) => {
   try {
@@ -198,6 +223,7 @@ const addTransaction = async (req, res) => {
 // Export the functions
 module.exports = {
   getTransactions,
+  updateTransaction,
   updateProductStatus,
   getStoreTransaction,
   getTransactionsByID,
