@@ -8,6 +8,9 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import OrderDetailsModal from "./OrderDetailsModal";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import { Icon } from "@iconify/react";
 
 const OrderManagement = ({ storeId, statusFilter = [] , title}) => {
   const [orders, setOrders] = useState([]);
@@ -123,6 +126,48 @@ const OrderManagement = ({ storeId, statusFilter = [] , title}) => {
     }
   };
 
+
+  const isOverdue = (createdAt) => {
+    const now = new Date();
+    const createdDate = new Date(createdAt);
+    const diffInDays = (now - createdDate) / (1000 * 60 * 60 * 24);
+    return diffInDays >= 3; // מעל 3 ימים ממתינה
+  };
+  
+  const handleExportOrders = () => {
+    const data = orders.map((order) => {
+      const productsList = order.products.map(p => `${p.name} (x${p.quantity})`).join(" | ");
+      return {
+        "מזהה הזמנה": order.orderId,
+        "סטטוס עסקה": order.status,
+        "סטטוס משלוח": order.delivery?.deliveryStatus || "",
+        "שם לקוח": order.buyerDetails?.fullName || "",
+        "טלפון": order.buyerDetails?.phone || "",
+        "אימייל": order.buyerDetails?.email || "",
+        "כתובת": order.buyerDetails?.address || "",
+        "תאריך יצירה": new Date(order.createdAt).toLocaleDateString("he-IL"),
+        "תאריך משוער": order.delivery?.estimatedDelivery
+          ? new Date(order.delivery.estimatedDelivery).toLocaleDateString("he-IL")
+          : "",
+        "מספר מעקב": order.delivery?.trackingNumber || "",
+        "מוצרים": productsList,
+        "סכום כולל": `${order.totalAmount || 0} ₪`,
+      };
+    });
+  
+    const headers = Object.keys(data[0]);
+    const worksheet = XLSX.utils.json_to_sheet(data);
+  
+    // התאמה לפי כותרות בלבד
+    worksheet["!cols"] = headers.map((key) => ({ wch: key.length + 2 }));
+  
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
+  
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "orders.xlsx");
+  };
+  
   return (
     <div className="w-full p-4">
       <h1 className="text-2xl font-bold mb-4 text-center">{pagetitle}</h1>
@@ -147,6 +192,14 @@ const OrderManagement = ({ storeId, statusFilter = [] , title}) => {
           <option value="completed">נמסר</option>
           <option value="canceled">בוטל</option>
         </select>
+        <button
+  onClick={handleExportOrders}
+  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+  title ="ייצוא לאקסל"
+>
+<Icon icon="mdi:export" width="30" />
+</button>
+
       </div>
 
 
@@ -181,12 +234,17 @@ const OrderManagement = ({ storeId, statusFilter = [] , title}) => {
             const isExpanded = expandedOrderId === order._id;
             return (
               <tr
-                key={order._id}
-                className="even:bg-gray-50 hover:bg-gray-100 block md:table-row border border-b md:border-none mb-4 md:mb-0 rounded md:rounded-none"
-              >
+              key={order._id}
+              className={`even:bg-gray-50 hover:bg-gray-100 block md:table-row border border-b md:border-none mb-4 md:mb-0 rounded md:rounded-none 
+                ${order.status === "pending" && isOverdue(order.createdAt) ? "bg-red-100 border-red-400" : ""}`}
+           
+           >
                 <td className="p-2 border text-center md:w-1/10">
                   <span className="md:hidden font-bold">תאריך: </span>
                   {new Date(order.createdAt).toLocaleDateString("he-IL")}
+                  {order.status === "pending" && isOverdue(order.createdAt) && (
+    <div className="text-red-600 text-xs mt-1">הזמנה ממתינה זמן רב!</div>
+  )}
                 </td>
                 <td className="p-2 border text-center md:w-1/10">
                   <span className="md:hidden font-bold">מזהה: </span>

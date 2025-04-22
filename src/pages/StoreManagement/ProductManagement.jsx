@@ -2,6 +2,8 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const ProductManagement = ({ storeId }) => {
   const [products, setProducts] = useState([]);
@@ -216,7 +218,45 @@ const ProductManagement = ({ storeId }) => {
       nameEn.includes(searchQuery.toLowerCase())
     );
   });
+  const handleExportProducts = () => {
+    const data = products.map((product) => {
+      const discount = product.discounts?.[0];
+      return {
+        "שם (עברית)": product.name?.he || "",
+        "שם (אנגלית)": product.name?.en || "",
+        תיאור_עברית: product.description?.he || "",
+        תיאור_אנגלית: product.description?.en || "",
+        "מאפיינים (עברית)": product.highlight?.he?.join(" | ") || "",
+        "מאפיינים (אנגלית)": product.highlight?.en?.join(" | ") || "",
+        מחיר: product.price,
+        "עלות ייצור": product.manufacturingCost || 0,
+        רווח: product.price - (product.manufacturingCost || 0),
+        מלאי: product.stock,
+        "משלוח לחו\"ל": product.internationalShipping ? "✔" : "✖",
+        "אפשר להזמין גם כשאין במלאי": product.allowBackorder ? "✔" : "✖",
+        "קטגוריות": product.categories?.join(", "),
+        "תמונות": product.images?.join(" | ") || "",
+        "אחוז מבצע": discount?.percentage || "",
+        "תאריך התחלה": discount?.startDate?.slice(0, 10) || "",
+        "תאריך סיום": discount?.endDate?.slice(0, 10) || "",
+      };
+    });
+    const headers = Object.keys(data[0]);
 
+  const worksheet = XLSX.utils.json_to_sheet(data);
+
+  // חישוב רוחב עמודות לפי אורך כותרת בלבד
+  worksheet["!cols"] = headers.map((key) => ({
+    wch: key.length + 2, // תוספת קטנה לנשימה
+  }));
+
+  const workbook = XLSX.utils.book_new();
+  XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+
+  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+  saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "products.xlsx");
+};
+  
   return (
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-4 text-center">ניהול מוצרים</h1>
@@ -227,6 +267,7 @@ const ProductManagement = ({ storeId }) => {
           onClick={() => setIsAddingProduct(true)}>
           הוסף מוצר
         </button>
+        
 
         <div className="flex w-full max-w-md gap-2">
           <input
@@ -237,6 +278,15 @@ const ProductManagement = ({ storeId }) => {
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
+                   
+        <button
+  onClick={handleExportProducts}
+  className="bg-green-600 text-white px-4 py-2 mr-4 rounded hover:bg-green-700 flex items-center gap-1"
+  title ="ייצוא לאקסל"
+>
+  <Icon icon="mdi:export" width="20" />
+ 
+</button>
       </div>
       {isAddingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

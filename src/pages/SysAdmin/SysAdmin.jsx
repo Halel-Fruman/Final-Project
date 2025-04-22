@@ -3,6 +3,8 @@ import { useTranslation } from "react-i18next";
 import axios from "axios";
 import { Icon } from "@iconify/react";
 import { useAlert } from "../../components/AlertDialog.jsx";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
 
 const SysAdmin = () => {
   const { t, i18n } = useTranslation();
@@ -163,7 +165,20 @@ const SysAdmin = () => {
       setSelectedStore({ ...selectedStore, manager: updated });
     });
   };
-
+  const handleExportStores = () => {
+    const data = stores.map((store) => ({
+      שם_חנות: store.name?.he || "",
+      Address: store.address,
+      Email: store.email,
+      מנהלים: store.manager.map(m => `${m.name} <${m.emailAddress}>`).join("; "),
+    }));
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Stores");
+    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
+    saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "stores.xlsx");
+  };
+  
   return (
     <div className="container mx-auto p-5">
       <header className="text-center mb-8">
@@ -182,6 +197,15 @@ const SysAdmin = () => {
             height="48"
           />
         </button>
+        <button
+  className="text-green-600 hover:text-green-800"
+  onClick={handleExportStores}
+  title ="ייצוא לאקסל"
+
+>
+  <Icon icon="mdi:export" width="30" height="30" />
+</button>
+
       </div>
 
       <table className="table-auto w-full border border-gray-300">
