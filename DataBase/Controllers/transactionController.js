@@ -195,7 +195,7 @@ const addTransaction = async (req, res) => {
         storeId,
         storeName,
         orderCounter,
-        ordersStart: "NS",
+        ordersStart: storeName[i18n.en].trim().replace(/\s+/g, '').toUpperCase(),
         transactions: [newTransaction],
       });
     } else {
