@@ -63,8 +63,8 @@ const Sidebar = (token) => {
           ].map((tab) => (
             <button
               key={tab.id}
-              className={`flex items-center w-full p-3 text-left hover:bg-gray-200 ${
-                activeTab === tab.id ? "bg-gray-300 font-semibold" : ""
+              className={`flex items-center w-full p-3 text-left hover:bg-gray-200 relative ${
+                activeTab === tab.id ? "bg-gray-300 font-semibold before:absolute before:right-0 before:top-0 before:bottom-0 before:w-1 before:bg-primaryColor rounded-r-md" : ""
               }`}
               onClick={() => setActiveTab(tab.id)}>
               <Icon icon={tab.icon} className="w-5 h-5 mr-3" />
