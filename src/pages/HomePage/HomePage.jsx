@@ -213,15 +213,17 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
                     {isOnSale ? (
                       <div className="mt-1 text-xl font-bold">
-                        <p className="text-red-600">
-                          ₪{discountedPrice.toFixed(2)}
-                          <span className="text-sm text-gray-500 line-through ml-2">
+                        <div className="flex flex-col items-center sm:flex-row sm:justify-center sm:space-x-2 rtl:space-x-reverse">
+                          <span className="text-red-600 text-xl font-bold">
+                            ₪{discountedPrice.toFixed(2)}
+                          </span>
+                          <span className="text-sm text-gray-500 line-through">
                             ₪{product.price.toFixed(2)}
                           </span>
-                          <span className="text-green-600 text-sm ml-2">
+                          <span className="text-green-600 text-sm font-medium">
                             -{discountPercentage}%
                           </span>
-                        </p>
+                        </div>
                       </div>
                     ) : (
                       <p className="mt-1 text-xl text-primaryColor font-bold">
