@@ -6,7 +6,7 @@ import { useTranslation } from "react-i18next";
 const ConfirmationPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
-  const { t } = useTranslation();
+  const { t,i18n } = useTranslation();
 
   const transactions = state?.transactions || [];
   const detailedCart = state?.detailedCart || [];
@@ -55,7 +55,8 @@ const ConfirmationPage = () => {
               <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-3 text-sm">
                 <p>
                   <strong>{t("orders.store")}:</strong>{" "}
-                  {storeName || t("confirmation.unknownStore")}
+                  {(storeName?.[i18n.language] || storeName?.he || storeName) ??
+                    t("confirmation.unknownStore")}
                 </p>
                 <p>
                   <strong>{t("confirmation.orderId")}:</strong>{" "}
