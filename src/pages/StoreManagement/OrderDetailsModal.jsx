@@ -185,12 +185,20 @@ const OrderDetailsModal = ({ order, onClose, showAlert }) => {
                   <strong>{getDeliveryLabel(key)}:</strong>
                   {isEditing ? (
                     <input
-                      className="border rounded-lg p-2 w-full mt-1"
-                      type={key.includes("Date") || key === "estimatedDelivery" ? "date" : "text"}
-                      placeholder={key.includes("Date") ? "בחר תאריך" : "הזן פרטים"}
-                      value={key.includes("Date") || key === "estimatedDelivery" ? formatDate(delivery[key]) : delivery[key] || ""}
-                      onChange={(e) => handleChange("delivery", key, e.target.value)}
-                    />
+                    className="border rounded-lg p-2 w-full mt-1"
+                    type={key.includes("Date") || key === "estimatedDelivery" ? "date" : "text"}
+                    placeholder={key.includes("Date") ? "בחר תאריך" : "הזן פרטים"}
+                    value={
+                      key.includes("Date") || key === "estimatedDelivery"
+                        ? formatDate(delivery[key])
+                        : delivery[key] || ""
+                    }
+                    onChange={(e) => handleChange("delivery", key, e.target.value)}
+                    // 👇 מבטל הגבלת תאריך עתידי בלבד
+                    max=""
+                    min=""
+                  />
+                  
                   ) : (
                     <span>{key.includes("Date") || key === "estimatedDelivery" ? formatDisplayDate(delivery[key]) : delivery[key] || "לא זמין"}</span>
                   )}
@@ -231,8 +239,8 @@ const getDeliveryLabel = (key) => {
   switch (key) {
     case "deliveryMethod": return "שיטה";
     case "trackingNumber": return "מספר מעקב";
-    case "estimatedDelivery": return "תאריך משוער";
-    case "deliveryDate": return "תאריך משלוח";
+    case "estimatedDelivery": return "תאריך הגעה משוער";
+    case "deliveryDate": return "תאריך מסירה";
     default: return key;
   }
 };
