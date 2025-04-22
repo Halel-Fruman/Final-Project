@@ -1,10 +1,14 @@
 import React, { useState, useEffect } from "react";
+import { useParams } from "react-router-dom";
+
 import { Icon } from "@iconify/react";
 import ProductManagement from "./ProductManagement.jsx";
 import OrderManagement from "./OrderManagement.jsx";
 import { useTranslation } from "react-i18next";
 
 const StoreManagement = () => {
+  const { storeId: paramStoreId } = useParams();
+
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
   const [storeId, setStoreId] = useState(null);
@@ -14,6 +18,32 @@ const StoreManagement = () => {
   const { t, i18n } = useTranslation();
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+
+  useEffect(() => {
+    const fetchStoreById = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await fetch(`/api/Stores/${paramStoreId}`, {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        });
+
+        if (!res.ok) throw new Error("Store not found");
+        const store = await res.json();
+        setStoreId(store._id);
+        setStoreName( store.name?.[i18n.language] || store.name?.he || store.name?.en);
+      } catch (error) {
+        console.error("Failed to load store by ID", error.message);
+      }
+    };
+
+    if (paramStoreId) {
+      fetchStoreById();
+    }
+  }, [paramStoreId]);
 
   const fetchUserEmail = async (userId) => {
     try {
@@ -77,12 +107,21 @@ const StoreManagement = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <div key="dashboard" className="p-6">📊 סטטיסטיקות מכירות</div>;
+        return (
+          <div key="dashboard" className="p-6">
+            📊 סטטיסטיקות מכירות
+          </div>
+        );
       case "products":
         return <ProductManagement key="products" storeId={storeId} />;
       case "orders":
-        return <OrderManagement key="orders" storeId={storeId} title="ניהול הזמנות"
-/>;
+        return (
+          <OrderManagement
+            key="orders"
+            storeId={storeId}
+            title="ניהול הזמנות"
+          />
+        );
       case "transactions":
         return (
           <OrderManagement
@@ -93,7 +132,11 @@ const StoreManagement = () => {
           />
         );
       case "store-stats":
-        return <div key="store-stats" className="p-6">📈 סטטיסטיקות כלליות</div>;
+        return (
+          <div key="store-stats" className="p-6">
+            📈 סטטיסטיקות כלליות
+          </div>
+        );
       default:
         return <div className="p-6">בחר קטגוריה מהתפריט</div>;
     }

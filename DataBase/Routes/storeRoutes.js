@@ -4,6 +4,10 @@ const router = express.Router();
 const Products = require("../models/Products");
 const UserController = require("../Controllers/userController"); // קובץ חדש לשליטה בלוגיקה של משתמשים
 const User = require("../models/User");
+const authenticateToken = require("../middleware/authenticateToken");
+const authorizeStoreAccess = require("../middleware/authorizeStoreAccess");
+
+
 // נתיב לשליפת כל החנויות
 router.get("/", async (req, res) => {
   try {
@@ -37,13 +41,19 @@ router.post("/", async (req, res) => {
         console.warn("User not found for email:", item.emailAddress);
       }
     }
+console.log("storeName to save:", {
+  he: newStore.name.he,
+  en: newStore.name.en,
+});
 
     const newStoreProducts = new Products({
-      storeId: newStore._id,
-      storeName: newStore.name,
-      products: [],
-    });
-    console.log("Products to be saved:", newStoreProducts.products);
+  storeId: newStore._id,
+  storeName: {
+    he: newStore.name.he,
+    en: newStore.name.en,
+  },
+  products: [],
+});    console.log("Products to be saved:", newStoreProducts.products);
 
     await newStoreProducts.save();
 
@@ -57,7 +67,7 @@ router.post("/", async (req, res) => {
 
 
 // עדכון פרטי חנות
-router.put("/:id", async (req, res) => {
+router.put("/:id",authenticateToken, authorizeStoreAccess, async (req, res) => {
   const { name, address, email, manager } = req.body;
   try {
     const updatedStore = await Store.findByIdAndUpdate(
@@ -72,7 +82,7 @@ router.put("/:id", async (req, res) => {
 });
 
 // נתיב למחיקת חנות
-router.delete("/:id", async (req, res) => {
+router.delete("/:id",authenticateToken, authorizeStoreAccess, async (req, res) => {
   const { id } = req.params; // מזהה החנות שברצוננו למחוק
 
   try {
@@ -86,7 +96,7 @@ router.delete("/:id", async (req, res) => {
 });
 
 // חיפוש חנות לפי ID
-router.get("/:id", async (req, res) => {
+router.get("/:id",authenticateToken, authorizeStoreAccess, async (req, res) => {
   try {
     const store = await Store.findById(req.params.id);
     if (!store) return res.status(404).json({ error: "Store not found" });
