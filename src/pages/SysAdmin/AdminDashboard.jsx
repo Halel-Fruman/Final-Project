@@ -10,7 +10,9 @@ import {
   Tooltip,
   Legend,
   ResponsiveContainer,
+  CartesianGrid,
 } from "recharts";
+import { FaStar } from "react-icons/fa";
 
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation();
@@ -30,7 +32,7 @@ const AdminDashboard = () => {
       if (toDate) query.push(`to=${toDate}`);
       const queryString = query.length ? `?${query.join("&")}` : "";
 
-      const [salesRes, topRes] = await Promise.all([
+      const [storeRes, productRes] = await Promise.all([
         axios.get(`/api/analytics/store-sales${queryString}`, {
           headers: { Authorization: `Bearer ${token}` },
         }),
@@ -39,14 +41,14 @@ const AdminDashboard = () => {
         }),
       ]);
 
-      const formattedSales = salesRes.data.map((store) => ({
+      const formattedStores = storeRes.data.map((store) => ({
         ...store,
         name:
           store.storeName?.[i18n.language] || store.storeName?.he || "Unnamed",
       }));
 
-      setStoreStats(formattedSales);
-      setTopProducts(topRes.data);
+      setStoreStats(formattedStores);
+      setTopProducts(productRes.data);
     } catch (err) {
       console.error("Failed to load statistics:", err);
       setError(t("sysadmin.errors.fetchFailed"));
@@ -57,11 +59,10 @@ const AdminDashboard = () => {
 
   useEffect(() => {
     fetchStats();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [i18n.language]);
 
   return (
-    <div className="p-6 bg-gray-50 h-full">
+    <div className="p-6 bg-gray-50 h-fit">
       <h1 className="text-3xl font-bold text-primaryColor mb-6 text-center">
         {t("sysadmin.dashboard.title")}
       </h1>
@@ -104,88 +105,119 @@ const AdminDashboard = () => {
       ) : isLoading ? (
         <p className="text-center text-gray-600">{t("loading")}</p>
       ) : (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* Total Revenue Chart */}
-          <div className="bg-white p-6 rounded shadow">
-            <h2 className="text-lg font-semibold mb-4 text-right">
-              {t("sysadmin.dashboard.totalRevenue")}
-            </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={storeStats}
-                margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
-                <XAxis
-                  dataKey="name"
-                  interval={0}
-                  angle={0}
-                  textAnchor="middle"
-                />
-                <YAxis
-                  orientation="left"
-                  tick={{ dx: -5, textAnchor: "start" }}
-                />
-                <Tooltip />
-                <Legend />
-                <Bar
-                  dataKey="totalRevenue"
-                  fill="#82ca9d"
-                  name={t("sysadmin.dashboard.totalRevenue")}
-                />
-              </BarChart>
-            </ResponsiveContainer>
+        <>
+          <div className=" grid grid-cols-1 lg:grid-cols-2 gap-8 ">
+            {/* Total Revenue Chart */}
+            <div className="bg-white p-6 rounded shadow">
+              <h2 className="text-lg font-semibold mb-4 text-right">
+                {t("sysadmin.dashboard.totalRevenue")}
+              </h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={storeStats}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="name"
+                    interval={0}
+                    angle={0}
+                    textAnchor="middle"
+                  />
+                  <YAxis
+                    orientation="left"
+                    tick={{ dx: -5, textAnchor: "start" }}
+                  />
+                  <Tooltip />
+                  <Legend />
+                  <Bar
+                    dataKey="totalRevenue"
+                    fill="#82ca9d"
+                    name={t("sysadmin.dashboard.totalRevenue")}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
+
+            {/* Total Orders Chart */}
+            <div className="bg-white p-6 rounded shadow">
+              <h2 className="text-lg font-semibold mb-4 text-right">
+                {t("sysadmin.dashboard.ordersCount")}
+              </h2>
+              <ResponsiveContainer width="100%" height={300}>
+                <BarChart
+                  data={storeStats}
+                  margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
+                  <CartesianGrid strokeDasharray="3 3" />
+                  <XAxis
+                    dataKey="name"
+                    interval={0}
+                    angle={0}
+                    textAnchor="middle"
+                  />
+                  <YAxis
+                    orientation="left"
+                    tick={{ dx: -5, textAnchor: "start" }}
+                  />
+                  <Tooltip />
+                  <Legend />
+                  <Bar
+                    dataKey="totalOrders"
+                    fill="#8884d8"
+                    name={t("sysadmin.dashboard.ordersCount")}
+                  />
+                </BarChart>
+              </ResponsiveContainer>
+            </div>
           </div>
 
-          {/* Total Orders Chart */}
-          <div className="bg-white p-6 rounded shadow">
-            <h2 className="text-lg font-semibold mb-4 text-right">
-              {t("sysadmin.dashboard.ordersCount")}
-            </h2>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart
-                data={storeStats}
-                margin={{ top: 10, right: 20, left: 0, bottom: 5 }}>
-                <XAxis
-                  dataKey="name"
-                  interval={0}
-                  angle={0}
-                  textAnchor="middle"
-                />
-                <YAxis
-                  orientation="left"
-                  tick={{ dx: -5, textAnchor: "start" }}
-                />
-                <Tooltip />
-                <Legend />
-                <Bar
-                  dataKey="totalOrders"
-                  fill="#8884d8"
-                  name={t("sysadmin.dashboard.ordersCount")}
-                />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-
-          {/* Top Products Card */}
-          <div className="bg-white p-6 rounded shadow col-span-1 lg:col-span-1">
-            <h2 className="text-lg font-semibold mb-4 text-right">
+          {/* Top Products Section */}
+          {/* Top Products Section */}
+          <div className="bg-white mt-8 p-6 rounded shadow">
+            <h2 className="text-xl font-bold mb-4 flex items-center gap-2">
+              <FaStar className="text-yellow-500" />
               {t("sysadmin.dashboard.topProducts")}
             </h2>
-            <ol className="list-decimal pr-4 space-y-2 text-right text-sm text-gray-700">
-              {topProducts.length > 0 ? (
-                topProducts.map((product, index) => (
-                  <li key={index}>
-                    {product.name} — {t("sysadmin.dashboard.sold")}:{" "}
-                    {product.totalSold}
-                  </li>
-                ))
-              ) : (
-                <p className="text-gray-500">
-                  {t("sysadmin.dashboard.noProducts")}
-                </p>
-              )}
-            </ol>
+
+            <div className="overflow-x-auto">
+              <table className="min-w-full table-auto border border-gray-200">
+                <thead className="bg-gray-100 text-gray-700">
+                  <tr>
+                    <th className="px-4 py-2 text-right">
+                      {t("sysadmin.dashboard.productName")}
+                    </th>
+                    <th className="px-4 py-2 text-right">
+                      {t("sysadmin.dashboard.storeName")}
+                    </th>
+                    <th className="px-4 py-2 text-right">
+                      {t("sysadmin.dashboard.price")}
+                    </th>
+                    <th className="px-4 py-2 text-right">
+                      {t("sysadmin.dashboard.sold")}
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topProducts.map((product, idx) => (
+                    <tr
+                      key={idx}
+                      className="border-t text-gray-800 hover:bg-gray-50">
+                      <td className="px-4 py-2">{product.name}</td>
+                      <td className="px-4 py-2">
+                        {product.storeName?.[i18n.language] ||
+                          product.storeName?.he ||
+                          "—"}
+                      </td>
+                      <td className="px-4 py-2">
+                        ₪{product.price?.toFixed(2) || "—"}
+                      </td>
+                      <td className="px-4 py-2">{product.totalSold}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
-        </div>
+        </>
       )}
     </div>
   );

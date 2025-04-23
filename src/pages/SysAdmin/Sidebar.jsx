@@ -34,7 +34,7 @@ const Sidebar = (token) => {
 
   // The return statement contains the JSX of the Sidebar component
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-fit  bg-gray-100">
       <aside className="w-64 bg-white border-r shadow-md">
         <div className="p-4 bg-gray-200 text-primaryColor font-bold">
           {t("sysadmin.admin_management")}
@@ -75,7 +75,7 @@ const Sidebar = (token) => {
         </nav>
       </aside>
 
-      <main className="flex-1 p-6 bg-white shadow-md m-4 rounded-lg">
+      <main className="flex-1 p-6 bg-white shadow-md m-6 rounded-lg h-fit overflow-y-auto">
         {renderContent()}
       </main>
     </div>

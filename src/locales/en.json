@@ -8,6 +8,7 @@
   "remove_filter": "Remove Filter",
   "category": "Category",
   "store": "Store",
+  "on_sale_only": "On Sale Only",
 
   "modal": {
     "close": "Close"
@@ -86,6 +87,10 @@
       "wishlist": "Wishlist"
     },
     "alerts": {
+      "addError": "Error while adding the address.",
+      "deleteError": "Error while deleting the address.",
+      "addressAdded": "Address added successfully!",
+      "deleteSuccess": "Address deleted successfully!",
       "passwordMismatch": "Passwords do not match. Please try again.",
       "saveSuccess": "Updated successfully!",
       "saveError": "Error while saving changes.",
@@ -182,8 +187,9 @@
   },
 
   "sysadmin": {
-    "admin_management": "System Administration",
-    "store_managemnt": "Srotes Managment",
+    "admin_management": "Admin Management",
+    "store_managemnt": "Store Management",
+    "go_to_store_management": "Go to Store Management",
     "stores": "Stores",
     "store_name": "Store Name",
     "store_address": "Store Address",
@@ -194,19 +200,36 @@
     "add_store": "Add Store",
     "edit_store": "Edit Store",
     "add_manager": "+",
-    "edit_manager": "Edit Manager",
     "save": "Save",
     "save_managers": "Save Managers",
+    "edit_manager": "Edit Managers",
     "delete": "Delete",
     "delete_manager": "Delete Manager",
     "statistics": "Statistics",
-    "statistics_info": "Here, statistical data about store activities will be displayed.",
-    "invalid_email": "Invalid Email! please enter a valid email",
-    "edit": "Edit",
+    "invalid_email": "Invalid email address! Please enter a valid email.",
     "cancel": "Cancel",
-
-    "store_email": "Store Email"
+    "edit": "Edit",
+    "store_email": "Store Email",
+    "dashboard": {
+      "title": "System Overview",
+      "salesComparison": "Sales Comparison Between Stores",
+      "ordersCount": "Number of Orders",
+      "totalRevenue": "Total Revenue (₪)",
+      "filter": "Filter",
+      "fromDate": "From Date",
+      "toDate": "To Date",
+      "topProducts": "Top Selling Products",
+      "productName": "Product Name",
+      "storeName": "Store Name",
+      "price": "Price",
+      "sold": "Quantity Sold",
+      "errors": {
+        "fetchFailed": "Failed to fetch statistics data."
+      },
+      "noData": "No data available for the selected period."
+    }
   },
+
   "storemanage": {
     "manage_products": "Manage Products",
     "add_product": "Add Product",
@@ -216,7 +239,6 @@
     "products": "Products",
     "delete": "Delete"
   },
-
   "cart": {
     "title": "Shopping Cart",
     "close": "Close",
@@ -246,7 +268,10 @@
     "quantity": "Quantity",
     "buyAgain": "Buy Again",
     "shopSimilar": "Similar Products",
-    "noOrders": "No previous orders found"
+    "noOrders": "No previous orders found",
+    "loading": "Loading your orders...",
+    "subtotal": "Subtotal",
+    "totalForTransaction": "Total Amount"
   },
   "status": {
     "pending": "Pending",
@@ -274,12 +299,13 @@
     "addNewAddress": "Add New Address",
     "cancelNewAddress": "Cancel New Address",
     "saveNewAddress": "Save New Address",
-    "deliveryMethod": {
+    "deliveryMethods": {
       "title": "Delivery Method",
+      "courier": "Courier",
+      "express": "Express",
       "pickup": "Pickup",
-      "delivery": "Delivery",
-      "storePickup": "Store Pickup",
-      "homeDelivery": "Home Delivery"
+      "selectAddress": "Select Address",
+      "selectDeliveryMethod": "Select Delivery Method"
     }
   },
   "confirmation": {
@@ -292,8 +318,10 @@
     "backHome": "Back to Home",
     "unknownStore": "Unknown Store",
     "noDeliveryInfo": "No delivery information",
-    "viewOrders": "Go to Order History"
+    "viewOrders": "Go to Order History",
+    "totalSum": "Total Amount"
   },
+  "no_products_found": "No products found",
 
   "not_found": {
     "title": "Page Not Found",

@@ -120,7 +120,16 @@ const SysAdmin = () => {
       : `/api/Stores/${selectedStore._id}`;
     const method = newStoreMode ? "post" : "put";
 
-    axios[method](url, selectedStore)
+    const token = localStorage.getItem("token");
+
+    axios({
+      method,
+      url,
+      data: selectedStore,
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    })
       .then((res) => {
         if (newStoreMode) {
           setStores([...stores, res.data]);
@@ -141,8 +150,13 @@ const SysAdmin = () => {
 
   const handleDeleteStore = () => {
     showAlert("האם אתה בטוח שברצונך למחוק את החנות?", "warning", () => {
+      const token = localStorage.getItem("token");
       axios
-        .delete(`/api/Stores/${selectedStore._id}`)
+        .delete(`/api/Stores/${selectedStore._id}`, {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        })
         .then(() => {
           setStores(stores.filter((s) => s._id !== selectedStore._id));
           handleCloseModal();
@@ -170,15 +184,23 @@ const SysAdmin = () => {
       שם_חנות: store.name?.he || "",
       Address: store.address,
       Email: store.email,
-      מנהלים: store.manager.map(m => `${m.name} <${m.emailAddress}>`).join("; "),
+      מנהלים: store.manager
+        .map((m) => `${m.name} <${m.emailAddress}>`)
+        .join("; "),
     }));
     const worksheet = XLSX.utils.json_to_sheet(data);
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Stores");
-    const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-    saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "stores.xlsx");
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    saveAs(
+      new Blob([excelBuffer], { type: "application/octet-stream" }),
+      "stores.xlsx"
+    );
   };
-  
+
   return (
     <div className="container mx-auto p-5">
       <header className="text-center mb-8">
@@ -198,14 +220,11 @@ const SysAdmin = () => {
           />
         </button>
         <button
-  className="text-green-600 hover:text-green-800"
-  onClick={handleExportStores}
-  title ="ייצוא לאקסל"
-
->
-  <Icon icon="mdi:export" width="30" height="30" />
-</button>
-
+          className="text-green-600 hover:text-green-800"
+          onClick={handleExportStores}
+          title="ייצוא לאקסל">
+          <Icon icon="mdi:export" width="30" height="30" />
+        </button>
       </div>
 
       <table className="table-auto w-full border border-gray-300">

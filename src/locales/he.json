@@ -122,6 +122,8 @@
     "email": "אימייל",
     "password": "סיסמה",
     "submit": "התחבר",
+    "emailRequired": "כתובת אימייל נדרשת",
+    "passwordRequired": "סיסמה נדרשת",
     "notMember": "אין לך חשבון? הרשם כאן",
     "registerLink": "להרשמה",
     "emailPlaceholder": "הכנס את כתובת האימייל שלך",
@@ -184,6 +186,7 @@
   "sysadmin": {
     "admin_management": "ניהול מערכת",
     "store_managemnt": "ניהול חנות",
+    "go_to_store_management": "מעבר לניהול חנות",
     "stores": "חנויות",
     "store_name": "שם החנות",
     "store_address": "כתובת החנות",
@@ -212,6 +215,11 @@
     "filter": "סנן",
      "fromDate": "מתאריך",
   "toDate": "עד תאריך",
+  "topProducts": "המוצרים הנמכרים ביותר",
+      "productName": "שם מוצר",
+      "storeName": "שם החנות",
+      "price": "מחיר",
+      "sold": "כמות שנמכרה",
     "errors": {
       "fetchFailed": "נכשל בטעינת נתונים סטטיסטיים."
     },
