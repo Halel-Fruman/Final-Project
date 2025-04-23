@@ -7,6 +7,7 @@ import { useAlert } from "../../components/AlertDialog.jsx";
 import CategoryManagement from "./CategoryManagement.jsx";
 import SysAdmin from "./SysAdmin.jsx";
 import UserManagement from "./UserManagement.jsx";
+import AdminDashboard from "./AdminDashboard.jsx";
 
 // The Sidebar component is a functional component that takes the token as a prop
 const Sidebar = (token) => {
@@ -19,7 +20,7 @@ const Sidebar = (token) => {
     // Switch statement to render the content based on the active tab
     switch (activeTab) {
       case "dashboard":
-        return <div className="p-6">📊 סטטיסטיקות כלליות</div>;
+        return <AdminDashboard />;
       case "stores":
         return <SysAdmin />;
       case "categories":
@@ -33,7 +34,7 @@ const Sidebar = (token) => {
 
   // The return statement contains the JSX of the Sidebar component
   return (
-    <div className="flex h-screen bg-gray-100">
+    <div className="flex h-fit  bg-gray-100">
       <aside className="w-64 bg-white border-r shadow-md">
         <div className="p-4 bg-gray-200 text-primaryColor font-bold">
           {t("sysadmin.admin_management")}
@@ -74,7 +75,7 @@ const Sidebar = (token) => {
         </nav>
       </aside>
 
-      <main className="flex-1 p-6 bg-white shadow-md m-4 rounded-lg">
+      <main className="flex-1 p-6 bg-white shadow-md m-6 rounded-lg h-fit overflow-y-auto">
         {renderContent()}
       </main>
     </div>
