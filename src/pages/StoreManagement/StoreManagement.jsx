@@ -5,6 +5,8 @@ import { Icon } from "@iconify/react";
 import ProductManagement from "./ProductManagement.jsx";
 import OrderManagement from "./OrderManagement.jsx";
 import { useTranslation } from "react-i18next";
+import StoreDashboard from "./StoreDashboard.jsx";
+import StoreAnalytics from "./StoreAnalytics.jsx";
 
 const StoreManagement = () => {
   const { storeId: paramStoreId } = useParams();
@@ -107,11 +109,7 @@ const StoreManagement = () => {
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return (
-          <div key="dashboard" className="p-6">
-            📊 סטטיסטיקות מכירות
-          </div>
-        );
+        return <StoreDashboard key="dashboard" storeId={storeId}/>;
       case "products":
         return <ProductManagement key="products" storeId={storeId} />;
       case "orders":
@@ -132,11 +130,7 @@ const StoreManagement = () => {
           />
         );
       case "store-stats":
-        return (
-          <div key="store-stats" className="p-6">
-            📈 סטטיסטיקות כלליות
-          </div>
-        );
+        return <StoreAnalytics key="store-stats"  storeId={storeId}/>        ;
       default:
         return <div className="p-6">בחר קטגוריה מהתפריט</div>;
     }
