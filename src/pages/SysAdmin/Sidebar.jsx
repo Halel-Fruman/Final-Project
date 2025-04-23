@@ -7,6 +7,7 @@ import { useAlert } from "../../components/AlertDialog.jsx";
 import CategoryManagement from "./CategoryManagement.jsx";
 import SysAdmin from "./SysAdmin.jsx";
 import UserManagement from "./UserManagement.jsx";
+import AdminDashboard from "./AdminDashboard.jsx";
 
 // The Sidebar component is a functional component that takes the token as a prop
 const Sidebar = (token) => {
@@ -19,7 +20,7 @@ const Sidebar = (token) => {
     // Switch statement to render the content based on the active tab
     switch (activeTab) {
       case "dashboard":
-        return <div className="p-6">📊 סטטיסטיקות כלליות</div>;
+        return <AdminDashboard />;
       case "stores":
         return <SysAdmin />;
       case "categories":

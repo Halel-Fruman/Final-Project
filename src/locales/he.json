@@ -200,12 +200,23 @@
     "delete": "מחק",
     "delete_manager": "מחק מנהל",
     "statistics": "סטטיסטיקה",
-    "statistics_info": "כאן יוצגו נתונים סטטיסטיים על פעילות החנויות.",
     "invalid_email": "כתובת מייל לא חוקית! הכנס בבקשה כתובת מייל חוקית.",
     "cancel": "ביטול",
     "edit": "ערוך",
-
-    "store_email": "מייל החנות"
+    "store_email": "מייל החנות",
+    "dashboard": {
+    "title": "סקירה מערכתית",
+    "salesComparison": "השוואת מכירות בין חנויות",
+    "ordersCount": "מספר עסקאות",
+    "totalRevenue": "סכום עסקאות (₪)",
+    "filter": "סנן",
+     "fromDate": "מתאריך",
+  "toDate": "עד תאריך",
+    "errors": {
+      "fetchFailed": "נכשל בטעינת נתונים סטטיסטיים."
+    },
+    "noData": "אין נתונים זמינים עבור התקופה שנבחרה."
+  }
   },
 
   "storemanage": {
