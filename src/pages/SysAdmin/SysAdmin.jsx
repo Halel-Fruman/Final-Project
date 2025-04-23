@@ -231,12 +231,24 @@ const SysAdmin = () => {
                   <div key={idx}>{mgr.name}</div>
                 ))}
               </td>
-              <td className="border px-4 py-2">
+              <td className="border text-center px-4 py-2">
                 <button
                   className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
                   onClick={() => handleOpenModal(store)}>
                   <Icon
                     icon="tabler:shopping-bag-edit"
+                    width="24"
+                    height="24"
+                  />
+                </button>
+                <button
+                  className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+                  onClick={() =>
+                    window.open(`/shop/store-management/${store._id}`, "_blank")
+                  }
+                  title={t("sysadmin.go_to_store_management")}>
+                  <Icon
+                    icon="material-symbols:settings-outline"
                     width="24"
                     height="24"
                   />

@@ -67,14 +67,11 @@ const App = () => {
 
       if (storedToken && storedUserId) {
         try {
-          const response = await fetch(
-            "/api/User/verify-token",
-            {
-              headers: {
-                Authorization: `Bearer ${storedToken}`,
-              },
-            }
-          );
+          const response = await fetch("/api/User/verify-token", {
+            headers: {
+              Authorization: `Bearer ${storedToken}`,
+            },
+          });
 
           if (response.ok) {
             setToken(storedToken);
@@ -166,7 +163,7 @@ const App = () => {
     <AlertProvider>
       {/*Router component to wrap the entire application and provide the routing context to all components */}
       <Router basename="/shop">
-      <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
+        <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
 
         {/*Header component to display the header of the application         */}
         <Header
@@ -277,7 +274,17 @@ const App = () => {
               path="/store-management"
               // check if the user is logged in and has the role of storeManager
               element={
-                token && role === "storeManager" ? (
+                token && (role === "storeManager" || "admin") ? (
+                  <StoreManagement />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/store-management/:storeId"
+              element={
+                token && role === "admin" ? (
                   <StoreManagement />
                 ) : (
                   <Navigate to="/" />
@@ -314,7 +321,6 @@ const App = () => {
             <Route path="/503" element={<ServiceUnavailablePage />} />
 
             <Route path="*" element={<NotFound />} />
-
           </Routes>
         </div>
         <Footer />
