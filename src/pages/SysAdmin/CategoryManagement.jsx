@@ -64,6 +64,7 @@ const CategoryManagement = () => {
       <div className="mb-4 flex gap-2">
         <input
           type="text"
+          aria-label="Category Name in English"
           className="border px-3 py-2"
           placeholder="שם קטגוריה באנגלית"
           value={categoryNameEn}
@@ -72,14 +73,16 @@ const CategoryManagement = () => {
         <input
           type="text"
           className="border px-3 py-2"
+          aria-label="Category Name in Hebrew"
           placeholder="שם קטגוריה בעברית"
           value={categoryNameHe}
           onChange={(e) => setCategoryNameHe(e.target.value)}
         />
         <button
-          className="bg-primaryColor text-white px-4 py-2"
-          onClick={handleAddCategory}>
-          הוסף קטגוריה
+          className="bg-primaryColor text-xl font-bold text-white px-4 py-2"
+          onClick={handleAddCategory}
+          aria-label="Add Category">
+          <h2>הוסף קטגוריה</h2>
         </button>
       </div>
 
@@ -102,7 +105,8 @@ const CategoryManagement = () => {
                 </span>
                 <button
                   className="bg-white text-deleteC px-2 py-2 rounded-full hover:bg-deleteC hover:text-white ring-2 ring-gray-200 hover:ring-deleteC transition duration-200"
-                  onClick={() => handleDeleteCategory(category._id)}>
+                  onClick={() => handleDeleteCategory(category._id)}
+                  aria-label="Delete Category">
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="24"

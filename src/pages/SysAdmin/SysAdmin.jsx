@@ -213,7 +213,9 @@ const SysAdmin = () => {
       <div className="flex justify-end mb-4">
         <button
           className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
-          onClick={() => handleOpenModal()}>
+          onClick={() => handleOpenModal()}
+          aria-label="Add Store"
+          >
           <Icon
             icon="material-symbols:add-business-outline"
             width="48"
@@ -239,7 +241,7 @@ const SysAdmin = () => {
       ):(
       <table className="table-auto w-full border border-gray-300">
         <thead>
-          <tr className="bg-primaryColor text-white">
+          <tr className="bg-primaryColor text-white text-xl font-bold">
             <th className="border px-4 py-2">{t("sysadmin.store_name")}</th>
             <th className="border px-4 py-2">{t("sysadmin.store_address")}</th>
             <th className="border px-4 py-2">{t("sysadmin.store_email")}</th>
@@ -263,7 +265,9 @@ const SysAdmin = () => {
               <td className="border text-center px-4 py-2">
                 <button
                   className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
-                  onClick={() => handleOpenModal(store)}>
+                  onClick={() => handleOpenModal(store)}
+                  aria-label="Edit Store"
+                  >
                   <Icon
                     icon="tabler:shopping-bag-edit"
                     width="24"
@@ -301,6 +305,7 @@ const SysAdmin = () => {
               <label className="block mb-1">שם החנות בעברית</label>
               <input
                 type="text"
+                aria-label="Store Name in Hebrew"
                 className="w-full border px-3 py-2"
                 value={selectedStore.name.he}
                 onChange={(e) => handleNameLangChange("he", e.target.value)}
@@ -311,6 +316,7 @@ const SysAdmin = () => {
               <label className="block mb-1">שם החנות באנגלית</label>
               <input
                 type="text"
+                aria-label="Store Name in English"
                 className="w-full border px-3 py-2"
                 value={selectedStore.name.en}
                 onChange={(e) => handleNameLangChange("en", e.target.value)}
@@ -323,6 +329,7 @@ const SysAdmin = () => {
               </label>
               <input
                 type="text"
+                aria-label="Store Address"
                 className="w-full border px-3 py-2"
                 value={selectedStore.address}
                 onChange={(e) => handleFieldChange("address", e.target.value)}
@@ -333,6 +340,7 @@ const SysAdmin = () => {
               <label className="block mb-1">{t("sysadmin.store_email")}</label>
               <input
                 type="email"
+                aria-label="Store Email"
                 className="w-full border px-3 py-2"
                 value={selectedStore.email}
                 onChange={(e) => handleFieldChange("email", e.target.value)}
@@ -345,6 +353,7 @@ const SysAdmin = () => {
                 <div key={index} className="flex items-center mb-2">
                   <input
                     type="text"
+                    aria-label="Manager Name"
                     placeholder={t("sysadmin.manager_name")}
                     className="border px-3 py-2 mr-2 flex-1"
                     value={mgr.name}
@@ -354,6 +363,7 @@ const SysAdmin = () => {
                   />
                   <input
                     type="email"
+                    aria-label="Manager Email"
                     placeholder={t("sysadmin.manager_email")}
                     className="border px-3 py-2 mr-2 flex-1"
                     value={mgr.emailAddress}
@@ -363,7 +373,9 @@ const SysAdmin = () => {
                   />
                   <button
                     className="bg-white text-deleteC px-2 py-2 rounded hover:bg-deleteC hover:text-white ring-2 ring-gray-200 hover:ring-deleteC transition duration-200"
-                    onClick={() => handleRemoveManager(index)}>
+                    onClick={() => handleRemoveManager(index)}
+                    aria-label="Remove Manager"
+                    >
                     <Icon
                       icon="material-symbols:delete-outline"
                       width="24"
@@ -374,7 +386,9 @@ const SysAdmin = () => {
               ))}
               <button
                 className="text-black px-2 py-2 mt-2 flex items-center hover:bg-primaryColor hover:text-white"
-                onClick={handleAddManager}>
+                onClick={handleAddManager}
+                aria-label="Add Manager"
+                >
                 <Icon
                   icon="material-symbols:add-circle-outline-rounded"
                   width="24"
@@ -387,7 +401,9 @@ const SysAdmin = () => {
               {!newStoreMode && (
                 <button
                   className="bg-white text-deleteC px-2 py-2 rounded-full hover:bg-deleteC hover:text-white ring-2 ring-gray-200 hover:ring-deleteC transition duration-200"
-                  onClick={handleDeleteStore}>
+                  onClick={handleDeleteStore}
+                  aria-label="Delete Store"
+                  >
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="28"
@@ -399,7 +415,9 @@ const SysAdmin = () => {
               <div className="flex justify-end">
                 <button
                   className="bg-white text-gray-600 px-2 py-2 border-primaryColor rounded mr-2 hover:bg-gray-600 hover:text-white"
-                  onClick={handleCloseModal}>
+                  onClick={handleCloseModal}
+                  aria-label="Close Modal"
+                  >
                   <Icon
                     icon="material-symbols:cancel-outline-rounded"
                     width="36"
@@ -408,7 +426,9 @@ const SysAdmin = () => {
                 </button>
                 <button
                   className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded mr-2 hover:bg-primaryColor hover:text-white"
-                  onClick={handleSave}>
+                  onClick={handleSave}
+                  aria-label="Save Store"
+                  >
                   <Icon
                     icon="material-symbols:check-circle-outline-rounded"
                     width="36"

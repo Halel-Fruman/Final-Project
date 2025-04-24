@@ -43,7 +43,7 @@ const UserManagement = () => {
       .catch(() => {
         showAlert("אירעה שגיאה בעת קבלת פרטי המשתמשים", "error");
       }).finally(() => setIsLoading(false));
-  }, []);
+  }, [showAlert]);
 
   const handleEditUser = (user) => {
     setSelectedUser(user);
@@ -201,7 +201,9 @@ const UserManagement = () => {
           <select
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
-            className="border px-2 py-1 rounded">
+            className="border px-2 py-1 rounded"
+
+            aria-label="Filter by role">
             <option value="">כל התפקידים</option>
             <option value="user">User</option>
             <option value="storeManager">Store Manager</option>

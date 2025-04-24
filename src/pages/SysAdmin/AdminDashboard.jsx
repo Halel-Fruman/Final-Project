@@ -74,6 +74,9 @@ const AdminDashboard = () => {
             {t("sysadmin.dashboard.fromDate")}
           </label>
           <input
+            name="fromDate"
+            id="fromDate"
+            aria-label="fromDate"
             type="date"
             value={fromDate}
             onChange={(e) => setFromDate(e.target.value)}
@@ -86,7 +89,9 @@ const AdminDashboard = () => {
             {t("sysadmin.dashboard.toDate")}
           </label>
           <input
+            name="toDate"
             type="date"
+            aria-label="toDate"
             value={toDate}
             onChange={(e) => setToDate(e.target.value)}
             className="border px-3 py-2 rounded shadow"
@@ -95,7 +100,7 @@ const AdminDashboard = () => {
 
         <button
           onClick={fetchStats}
-          className="bg-primaryColor text-white px-4 py-2 rounded mt-1 sm:mt-6 hover:bg-secondaryColor">
+          className="bg-primaryColor text-white  text-xl font-bold px-4 py-2 rounded mt-1 sm:mt-6 hover:bg-secondaryColor">
           {t("sysadmin.dashboard.filter")}
         </button>
       </div>
