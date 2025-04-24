@@ -13,6 +13,7 @@ const SysAdmin = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStoreMode, setNewStoreMode] = useState(false);
   const { showAlert } = useAlert();
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     axios
@@ -23,7 +24,7 @@ const SysAdmin = () => {
       .catch((err) => {
         console.log(err);
         showAlert("אירעה שגיאה בשרת, אנא נסה שנית.", "error");
-      });
+      }).finally(() => setIsLoading(false));
   }, []);
 
   const handleOpenModal = (store = null) => {
@@ -226,7 +227,16 @@ const SysAdmin = () => {
           <Icon icon="mdi:export" width="30" height="30" />
         </button>
       </div>
-
+      {isLoading ? (
+        <div className="space-y-4 animate-pulse">
+          {[...Array(5)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-gray-200 rounded h-10 w-full"
+            ></div>
+          ))}
+        </div>
+      ):(
       <table className="table-auto w-full border border-gray-300">
         <thead>
           <tr className="bg-primaryColor text-white">
@@ -277,7 +287,7 @@ const SysAdmin = () => {
           ))}
         </tbody>
       </table>
-
+)}
       {isModalOpen && selectedStore && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
           <div className="bg-white p-8 rounded shadow-lg w-1/2">

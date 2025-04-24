@@ -103,7 +103,43 @@ const AdminDashboard = () => {
       {error ? (
         <p className="text-center text-red-600">{error}</p>
       ) : isLoading ? (
-        <p className="text-center text-gray-600">{t("loading")}</p>
+        <div className="space-y-8">
+          {/* Skeleton for Filters */}
+          <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6 items-end">
+            <div className="w-40 h-10 bg-gray-200 rounded animate-pulse" />
+            <div className="w-40 h-10 bg-gray-200 rounded animate-pulse" />
+            <div className="w-24 h-10 bg-gray-300 rounded animate-pulse" />
+          </div>
+
+          {/* Skeleton for Charts */}
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+            <div className="bg-white p-6 rounded shadow space-y-4">
+              <div className="w-1/2 h-6 bg-gray-300 rounded animate-pulse" />
+              <div className="w-full h-64 bg-gray-200 rounded animate-pulse" />
+            </div>
+            <div className="bg-white p-6 rounded shadow space-y-4">
+              <div className="w-1/2 h-6 bg-gray-300 rounded animate-pulse" />
+              <div className="w-full h-64 bg-gray-200 rounded animate-pulse" />
+            </div>
+          </div>
+
+          {/* Skeleton for Top Products Table */}
+          <div className="bg-white mt-8 p-6 rounded shadow space-y-4">
+            <div className="w-1/3 h-6 bg-gray-300 rounded animate-pulse" />
+            <div className="overflow-x-auto">
+              <div className="space-y-2">
+                {[...Array(5)].map((_, i) => (
+                  <div key={i} className="flex justify-between gap-4 text-sm">
+                    <div className="h-5 bg-gray-200 rounded w-1/4 animate-pulse" />
+                    <div className="h-5 bg-gray-200 rounded w-1/4 animate-pulse" />
+                    <div className="h-5 bg-gray-200 rounded w-1/6 animate-pulse" />
+                    <div className="h-5 bg-gray-200 rounded w-1/6 animate-pulse" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
       ) : (
         <>
           <div className=" grid grid-cols-1 lg:grid-cols-2 gap-8 ">
