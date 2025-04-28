@@ -155,12 +155,12 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     <main className="bg-gray-50">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
-          <div className="flex-shrink-0 w-full lg:w-1/2 flex justify-center">
-            <img
-              src={selectedImage || "https://placehold.co/300"}
-              alt={productName}
-              className="h-128 w-176 rounded-lg shadow-lg"
-            />
+        <div className="flex-shrink-0 w-full lg:w-1/2 flex justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
+        <img
+               src={selectedImage || "https://placehold.co/300"}
+               alt={productName}  
+               className="object-contain max-h-128 max-w-full rounded-md border"
+               />
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
