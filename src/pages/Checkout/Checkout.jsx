@@ -18,6 +18,7 @@ const CheckoutPage = ({
   const [newAddress, setNewAddress] = useState({ city: "", streetAddress: "" });
   const [showNewAddressForm, setShowNewAddressForm] = useState(false);
   const navigate = useNavigate();
+  const [startPayment, setStartPayment] = useState(false);
 
   useEffect(() => {
     const loadDetails = async () => {
@@ -33,7 +34,55 @@ const CheckoutPage = ({
 
     if (cartItems.length > 0) loadDetails();
   }, [cartItems, fetchProductDetails]);
+  
 
+  const TranzilaIframe = ({ sum, userId, cartItems, selectedAddress }) => {
+    const [formHtml, setFormHtml] = useState(null);
+  
+    useEffect(() => {
+      const createPaymentSession = async () => {
+        try {
+          const res = await fetch("/api/tranzila/create-payment", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              sum,
+              userId,
+              cartItems,
+              selectedAddress,
+            }),
+          });
+  
+          const html = await res.text();
+          setFormHtml(html); // לא לייצר blob — לשמור את הטקסט ישירות
+        } catch (error) {
+          console.error("Failed to create Tranzila payment iframe", error);
+        }
+      };
+  
+      createPaymentSession();
+    }, [sum, userId, cartItems, selectedAddress]);
+  
+    if (!formHtml) return <div>Loading payment form...</div>;
+  
+    return (
+      <div className="w-full h-[700px]">
+        <iframe
+          title="Tranzila Secure Payment"
+          srcDoc={formHtml} // 👈 הנה השינוי הגדול!
+          width="100%"
+          height="100%"
+          frameBorder="0"
+          allow="payment"
+          allowPaymentRequest
+        ></iframe>
+      </div>
+    );
+  };
+  
+  
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -104,7 +153,7 @@ const CheckoutPage = ({
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
         {/* Form Section */}
-        <div className="bg-white rounded-lg shadow-md p-6 space-y-6">
+        <div className="order-2 md:order-1 bg-white rounded-lg shadow-md p-6 space-y-6">
           <h2 className="text-2xl font-semibold text-gray-900">
             {t("checkout.contactInformation")}
           </h2>
@@ -144,7 +193,7 @@ const CheckoutPage = ({
                 <option key={i} value={i}>
                   {addr.city}, {addr.streetAddress}
                 </option>
-              ))}
+              ))} 
             </select>
           )}
 
@@ -202,35 +251,36 @@ const CheckoutPage = ({
               : t("checkout.addNewAddress")}
           </button>
 
-          <h3 className="text-xl font-semibold">
-            {t("checkout.paymentDetails")}
-          </h3>
-          <input
-            placeholder={t("checkout.cardNumber")}
-            className="w-full border rounded-md p-2"
-          />
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              placeholder={t("checkout.expiry")}
-              className="border rounded-md p-2"
-            />
-            <input
-              placeholder={t("checkout.cvc")}
-              className="border rounded-md p-2"
-            />
-          </div>
+         
+          
 
           <button
-            className="w-full bg-primaryColor text-xl text-white py-2 rounded-md font-bold hover:bg-secondaryColor"
-            onClick={handleCheckout}>
-            {t("checkout.payNow")}
+           className="w-full bg-primaryColor text-xl text-white py-2 rounded-md font-bold hover:bg-secondaryColor"
+           onClick={() => setStartPayment(true)}
+         >
+           {t("checkout.payNow")}
+         
           </button>
+
+          {startPayment && (
+  <div className="mt-10">
+    <TranzilaIframe
+      sum={total}
+      userId={userId}
+      cartItems={detailedCart}
+      selectedAddress={selectedAddress}
+    />
+  </div>
+)}
+
         </div>
 
         {/* Summary Section */}
-        <div className="bg-white p-8 shadow-md rounded-lg">
+        <div className="order-1 md:order-2 bg-white p-8 shadow-md rounded-lg">
           <h2 className="text-2xl font-bold mb-6">{t("checkout.summary")}</h2>
-          <div className="space-y-4">
+         
+         
+          <div className="space-y-4 overflow-y-auto max-h-96 pr-2">
             {detailedCart.map((item, index) => (
               <div
                 key={index}

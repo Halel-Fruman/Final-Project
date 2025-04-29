@@ -281,7 +281,7 @@ const ProductManagement = ({ storeId }) => {
                    
         <button
   onClick={handleExportProducts}
-  className="bg-green-600 text-white px-4 py-2 mr-4 rounded hover:bg-green-700 flex items-center gap-1"
+  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
   title ="ייצוא לאקסל"
 >
   <Icon icon="mdi:export" width="20" />
