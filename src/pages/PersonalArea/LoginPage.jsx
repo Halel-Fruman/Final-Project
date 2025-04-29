@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DialogTitle } from "@headlessui/react";
 import toast from "react-hot-toast";
+import { el } from "date-fns/locale";
 
 const Login = ({
   setToken,
@@ -33,7 +34,12 @@ const Login = ({
         } else if (response.status === 503) {
           toast.error(t("login.serverUnavailable"));
           return;
-        } else {
+        }
+        else if (response.status === 404) {
+          toast.error(t("login.userNotFound"));
+          return;
+        }
+        else {
           toast.error(t("login.genericError"));
           return;
         }

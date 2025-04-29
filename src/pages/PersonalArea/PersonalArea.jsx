@@ -95,8 +95,8 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
     <aside className="lg:col-span-3">
     <button
     onClick={() => setIsSidebarOpen(!isSidebarOpen)}
-    className="lg:hidden mb-4 bg-primaryColor text-white py-2 px-4 rounded-md w-full">
-    {t("personal_area.toggleMenu")}
+    className="lg:hidden mb-4 text-xl font-bold bg-primaryColor text-white py-2 px-4 rounded-md w-full">
+    <h1>{t("personal_area.toggleMenu")}</h1>
     </button>
     <div
     className={`lg:block ${

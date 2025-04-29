@@ -68,6 +68,7 @@ const Sidebar = (token) => {
         <div className="text-lg font-bold mb-2">{t("sysadmin.admin_management")}</div>
         <nav className="flex flex-col gap-1">
           {tabs.map((tab) => (
+
             <button
               key={tab.id}
               className={`flex items-center text-right w-full p-3 rounded hover:bg-gray-200 ${

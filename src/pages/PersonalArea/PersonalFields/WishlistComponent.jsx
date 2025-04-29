@@ -106,7 +106,7 @@ const WishlistComponent = ({
                   <img
                     src={product.images?.[0] || "https://placehold.co/50"}
                     alt={
-                      product.name[i18n.language] ||
+                      product.name[i18n.language] +"image" ||
                       t("product.nameUnavailable")
                     }
                     className="w-12 h-12 rounded-full ml-2"
@@ -115,7 +115,7 @@ const WishlistComponent = ({
                     {product.name[i18n.language]}
                   </span>
                 </td>
-                <td className="p-4 text-center font-bold text-primaryColor">
+                <td className="p-4 text-center text-xl font-bold text-primaryColor">
                   ₪{product.price}
                 </td>
                 <td className="p-4 text-center text-gray-700">
@@ -129,7 +129,9 @@ const WishlistComponent = ({
                       addToCart({ productId: product._id, quantity: 1 });
                       toast.success(t("wishlist.addToCart") + " ✅");
                     }}
-                    className="bg-secondaryColor text-white p-2 rounded-full shadow-lg hover:bg-primaryColor">
+                    className="bg-secondaryColor text-white p-2 rounded-full shadow-lg hover:bg-primaryColor"
+                    aria-label="Add to cart"
+                    >
                     <Icon
                       icon="material-symbols:add-shopping-cart-rounded"
                       width="24"
@@ -138,7 +140,9 @@ const WishlistComponent = ({
                   </button>
                   <button
                     onClick={() => handleRemoveFromWishlist(product)}
-                    className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white">
+                    className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white"
+                    aria-label="Remove from wishlist"
+                    >
                     <Icon
                       icon="material-symbols:delete-outline"
                       width="24"
@@ -169,7 +173,7 @@ const WishlistComponent = ({
               </h3>
               <p className="text-sm text-gray-700">
                 {t("wishlist.unitPrice")}:{" "}
-                <span className="font-bold text-primaryColor">
+                <span className="font-bold text-xl text-primaryColor">
                   ₪{product.price}
                 </span>
               </p>
@@ -179,13 +183,15 @@ const WishlistComponent = ({
                   ? t("wishlist.inStock")
                   : t("wishlist.outOfStock")}
               </p>
-              <div className="flex mt-2 space-x-2">
+              <div className="flex mt-2 gap-x-2">
                 <button
                   onClick={() => {
                     addToCart({ productId: product._id, quantity: 1 });
                     toast.success(t("wishlist.addToCart") + " ✅");
                   }}
-                  className="bg-secondaryColor text-white p-2  rounded-full shadow-lg hover:bg-primaryColor">
+                  className="bg-secondaryColor text-white p-2  rounded-full shadow-lg hover:bg-primaryColor"
+                  aria-label="Add to cart"
+                  >
                   <Icon
                     icon="material-symbols:add-shopping-cart-rounded"
                     width="20"
@@ -194,7 +200,9 @@ const WishlistComponent = ({
                 </button>
                 <button
                   onClick={() => handleRemoveFromWishlist(product)}
-                  className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white">
+                  className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white"
+                  aria-label="Remove from wishlist"
+                  >
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="20"
