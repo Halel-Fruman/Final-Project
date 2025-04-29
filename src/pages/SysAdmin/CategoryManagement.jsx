@@ -61,18 +61,18 @@ const CategoryManagement = () => {
     <div className="container mx-auto p-5">
       <h1 className="text-center mb-8 text-2xl font-bold">ניהול קטגוריות</h1>
 
-      <div className="mb-4 flex gap-2">
+      <div className="mb-4 flex lg:flex-row flex-col gap-2">
         <input
           type="text"
           aria-label="Category Name in English"
-          className="border px-3 py-2"
+          className="flex border px-3 py-2"
           placeholder="שם קטגוריה באנגלית"
           value={categoryNameEn}
           onChange={(e) => setCategoryNameEn(e.target.value)}
         />
         <input
           type="text"
-          className="border px-3 py-2"
+          className="flex border px-3 py-2"
           aria-label="Category Name in Hebrew"
           placeholder="שם קטגוריה בעברית"
           value={categoryNameHe}

@@ -105,7 +105,9 @@ const Sidebar = (token) => {
       )}
 
       {/* Main content */}
-      <main className="flex-1 p-4 bg-white overflow-y-auto h-fit">
+      {/* <main className="flex-1 p-4 bg-white  overflow-y-auto h-fit"> */}
+      <main className="flex-1 p-4 pl-6 bg-white shadow-md m-6 rounded-lg h-fit overflow-y-auto">
+
           {renderContent()}
       </main>
     </div>

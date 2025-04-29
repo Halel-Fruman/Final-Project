@@ -187,7 +187,7 @@ const UserManagement = () => {
   };
 
   return (
-    <div className="p-6 max-w-7xl mx-auto  ">
+    <div className="p-6 max-w-7xl mx-auto lg:w-full w-fit  ">
       <div className="flex justify-between items-center mb-4">
         <h1 className="text-2xl font-bold">ניהול משתמשים ({users.length})</h1>
         <div className="flex gap-2">
@@ -286,7 +286,7 @@ const UserManagement = () => {
                   <td className="border px-2 py-1">{user.address}</td>
                   <td className="border px-2 py-1">
                     <span
-                      className={`px-2 py-1 text-white rounded-full text-sm ${
+                      className={`px-2 py-1 text-white rounded-full box-decoration-clone text-sm ${
                         user.role === "admin"
                           ? "bg-red-600"
                           : user.role === "storeManager"

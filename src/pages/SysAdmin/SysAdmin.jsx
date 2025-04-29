@@ -203,7 +203,7 @@ const SysAdmin = () => {
   };
 
   return (
-    <div className="container mx-auto p-5">
+    <div className="container lg:w-full w-fit mx-auto p-5">
       <header className="text-center mb-8">
         <h1 className="text-3xl text-primaryColor font-bold">
           {t("sysadmin.store_managemnt")}
@@ -239,7 +239,7 @@ const SysAdmin = () => {
           ))}
         </div>
       ):(
-      <table className="table-auto w-full border border-gray-300">
+      <table className="table-auto p-6 w-full border border-gray-300">
         <thead>
           <tr className="bg-primaryColor text-white text-xl font-bold">
             <th className="border px-4 py-2">{t("sysadmin.store_name")}</th>
