@@ -1,24 +1,42 @@
 // File: ConfirmationPage.jsx
-import React from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useSearchParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
 const ConfirmationPage = () => {
-  const { state } = useLocation();
+  const { t } = useTranslation();
   const navigate = useNavigate();
-  const { t,i18n } = useTranslation();
+  const [searchParams] = useSearchParams();
+  const [orderData, setOrderData] = useState(null);
 
-  const transactions = state?.transactions || [];
-  const detailedCart = state?.detailedCart || [];
+  const transactionId = searchParams.get("index"); // מוציאים את מזהה העסקה מה-URL
 
-  if (!transactions.length) {
+  useEffect(() => {
+    const fetchOrder = async () => {
+      try {
+        const res = await fetch(`/api/orders/status/${transactionId}`);
+        if (!res.ok) {
+          throw new Error("Order not found");
+        }
+        const data = await res.json();
+        setOrderData(data);
+      } catch (error) {
+        console.error("Failed to fetch order", error);
+        setOrderData(null);
+      }
+    };
+
+    if (transactionId) {
+      fetchOrder();
+    }
+  }, [transactionId]);
+
+  if (!orderData) {
     return (
-      <div className="text-center py-10">
-        <h2 className="text-2xl font-bold">
-          {t("confirmation.noTransactions")}
-        </h2>
+      <div className="flex flex-col items-center justify-center min-h-screen text-center">
+        <h2 className="text-2xl font-bold text-gray-700">{t("confirmation.loading")}</h2>
         <button
-          className="mt-4 px-4 py-2 bg-primaryColor text-white rounded"
+          className="mt-6 px-4 py-2 bg-primaryColor text-white rounded"
           onClick={() => navigate("/")}>
           {t("confirmation.backHome")}
         </button>
@@ -26,107 +44,35 @@ const ConfirmationPage = () => {
     );
   }
 
-  const groupedByTransactionId = transactions.reduce((acc, tx) => {
-    const txId = tx.transaction.transactionId;
-    if (!acc[txId]) acc[txId] = [];
-    acc[txId].push(tx);
-    return acc;
-  }, {});
-
   return (
-    <main className="max-w-5xl mx-auto p-6">
-      <h1 className="text-4xl font-bold mb-6 text-center text-primaryColor">
+    <main className="max-w-3xl mx-auto p-6 text-center">
+      <h1 className="text-4xl font-bold mb-6 text-primaryColor">
         {t("confirmation.title")}
       </h1>
-      <h2 className="text-center text-gray-700 mb-4">
-        {t("confirmation.successMessage")}
-      </h2>
+      <h2 className="text-gray-700 mb-4">{t("confirmation.successMessage")}</h2>
 
-      {Object.entries(groupedByTransactionId).map(([txId, group], groupIdx) => (
-        <div
-          key={groupIdx}
-          className="mb-10 border border-secondaryColor rounded-lg shadow-md">
-          <div className="bg-primaryColor bg-opacity-10 px-4 py-3 text-xl font-bold text-primaryColor border-b border-secondaryColor">
-            {t("orders.orderGroup")}: <span className="font-mono">{txId}</span>
-          </div>
-
-          {group.map(({ transaction, storeId, storeName }, index) => (
-            <div key={index} className="p-6 border-b last:border-b-0">
-              <div className="flex flex-col md:flex-row justify-between text-gray-700 mb-3 text-sm">
-                <p>
-                  <strong>{t("orders.store")}:</strong>{" "}
-                  {(storeName?.[i18n.language] || storeName?.he || storeName) ??
-                    t("confirmation.unknownStore")}
-                </p>
-                <p>
-                  <strong>{t("confirmation.orderId")}:</strong>{" "}
-                  {transaction.orderId}
-                </p>
-
-                <p>
-                  <strong>{t("orders.status")}:</strong>{" "}
-                  {t(
-                    `status.${
-                      transaction.delivery?.deliveryStatus || "pending"
-                    }`
-                  )}
-                </p>
-              </div>
-
-              <div className="grid gap-4 mt-4">
-                {transaction.products.map((product, idx) => {
-                  const matchedProduct = detailedCart.find(
-                    (item) =>
-                      item._id === product.productId &&
-                      (item.storeId?._id || item.storeId) === storeId
-                  );
-
-                  return (
-                    <div
-                      key={idx}
-                      className="flex items-center gap-4 border-b pb-2">
-                      <img
-                        src={
-                          matchedProduct?.images?.[0] ||
-                          "https://placehold.co/60"
-                        }
-                        alt={product.name}
-                        className="w-16 h-16 object-cover rounded"
-                      />
-                      <div>
-                        <p className="text-lg">{product.name}</p>
-                        <p className="text-sm text-gray-600">
-                          {t("checkout.quantity")}: {product.quantity}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          {t("price")}: ₪{product.price}
-                        </p>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="text-right mt-4 text-xl font-bold text-primaryColor">
-                {t("orders.subtotal")}: ₪{transaction.totalAmount.toFixed(2)}
-              </div>
-            </div>
-          ))}
-          <div className="text-right m-4 font-bold text-2xl text-primaryColor">
-            {t("confirmation.totalSum")}: ₪
-            {group
-              .reduce((sum, tx) => sum + tx.transaction.totalAmount, 0)
-              .toFixed(2)}
-          </div>
+      <div className="mt-8 text-lg text-gray-800 space-y-4">
+        <div>
+          <span className="font-bold">{t("confirmation.orderId")}:</span>{" "}
+          <span className="font-mono">{orderData.transactionId}</span>
         </div>
-      ))}
+        <div>
+          <span className="font-bold">{t("confirmation.totalSum")}:</span>{" "}
+          ₪{Number(orderData.totalAmount).toFixed(2)}
+        </div>
+        <div>
+          <span className="font-bold">{t("confirmation.createdAt")}:</span>{" "}
+          {new Date(orderData.createdAt).toLocaleString("he-IL")}
+        </div>
+      </div>
 
-      <div className="text-center mt-6">
+      <div className="mt-8">
         <button
           onClick={() =>
             navigate("/personal-area", { state: { selectedTab: "orders" } })
           }
-          className="px-6 py-2 bg-primaryColor text-white text-xl font-bold rounded-md hover:bg-secondaryColor">
+          className="px-6 py-2 bg-primaryColor text-white text-xl font-bold rounded-md hover:bg-secondaryColor"
+        >
           {t("confirmation.viewOrders")}
         </button>
       </div>

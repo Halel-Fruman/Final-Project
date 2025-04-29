@@ -1,7 +1,5 @@
-import React from "react";
-import { Link } from "react-router-dom";
+import React, { useState } from "react";
 import { Icon } from "@iconify/react";
-import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import CategoryManagement from "./CategoryManagement.jsx";
@@ -9,15 +7,36 @@ import SysAdmin from "./SysAdmin.jsx";
 import UserManagement from "./UserManagement.jsx";
 import AdminDashboard from "./AdminDashboard.jsx";
 
-// The Sidebar component is a functional component that takes the token as a prop
 const Sidebar = (token) => {
-  const { t } = useTranslation(); // The useTranslation hook is used to access the i18n instance
-  const [activeTab, setActiveTab] = useState("dashboard"); // The activeTab state is used to store the active tab
-  const { showAlert } = useAlert(); // The useAlert hook is used to show an alert dialog
+  const { t } = useTranslation();
+  const [activeTab, setActiveTab] = useState("dashboard");
+  const [menuOpen, setMenuOpen] = useState(false); // תפריט מובייל
+  const { showAlert } = useAlert();
 
-  // The renderContent function returns the content based on the active tab
+  const tabs = [
+    {
+      id: "dashboard",
+      label: "סטטיסטיקות כלליות",
+      icon: "material-symbols:bar-chart-outline",
+    },
+    {
+      id: "stores",
+      label: "ניהול חנויות",
+      icon: "material-symbols:bar-chart-outline",
+    },
+    {
+      id: "categories",
+      label: "ניהול קטגוריות",
+      icon: "material-symbols:bar-chart-outline",
+    },
+    {
+      id: "users",
+      label: "ניהול משתמשים",
+      icon: "material-symbols:bar-chart-outline",
+    },
+  ];
+
   const renderContent = () => {
-    // Switch statement to render the content based on the active tab
     switch (activeTab) {
       case "dashboard":
         return <AdminDashboard />;
@@ -32,51 +51,62 @@ const Sidebar = (token) => {
     }
   };
 
-  // The return statement contains the JSX of the Sidebar component
   return (
-    <div className="flex h-fit  bg-gray-100">
-      <aside className="w-64 bg-white border-r shadow-md">
-        <div className="p-4 bg-gray-200 text-primaryColor text-xl font-bold">
+    <div className="flex flex-col lg:flex-row min-h-screen bg-gray-100 relative">
+      {/* Top bar for mobile */}
+      <div className="lg:hidden flex justify-between items-center bg-white p-4 shadow ">
+        <span className="font-bold text-primaryColor">
           {t("sysadmin.admin_management")}
-        </div>
-        <nav className="mt-4" aria-label="Sidebar">
-          {[
-            {
-              id: "dashboard",
-              label: "סטטיסטיקות כלליות",
-              icon: "material-symbols:bar-chart-outline",
-            },
-            {
-              id: "stores",
-              label: "ניהול חנויות",
-              icon: "material-symbols:business-outline",
-            },
-            {
-              id: "categories",
-              label: "ניהול קטגוריות",
-              icon: "material-symbols:bar-chart-outline",
-            },
-            {
-              id: "users",
-              label: "ניהול משתמשים",
-              icon: "material-symbols:bar-chart-outline",
-            },
-          ].map((tab) => (
+        </span>
+        <button onClick={() => setMenuOpen(!menuOpen)} className="text-xl">
+          <Icon icon="material-symbols:menu" width="28" />
+        </button>
+      </div>
+
+      {/* Sidebar for desktop */}
+      <aside className="hidden lg:block w-64 bg-white border-r shadow-md p-4">
+        <div className="text-lg font-bold mb-2">{t("sysadmin.admin_management")}</div>
+        <nav className="flex flex-col gap-1">
+          {tabs.map((tab) => (
+
             <button
               key={tab.id}
-              className={`flex items-center w-full p-3 text-left hover:bg-gray-200 relative ${
-                activeTab === tab.id ? "bg-gray-300 font-semibold before:absolute before:right-0 before:top-0 before:bottom-0 before:w-1 before:bg-primaryColor rounded-r-md" : ""
+              className={`flex items-center text-right w-full p-3 rounded hover:bg-gray-200 ${
+                activeTab === tab.id ? "bg-gray-300 font-semibold" : ""
               }`}
               onClick={() => setActiveTab(tab.id)}>
-              <Icon icon={tab.icon} className="w-5 h-5 mr-3" />
+              <Icon icon={tab.icon} className="w-5 h-5 ml-3" />
               {tab.label}
             </button>
           ))}
         </nav>
       </aside>
 
-      <main className="flex-1 p-6 bg-white shadow-md m-6 rounded-lg h-fit overflow-y-auto">
-        {renderContent()}
+      {/* Mobile menu dropdown */}
+      {menuOpen && (
+        <div className="lg:hidden bg-white border-t border-b shadow z-10">
+          <nav className="flex flex-col px-4 py-2">
+            {tabs.map((tab) => (
+              <button
+                key={tab.id}
+                className={`flex items-center  text-right py-3 border-b hover:bg-gray-100 ${
+                  activeTab === tab.id ? "bg-gray-200 font-semibold" : ""
+                }`}
+                onClick={() => {
+                  setActiveTab(tab.id);
+                  setMenuOpen(false);
+                }}>
+                <Icon icon={tab.icon} className="w-5 h-5 ml-3" />
+                {tab.label}
+              </button>
+            ))}
+          </nav>
+        </div>
+      )}
+
+      {/* Main content */}
+      <main className="flex-1 p-4 bg-white overflow-y-auto h-fit">
+          {renderContent()}
       </main>
     </div>
   );
