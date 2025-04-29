@@ -55,6 +55,7 @@ const AddStorePage = () => {
           <label>שם החנות בעברית:</label>
           <input
             type="text"
+            aria-label="Store Name in Hebrew"
             value={storeNameHe}
             onChange={(e) => setStoreNameHe(e.target.value)}
             required
@@ -64,6 +65,7 @@ const AddStorePage = () => {
           <label>שם החנות באנגלית:</label>
           <input
             type="text"
+            aria-label="Store Name in English"
             value={storeNameEn}
             onChange={(e) => setStoreNameEn(e.target.value)}
             required
@@ -73,6 +75,7 @@ const AddStorePage = () => {
           <label>כתובת החנות:</label>
           <input
             type="text"
+            aria-label="Store Address"
             value={storeAddress}
             onChange={(e) => setStoreAddress(e.target.value)}
             required
@@ -84,6 +87,7 @@ const AddStorePage = () => {
           <label>שם המנהל:</label>
           <input
             type="text"
+            aria-label="Manager Name"
             value={managerName}
             onChange={(e) => setManagerName(e.target.value)}
           />
@@ -92,6 +96,7 @@ const AddStorePage = () => {
           <label>דוא"ל המנהל:</label>
           <input
             type="email"
+            aria-label="Manager Email"
             value={managerEmail}
             onChange={(e) => setManagerEmail(e.target.value)}
           />

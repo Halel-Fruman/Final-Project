@@ -36,10 +36,10 @@ const Sidebar = (token) => {
   return (
     <div className="flex h-fit  bg-gray-100">
       <aside className="w-64 bg-white border-r shadow-md">
-        <div className="p-4 bg-gray-200 text-primaryColor font-bold">
+        <div className="p-4 bg-gray-200 text-primaryColor text-xl font-bold">
           {t("sysadmin.admin_management")}
         </div>
-        <nav className="mt-4">
+        <nav className="mt-4" aria-label="Sidebar">
           {[
             {
               id: "dashboard",

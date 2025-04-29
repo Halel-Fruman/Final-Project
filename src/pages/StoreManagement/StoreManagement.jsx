@@ -176,7 +176,9 @@ const StoreManagement = () => {
         <div className="text-lg font-bold hidden lg:block">
           ניהול חנות: {storeId ? `"${storeName}"` : "לא נטען"}
         </div>
-        <nav className="mt-4 flex flex-col gap-1">
+        <nav  className="mt-4 flex flex-col gap-1"
+        aria-label="Sidebar"
+        >
           {tabs.map((tab) => (
             <button
               key={tab.id}
