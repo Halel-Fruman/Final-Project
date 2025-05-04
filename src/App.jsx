@@ -52,6 +52,7 @@ const App = () => {
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("role");
+    setCartItems([]);
 
     setToken(null);
     setUserId(null);

@@ -134,7 +134,9 @@
     "invalidCredentials": "כתובת דוא\"ל או סיסמה שגויים",
     "genericError": "אירעה שגיאה. נסה שוב מאוחר יותר",
     "networkError": "אין חיבור לשרת. נסה שוב מאוחר יותר",
-    "serverUnavailable": "השרת אינו זמין כעת. אנא נסה מאוחר יותר"
+    "serverUnavailable": "השרת אינו זמין כעת. אנא נסה מאוחר יותר",
+    "requiredToRate": "יש להתחבר כדי לדרג מוצרים"
+
   },
   "addAddress": {
     "title": "הוספת כתובת",
@@ -180,7 +182,10 @@
     "details": "פרטים",
     "reviews": "דירוג",
     "img": "תמונה",
-    "onSale": "מחיר מבצע"
+    "onSale": "מחיר מבצע",
+    "alreadyRated": "כבר דירגת מוצר זה.",
+    "ratingError": "הייתה שגיאה בשליחת הדירוג.",
+    "ratingSuccess": "תודה על הדירוג!"
   },
 
   "sysadmin": {
@@ -250,7 +255,9 @@
     "continueShopping": "המשך בקניות",
     "removed": "הפריט הוסר מהעגלה",
     "quantity_updated": "הכמות עודכנה בהצלחה",
-    "quantity_update_failed": "אירעה שגיאה בעדכון הכמות"
+    "quantity_update_failed": "אירעה שגיאה בעדכון הכמות",
+    "mustBeLoggedIn": "עליך להתחבר כדי להוסיף לעגלה"
+
   },
   "modal": {
     "close": "סגור"

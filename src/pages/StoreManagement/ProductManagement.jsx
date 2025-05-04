@@ -290,7 +290,7 @@ const ProductManagement = ({ storeId }) => {
   title ="ייצוא לאקסל"
 >
   <Icon icon="mdi:export" width="20" />
- 
+
 </button>
 
       </div>
@@ -383,6 +383,7 @@ const ProductManagement = ({ storeId }) => {
               <textarea
                 aria-label="Product Highlights in English"
                 className="w-full border px-3 py-2 rounded-md shadow-sm"
+
                 value={newProduct.highlightEn.join("\n")}
                 onChange={(e) =>
                   setNewProduct({

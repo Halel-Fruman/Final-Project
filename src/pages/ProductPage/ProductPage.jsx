@@ -1,3 +1,4 @@
+// File: src/pages/ProductPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -10,24 +11,36 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
 
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [rating, setRating] = useState(0);
+  const [userAlreadyRated, setUserAlreadyRated] = useState(false);
 
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
 
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`/api/Products/${id}`);
+        const token = localStorage.getItem("token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        const response = await fetch(`/api/Products/${id}`, {
+          method: "GET",
+          headers,
+        });
+
         if (!response.ok) throw new Error(t("error.fetchProduct"));
         const data = await response.json();
+
         setProduct(data);
         setSelectedImage(data.images[0]);
         setRating(data.averageRating || 0);
+        setUserAlreadyRated(data.userHasRated || false);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -51,6 +64,12 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   };
 
   const handleAddToCart = () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      toast.error(t("cart.mustBeLoggedIn")); // הוסף תרגום מתאים
+      return;
+    }
+
     addToCart({ productId: product._id, quantity: 1 });
     toast.success(t("wishlist.addToCart") + " ✅");
   };
@@ -61,21 +80,37 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
   const handleRating = async (newRating) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`/api/products/${id}/rate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ rating: newRating }),
       });
-      if (!response.ok) throw new Error("Failed to update rating");
-      const updatedProduct = await response.json();
-      setProduct(updatedProduct.product);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message === "You have already rated this product.") {
+          toast.error(t("product.alreadyRated")); // תרגם את זה בקובץ השפה
+        } else {
+          toast.error(t("product.ratingError"));
+        }
+        return;
+      }
+
+      setProduct(data.product);
       setRating(newRating);
+      toast.success(t("product.ratingSuccess")); // אפשרות לתגובה חיובית
     } catch (err) {
       console.error("Error updating rating:", err.message);
+      toast.error(t("product.ratingError"));
     }
   };
 
-  if (isLoading)
+  if (isLoading) {
     return (
       <main className="bg-gray-50">
         <div className="container mx-auto py-12 animate-pulse">
@@ -124,6 +159,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
         </div>
       </main>
     );
+  }
 
   if (!product) return <div>{t("product.notFound")}</div>;
 
@@ -155,12 +191,12 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     <main className="bg-gray-50">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
-        <div className="flex-shrink-0 w-full lg:w-1/2 flex justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
-        <img
-               src={selectedImage || "https://placehold.co/300"}
-               alt={productName}  
-               className="object-contain max-h-128 max-w-full rounded-md border"
-               />
+          <div className="flex-shrink-0 w-full lg:w-1/2 flex justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
+            <img
+              src={selectedImage || "https://placehold.co/300"}
+              alt={productName}
+              className="object-contain max-h-128 max-w-full rounded-md border"
+            />
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -193,8 +229,14 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   key={i}
                   className={`h-6 w-6 cursor-pointer ${
                     i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"
-                  }`}
-                  onClick={() => handleRating(i + 1)}
+                  } ${!isLoggedIn ? "cursor-not-allowed opacity-50" : ""}`}
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      handleRating(i + 1);
+                    } else {
+                      toast.error(t("login.requiredToRate"));
+                    }
+                  }}
                 />
               ))}
               <span className="ml-2 text-gray-600">

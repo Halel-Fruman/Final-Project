@@ -135,7 +135,8 @@
     "emailRequired": "Email is required",
     "passwordRequired": "Password is required",
     "serverUnavailable": "Server is currently unavailable. Please try again later.",
-    "networkError": "Network error. Please check your connection."
+    "networkError": "Network error. Please check your connection.",
+    "requiredToRate": "You must be logged in to rate products."
   },
   "addAddress": {
     "title": "Add Address",
@@ -182,7 +183,9 @@
     "highlights": "Highlight",
     "details": "Details",
     "onSale": "Sale Price",
-
+    "alreadyRated": "You have already rated this product.",
+    "ratingError": "Failed to submit rating.",
+    "ratingSuccess": "Thank you for your rating!",
     "reviews": "Reviews"
   },
 
@@ -252,7 +255,8 @@
     "continueShopping": "Continue Shopping",
     "removed": "Item removed from cart",
     "quantity_updated": "Quantity updated successfully",
-    "quantity_update_failed": "Error updating quantity"
+    "quantity_update_failed": "Error updating quantity",
+    "mustBeLoggedIn": "You must be logged in to add items to the cart"
   },
   "orders": {
     "title": "My Orders",
