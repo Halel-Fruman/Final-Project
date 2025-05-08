@@ -114,7 +114,7 @@ const Login = ({
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 px-4 text-white font-bold text-xl rounded-md shadow-sm ${
+          className={`w-full py-2 px-4 text-white font-bold text-xl rounded-full shadow-sm ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-primaryColor hover:bg-secondaryColor"

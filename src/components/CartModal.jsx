@@ -168,7 +168,7 @@ const CartModal = ({
                       onClose();
                       navigate("/checkout");
                     }}
-                    className="w-full bg-secondaryColor text-white py-2 px-4 rounded-md shadow hover:bg-primaryColor">
+                    className="w-full bg-secondaryColor text-white py-2 px-4 rounded-full shadow hover:bg-primaryColor">
                     {t("cart.checkout")}
                   </button>
                 </div>

@@ -1,10 +1,16 @@
 export const processCheckout = async ({
   cartItems,
   userData,
+  transactionId,
   selectedAddress,
-  deliveryMethod = "courier",
+  deliveryMethods,
   token,
+  setCartItems,
 }) => {
+  console.log("Processing checkout with the following data:", {
+
+    deliveryMethods,
+  });
   if (!userData || !selectedAddress) {
     throw new Error("User data or selected address missing");
   }
@@ -17,6 +23,7 @@ export const processCheckout = async ({
         storeId,
         storeName: item.storeName,
         storeEmail: item.storeEmail,
+        deliveryMethod:deliveryMethods[storeId],
         products: [],
         totalAmount: 0,
       };
@@ -30,7 +37,6 @@ export const processCheckout = async ({
     groupedByStore[storeId].totalAmount += item.price * item.quantity;
   });
 
-  const transactionId = generateTransactionId();
   const commonBuyerDetails = {
     fullName: `${userData.first_name} ${userData.last_name}`,
     phone: userData.phoneNumber,
@@ -49,12 +55,11 @@ export const processCheckout = async ({
       buyerDetails: commonBuyerDetails,
       products: storeData.products,
       delivery: {
-        deliveryMethod,
+        deliveryMethod:storeData.deliveryMethod,
         deliveryStatus: "pending",
       },
     };
 
-    // שליחת העסקה לשרת – יחזור רק העסקה האחרונה
     const storeRes = await fetch("/api/Transactions/add", {
       method: "POST",
       headers: {
@@ -70,9 +75,8 @@ export const processCheckout = async ({
 
     if (!storeRes.ok) throw new Error("Failed to add transaction to store");
 
-    const { newTransaction } = await storeRes.json(); // כאן נשלפת רק העסקה האחרונה שנוספה
+    const { newTransaction } = await storeRes.json();
 
-    // הוספת מזהה עסקה למשתמש
     const userRes = await fetch(
       `/api/User/${userData._id}/add-transaction`,
       {
@@ -86,7 +90,7 @@ export const processCheckout = async ({
     );
     if (!userRes.ok) throw new Error("Failed to add transaction to user");
 
-    // שליחת מייל
+    // Send confirmation email to the user
     await fetch("/api/email/send-confirmation", {
       method: "POST",
       headers: {
@@ -108,10 +112,16 @@ export const processCheckout = async ({
       storeName: storeData.storeName,
     });
   }
+await fetch(`/api/User/${userData._id}/clear-cart`, {
+  method: "PUT",
+  headers: {
+    Authorization: `Bearer ${token}`,
+  },
+});
+localStorage.removeItem("cart");
+setCartItems([]);
 
   return results;
 };
 
-function generateTransactionId() {
-  return "TX-" + Math.random().toString(36).substr(2, 9).toUpperCase();
-}
+

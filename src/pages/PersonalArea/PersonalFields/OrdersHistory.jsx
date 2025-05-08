@@ -74,8 +74,8 @@ const OrderHistory = ({ user, addToCart }) => {
       </h2>
 
       {Object.entries(transactionGroups).map(([transactionId, orders], idx) => (
-        <div key={idx} className="mb-12 bg-blue-50 border rounded shadow-md">
-          <div className="bg-primaryColor bg-opacity-10 text-primaryColor px-6 py-3 font-bold text-xl border-b">
+        <div key={idx} className="mb-12 bg-blue-50 border rounded-md shadow-md">
+          <div className="bg-primaryColor bg-opacity-10 text-primaryColor rounded-md px-6 py-3 font-bold text-xl border-b">
             {t("orders.orderGroup")}:{" "}
             <span className="font-mono">{transactionId}</span>
           </div>
@@ -122,7 +122,7 @@ const OrderHistory = ({ user, addToCart }) => {
                           {highlights.map((h, idx) => (
                             <span
                               key={idx}
-                              className="bg-gray-100 px-3 py-1 rounded-md">
+                              className="bg-gray-100 px-3 py-1 rounded-full">
                               {h}
                             </span>
                           ))}
@@ -143,7 +143,7 @@ const OrderHistory = ({ user, addToCart }) => {
                             });
                             toast.success(t("wishlist.addToCart") + " ✅");
                           }}
-                          className="bg-primaryColor text-white text-xl font-bold px-4 py-2 rounded hover:bg-secondaryColor">
+                          className="bg-primaryColor text-white text-xl font-bold px-4 py-2 rounded-full hover:bg-secondaryColor">
                           {t("orders.buyAgain")}
                         </button>
                         <button className="border border-gray-300 text-md px-4 py-2 rounded text-gray-700 hover:bg-gray-100">
@@ -161,7 +161,7 @@ const OrderHistory = ({ user, addToCart }) => {
             </div>
           ))}
 
-          <div className="text-right text-xl font-bold text-primaryColor px-6 py-4 border-t bg-secondaryColor bg-opacity-10">
+          <div className="text-right text-xl font-bold text-primaryColor px-6 py-4 border-t rounded-md bg-secondaryColor bg-opacity-10">
             {t("orders.totalForTransaction")}: ₪
             {orders
               .reduce((sum, order) => sum + (order.totalAmount || 0), 0)

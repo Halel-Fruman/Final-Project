@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -17,6 +18,15 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -75,6 +85,12 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     return categoryMatch && storeMatch && onSaleMatch;
   });
 
+  const shuffledProductsToShow = useMemo(
+    () => shuffleArray(productsToShow),
+    [productsToShow]
+  );
+
+
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -131,7 +147,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             className="mt-4 text-xl sm:text-2xl md:text-5xl text-secondaryColor"
             dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
           <button
-            className="mt-6 bg-white text-black py-2 px-6 rounded-lg font-semibold shadow-lg hover:bg-gray-200 transition"
+            className="mt-6 bg-white text-black py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-gray-200 transition"
             onClick={() => {
               document
                 .getElementById("products-section")
@@ -162,7 +178,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           <p className="text-center text-gray-500">{t("no_products_found")}</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {productsToShow.map((product) => {
+            {shuffledProductsToShow.map((product) => {
               const isInWishlist = wishlistLoading
                 ? false
                 : wishlist?.some(

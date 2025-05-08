@@ -76,7 +76,7 @@ const PasswordManager = ({ userId, token }) => {
           />
           <div className="flex justify-end gap-3 mt-2">
             <button
-              className="bg-primaryColor text-white font-bold text-xl px-4 py-2 rounded hover:bg-secondaryColor transition"
+              className="bg-primaryColor text-white font-bold text-xl px-4 py-2 rounded-full hover:bg-secondaryColor transition"
               onClick={handlePasswordChange}>
               {t("personal_area.save")}
             </button>

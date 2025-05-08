@@ -24,7 +24,8 @@ const SysAdmin = () => {
       .catch((err) => {
         console.log(err);
         showAlert("אירעה שגיאה בשרת, אנא נסה שנית.", "error");
-      }).finally(() => setIsLoading(false));
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
   const handleOpenModal = (store = null) => {
@@ -34,8 +35,13 @@ const SysAdmin = () => {
         address: "",
         email: "",
         manager: [{ name: "", emailAddress: "" }],
+        deliveryOptions: {
+          homeDelivery: { company: "", price: 0 },
+          pickupPoint: { company: "", price: 0 },
+        },
       }
     );
+
     setNewStoreMode(!store);
     setIsModalOpen(true);
   };
@@ -214,8 +220,7 @@ const SysAdmin = () => {
         <button
           className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
           onClick={() => handleOpenModal()}
-          aria-label="Add Store"
-          >
+          aria-label="Add Store">
           <Icon
             icon="material-symbols:add-business-outline"
             width="48"
@@ -232,69 +237,71 @@ const SysAdmin = () => {
       {isLoading ? (
         <div className="space-y-4 animate-pulse">
           {[...Array(5)].map((_, i) => (
-            <div
-              key={i}
-              className="bg-gray-200 rounded h-10 w-full"
-            ></div>
+            <div key={i} className="bg-gray-200 rounded h-10 w-full"></div>
           ))}
         </div>
-      ):(
-      <table className="table-auto p-6 w-full border border-gray-300">
-        <thead>
-          <tr className="bg-primaryColor text-white text-xl font-bold">
-            <th className="border px-4 py-2">{t("sysadmin.store_name")}</th>
-            <th className="border px-4 py-2">{t("sysadmin.store_address")}</th>
-            <th className="border px-4 py-2">{t("sysadmin.store_email")}</th>
-            <th className="border px-4 py-2">{t("sysadmin.managers")}</th>
-            <th className="border px-2 py-2">{t("sysadmin.actions")}</th>
-          </tr>
-        </thead>
-        <tbody>
-          {stores.map((store) => (
-            <tr key={store._id}>
-              <td className="border px-4 py-2">
-                {store.name?.[i18n.language] || store.name?.he}
-              </td>
-              <td className="border px-4 py-2">{store.address}</td>
-              <td className="border px-4 py-2">{store.email}</td>
-              <td className="border px-4 py-2">
-                {store.manager.map((mgr, idx) => (
-                  <div key={idx}>{mgr.name}</div>
-                ))}
-              </td>
-              <td className="border text-center px-4 py-2">
-                <button
-                  className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
-                  onClick={() => handleOpenModal(store)}
-                  aria-label="Edit Store"
-                  >
-                  <Icon
-                    icon="tabler:shopping-bag-edit"
-                    width="24"
-                    height="24"
-                  />
-                </button>
-                <button
-                  className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
-                  onClick={() =>
-                    window.open(`/shop/store-management/${store._id}`, "_blank")
-                  }
-                  title={t("sysadmin.go_to_store_management")}>
-                  <Icon
-                    icon="material-symbols:settings-outline"
-                    width="24"
-                    height="24"
-                  />
-                </button>
-              </td>
+      ) : (
+        <table className="table-auto p-6 w-full border border-gray-300">
+          <thead>
+            <tr className="bg-primaryColor text-white text-xl font-bold">
+              <th className="border px-4 py-2">{t("sysadmin.store_name")}</th>
+              <th className="border px-4 py-2">
+                {t("sysadmin.store_address")}
+              </th>
+              <th className="border px-4 py-2">{t("sysadmin.store_email")}</th>
+              <th className="border px-4 py-2">{t("sysadmin.managers")}</th>
+              <th className="border px-2 py-2">{t("sysadmin.actions")}</th>
             </tr>
-          ))}
-        </tbody>
-      </table>
-)}
+          </thead>
+          <tbody>
+            {stores.map((store) => (
+              <tr key={store._id}>
+                <td className="border px-4 py-2">
+                  {store.name?.[i18n.language] || store.name?.he}
+                </td>
+                <td className="border px-4 py-2">{store.address}</td>
+                <td className="border px-4 py-2">{store.email}</td>
+                <td className="border px-4 py-2">
+                  {store.manager.map((mgr, idx) => (
+                    <div key={idx}>{mgr.name}</div>
+                  ))}
+                </td>
+                <td className="border text-center px-4 py-2">
+                  <button
+                    className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+                    onClick={() => handleOpenModal(store)}
+                    aria-label="Edit Store">
+                    <Icon
+                      icon="tabler:shopping-bag-edit"
+                      width="24"
+                      height="24"
+                    />
+                  </button>
+                  <button
+                    className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded hover:bg-primaryColor hover:text-white"
+                    onClick={() =>
+                      window.open(
+                        `/shop/store-management/${store._id}`,
+                        "_blank"
+                      )
+                    }
+                    title={t("sysadmin.go_to_store_management")}>
+                    <Icon
+                      icon="material-symbols:settings-outline"
+                      width="24"
+                      height="24"
+                    />
+                  </button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
       {isModalOpen && selectedStore && (
         <div className="fixed inset-0 bg-gray-900 bg-opacity-50 flex justify-center items-center">
-          <div className="bg-white p-8 rounded shadow-lg w-1/2">
+          <div className="bg-white p-8 rounded shadow-lg w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+
             <h2 className="text-3xl font-bold mb-4 text-center">
               {newStoreMode
                 ? t("sysadmin.add_store")
@@ -346,6 +353,107 @@ const SysAdmin = () => {
                 onChange={(e) => handleFieldChange("email", e.target.value)}
               />
             </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+              <div>
+                <label className="block mb-1">
+                  {t("sysadmin.delivery_company_home")}
+                </label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2"
+                  value={
+                    selectedStore?.deliveryOptions?.homeDelivery?.company || ""
+                  }
+                  onChange={(e) =>
+                    setSelectedStore((prev) => ({
+                      ...prev,
+                      deliveryOptions: {
+                        ...prev.deliveryOptions,
+                        homeDelivery: {
+                          ...prev.deliveryOptions?.homeDelivery,
+                          company: e.target.value,
+                        },
+                      },
+                    }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">
+                  {t("sysadmin.delivery_price_home")}
+                </label>
+                <input
+                  type="number"
+                  className="w-full border px-3 py-2"
+                  value={
+                    selectedStore?.deliveryOptions?.homeDelivery?.price || 0
+                  }
+                  onChange={(e) =>
+                    setSelectedStore((prev) => ({
+                      ...prev,
+                      deliveryOptions: {
+                        ...prev.deliveryOptions,
+                        homeDelivery: {
+                          ...prev.deliveryOptions?.homeDelivery,
+                          price: Number(e.target.value),
+                        },
+                      },
+                    }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">
+                  {t("sysadmin.delivery_company_pickup")}
+                </label>
+                <input
+                  type="text"
+                  className="w-full border px-3 py-2"
+                  value={
+                    selectedStore?.deliveryOptions?.pickupPoint?.company || ""
+                  }
+                  onChange={(e) =>
+                    setSelectedStore((prev) => ({
+                      ...prev,
+                      deliveryOptions: {
+                        ...prev.deliveryOptions,
+                        pickupPoint: {
+                          ...prev.deliveryOptions?.pickupPoint,
+                          company: e.target.value,
+                        },
+                      },
+                    }))
+                  }
+                />
+              </div>
+
+              <div>
+                <label className="block mb-1">
+                  {t("sysadmin.delivery_price_pickup")}
+                </label>
+                <input
+                  type="number"
+                  className="w-full border px-3 py-2"
+                  value={
+                    selectedStore?.deliveryOptions?.pickupPoint?.price || 0
+                  }
+                  onChange={(e) =>
+                    setSelectedStore((prev) => ({
+                      ...prev,
+                      deliveryOptions: {
+                        ...prev.deliveryOptions,
+                        pickupPoint: {
+                          ...prev.deliveryOptions?.pickupPoint,
+                          price: Number(e.target.value),
+                        },
+                      },
+                    }))
+                  }
+                />
+              </div>
+            </div>
 
             <div className="mb-4">
               <label className="block mb-1">{t("sysadmin.managers")}</label>
@@ -374,8 +482,7 @@ const SysAdmin = () => {
                   <button
                     className="bg-white text-deleteC px-2 py-2 rounded hover:bg-deleteC hover:text-white ring-2 ring-gray-200 hover:ring-deleteC transition duration-200"
                     onClick={() => handleRemoveManager(index)}
-                    aria-label="Remove Manager"
-                    >
+                    aria-label="Remove Manager">
                     <Icon
                       icon="material-symbols:delete-outline"
                       width="24"
@@ -387,8 +494,7 @@ const SysAdmin = () => {
               <button
                 className="text-black px-2 py-2 mt-2 flex items-center hover:bg-primaryColor hover:text-white"
                 onClick={handleAddManager}
-                aria-label="Add Manager"
-                >
+                aria-label="Add Manager">
                 <Icon
                   icon="material-symbols:add-circle-outline-rounded"
                   width="24"
@@ -402,8 +508,7 @@ const SysAdmin = () => {
                 <button
                   className="bg-white text-deleteC px-2 py-2 rounded-full hover:bg-deleteC hover:text-white ring-2 ring-gray-200 hover:ring-deleteC transition duration-200"
                   onClick={handleDeleteStore}
-                  aria-label="Delete Store"
-                  >
+                  aria-label="Delete Store">
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="28"
@@ -416,8 +521,7 @@ const SysAdmin = () => {
                 <button
                   className="bg-white text-gray-600 px-2 py-2 border-primaryColor rounded mr-2 hover:bg-gray-600 hover:text-white"
                   onClick={handleCloseModal}
-                  aria-label="Close Modal"
-                  >
+                  aria-label="Close Modal">
                   <Icon
                     icon="material-symbols:cancel-outline-rounded"
                     width="36"
@@ -427,8 +531,7 @@ const SysAdmin = () => {
                 <button
                   className="bg-white text-primaryColor px-2 py-2 border-primaryColor rounded mr-2 hover:bg-primaryColor hover:text-white"
                   onClick={handleSave}
-                  aria-label="Save Store"
-                  >
+                  aria-label="Save Store">
                   <Icon
                     icon="material-symbols:check-circle-outline-rounded"
                     width="36"

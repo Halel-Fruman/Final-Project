@@ -226,6 +226,10 @@
       "storeName": "Store Name",
       "price": "Price",
       "sold": "Quantity Sold",
+      "delivery_company_home": "Home Delivery Company",
+      "delivery_price_home": "Home Delivery Price",
+      "delivery_company_pickup": "Pickup Point Company",
+      "delivery_price_pickup": "Pickup Point Price",
       "errors": {
         "fetchFailed": "Failed to fetch statistics data."
       },

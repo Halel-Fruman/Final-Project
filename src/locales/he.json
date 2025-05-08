@@ -198,6 +198,10 @@
     "managers": "מנהלים",
     "manager_name": "שם המנהל",
     "manager_email": "אימייל של המנהל",
+    "delivery_company_home": "חברת משלוח לבית",
+    "delivery_price_home": "מחיר משלוח לבית",
+    "delivery_company_pickup": "חברת משלוח לנקודת איסוף",
+    "delivery_price_pickup": "מחיר לנקודת איסוף",
     "actions": "פעולות",
     "add_store": "הוסף חנות",
     "edit_store": "ערוך חנות",
@@ -307,11 +311,15 @@
     "addNewAddress": "הוסף כתובת חדשה",
     "cancelNewAddress": "ביטול הוספת כתובת",
     "saveNewAddress": "שמור כתובת ",
+    "deliveryCompany": "חברת משלוח",
+    "deliveryPrice": "מחיר משלוח",
+    "deliveryMethod": "שיטת משלוח",
     "deliveryMethods": {
       "title": "שיטת משלוח",
       "pickup": "איסוף עצמי",
       "express": "משלוח מהיר",
       "courier": "משלוח רגיל",
+      "delivery_box": "נקודת איסוף",
 
       "selectDeliveryMethod": "בחר שיטת משלוח",
       "selectAddress": "בחר כתובת"

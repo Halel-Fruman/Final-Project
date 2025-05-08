@@ -66,7 +66,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const handleAddToCart = () => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
-      toast.error(t("cart.mustBeLoggedIn")); // הוסף תרגום מתאים
+      toast.error(t("cart.mustBeLoggedIn"));
       return;
     }
 
@@ -94,7 +94,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
       if (!response.ok) {
         if (data.message === "You have already rated this product.") {
-          toast.error(t("product.alreadyRated")); // תרגם את זה בקובץ השפה
+          toast.error(t("product.alreadyRated"));
         } else {
           toast.error(t("product.ratingError"));
         }
@@ -103,7 +103,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
       setProduct(data.product);
       setRating(newRating);
-      toast.success(t("product.ratingSuccess")); // אפשרות לתגובה חיובית
+      toast.success(t("product.ratingSuccess"));
     } catch (err) {
       console.error("Error updating rating:", err.message);
       toast.error(t("product.ratingError"));
@@ -255,21 +255,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   ))}
                 </ul>
               </div>
-              <div className="flex justify-end mb-4 flex-wrap gap-2 mr-auto">
-                {product.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Thumbnail ${index + 1}`}
-                    onClick={() => handleImageClick(image)}
-                    className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
-                      selectedImage === image
-                        ? "border-4 border-primaryColor"
-                        : "border-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
+
             </div>
 
             <div className="mb-6">
@@ -282,7 +268,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
-                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-lg text-xl font-bold hover:bg-primaryColor transition">
+                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-full text-xl font-bold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
               <button
@@ -298,6 +284,21 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                 )}
               </button>
             </div>
+            <div className="flex justify-start m-4 flex-wrap gap-2 mr-auto">
+                {product.images.map((image, index) => (
+                  <img
+                    key={index}
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    onClick={() => handleImageClick(image)}
+                    className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
+                      selectedImage === image
+                        ? "border-4 border-primaryColor"
+                        : "border-gray-300"
+                    }`}
+                  />
+                ))}
+              </div>
           </div>
         </div>
       </div>

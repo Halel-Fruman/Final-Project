@@ -43,7 +43,7 @@ const App = () => {
   const [wishlistLoading, setWishlistLoading] = useState(true); // use the useState hook to create a wishlistLoading state variable and set it to true
   const [cartItems, setCartItems] = useState([]); // use the useState hook to create a cartItems state variable and set it to an empty array
   const [isCartOpen, setIsCartOpen] = useState(false); // use the useState hook to create an isCartOpen state variable and set it to false
-  const [isWishlistOpen, setIsWishlistOpen] = useState(false); // חדש
+  const [isWishlistOpen, setIsWishlistOpen] = useState(false); // use the useState hook to create an isWishlistOpen state variable and set it to false
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false); // use the useState hook to create an isLoginModalOpen state variable and set it to false
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false); // use the useState hook to create an isRegisterModalOpen state variable and set it to false
 
@@ -165,6 +165,7 @@ const App = () => {
       {/*Router component to wrap the entire application and provide the routing context to all components */}
       <Router basename="/shop">
         <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
+        <div className="flex flex-col bg-gray-50 min-h-screen">
 
         {/*Header component to display the header of the application         */}
         <Header
@@ -255,6 +256,9 @@ const App = () => {
                   fetchProductDetails={fetchProductDetails}
                   userId={userId}
                   token={token}
+                  addToCart={handleAddToCart}
+                  setCartItems={setCartItems}
+                  handleRemoveFromCart={handleRemoveFromCart}
                 />
               }
             />
@@ -325,6 +329,7 @@ const App = () => {
           </Routes>
         </div>
         <Footer />
+        </div>
       </Router>
     </AlertProvider>
   );
