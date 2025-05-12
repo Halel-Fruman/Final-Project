@@ -258,7 +258,7 @@ const App = () => {
                   token={token}
                   addToCart={handleAddToCart}
                   setCartItems={setCartItems}
-                  handleRemoveFromCart={handleRemoveFromCart}
+                  removeFromCart={handleRemoveFromCart}
                 />
               }
             />

@@ -11,7 +11,7 @@ const productSchema = new mongoose.Schema(
       he: { type: String },
     },
     categories: [{ type: mongoose.Schema.Types.ObjectId, ref: "Category" }],
-    // רשימת קטגוריות בכל שפה
+ // רשימת קטגוריות בכל שפה
     attributes: {
       en: { type: Map, of: String },
       he: { type: Map, of: String },
@@ -65,8 +65,9 @@ const storeProductsSchema = new mongoose.Schema({
     he: { type: String, required: true },
     en: { type: String, required: true },
   }, // שם החנות
-  products: [productSchema], // מערך מוצרים של החנות
-});
+ products: {
+    type: [productSchema]
+  }});
 
 const Products = mongoose.model(
   "StoreProducts",

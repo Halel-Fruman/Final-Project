@@ -4,7 +4,7 @@
   "show_filters": "הצג סינון",
   "hide_filters": "הסתר סינון",
   "clear_filters": "נקה סינון",
-  "on_sale_only":"במבצע",
+  "on_sale_only": "במבצע",
   "error": "שגיאה",
   "add_to_wishlist": "הוסף לרשימת המשאלות",
   "remove_from_wishlist": "הסר מרשימת המשאלות",
@@ -14,6 +14,9 @@
   "no_products_found": "לא נמצאו מוצרים מתאימים",
   "filters": "סינון",
   "remove_filter": "הסר סינון",
+  "search": "חיפוש",
+  "max_price": "מחיר מקסימלי",
+  "min_price": "מחיר מינימלי",
 
   "view_products": "צפה במוצרים",
   "header": {
@@ -136,7 +139,6 @@
     "networkError": "אין חיבור לשרת. נסה שוב מאוחר יותר",
     "serverUnavailable": "השרת אינו זמין כעת. אנא נסה מאוחר יותר",
     "requiredToRate": "יש להתחבר כדי לדרג מוצרים"
-
   },
   "addAddress": {
     "title": "הוספת כתובת",
@@ -217,23 +219,23 @@
     "edit": "ערוך",
     "store_email": "מייל החנות",
     "dashboard": {
-    "title": "סקירה מערכתית",
-    "salesComparison": "השוואת מכירות בין חנויות",
-    "ordersCount": "מספר עסקאות",
-    "totalRevenue": "סכום עסקאות (₪)",
-    "filter": "סנן",
-     "fromDate": "מתאריך",
-  "toDate": "עד תאריך",
-  "topProducts": "המוצרים הנמכרים ביותר",
+      "title": "סקירה מערכתית",
+      "salesComparison": "השוואת מכירות בין חנויות",
+      "ordersCount": "מספר עסקאות",
+      "totalRevenue": "סכום עסקאות (₪)",
+      "filter": "סנן",
+      "fromDate": "מתאריך",
+      "toDate": "עד תאריך",
+      "topProducts": "המוצרים הנמכרים ביותר",
       "productName": "שם מוצר",
       "storeName": "שם החנות",
       "price": "מחיר",
       "sold": "כמות שנמכרה",
-    "errors": {
-      "fetchFailed": "נכשל בטעינת נתונים סטטיסטיים."
-    },
-    "noData": "אין נתונים זמינים עבור התקופה שנבחרה."
-  }
+      "errors": {
+        "fetchFailed": "נכשל בטעינת נתונים סטטיסטיים."
+      },
+      "noData": "אין נתונים זמינים עבור התקופה שנבחרה."
+    }
   },
 
   "storemanage": {
@@ -261,7 +263,6 @@
     "quantity_updated": "הכמות עודכנה בהצלחה",
     "quantity_update_failed": "אירעה שגיאה בעדכון הכמות",
     "mustBeLoggedIn": "עליך להתחבר כדי להוסיף לעגלה"
-
   },
   "modal": {
     "close": "סגור"
@@ -314,12 +315,14 @@
     "deliveryCompany": "חברת משלוח",
     "deliveryPrice": "מחיר משלוח",
     "deliveryMethod": "שיטת משלוח",
+    "remove": "הסר",
     "deliveryMethods": {
       "title": "שיטת משלוח",
       "pickup": "איסוף עצמי",
       "express": "משלוח מהיר",
-      "courier": "משלוח רגיל",
+      "courier": "משלוח עד הבית",
       "delivery_box": "נקודת איסוף",
+      "pickupFromStore": "איסוף מהחנות",
 
       "selectDeliveryMethod": "בחר שיטת משלוח",
       "selectAddress": "בחר כתובת"

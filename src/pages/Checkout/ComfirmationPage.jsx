@@ -3,6 +3,8 @@ import React from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+// This component is responsible for displaying the confirmation page after a successful order
+// It shows the order details, including the store name, order ID, status, products, and delivery method
 const ConfirmationPage = () => {
 
   const { state } = useLocation();
@@ -15,6 +17,8 @@ const ConfirmationPage = () => {
 
   const isSameId = (a, b) => a?.toString?.() === b?.toString?.();
 
+  // Group transactions by transactionId
+  // This is useful for displaying multiple orders in a single transaction
   const groupedByTransactionId = transactions.reduce((acc, tx) => {
     const txId = tx.transaction?.transactionId;
     if (!txId) return acc;
@@ -23,6 +27,8 @@ const ConfirmationPage = () => {
     return acc;
   }, {});
 
+  // If there are no transactions, display a message and a button to go back home
+  // This is useful for cases where the user navigates to this page without completing an order
   if (!transactions.length) {
     return (
       <div className="text-center py-10">
@@ -38,6 +44,8 @@ const ConfirmationPage = () => {
     );
   }
 
+  // If there are transactions, display the confirmation page with order details
+  // This includes the store name, order ID, status, products, and delivery method
   return (
     <main className="max-w-5xl mx-auto p-6">
       <h1 className="text-4xl font-bold mb-6 text-center text-primaryColor">
@@ -46,6 +54,7 @@ const ConfirmationPage = () => {
       <h2 className="text-center text-gray-700 mb-4">
         {t("confirmation.successMessage")}
       </h2>
+
 
       {Object.entries(groupedByTransactionId).map(([txId, group], groupIdx) => (
         <div
@@ -160,13 +169,20 @@ const ConfirmationPage = () => {
         </div>
       ))}
 
-      <div className="text-center mt-6">
+      <div className="text-center  mt-6">
         <button
           onClick={() =>
             navigate("/personal-area", { state: { selectedTab: "orders" } })
           }
-          className="px-6 py-2 bg-primaryColor text-white text-xl font-bold rounded-full hover:bg-secondaryColor">
+          className="px-6 py-2 mx-2 bg-primaryColor text-white text-xl font-bold rounded-full hover:bg-secondaryColor">
           {t("confirmation.viewOrders")}
+        </button>
+        <button
+          onClick={() =>
+            navigate("/")
+          }
+          className="px-6 py-2 bg-primaryColor text-white text-xl font-bold rounded-full hover:bg-secondaryColor">
+          {t("confirmation.backHome")}
         </button>
       </div>
     </main>

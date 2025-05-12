@@ -1,6 +1,8 @@
 // File: src/pages/SysAdmin/AdminDashboard.jsx
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
+import { Text } from "recharts";
+
 import axios from "axios";
 import {
   BarChart,
@@ -60,6 +62,28 @@ const AdminDashboard = () => {
   useEffect(() => {
     fetchStats();
   }, [i18n.language]);
+
+const CustomTick = ({ x, y, payload }) => {
+  const lines = payload.value.split(" "); // שובר לפי רווח
+  return (
+    <g transform={`translate(${x},${y})`}>
+
+      {lines.map((line, index) => (
+        <Text
+          key={index}
+          x={0}
+          y={index * 12}
+          textAnchor="middle"
+          fontSize={16}
+          dominantBaseline="hanging"
+          transform="rotate(0)">
+          {line}
+        </Text>
+      ))}
+    </g>
+  );
+};
+
 
   return (
     <div className="p-6 bg-gray-50 h-fit">
@@ -163,13 +187,16 @@ const AdminDashboard = () => {
                     interval={0}
                     angle={0}
                     textAnchor="middle"
+                    tick={<CustomTick />}
+
+
                   />
                   <YAxis
                     orientation="left"
                     tick={{ dx: -5, textAnchor: "start" }}
                   />
                   <Tooltip />
-                  <Legend />
+                  <Legend align="right" wrapperStyle={{ marginTop: 10 }}  />
                   <Bar
                     dataKey="totalRevenue"
                     fill="#82ca9d"
@@ -194,13 +221,15 @@ const AdminDashboard = () => {
                     interval={0}
                     angle={0}
                     textAnchor="middle"
+                    tick={<CustomTick />}
+
                   />
                   <YAxis
                     orientation="left"
                     tick={{ dx: -5, textAnchor: "start" }}
                   />
                   <Tooltip />
-                  <Legend />
+                  <Legend align="right" wrapperStyle={{ marginTop: 10 }}  />
                   <Bar
                     dataKey="totalOrders"
                     fill="#8884d8"

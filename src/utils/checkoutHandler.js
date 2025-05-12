@@ -7,10 +7,7 @@ export const processCheckout = async ({
   token,
   setCartItems,
 }) => {
-  console.log("Processing checkout with the following data:", {
 
-    deliveryMethods,
-  });
   if (!userData || !selectedAddress) {
     throw new Error("User data or selected address missing");
   }

@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
+const authenticateToken = require("../Middleware/authenticateToken");
+
 
 // storage setting
 const storage = multer.diskStorage({
@@ -189,7 +191,8 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-router.post("/:id/rate", async (req, res) => {
+
+router.post("/:id/rate", authenticateToken, async (req, res) => {
   const { id } = req.params;
   const { rating } = req.body;
 
@@ -204,14 +207,22 @@ router.post("/:id/rate", async (req, res) => {
     const product = store.products.find((p) => String(p._id) === id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
+    const userId = req.user.userId; // כאן בטוח יש userId כי authenticateToken דרש טוקן תקין
+
+    const alreadyReviewed = product.reviews.some(
+      (review) => review.user?.toString() === userId
+    );
+    if (alreadyReviewed) {
+      return res.status(400).json({ message: "You have already rated this product." });
+    }
+
     product.reviews.push({
-      user: null,
+      user: userId,
       rating,
     });
 
     await store.save();
 
-    // חישוב ממוצע חדש
     const averageRating =
       product.reviews.reduce((sum, r) => sum + r.rating, 0) /
       product.reviews.length;

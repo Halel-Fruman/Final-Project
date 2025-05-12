@@ -12,6 +12,12 @@ const FilterBar = ({
   setSelectedStores,
   isOnSaleOnly,
   setIsOnSaleOnly,
+  searchText,
+  setSearchText,
+  minPrice,
+  setMinPrice,
+  maxPrice,
+  setMaxPrice,
 }) => {
   const { i18n, t } = useTranslation();
 
@@ -19,10 +25,18 @@ const FilterBar = ({
     setSelectedCategories([]);
     setSelectedStores([]);
     setIsOnSaleOnly(false);
+    setSearchText("");
+    setMinPrice("");
+    setMaxPrice("");
   };
 
   const hasFilters =
-    selectedCategories.length > 0 || selectedStores.length > 0 || isOnSaleOnly;
+    selectedCategories.length > 0 ||
+    selectedStores.length > 0 ||
+    isOnSaleOnly ||
+    searchText ||
+    minPrice ||
+    maxPrice;
 
   const FilterDropdown = ({ label, options, selected, onChange }) => {
     const toggleOption = (id) => {
@@ -36,12 +50,12 @@ const FilterBar = ({
     return (
       <Menu as="div" className="relative inline-block text-left">
         <Menu.Button
-          className="inline-flex items-center rounded-md border border-gray-300 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50 shadow-sm"
+          className="inline-flex items-center rounded-full border border-secondaryColor bg-secondaryColor bg-opacity-10 px-4 py-2 text-sm font-medium text-black hover:bg-secondary bg-opacity-10 shadow-sm"
           aria-haspopup="true"
           aria-expanded="true">
           {label}
           {selected.length > 0 && (
-            <span className="ml-2 mr-2 rounded bg-gray-200 px-1 text-xs">
+            <span className="ml-2 mr-2 rounded-full bg-secondaryColor bg-opacity-20 px-1 text-sm">
               {selected.length}
             </span>
           )}
@@ -57,28 +71,30 @@ const FilterBar = ({
           leaveFrom="transform opacity-100 scale-100"
           leaveTo="transform opacity-0 scale-95">
           <Menu.Items
-            className="absolute z-50 mt-2 w-56 origin-top-right rounded-md bg-white shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none p-2 max-h-64 overflow-y-auto"
+            className="absolute z-50 mt-2 w-56 origin-top-right rounded-lg bg-white  shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none  max-h-64 overflow-y-auto"
             role="menu">
-            {options.map((opt) => {
-              const inputId = `filter-${label}-${opt.id}`;
-              return (
-                <Menu.Item key={opt.id} as="div" role="none">
-                  <div className="flex items-center px-2 py-1 hover:bg-gray-100 rounded">
-                    <input
-                      id={inputId}
-                      type="checkbox"
-                      checked={selected.includes(opt.id)}
-                      onChange={() => toggleOption(opt.id)}
-                      className="mr-2"
-                      aria-checked={selected.includes(opt.id)}
-                    />
-                    <label htmlFor={inputId} className="cursor-pointer">
-                      {opt.label}
-                    </label>
-                  </div>
-                </Menu.Item>
-              );
-            })}
+            <div className="bg-secondaryColor bg-opacity-20 p-2 ">
+              {options.map((opt) => {
+                const inputId = `filter-${label}-${opt.id}`;
+                return (
+                  <Menu.Item key={opt.id} as="div" role="none">
+                    <div className="flex items-center gap-2 px-2 py-1  hover:bg-secondaryColor hover:bg-opacity-20 rounded-full">
+                      <input
+                        id={inputId}
+                        type="checkbox"
+                        checked={selected.includes(opt.id)}
+                        onChange={() => toggleOption(opt.id)}
+                        className="mr-2 accent-primaryColor "
+                        aria-checked={selected.includes(opt.id)}
+                      />
+                      <label htmlFor={inputId} className="cursor-pointer">
+                        {opt.label}
+                      </label>
+                    </div>
+                  </Menu.Item>
+                );
+              })}
+            </div>
           </Menu.Items>
         </Transition>
       </Menu>
@@ -87,7 +103,7 @@ const FilterBar = ({
 
   return (
     <div
-      className="divide-y bg-gray-100 rounded-lg px-4 py-3 shadow mb-6 w-full mx-auto"
+      className="divide-y bg-primaryColor bg-opacity-10 rounded-lg px-4 py-3 shadow mb-6 w-full mx-auto"
       role="region"
       aria-label={t("filters")}>
       {/* Dropdowns row */}
@@ -120,15 +136,50 @@ const FilterBar = ({
             onChange={(e) => setIsOnSaleOnly(e.target.checked)}
             className="mr-2"
           />
-          <label htmlFor="filter-sale" className="text-sm text-gray-700 mr-2">
+          <label htmlFor="filter-sale" className="text-md text-gray-700 mr-2">
             {t("on_sale_only")}
           </label>
+        </div>
+
+        {/* Price range filter */}
+        <div className="flex items-center gap-2">
+          <label htmlFor="min-price" className="text-md font-bold text-gray-700">
+            {t("min_price")}:
+          </label>
+          <input
+            type="number"
+            id="min-price"
+            className="w-20 border rounded-full border-secondaryColor bg-opacity-20  px-1 py-0.5 text-md "
+            value={minPrice}
+            onChange={(e) => setMinPrice(e.target.value)}
+          />
+          <label htmlFor="max-price" className="text-md font-bold text-gray-700">
+            {t("max_price")}:
+          </label>
+          <input
+            type="number"
+            id="max-price"
+            className="w-20 border border  rounded-full border-secondaryColor   px-1 py-0.5 text-md "
+            value={maxPrice}
+            onChange={(e) => setMaxPrice(e.target.value)}
+          />
+        </div>
+
+        {/* Search field */}
+        <div className="flex items-center">
+          <input
+            type="text"
+            placeholder={t("search")}
+            className="border border-secondaryColor rounded-full px-2 py-1 text-md"
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+          />
         </div>
 
         {hasFilters && (
           <button
             onClick={clearAll}
-            className="text-sm text-gray-700 underline hover:text-primaryColor"
+            className="text-sm text-black underline hover:text-primaryColor"
             aria-label={t("clear_filters")}>
             {t("clear_filters")}
           </button>
@@ -145,7 +196,7 @@ const FilterBar = ({
             return (
               <span
                 key={id}
-                className="bg-white border rounded px-2 py-1 text-sm flex items-center">
+                className="bg-secondaryColor bg-opacity-20 border-secondaryColor border rounded-full px-2 py-1 text-md flex items-center">
                 {cat?.name?.[i18n.language]}
                 <button
                   onClick={() =>
@@ -168,7 +219,7 @@ const FilterBar = ({
             return (
               <span
                 key={id}
-                className="bg-white border rounded px-2 py-1 text-sm flex items-center">
+                className="bg-secondaryColor bg-opacity-20 border border-secondaryColor rounded-full px-2 py-1 text-md flex items-center">
                 {store?.name}
                 <button
                   onClick={() =>
@@ -183,12 +234,36 @@ const FilterBar = ({
           })}
 
           {isOnSaleOnly && (
-            <span className="bg-white border rounded px-2 py-1 text-sm flex items-center">
+            <span className="bg-secondaryColor bg-opacity-20 border rounded-full px-2 py-1 text-sm flex items-center">
               {t("on_sale_only")}
               <button
                 onClick={() => setIsOnSaleOnly(false)}
                 className="ml-1 text-gray-500 hover:text-red-500"
                 aria-label={t("remove_filter") + " " + t("on_sale_only")}>
+                ×
+              </button>
+            </span>
+          )}
+
+          {minPrice && (
+            <span className="bg-secondaryColor bg-opacity-20 border rounded-full px-2 py-1 text-sm flex items-center">
+              {t("min_price")}: ₪{minPrice}
+              <button
+                onClick={() => setMinPrice("")}
+                className="ml-1 text-gray-500 hover:text-red-500"
+                aria-label={t("remove_filter") + " " + t("min_price")}>
+                ×
+              </button>
+            </span>
+          )}
+
+          {maxPrice && (
+            <span className="bg-secondaryColor bg-opacity-20 border rounded-full px-2 py-1 text-md flex items-center">
+              {t("max_price")}: ₪{maxPrice}
+              <button
+                onClick={() => setMaxPrice("")}
+                className="ml-1 text-gray-500 hover:text-red-500"
+                aria-label={t("remove_filter") + " " + t("max_price")}>
                 ×
               </button>
             </span>

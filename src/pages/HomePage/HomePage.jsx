@@ -17,6 +17,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [isOnSaleOnly, setIsOnSaleOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [searchText, setSearchText] = useState("");
+
   const navigate = useNavigate();
   const shuffleArray = (array) => {
     const shuffled = [...array];
@@ -26,7 +30,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     }
     return shuffled;
   };
-
 
   useEffect(() => {
     const fetchProducts = async () => {
@@ -82,14 +85,22 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       selectedStores.length === 0 || selectedStores.includes(product.storeId);
     const activeDiscount = getActiveDiscount(product.discounts);
     const onSaleMatch = !isOnSaleOnly || !!activeDiscount;
-    return categoryMatch && storeMatch && onSaleMatch;
+    const price = product.price;
+    const priceMatch =
+      (!minPrice || price >= parseFloat(minPrice)) &&
+      (!maxPrice || price <= parseFloat(maxPrice));
+    const name = product.name?.[i18n.language]?.toLowerCase() || "";
+    const searchMatch = name.includes(searchText.toLowerCase());
+
+    return (
+      categoryMatch && storeMatch && onSaleMatch && priceMatch && searchMatch
+    );
   });
 
   const shuffledProductsToShow = useMemo(
     () => shuffleArray(productsToShow),
     [productsToShow]
   );
-
 
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
@@ -127,7 +138,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
   return (
     <div className="bg-gray-50">
-      <header id="home"
+      <header
+        id="home"
         aria-label="Hero Section"
         className="relative bg-primaryColor text-white"
         style={{
@@ -172,6 +184,12 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           setSelectedStores={setSelectedStores}
           isOnSaleOnly={isOnSaleOnly}
           setIsOnSaleOnly={setIsOnSaleOnly}
+          minPrice={minPrice}
+          setMinPrice={setMinPrice}
+          maxPrice={maxPrice}
+          setMaxPrice={setMaxPrice}
+          searchText={searchText}
+          setSearchText={setSearchText}
         />
 
         {productsToShow.length === 0 ? (

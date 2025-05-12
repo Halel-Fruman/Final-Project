@@ -105,7 +105,7 @@ const UserController = {
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).send("Invalid credentials");
       // create a token with the user id
-      const token = jwt.sign({ id: user._id }, SECRET_KEY, { expiresIn: "1h" });
+      const token = jwt.sign({  userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: "2h" });
       res.status(200).json({ token, userId: user._id, role: user.role });
     } catch (error) {
       res.status(500).send("Error logging in: " + error.message);
@@ -160,6 +160,29 @@ const UserController = {
       res.status(500).send("Error updating user: " + error.message);
     }
   },
+
+// מחיקת משתמש – רק למשתמשים עם role === 'admin'
+deleteUser: async (req, res) => {
+  const requesterRole = req.user.role; // נשלף מהמידלוור
+  const userIdToDelete = req.params.userId;
+
+  if (requesterRole !== "admin") {
+    return res.status(403).json({ error: "גישה נדחתה – נדרשת הרשאת אדמין." });
+  }
+
+  try {
+    const deletedUser = await User.findByIdAndDelete(userIdToDelete);
+    if (!deletedUser) {
+      return res.status(404).json({ error: "משתמש לא נמצא." });
+    }
+
+    res.status(200).json({ message: "המשתמש נמחק בהצלחה." });
+  } catch (err) {
+    console.error("שגיאה במחיקת משתמש:", err);
+    res.status(500).json({ error: "שגיאה במחיקת המשתמש." });
+  }
+},
+
 
   // change the role of a user by id
   changePassword: async (req, res) => {
@@ -545,6 +568,17 @@ const UserController = {
         .json({ error: "Error updating product quantity: " + error.message });
     }
   },
+
+clearUserCart: async (req, res) => {
+  try {
+    const userId = req.params.id;
+    await User.findByIdAndUpdate(userId, { cart: [] });
+    res.status(200).json({ message: 'Cart cleared successfully' });
+  } catch (err) {
+    console.error('❌ Failed to clear cart:', err);
+    res.status(500).json({ error: 'Failed to clear cart' });
+  }
+},
   addTransactionToUser: async (req, res) => {
     const { userId } = req.params;
     const { transactionId } = req.body;

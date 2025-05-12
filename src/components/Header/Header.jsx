@@ -253,10 +253,11 @@ const Header = ({
       <Dialog
         open={isRegisterModalOpen}
         onClose={() => setIsRegisterModalOpen(false)}
-        className="fixed inset-0 z-50 flex p-4 items-center justify-center overflow-y-scroll">
-        <div className="fixed inset-0 bg-black bg-opacity-50" />
-        <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md  w-full p-6">
-          <Register
+        className="fixed inset-0 z-50 flex p-4 items-center justify-center max-h-screen overflow-y-scroll">
+        <div className="fixed inset-0 bg-black bg-opacity-50 max-h-screen" />
+        <DialogPanel className="relative bg-white rounded-lg shadow-lg  max-w-md w-full h-full max-h-screen p-6 overflow-y-auto">
+
+        <Register
             setToken={setToken}
             setUserId={setUserId}
             onClose={() => setIsRegisterModalOpen(false)}

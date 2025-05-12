@@ -5,6 +5,8 @@ import { addAddress } from "../../utils/Address";
 import { processCheckout } from "../../utils/checkoutHandler";
 import { useNavigate } from "react-router-dom";
 import { set } from "mongoose";
+import { Icon } from "@iconify/react";
+import { updateCartItemQuantity } from "../../utils/Cart";
 
 const CheckoutPage = ({
   cartItems = [],
@@ -24,11 +26,14 @@ const CheckoutPage = ({
   const [startPayment, setStartPayment] = useState(false);
   const [deliveryMethods, setDeliveryMethods] = useState({});
   const [storeShippingInfo, setStoreShippingInfo] = useState({});
+  const [isFinalizing, setIsFinalizing] = useState(false);
 
   const navigate = useNavigate();
 
   const selectedAddress = userData?.addresses?.[selectedAddressIndex];
 
+  // Fetch product details for each item in the cart
+  // and set the detailed cart state
   useEffect(() => {
     const loadDetails = async () => {
       const enriched = await Promise.all(
@@ -43,12 +48,15 @@ const CheckoutPage = ({
     if (cartItems.length > 0) loadDetails();
   }, [cartItems, fetchProductDetails]);
 
+  // Handle payment success message from Tranzila
+  // and process the checkout
   useEffect(() => {
     const handleMessage = (event) => {
       if (event?.data?.type === "TRZILA_PAYMENT_SUCCESS") {
         (async () => {
           try {
-            // שליפת נתוני notify מהשרת
+            setIsFinalizing(true); // ⬅️ התחלת טעינה
+
             const res = await fetch(`/api/tranzila/notify/${userId}`);
             if (!res.ok) throw new Error("Failed to fetch notify info");
             const notifyData = await res.json();
@@ -69,6 +77,8 @@ const CheckoutPage = ({
           } catch (err) {
             console.error("❌ Error during post-payment processing:", err);
             alert("שגיאה בעת השלמת ההזמנה");
+          } finally {
+            setIsFinalizing(false); // ⬅️ סיום טעינה
           }
         })();
       }
@@ -86,6 +96,8 @@ const CheckoutPage = ({
     navigate,
   ]);
 
+  // Tranzila Iframe component
+  // This component creates a payment session with Tranzila
   const TranzilaIframe = ({
     sum,
     userId,
@@ -103,13 +115,13 @@ const CheckoutPage = ({
       return acc;
     }, {});
 
+    // Calculate the total sum of the cart items
     useEffect(() => {
       const createPaymentSession = async () => {
         try {
           const cartDetails = [];
 
           Object.entries(groupedByStore).forEach(([storeId, products]) => {
-            // הוספת פרטי המוצרים
             products.forEach((item) => {
               cartDetails.push({
                 product_name: item.name?.[i18n.language] || "Product",
@@ -118,25 +130,28 @@ const CheckoutPage = ({
               });
             });
 
-            // הוספת פריט משלוח
             const method = deliveryMethods[storeId];
             const shipping = storeShippingInfo[storeId];
-
+            console.log(method);
             let price = 0;
             let company = "";
+            let deliveryMethod = "";
             if (method === "courier") {
               price = shipping?.homeDelivery?.price || 0;
               company = shipping?.homeDelivery?.company || "";
+              deliveryMethod = t("checkout.deliveryMethods.courier");
             } else if (method === "pickupPoint") {
               price = shipping?.pickupPoint?.price || 0;
               company = shipping?.pickupPoint?.company || "";
+              deliveryMethod = t("checkout.deliveryMethods.delivery_box");
             } else {
               price = 0;
               company = t("checkout.deliveryMethods.pickup");
+              deliveryMethod = t("checkout.deliveryMethods.pickupFromStore");
             }
 
             cartDetails.push({
-              product_name: `${method} - ${company}`,
+              product_name: `${deliveryMethod} - ${company}`,
               product_quantity: 1,
               product_price: price,
             });
@@ -168,8 +183,20 @@ const CheckoutPage = ({
       createPaymentSession();
     }, [sum, userId, cartItems, selectedAddress, userData]);
 
-    if (!formHtml) return <div>Loading payment form...</div>;
+    // Render the Tranzila iframe
+    // If formHtml is not available, show a loading spinner
+    if (!formHtml)
+      return (
+        <div className="flex justify-center items-center py-12">
+          <Icon
+            icon="eos-icons:loading"
+            className="w-10 h-10 animate-spin text-primaryColor"
+          />
+        </div>
+      );
 
+    // Render the iframe with the payment form
+    // The iframe is set to 100% width and height of its container
     return (
       <div className="w-full h-[350px] mt-8">
         <iframe
@@ -178,12 +205,13 @@ const CheckoutPage = ({
           width="100%"
           height="100%"
           frameBorder="0"
-          allow="payment"
-          allowPaymentRequest></iframe>
+          allow="payment"></iframe>
       </div>
     );
   };
 
+  // Fetch user data when the component mounts
+  // and when the userId or token changes
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -199,6 +227,10 @@ const CheckoutPage = ({
     };
     if (userId) fetchUser();
   }, [userId, token]);
+
+  // Fetch shipping info for each store in the cart
+  // and set the storeShippingInfo state
+
   useEffect(() => {
     const fetchShippingInfo = async () => {
       const stores = [...new Set(detailedCart.map((p) => p.storeId))];
@@ -221,6 +253,9 @@ const CheckoutPage = ({
     if (detailedCart.length > 0) fetchShippingInfo();
   }, [detailedCart, token]);
 
+  // Set initial delivery methods for each store
+  // based on the detailed cart items
+  // If a store doesn't have a delivery method set, default to "pickupFromStore"
   useEffect(() => {
     if (detailedCart.length === 0) return;
 
@@ -229,9 +264,8 @@ const CheckoutPage = ({
       ...new Set(detailedCart.map((item) => item.storeId)),
     ];
     uniqueStoreIds.forEach((storeId) => {
-      // רק אם לא קיים כבר
       if (!deliveryMethods[storeId]) {
-        initialMethods[storeId] = "pickupFromStore"; // ברירת מחדל
+        initialMethods[storeId] = "pickupFromStore";
       }
     });
 
@@ -240,6 +274,9 @@ const CheckoutPage = ({
     }
   }, [detailedCart]);
 
+  // Group the detailed cart items by storeId
+  // This is used to display the items in the summary section
+  // and to calculate the total price
   const groupedByStore = useMemo(() => {
     return detailedCart.reduce((acc, item) => {
       const storeId = item.storeId;
@@ -284,7 +321,17 @@ const CheckoutPage = ({
     }
   };
 
-  return (
+  return (<>
+    {isFinalizing && (
+      <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center">
+        <div className="bg-white p-6 rounded-lg shadow-lg flex flex-col items-center space-y-4">
+          <Icon icon="eos-icons:loading" className="w-8 h-8 animate-spin text-primaryColor" />
+          <p className="text-lg font-semibold text-gray-700">
+            {t("checkout.finalizingTransaction") || "מעבד הזמנה..."}
+          </p>
+        </div>
+      </div>
+    )}
     <main className="w-11/12 max-w-7xl mx-auto py-12 px-4 sm:px-6 lg:px-8">
       <h1 className="text-5xl font-bold text-center text-gray-900 mb-2">
         {t("checkout.title")}
@@ -429,11 +476,67 @@ const CheckoutPage = ({
                       <div className="font-medium">
                         {item.name?.[i18n.language]}
                       </div>
-                      <div className="text-xs">
-                        {t("checkout.quantity")}: {item.quantity}
+                      <div className="flex items-center mt-1 space-x-2 rtl:space-x-reverse">
+                        <span className="text-xs">
+                          {t("checkout.quantity")}:
+                        </span>
+                        <button
+                          onClick={async () => {
+                            if (item.quantity > 1) {
+                              await updateCartItemQuantity(
+                                userId,
+                                item.productId?._id || item.productId,
+                                item.quantity - 1,
+                                token
+                              );
+                              setDetailedCart((prev) =>
+                                prev.map((p) =>
+                                  p._id === item._id
+                                    ? { ...p, quantity: item.quantity - 1 }
+                                    : p
+                                )
+                              );
+                            }
+                          }}
+                          disabled={item.quantity <= 1}
+                          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
+                          -
+                        </button>
+                        <span className="px-2">{item.quantity}</span>
+                        <button
+                          onClick={async () => {
+                            await updateCartItemQuantity(
+                              userId,
+                              item.productId?._id || item.productId,
+                              item.quantity + 1,
+                              token
+                            );
+                            setDetailedCart((prev) =>
+                              prev.map((p) =>
+                                p._id === item._id
+                                  ? { ...p, quantity: item.quantity + 1 }
+                                  : p
+                              )
+                            );
+                          }}
+                          className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                          +
+                        </button>
+                        <button
+                          onClick={async () => {
+                            removeFromCart(
+                              item.productId?._id || item.productId
+                            );
+                            setDetailedCart((prev) =>
+                              prev.filter((p) => p._id !== item._id)
+                            );
+                          }}
+                          className="ml-2 text-red-600 hover:text-red-800"
+                          title={t("checkout.remove")}>
+                          {t("checkout.remove")}
+                        </button>
                       </div>
                     </div>
-
                     <div className="text-md font-bold text-primaryColor ml-auto">
                       ₪{item.price}
                     </div>
@@ -512,6 +615,7 @@ const CheckoutPage = ({
         </div>
       </div>
     </main>
+    </>
   );
 };
 

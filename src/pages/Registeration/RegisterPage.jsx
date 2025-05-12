@@ -65,7 +65,7 @@ export default function Register({ setToken, setUserId, onClose }) {
   };
 
   return (
-    <div className="relative bg-white rounded-lg my-4 max-w-md w-full  p-4">
+    <div className="relative p-6 bg-white rounded-md w-full max-w-md h-full overflow-auto mx-auto">
       {onClose && (
         <button
           onClick={onClose}

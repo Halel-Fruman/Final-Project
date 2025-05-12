@@ -9,6 +9,9 @@
   "category": "Category",
   "store": "Store",
   "on_sale_only": "On Sale Only",
+  "search": "Search",
+  "min_price": "Min Price",
+  "max_price": "Max Price",
 
   "modal": {
     "close": "Close"
