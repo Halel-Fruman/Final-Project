@@ -7,9 +7,13 @@ import OrderManagement from "./OrderManagement.jsx";
 import { useTranslation } from "react-i18next";
 import StoreDashboard from "./StoreDashboard.jsx";
 import StoreAnalytics from "./StoreAnalytics.jsx";
+import { useLocation } from "react-router-dom";
 
 const StoreManagement = () => {
   const { storeId: paramStoreId } = useParams();
+  const location = useLocation();
+  const { tab, openAddProductForm ,autofill } = location.state || {};
+  console.log("Location state:", location.state);
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -20,6 +24,13 @@ const StoreManagement = () => {
   const { t, i18n } = useTranslation();
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
+
+
+  useEffect(() => {
+    if (tab) setActiveTab(tab);
+  }, [tab]);
+  
+
 
   useEffect(() => {
     const fetchStoreById = async () => {
@@ -111,7 +122,12 @@ const StoreManagement = () => {
       case "dashboard":
         return <StoreDashboard key="dashboard" storeId={storeId}/>;
       case "products":
-        return <ProductManagement key="products" storeId={storeId} />;
+        return <ProductManagement
+         key="products" 
+         storeId={storeId}  
+         autoOpenAddForm={openAddProductForm}       
+         autofill={autofill}
+/>;
       case "orders":
         return (
           <OrderManagement

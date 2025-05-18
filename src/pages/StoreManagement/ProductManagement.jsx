@@ -4,39 +4,69 @@ import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { useLocation, useNavigate } from "react-router-dom";
 
-const ProductManagement = ({ storeId }) => {
+
+
+const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [isAddingProduct, setIsAddingProduct] = useState(false);
+  const [isAddingProduct, setIsAddingProduct] = useState(autoOpenAddForm || false);
   const [searchQuery, setSearchQuery] = useState("");
   const { showAlert } = useAlert();
   const [editingProduct, setEditingProduct] = useState(null);
-
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [isEditing, setIsEditing] = useState(false);
+  const [editProductId, setEditProductId] = useState(null);
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true); // נשתמש באותו מודאל של הוספה
   };
 
-  const [newProduct, setNewProduct] = useState({
-    nameEn: "",
-    nameHe: "",
-    price: "",
-    stock: "",
-    manufacturingCost: "",
-    descriptionEn: "",
-    descriptionHe: "",
-    selectedCategories: [],
-    allowBackorder: false,
-    internationalShipping: false,
-    images: [],
-    newImageUrl: "",
-    discountPercentage: "",
-    discountStart: "",
-    discountEnd: "",
-    highlightHe: [],
-    highlightEn: [],
+  const [newProduct, setNewProduct] = useState(() => {
+    const safe = autofill || {};
+    return {
+      nameEn: safe.nameEn || "",
+      nameHe: safe.nameHe || "",
+      price: safe.price || "",
+      stock: safe.stock || "",
+      manufacturingCost: safe.manufacturingCost || "",
+      descriptionEn: safe.descriptionEn || "",
+      descriptionHe: safe.descriptionHe || "",
+      selectedCategories: safe.selectedCategories || [],
+      allowBackorder: safe.allowBackorder || false,
+      internationalShipping: safe.internationalShipping || false,
+      images: safe.images || [],
+      newImageUrl: "",
+      discountPercentage: safe.discountPercentage || "",
+      discountStart: safe.discountStart || "",
+      discountEnd: safe.discountEnd || "",
+      highlightHe: safe.highlightHe || [],
+      highlightEn: safe.highlightEn || [],
+    };
   });
+
+  
+  useEffect(() => {
+    const state = location.state;
+    if (state?.openAddProductForm && autofill) {
+      setIsAddingProduct(true);
+      setNewProduct((prev) => ({ ...prev, ...autofill }));
+      navigate(location.pathname, { replace: true, state: {} });
+    } else if (state?.openEditProductForm && state?.editProductData) {
+      setIsEditing(true);
+      setEditProductId(state.editProductData.productId);
+      setNewProduct((prev) => ({
+        ...prev,
+        ...state.editProductData.updates
+      }));
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state]);
+  
+  
+  
 
   useEffect(() => {
     axios
@@ -205,10 +235,17 @@ const ProductManagement = ({ storeId }) => {
     showAlert(
       "האם אתה בטוח שברצונך לבטל?",
       "warning",
-      () => setIsAddingProduct(false),
+      () => {
+        setIsAddingProduct(false);
+        setIsEditing(false);
+        setEditProductId(null);
+        setEditingProduct(null);
+        resetNewProductForm();
+      },
       () => {}
     );
   };
+  
 
   const filteredProducts = products.filter((product) => {
     const nameHe = product.name?.he?.toLowerCase() || "";
@@ -631,7 +668,9 @@ const ProductManagement = ({ storeId }) => {
               </button>
               <button
                 className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
-                onClick={handleSaveProduct}>
+                onClick={handleSaveProduct}
+                data-chat-approve="true"
+>
                 {editingProduct ? "שמור שינויים" : "הוסף מוצר"}
               </button>
             </div>

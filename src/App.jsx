@@ -30,7 +30,8 @@ import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
-
+import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx"; // 
+import { useNavigate } from "react-router-dom";
 import NotFound from "./pages/Erorrs/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Erorrs/Service.jsx"; // import the ServiceUnavailablePage component
 
@@ -97,6 +98,18 @@ const App = () => {
   // loadCart function to fetch the cart items from the server
   const handleOpenWishlist = () => setIsWishlistOpen(true);
   const handleCloseWishlist = () => setIsWishlistOpen(false);
+  
+
+const handleOpenAddProductForm = () =>
+  window.dispatchEvent(new CustomEvent("openAddProductForm"));
+
+const handleCreateDiscount = () =>
+  window.dispatchEvent(new CustomEvent("createDiscount"));
+
+const handleSendNewsletter = () =>
+  window.dispatchEvent(new CustomEvent("sendNewsletter"));
+ 
+
 
   const loadCart = useCallback(async () => {
     if (userId && token) {
@@ -323,6 +336,20 @@ const App = () => {
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
+              
++        <ChatBot
+          token={token}
+          userId={userId}
+          onOpenCart={handleOpenCart}
+          onOpenWishlist={handleOpenWishlist}
+          onLogout={handleLogout}
+         onOpenAddProductForm={handleOpenAddProductForm}
+          onCreateDiscount={handleCreateDiscount}
+          onSendNewsletter={handleSendNewsletter}
+       />
+
+
+
         <Footer />
       </Router>
     </AlertProvider>
