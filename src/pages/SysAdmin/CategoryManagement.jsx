@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers.js";
 
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
@@ -11,50 +11,66 @@ const CategoryManagement = () => {
   const { showAlert } = useAlert();
 
   useEffect(() => {
-    axios
-      .get("/api/Category/")
-      .then((res) => {
-        setCategories(res.data);
-      })
-      .catch(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await fetchWithTokenRefresh("/api/Category/");
+        setCategories(await res.json());
+      } catch (err) {
         showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error");
-      })
-      .finally(() => setIsLoading(false));
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
-  const handleAddCategory = () => {
+  const handleAddCategory = async () => {
     if (!categoryNameEn || !categoryNameHe) {
       showAlert("יש להזין שם קטגוריה גם בעברית וגם באנגלית.", "error");
       return;
     }
 
-    axios
-      .post("/api/Category/", {
-        name: { en: categoryNameEn, he: categoryNameHe },
-      })
-      .then((res) => {
-        setCategories([...categories, res.data]);
-        showAlert("הקטגוריה נוספה בהצלחה!", "success");
-        setCategoryNameEn("");
-        setCategoryNameHe("");
-      })
-      .catch(() => {
-        showAlert("אירעה שגיאה בעת הוספת הקטגוריה", "error");
+    try {
+      const res = await fetchWithTokenRefresh("/api/Category/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: { en: categoryNameEn, he: categoryNameHe },
+        }),
       });
+
+      if (!res.ok) throw new Error();
+      const newCategory = await res.json();
+      setCategories([...categories, newCategory]);
+      showAlert("הקטגוריה נוספה בהצלחה!", "success");
+      setCategoryNameEn("");
+      setCategoryNameHe("");
+    } catch {
+      showAlert("אירעה שגיאה בעת הוספת הקטגוריה", "error");
+    }
   };
 
   const handleDeleteCategory = (categoryId) => {
-    showAlert("האם אתה בטוח שברצונך למחוק את הקטגוריה?", "warning", () => {
-      axios
-        .delete(`/api/Category/${categoryId}`)
-        .then(() => {
+    showAlert(
+      "האם אתה בטוח שברצונך למחוק את הקטגוריה?",
+      "warning",
+      async () => {
+        try {
+          const res = await fetchWithTokenRefresh(
+            `/api/Category/${categoryId}`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (!res.ok) throw new Error();
           setCategories(categories.filter((cat) => cat._id !== categoryId));
           showAlert("הקטגוריה נמחקה בהצלחה!", "success");
-        })
-        .catch(() => {
+        } catch {
           showAlert("אירעה שגיאה בעת מחיקת הקטגוריה", "error");
-        });
-    });
+        }
+      }
+    );
   };
 
   return (

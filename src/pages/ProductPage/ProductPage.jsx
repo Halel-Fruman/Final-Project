@@ -13,14 +13,15 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const navigate = useNavigate();
   const token = localStorage.getItem("token");
   const isLoggedIn = !!token;
-
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [rating, setRating] = useState(0);
+  const [about, setAbout] = useState("");
   const [userAlreadyRated, setUserAlreadyRated] = useState(false);
 
+  // Fetch product details when the component mounts
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
 
@@ -36,10 +37,11 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
         if (!response.ok) throw new Error(t("error.fetchProduct"));
         const data = await response.json();
-
+        console.log("Product data:", data);
         setProduct(data);
         setSelectedImage(data.images[0]);
         setRating(data.averageRating || 0);
+        setAbout(data.storeAbout?.[i18n.language] || data.storeAbout?.he || "");
         setUserAlreadyRated(data.userHasRated || false);
       } catch (err) {
         setError(err.message);
@@ -50,12 +52,14 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     fetchProduct();
   }, [id, t]);
 
+  // Redirect to error page if there's an error
   useEffect(() => {
     if (error) {
       navigate("/503");
     }
   }, [error, navigate]);
 
+  // Handle adding/removing from wishlist
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -63,6 +67,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     addToWishlist(product, isInWishlist);
   };
 
+  // Handle adding to cart
+  // Check if user is logged in before adding to cart
   const handleAddToCart = () => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
@@ -74,10 +80,14 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     toast.success(t("wishlist.addToCart") + " ✅");
   };
 
+  // Handle image click to set selected image
+  // This function is used to set the selected image when a thumbnail is clicked
   const handleImageClick = (image) => {
     setSelectedImage(image);
   };
 
+  // Handle rating the product
+  // This function is used to send the rating to the server
   const handleRating = async (newRating) => {
     try {
       const token = localStorage.getItem("token");
@@ -110,6 +120,9 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     }
   };
 
+
+  // skeleton loading state
+  // This is used to show a loading state while the product data is being fetched
   if (isLoading) {
     return (
       <main className="bg-gray-50">
@@ -161,8 +174,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     );
   }
 
+  // Error handling
   if (!product) return <div>{t("product.notFound")}</div>;
 
+  // Main product page content
   const language = i18n.language;
   const productName = product.name[language] || product.name["en"];
   const productDetails =
@@ -181,6 +196,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     return start <= currentDate && currentDate <= end;
   });
 
+  // Check if the product is on sale
+  // This is used to check if the product has an active discount
   const isOnSale = !!activeDiscount;
   const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
   const discountedPrice = isOnSale
@@ -191,12 +208,27 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     <main className="bg-gray-50">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
-          <div className="flex-shrink-0 w-full lg:w-1/2 flex justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
+          <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
             <img
               src={selectedImage || "https://placehold.co/300"}
               alt={productName}
               className="object-contain max-h-128 max-w-full rounded-md border"
             />
+            <div className="flex  m-4 flex-wrap gap-2 ">
+              {product.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Thumbnail ${index + 1}`}
+                  onClick={() => handleImageClick(image)}
+                  className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
+                    selectedImage === image
+                      ? "border-4 border-primaryColor"
+                      : "border-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -255,7 +287,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   ))}
                 </ul>
               </div>
-
             </div>
 
             <div className="mb-6">
@@ -284,21 +315,12 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                 )}
               </button>
             </div>
-            <div className="flex justify-start m-4 flex-wrap gap-2 mr-auto">
-                {product.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Thumbnail ${index + 1}`}
-                    onClick={() => handleImageClick(image)}
-                    className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
-                      selectedImage === image
-                        ? "border-4 border-primaryColor"
-                        : "border-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
+            <div className="my-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t("product.about")}
+              </h3>
+              <p className="text-gray-700">{about}</p>
+            </div>
           </div>
         </div>
       </div>

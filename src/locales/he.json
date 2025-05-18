@@ -187,7 +187,8 @@
     "onSale": "מחיר מבצע",
     "alreadyRated": "כבר דירגת מוצר זה.",
     "ratingError": "הייתה שגיאה בשליחת הדירוג.",
-    "ratingSuccess": "תודה על הדירוג!"
+    "ratingSuccess": "תודה על הדירוג!",
+    "about": "על החנות"
   },
 
   "sysadmin": {
@@ -197,6 +198,13 @@
     "stores": "חנויות",
     "store_name": "שם החנות",
     "store_address": "כתובת החנות",
+    "about": "על החנות",
+    "store_about_he": "על החנות בעברית",
+    "store_about_en": "על החנות באנגלית",
+    "store_about_placeholder_he": "הכנס טקסט בעברית",
+    "store_about_placeholder_en": "הכנס טקסט באנגלית",
+
+
     "managers": "מנהלים",
     "manager_name": "שם המנהל",
     "manager_email": "אימייל של המנהל",

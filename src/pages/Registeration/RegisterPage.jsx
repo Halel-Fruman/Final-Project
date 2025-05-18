@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 
 export default function Register({ setToken, setUserId, onClose }) {
   const { t } = useTranslation();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,6 +13,8 @@ export default function Register({ setToken, setUserId, onClose }) {
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handle form submission
+  // This function is called when the user submits the registration form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -23,7 +24,8 @@ export default function Register({ setToken, setUserId, onClose }) {
     }
 
     setLoading(true);
-
+    // Send registration data to the server
+    // The server will handle the registration process
     try {
       const response = await fetch("/api/User/register", {
         method: "POST",
@@ -36,24 +38,26 @@ export default function Register({ setToken, setUserId, onClose }) {
           last_name: lastName,
         }),
       });
-
+      // Check if the response is successful
       if (!response.ok) {
-        if (response.status === 409) {
+        if (response.status === 409) { // Conflict, email already exists
           toast.error(t("register.errors.emailExists"));
-        } else if (response.status === 503) {
+        } else if (response.status === 503) { // Service unavailable
           toast.error(t("register.errors.serverUnavailable"));
         } else {
           toast.error(t("register.errors.failed"));
         }
         return;
       }
-
+      // Parse the response data
+      // The server should return a token and userId upon successful registration
       const data = await response.json();
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       setToken(data.token);
       setUserId(data.userId);
 
+      // Show success message and close the modal
       toast.success(t("register.success"));
       if (onClose) onClose();
     } catch (err) {
@@ -63,6 +67,7 @@ export default function Register({ setToken, setUserId, onClose }) {
       setLoading(false);
     }
   };
+
 
   return (
     <div className="relative p-6 bg-white rounded-md w-full max-w-md h-full overflow-auto mx-auto">

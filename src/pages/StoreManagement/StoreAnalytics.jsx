@@ -15,29 +15,45 @@ import {
   Legend,
 } from "recharts";
 import { FaChartLine } from "react-icons/fa";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
-const COLORS = ["#4CAF50", "#2196F3", "#FFC107", "#FF5722", "#9C27B0", "#00BCD4"];
+const COLORS = [
+  "#4CAF50",
+  "#2196F3",
+  "#FFC107",
+  "#FF5722",
+  "#9C27B0",
+  "#00BCD4",
+];
 
 const StoreAnalytics = ({ storeId }) => {
   const [monthlyData, setMonthlyData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
 
   useEffect(() => {
-    axios
-      .get(`/api/Transactions/transactions/${storeId}`)
-      .then((res) => {
-        const transactions = res.data;
-        setMonthlyData(groupTransactionsByMonth(transactions));
-        setCategoryData(groupProductsByCategory(transactions));
-      })
-      .catch((err) => console.error("שגיאה בטעינת נתונים:", err));
+    const fetchData = async () => {
+      try {
+        const res = await fetchWithTokenRefresh(
+          `/api/Transactions/transactions/${storeId}`
+        );
+        const data = await res.json();
+        setMonthlyData(groupTransactionsByMonth(data));
+        setCategoryData(groupProductsByCategory(data));
+      } catch (err) {
+        console.error("שגיאה בטעינת נתונים:", err);
+      }
+    };
+
+    fetchData();
   }, [storeId]);
 
   const groupTransactionsByMonth = (transactions) => {
     const monthsMap = {};
     transactions.forEach((tx) => {
       const date = new Date(tx.createdAt);
-      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}`;
+      const monthKey = `${date.getFullYear()}-${(date.getMonth() + 1)
+        .toString()
+        .padStart(2, "0")}`;
       if (!monthsMap[monthKey]) {
         monthsMap[monthKey] = 0;
       }
@@ -63,7 +79,10 @@ const StoreAnalytics = ({ storeId }) => {
       });
     });
 
-    return Object.entries(categoryMap).map(([name, value]) => ({ name, value }));
+    return Object.entries(categoryMap).map(([name, value]) => ({
+      name,
+      value,
+    }));
   };
 
   return (
@@ -74,9 +93,17 @@ const StoreAnalytics = ({ storeId }) => {
 
       <div className="bg-white rounded shadow p-4">
         <ResponsiveContainer width="100%" height={400}>
-          <BarChart data={monthlyData} margin={{ top: 20, right: 30, left: 10, bottom: 60 }}>
+          <BarChart
+            data={monthlyData}
+            margin={{ top: 20, right: 30, left: 10, bottom: 60 }}>
             <CartesianGrid strokeDasharray="3 3" />
-            <XAxis dataKey="month" angle={-30} textAnchor="end" height={80} interval={0} />
+            <XAxis
+              dataKey="month"
+              angle={-30}
+              textAnchor="end"
+              height={80}
+              interval={0}
+            />
             <YAxis />
             <Tooltip formatter={(value) => `${value.toFixed(2)} ₪`} />
             <Bar dataKey="revenue" fill="#4CAF50" radius={[6, 6, 0, 0]} />
@@ -95,10 +122,12 @@ const StoreAnalytics = ({ storeId }) => {
               cx="50%"
               cy="50%"
               outerRadius={130}
-              label
-            >
+              label>
               {categoryData.map((entry, index) => (
-                <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                <Cell
+                  key={`cell-${index}`}
+                  fill={COLORS[index % COLORS.length]}
+                />
               ))}
             </Pie>
             <Tooltip formatter={(value) => `${value} מוצרים`} />

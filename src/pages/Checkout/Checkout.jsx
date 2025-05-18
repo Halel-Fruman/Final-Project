@@ -8,6 +8,7 @@ import { set } from "mongoose";
 import { Icon } from "@iconify/react";
 import { updateCartItemQuantity } from "../../utils/Cart";
 
+
 const CheckoutPage = ({
   cartItems = [],
   fetchProductDetails,

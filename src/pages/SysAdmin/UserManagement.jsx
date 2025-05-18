@@ -1,10 +1,9 @@
-// קובץ: UserManagement.jsx - גרסה משודרגת מלאה
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
@@ -16,18 +15,13 @@ const UserManagement = () => {
   const [isAdding, setIsAdding] = useState(false);
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
-  const currentUserId = localStorage.getItem("userId"); // נניח שזה מגיע מה-auth
+  const currentUserId = localStorage.getItem("userId");
 
   useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (!storedToken) return showAlert("אין הרשאה. התחבר מחדש.", "error");
-
-    axios
-      .get("/api/User/", {
-        headers: { Authorization: `Bearer ${storedToken}` },
-      })
-      .then((res) => {
-        const formattedUsers = res.data.map((user) => ({
+    fetchWithTokenRefresh("/api/User/")
+      .then((res) => res.json())
+      .then((data) => {
+        const formattedUsers = data.map((user) => ({
           _id: user._id,
           firstName: user.first_name,
           lastName: user.last_name,
@@ -40,9 +34,8 @@ const UserManagement = () => {
         }));
         setUsers(formattedUsers);
       })
-      .catch(() => {
-        showAlert("אירעה שגיאה בעת קבלת פרטי המשתמשים", "error");
-      }).finally(() => setIsLoading(false));
+      .catch(() => showAlert("אירעה שגיאה בעת קבלת פרטי המשתמשים", "error"))
+      .finally(() => setIsLoading(false));
   }, [showAlert]);
 
   const handleEditUser = (user) => {
@@ -64,11 +57,7 @@ const UserManagement = () => {
 
   const handleDeleteUser = (userId) => {
     showAlert("האם אתה בטוח שברצונך למחוק את המשתמש?", "warning", () => {
-      const token = localStorage.getItem("token");
-      axios
-        .delete(`/api/User/${userId}`, {
-          headers: { Authorization: `Bearer ${token}` },
-        })
+      fetchWithTokenRefresh(`/api/User/${userId}`, { method: "DELETE" })
         .then(() => {
           setUsers(users.filter((u) => u._id !== userId));
           showAlert("המשתמש נמחק.", "success");
@@ -108,24 +97,26 @@ const UserManagement = () => {
       role: selectedUser.role,
     };
 
-    const token = localStorage.getItem("token");
-    const method = isAdding ? "post" : "put";
+    const method = isAdding ? "POST" : "PUT";
     const url = isAdding ? "/api/User/" : `/api/User/${selectedUser._id}/edit`;
 
-    axios[method](url, userData, {
-      headers: { Authorization: `Bearer ${token}` },
+    fetchWithTokenRefresh(url, {
+      method,
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(userData),
     })
+      .then((res) => res.json())
       .then((res) => {
         const user = {
-          _id: res.data._id,
-          firstName: res.data.first_name,
-          lastName: res.data.last_name,
-          email: res.data.email,
-          phone: res.data.phoneNumber,
-          address: res.data.addresses?.[0]
-            ? `${res.data.addresses[0].streetAddress}, ${res.data.addresses[0].city}`
+          _id: res._id,
+          firstName: res.first_name,
+          lastName: res.last_name,
+          email: res.email,
+          phone: res.phoneNumber,
+          address: res.addresses?.[0]
+            ? `${res.addresses[0].streetAddress}, ${res.addresses[0].city}`
             : "לא צוינה כתובת",
-          role: res.data.role,
+          role: res.role,
         };
         setUsers(
           isAdding
@@ -202,7 +193,6 @@ const UserManagement = () => {
             value={roleFilter}
             onChange={(e) => setRoleFilter(e.target.value)}
             className="border px-2 py-1 rounded"
-
             aria-label="Filter by role">
             <option value="">כל התפקידים</option>
             <option value="user">User</option>

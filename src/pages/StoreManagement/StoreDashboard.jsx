@@ -16,6 +16,7 @@ import {
   FaCheckCircle,
 } from "react-icons/fa";
 import { useAlert } from "../../components/AlertDialog.jsx";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
 const StoreDashboard = ({ storeId }) => {
   const [transactions, setTransactions] = useState([]);
@@ -31,14 +32,20 @@ const StoreDashboard = ({ storeId }) => {
     new Date().toISOString().split("T")[0]
   );
   const [showAllTimeRevenue, setShowAllTimeRevenue] = useState(false);
-  const [customRangeRevenue, setCustomRangeRevenue] = useState(0); // משתנה חדש
+  const [customRangeRevenue, setCustomRangeRevenue] = useState(0);
 
+  // Fetch transactions when the component mounts
+  // and when the storeId changes
   useEffect(() => {
-    axios
-      .get(`/api/Transactions/transactions/${storeId}`)
-      .then((res) => {
-        setTransactions(res.data);
-        calculateStats(res.data);
+    const fetchTransactions = async () => {
+      try {
+        const res = await fetchWithTokenRefresh(
+          `/api/Transactions/transactions/${storeId}`
+        );
+        const data = await res.json();
+        setTransactions(data);
+        calculateStats(data);
+
         const currentMonthStart = new Date(
           new Date().getFullYear(),
           new Date().getMonth(),
@@ -47,21 +54,25 @@ const StoreDashboard = ({ storeId }) => {
           .toISOString()
           .split("T")[0];
         const currentDate = new Date().toISOString().split("T")[0];
+
         calculateRevenueByDateRange(
-          res.data,
+          data,
           currentMonthStart,
           currentDate,
           setMonthlyRevenue
         );
-
         calculateRevenueByDateRange(
-          res.data,
+          data,
           startDate,
           endDate,
           setCustomRangeRevenue
         );
-      })
-      .catch(() => showAlert("שגיאה בקבלת נתוני העסקאות", "error"));
+      } catch (err) {
+        showAlert("שגיאה בקבלת נתוני העסקאות", "error");
+      }
+    };
+
+    fetchTransactions();
   }, [storeId]);
 
   useEffect(() => {
@@ -73,6 +84,7 @@ const StoreDashboard = ({ storeId }) => {
     );
   }, [startDate, endDate]);
 
+  // Calculate statistics based on transactions data
   const calculateStats = (transactions) => {
     const totals = {
       totalRevenue: 0,
@@ -123,6 +135,7 @@ const StoreDashboard = ({ storeId }) => {
     });
   };
 
+  // This function filters transactions based on the provided date range
   const calculateRevenueByDateRange = (transactions, from, to, setter) => {
     const fromDate = new Date(from);
     const toDate = new Date(to);
@@ -208,8 +221,7 @@ const StoreDashboard = ({ storeId }) => {
           onClick={() => setShowAllTimeRevenue((prev) => !prev)}
           className="flex items-center gap-2 px-4 py-2 bg-primaryColor text-white rounded shadow hover:bg-opacity-90"
           aria-label="Toggle Revenue Display"
-          aria-describedby="revenue-toggle"
-          >
+          aria-describedby="revenue-toggle">
           <FaSync />
           {showAllTimeRevenue ? "הצג הכנסות לחודש האחרון" : 'הצג סה"כ הכנסות'}
         </button>

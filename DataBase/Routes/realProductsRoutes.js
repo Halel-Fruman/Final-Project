@@ -4,14 +4,13 @@ const multer = require("multer");
 const path = require("path");
 const authenticateToken = require("../Middleware/authenticateToken");
 
-
 // storage setting
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, "uploads/");
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + path.extname(file.originalname)); 
+    cb(null, Date.now() + path.extname(file.originalname));
   },
 });
 
@@ -66,7 +65,6 @@ router.get("/by-store", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 router.post("/:storeId", async (req, res) => {
   const { storeId } = req.params;
@@ -178,6 +176,7 @@ router.get("/:id", async (req, res) => {
       ...product.toObject(),
       storeId: store.storeId,
       storeName: store.storeName,
+      about: store.about,
       averageRating:
         product.reviews?.length > 0
           ? product.reviews.reduce((sum, r) => sum + r.rating, 0) /
@@ -190,7 +189,6 @@ router.get("/:id", async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-
 
 router.post("/:id/rate", authenticateToken, async (req, res) => {
   const { id } = req.params;
@@ -213,7 +211,9 @@ router.post("/:id/rate", authenticateToken, async (req, res) => {
       (review) => review.user?.toString() === userId
     );
     if (alreadyReviewed) {
-      return res.status(400).json({ message: "You have already rated this product." });
+      return res
+        .status(400)
+        .json({ message: "You have already rated this product." });
     }
 
     product.reviews.push({
@@ -240,35 +240,39 @@ router.post("/:id/rate", authenticateToken, async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 });
-router.get('/filter-by-categories', async (req, res) => {
+router.get("/filter-by-categories", async (req, res) => {
   try {
     const { categories } = req.query;
 
     if (!categories) {
-      return res.status(400).json({ error: 'No category ids provided' });
+      return res.status(400).json({ error: "No category ids provided" });
     }
 
-    const categoryIds = categories.split(',').map(id => new mongoose.Types.ObjectId(id));
+    const categoryIds = categories
+      .split(",")
+      .map((id) => new mongoose.Types.ObjectId(id));
 
     // שליפה של כל החנויות שמכילות לפחות מוצר אחד עם אחת מהקטגוריות
     const stores = await StoreProducts.find({
-      'products.categories': { $in: categoryIds }
+      "products.categories": { $in: categoryIds },
     });
 
     // סינון מוצרים בכל חנות לפי הקטגוריות שנבחרו
-    const filtered = stores.map(store => ({
-      storeId: store.storeId,
-      storeName: store.storeName,
-      products: store.products.filter(product =>
-        product.categories.some(catId =>
-          categoryIds.some(cid => catId.equals(cid))
-        )
-      )
-    })).filter(store => store.products.length > 0);
+    const filtered = stores
+      .map((store) => ({
+        storeId: store.storeId,
+        storeName: store.storeName,
+        products: store.products.filter((product) =>
+          product.categories.some((catId) =>
+            categoryIds.some((cid) => catId.equals(cid))
+          )
+        ),
+      }))
+      .filter((store) => store.products.length > 0);
 
     res.json(filtered);
   } catch (err) {
-    console.error('Error filtering products by categories:', err);
+    console.error("Error filtering products by categories:", err);
     res.status(500).json({ error: err.message });
   }
 });

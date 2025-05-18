@@ -7,7 +7,7 @@ import SysAdmin from "./SysAdmin.jsx";
 import UserManagement from "./UserManagement.jsx";
 import AdminDashboard from "./AdminDashboard.jsx";
 
-const Sidebar = (token) => {
+const Sidebar = ({ token }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false); // תפריט מובייל

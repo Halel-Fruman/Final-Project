@@ -189,7 +189,8 @@
     "alreadyRated": "You have already rated this product.",
     "ratingError": "Failed to submit rating.",
     "ratingSuccess": "Thank you for your rating!",
-    "reviews": "Reviews"
+    "reviews": "Reviews",
+    "about": "About the Store"
   },
 
   "sysadmin": {
@@ -199,6 +200,11 @@
     "stores": "Stores",
     "store_name": "Store Name",
     "store_address": "Store Address",
+    "about": "About the Store",
+    "store_about_he": "Store Description (Hebrew)",
+    "store_about_en": "Store Description (English)",
+    "store_about_placeholder_he": "Store Description in Hebrew",
+    "store_about_placeholder_en": "Store Description in English",
     "managers": "Managers",
     "manager_name": "Manager Name",
     "manager_email": "Manager Email",
