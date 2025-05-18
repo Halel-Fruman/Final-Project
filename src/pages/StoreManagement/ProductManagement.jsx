@@ -269,10 +269,10 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
         "עלות ייצור": product.manufacturingCost || 0,
         רווח: product.price - (product.manufacturingCost || 0),
         מלאי: product.stock,
-        "משלוח לחו\"ל": product.internationalShipping ? "✔" : "✖",
+        'משלוח לחו"ל': product.internationalShipping ? "✔" : "✖",
         "אפשר להזמין גם כשאין במלאי": product.allowBackorder ? "✔" : "✖",
-        "קטגוריות": product.categories?.join(", "),
-        "תמונות": product.images?.join(" | ") || "",
+        קטגוריות: product.categories?.join(", "),
+        תמונות: product.images?.join(" | ") || "",
         "אחוז מבצע": discount?.percentage || "",
         "תאריך התחלה": discount?.startDate?.slice(0, 10) || "",
         "תאריך סיום": discount?.endDate?.slice(0, 10) || "",
@@ -280,31 +280,36 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
     });
     const headers = Object.keys(data[0]);
 
-  const worksheet = XLSX.utils.json_to_sheet(data);
+    const worksheet = XLSX.utils.json_to_sheet(data);
 
-  // חישוב רוחב עמודות לפי אורך כותרת בלבד
-  worksheet["!cols"] = headers.map((key) => ({
-    wch: key.length + 2, // תוספת קטנה לנשימה
-  }));
+    // חישוב רוחב עמודות לפי אורך כותרת בלבד
+    worksheet["!cols"] = headers.map((key) => ({
+      wch: key.length + 2, // תוספת קטנה לנשימה
+    }));
 
-  const workbook = XLSX.utils.book_new();
-  XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Products");
 
-  const excelBuffer = XLSX.write(workbook, { bookType: "xlsx", type: "array" });
-  saveAs(new Blob([excelBuffer], { type: "application/octet-stream" }), "products.xlsx");
-};
-  
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+    saveAs(
+      new Blob([excelBuffer], { type: "application/octet-stream" }),
+      "products.xlsx"
+    );
+  };
+
   return (
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-4 text-center">ניהול מוצרים</h1>
 
       <div className="mb-4 mr-4 flex justify">
         <button
-          className="bg-primaryColor ml-4 text-white px-4 py-2 rounded"
+          className="bg-blue-700 font-bold text-xl  ml-4 text-white px-4 py-2 rounded"
           onClick={() => setIsAddingProduct(true)}>
-          הוסף מוצר
+          <h2>הוסף מוצר</h2>
         </button>
-        
 
         <div className="flex w-full max-w-md gap-2">
           <input
@@ -315,7 +320,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
             onChange={(e) => setSearchQuery(e.target.value)}
           />
         </div>
-                   
+
         <button
   onClick={handleExportProducts}
   className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
@@ -324,6 +329,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
   <Icon icon="mdi:export" width="20" />
  
 </button>
+
       </div>
       {isAddingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
@@ -337,6 +343,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">שם בעברית</label>
                 <input
+                  aria-label="Product Name in Hebrew"
                   type="text"
                   className="w-full border px-3 py-2 rounded-md shadow-sm"
                   value={newProduct.nameHe}
@@ -348,6 +355,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">שם באנגלית</label>
                 <input
+                  aria-label="Product Name in English"
                   type="text"
                   className="w-full border px-3 py-2 rounded-md shadow-sm"
                   value={newProduct.nameEn}
@@ -362,6 +370,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
             <div className="mb-4">
               <label className="block mb-1">תיאור בעברית</label>
               <textarea
+                aria-label="Product Description in Hebrew"
                 className="w-full border px-3 py-2 rounded-md shadow-sm"
                 value={newProduct.descriptionHe}
                 onChange={(e) =>
@@ -376,6 +385,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
             <div className="mb-4">
               <label className="block mb-1">תיאור באנגלית</label>
               <textarea
+                aria-label="Product Description in English"
                 className="w-full border px-3 py-2 rounded-md shadow-sm"
                 value={newProduct.descriptionEn}
                 onChange={(e) =>
@@ -391,6 +401,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                 מאפיינים בעברית (שורה לכל מאפיין)
               </label>
               <textarea
+                aria-label="Product Highlights in Hebrew"
                 className="w-full border px-3 py-2 rounded-md shadow-sm"
                 value={newProduct.highlightHe.join("\n")}
                 onChange={(e) =>
@@ -407,6 +418,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                 מאפיינים באנגלית (שורה לכל מאפיין)
               </label>
               <textarea
+                aria-label="Product Highlights in English"
                 className="w-full border px-3 py-2 rounded-md shadow-sm"
                 value={newProduct.highlightEn.join("\n")}
                 onChange={(e) =>
@@ -423,6 +435,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">מחיר</label>
                 <input
+                  aria-label="Product Price"
                   type="number"
                   className="w-full border px-3 py-2 rounded-md"
                   value={newProduct.price}
@@ -437,6 +450,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">עלות ייצור</label>
                 <input
+                  aria-label="Manufacturing Cost"
                   type="number"
                   className="w-full border px-3 py-2 rounded-md"
                   value={newProduct.manufacturingCost || ""}
@@ -455,6 +469,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">אחוז מבצע</label>
                 <input
+                  aria-label="Discount Percentage"
                   type="number"
                   className="w-full border px-3 py-2 rounded-md"
                   value={newProduct.discountPercentage}
@@ -469,6 +484,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">תאריך התחלה</label>
                 <input
+                  aria-label="Discount Start Date"
                   type="date"
                   className="w-full border px-3 py-2 rounded-md"
                   value={newProduct.discountStart}
@@ -483,6 +499,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">תאריך סיום</label>
                 <input
+                  aria-label="Discount End Date"
                   type="date"
                   className="w-full border px-3 py-2 rounded-md"
                   value={newProduct.discountEnd}
@@ -501,6 +518,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               <div>
                 <label className="block mb-1">מלאי</label>
                 <input
+                  aria-label="Product Stock"
                   type="number"
                   className="w-full border px-3 py-2 rounded-md"
                   value={newProduct.stock}
@@ -514,6 +532,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               </div>
               <div className="flex items-center gap-2 mt-6">
                 <input
+                  aria-label="Allow Backorder"
                   type="checkbox"
                   checked={newProduct.allowBackorder || false}
                   onChange={(e) =>
@@ -527,6 +546,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               </div>
               <div className="flex items-center gap-2 mt-6">
                 <input
+                  aria-label="International Shipping"
                   type="checkbox"
                   checked={newProduct.internationalShipping || false}
                   onChange={(e) =>
@@ -547,6 +567,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                 {categories.map((category) => (
                   <label key={category._id} className="flex items-center gap-2">
                     <input
+                      aria-label={`Category ${category.name.he}`}
                       type="checkbox"
                       value={category._id}
                       checked={newProduct.selectedCategories.includes(
@@ -567,6 +588,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               {/* שדה להוספת קישור */}
               <div className="flex gap-2 mb-2 flex-col sm:flex-row">
                 <input
+                  aria-label="Image URL"
                   type="text"
                   placeholder="הדבק קישור לתמונה"
                   className="flex-grow border px-3 py-2 rounded-md"
@@ -580,7 +602,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                 />
                 <button
                   type="button"
-                  className="bg-blue-600 text-white px-3 py-2 rounded-md"
+                  className="bg-blue-700 font-bold text-xl text-white px-3 py-2 rounded-md"
                   onClick={() => {
                     if (newProduct.newImageUrl) {
                       setNewProduct({
@@ -597,6 +619,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
               {/* שדה להעלאת קובץ */}
               <div className="flex gap-2 mb-2 flex-col sm:flex-row">
                 <input
+                  aria-label="Upload Image"
                   type="file"
                   accept="image/*"
                   onChange={async (e) => {
@@ -617,10 +640,13 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
 
                       const data = await response.json();
                       if (response.ok && data.imageUrl) {
-                        let fileName =data.imageUrl
+                        let fileName = data.imageUrl;
                         setNewProduct((prev) => ({
                           ...prev,
-                          images: [...prev.images,`https://ilan-israel.co.il/api${data.imageUrl}` ],
+                          images: [
+                            ...prev.images,
+                            `https://ilan-israel.co.il/api${data.imageUrl}`,
+                          ],
                         }));
                       } else {
                         console.error(
@@ -642,6 +668,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                 {newProduct.images?.map((img, index) => (
                   <div key={index} className="relative">
                     <img
+                      aria-label={`Product Image ${index}`}
                       src={img}
                       alt={`image-${index}`}
                       className="w-24 h-24 object-cover rounded border"
@@ -727,7 +754,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                     <td className="p-2 border w-[10%]">{product.price}₪</td>
                     <td className="p-2 border w-[10%]">
                       {product.manufacturingCost ? (
-                        <span className="text-red-600">
+                        <span className="text-red-900">
                           {product.manufacturingCost}₪
                         </span>
                       ) : (
@@ -737,7 +764,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                     <td className="p-2 border w-[10%]">
                       <span
                         className={
-                          profit > 0 ? "text-green-600" : "text-red-600"
+                          profit > 0 ? "text-green-900" : "text-red-600"
                         }>
                         {profit}₪
                       </span>
@@ -757,11 +784,11 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
                             className={
                               new Date(discount.endDate) < new Date()
                                 ? "text-red-500"
-                                : "text-green-600"
+                                : "text-green-900"
                             }>
                             {discount.percentage}%
                           </span>
-                          <span className="text-gray-500 text-xs">
+                          <span className="text-gray-800 text-xs">
                             עד{" "}
                             {new Date(discount.endDate).toLocaleDateString(
                               "he-IL"

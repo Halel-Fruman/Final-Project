@@ -22,8 +22,14 @@ const StoreDashboard = ({ storeId }) => {
   const { showAlert } = useAlert();
   const [stats, setStats] = useState({});
   const [monthlyRevenue, setMonthlyRevenue] = useState(0);
-  const [startDate, setStartDate] = useState(new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0]);
-  const [endDate, setEndDate] = useState(new Date().toISOString().split('T')[0]);
+  const [startDate, setStartDate] = useState(
+    new Date(new Date().getFullYear(), new Date().getMonth(), 1)
+      .toISOString()
+      .split("T")[0]
+  );
+  const [endDate, setEndDate] = useState(
+    new Date().toISOString().split("T")[0]
+  );
   const [showAllTimeRevenue, setShowAllTimeRevenue] = useState(false);
   const [customRangeRevenue, setCustomRangeRevenue] = useState(0); // משתנה חדש
 
@@ -33,19 +39,39 @@ const StoreDashboard = ({ storeId }) => {
       .then((res) => {
         setTransactions(res.data);
         calculateStats(res.data);
-        const currentMonthStart = new Date(new Date().getFullYear(), new Date().getMonth(), 1).toISOString().split('T')[0];
-         const currentDate = new Date().toISOString().split('T')[0];
-         calculateRevenueByDateRange(res.data, currentMonthStart, currentDate, setMonthlyRevenue);
+        const currentMonthStart = new Date(
+          new Date().getFullYear(),
+          new Date().getMonth(),
+          1
+        )
+          .toISOString()
+          .split("T")[0];
+        const currentDate = new Date().toISOString().split("T")[0];
+        calculateRevenueByDateRange(
+          res.data,
+          currentMonthStart,
+          currentDate,
+          setMonthlyRevenue
+        );
 
-         calculateRevenueByDateRange(res.data, startDate, endDate, setCustomRangeRevenue);
-
-    })
+        calculateRevenueByDateRange(
+          res.data,
+          startDate,
+          endDate,
+          setCustomRangeRevenue
+        );
+      })
       .catch(() => showAlert("שגיאה בקבלת נתוני העסקאות", "error"));
   }, [storeId]);
 
   useEffect(() => {
-    calculateRevenueByDateRange(transactions, startDate, endDate, setCustomRangeRevenue);
-}, [startDate, endDate]);
+    calculateRevenueByDateRange(
+      transactions,
+      startDate,
+      endDate,
+      setCustomRangeRevenue
+    );
+  }, [startDate, endDate]);
 
   const calculateStats = (transactions) => {
     const totals = {
@@ -65,7 +91,10 @@ const StoreDashboard = ({ storeId }) => {
       tx.products.forEach((p) => (totals.totalProductsSold += p.quantity));
       totals.customers.add(tx.buyerDetails.email);
       totals.byStatus[tx.status] = (totals.byStatus[tx.status] || 0) + 1;
-      if (!totals.lastOrderDate || new Date(tx.createdAt) > new Date(totals.lastOrderDate)) {
+      if (
+        !totals.lastOrderDate ||
+        new Date(tx.createdAt) > new Date(totals.lastOrderDate)
+      ) {
         totals.lastOrderDate = tx.createdAt;
       }
 
@@ -94,17 +123,17 @@ const StoreDashboard = ({ storeId }) => {
     });
   };
 
- const calculateRevenueByDateRange = (transactions, from, to, setter) => {
-  const fromDate = new Date(from);
-  const toDate = new Date(to);
-  const total = transactions
-    .filter(tx => {
-      const date = new Date(tx.createdAt);
-      return date >= fromDate && date <= toDate;
-    })
-    .reduce((sum, tx) => sum + tx.totalAmount, 0);
-  setter(total);
-};
+  const calculateRevenueByDateRange = (transactions, from, to, setter) => {
+    const fromDate = new Date(from);
+    const toDate = new Date(to);
+    const total = transactions
+      .filter((tx) => {
+        const date = new Date(tx.createdAt);
+        return date >= fromDate && date <= toDate;
+      })
+      .reduce((sum, tx) => sum + tx.totalAmount, 0);
+    setter(total);
+  };
 
   const isOverdue = (createdAt) => {
     const now = new Date();
@@ -135,24 +164,55 @@ const StoreDashboard = ({ storeId }) => {
       <h1 className="text-2xl font-bold text-center mb-6">לוח מחוונים לחנות</h1>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        <StatCard icon={<FaChartBar />} title='סה"כ עסקאות' value={stats.totalOrders} />
         <StatCard
-  icon={<FaMoneyBillWave />}
-  title={showAllTimeRevenue ? "סה\"כ הכנסות (כל הזמנים)" : "סה\"כ הכנסות (החודש האחרון)"}
-  value={(showAllTimeRevenue ? stats.totalRevenue : monthlyRevenue)?.toFixed(2) + " ₪"}
-/>        <StatCard icon={<FaUsers />} title="לקוחות ייחודיים" value={stats.uniqueCustomers} />
-        <StatCard icon={<FaBox />} title='סה"כ מוצרים שנמכרו' value={stats.totalProductsSold} />
-        <StatCard icon={<FaClock />} title="הזמנה אחרונה" value={stats.lastOrderDate ? new Date(stats.lastOrderDate).toLocaleDateString("he-IL") : "-"} />
+          icon={<FaChartBar />}
+          title='סה"כ עסקאות'
+          value={stats.totalOrders}
+        />
+        <StatCard
+          icon={<FaMoneyBillWave />}
+          title={
+            showAllTimeRevenue
+              ? 'סה"כ הכנסות (כל הזמנים)'
+              : 'סה"כ הכנסות (החודש האחרון)'
+          }
+          value={
+            (showAllTimeRevenue ? stats.totalRevenue : monthlyRevenue)?.toFixed(
+              2
+            ) + " ₪"
+          }
+        />{" "}
+        <StatCard
+          icon={<FaUsers />}
+          title="לקוחות ייחודיים"
+          value={stats.uniqueCustomers}
+        />
+        <StatCard
+          icon={<FaBox />}
+          title='סה"כ מוצרים שנמכרו'
+          value={stats.totalProductsSold}
+        />
+        <StatCard
+          icon={<FaClock />}
+          title="הזמנה אחרונה"
+          value={
+            stats.lastOrderDate
+              ? new Date(stats.lastOrderDate).toLocaleDateString("he-IL")
+              : "-"
+          }
+        />
       </div>
 
       <div className="mt-4 flex justify-end">
-      <button
-  onClick={() => setShowAllTimeRevenue(prev => !prev)}
-  className="flex items-center gap-2 px-4 py-2 bg-primaryColor text-white rounded shadow hover:bg-opacity-90"
->
-  <FaSync />
-  {showAllTimeRevenue ? "הצג הכנסות לחודש האחרון" : "הצג סה\"כ הכנסות"}
-</button>
+        <button
+          onClick={() => setShowAllTimeRevenue((prev) => !prev)}
+          className="flex items-center gap-2 px-4 py-2 bg-primaryColor text-white rounded shadow hover:bg-opacity-90"
+          aria-label="Toggle Revenue Display"
+          aria-describedby="revenue-toggle"
+          >
+          <FaSync />
+          {showAllTimeRevenue ? "הצג הכנסות לחודש האחרון" : 'הצג סה"כ הכנסות'}
+        </button>
       </div>
       <div className="mt-8">
         <h2 className="text-xl font-bold mb-2">התראות:</h2>
@@ -173,7 +233,9 @@ const StoreDashboard = ({ storeId }) => {
                 <FaExclamationTriangle className="text-red-600 text-xl" />
                 <div>
                   <p className="font-semibold">הזמנות שממתינות מעל שבוע:</p>
-                  <p className="text-lg font-bold text-red-700">{stats.overdueCount}</p>
+                  <p className="text-lg font-bold text-red-900">
+                    {stats.overdueCount}
+                  </p>
                 </div>
               </div>
             </div>
@@ -184,8 +246,12 @@ const StoreDashboard = ({ storeId }) => {
               <div className="flex items-center gap-2">
                 <FaTruck className="text-orange-600 text-xl" />
                 <div>
-                  <p className="font-semibold">הזמנות שלא נמסרו אחרי מועד ההגעה:</p>
-                  <p className="text-lg font-bold text-orange-700">{stats.deliveryOverdueCount}</p>
+                  <p className="font-semibold">
+                    הזמנות שלא נמסרו אחרי מועד ההגעה:
+                  </p>
+                  <p className="text-lg font-bold text-orange-700">
+                    {stats.deliveryOverdueCount}
+                  </p>
                 </div>
               </div>
             </div>
@@ -193,48 +259,62 @@ const StoreDashboard = ({ storeId }) => {
         </div>
       </div>
       <div className="mt-8 flex flex-col lg:flex-row gap-8 items-start">
-  {/* טבלת סטטוסים */}
-  <div className="w-full lg:w-1/2">
-    <h2 className="text-xl font-bold mb-2">סטטוסים של עסקאות:</h2>
-    <table className="w-fit text-sm border border-gray-300 bg-white rounded shadow">
-      <thead className="bg-gray-100">
-        <tr>
-          <th className="p-2 text-right">סטטוס</th>
-          <th className="p-2 text-right">כמות</th>
-        </tr>
-      </thead>
-      <tbody>
-        {Object.entries(stats.byStatus || {}).map(([status, count]) => (
-          <tr key={status} className="border-t">
-            <td className="p-2 whitespace-nowrap flex items-center gap-2">{getStatusIcon(status)} {status}</td>
-            <td className="p-2 font-bold">{count}</td>
-          </tr>
-        ))}
-      </tbody>
-    </table>
-  </div>
+        {/* טבלת סטטוסים */}
+        <div className="w-full lg:w-1/2">
+          <h2 className="text-xl font-bold mb-2">סטטוסים של עסקאות:</h2>
+          <table className="w-fit text-sm border border-gray-300 bg-white rounded shadow">
+            <thead className="bg-gray-100">
+              <tr>
+                <th className="p-2 text-right">סטטוס</th>
+                <th className="p-2 text-right">כמות</th>
+              </tr>
+            </thead>
+            <tbody>
+              {Object.entries(stats.byStatus || {}).map(([status, count]) => (
+                <tr key={status} className="border-t">
+                  <td className="p-2 whitespace-nowrap flex items-center gap-2">
+                    {getStatusIcon(status)} {status}
+                  </td>
+                  <td className="p-2 font-bold">{count}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
 
-  {/* טווח תאריכים */}
-  <div className="w-full lg:w-1/2">
-    <h2 className="text-xl font-bold mb-4">הכנסות לפי טווח תאריכים</h2>
-    <div className="flex items-center gap-4 mb-4 flex-wrap">
-      <div>
-        <label className="block text-sm">מתאריך:</label>
-        <input type="date" value={startDate} onChange={(e) => setStartDate(e.target.value)} className="border rounded px-2 py-1" />
+        {/* טווח תאריכים */}
+        <div className="w-full lg:w-1/2">
+          <h2 className="text-xl font-bold mb-4">הכנסות לפי טווח תאריכים</h2>
+          <div className="flex items-center gap-4 mb-4 flex-wrap">
+            <div>
+              <label className="block text-sm">מתאריך:</label>
+              <input
+                aria-label="Start Date"
+                type="date"
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+                className="border rounded px-2 py-1"
+              />
+            </div>
+            <div>
+              <label className="block text-sm">עד תאריך:</label>
+              <input
+                aria-label="End Date"
+                type="date"
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+                className="border rounded px-2 py-1"
+              />
+            </div>
+          </div>
+          <div className="bg-white border p-4 rounded shadow w-fit">
+            סה"כ הכנסות בטווח:{" "}
+            <span className="font-bold text-green-800">
+              {customRangeRevenue.toFixed(2)} ₪
+            </span>
+          </div>
+        </div>
       </div>
-      <div>
-        <label className="block text-sm">עד תאריך:</label>
-        <input type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} className="border rounded px-2 py-1" />
-      </div>
-    </div>
-    <div className="bg-white border p-4 rounded shadow w-fit">
-      סה"כ הכנסות בטווח: <span className="font-bold text-green-600">
-        {customRangeRevenue.toFixed(2)} ₪
-      </span>
-    </div>
-  </div>
-</div>
-
     </div>
   );
 };

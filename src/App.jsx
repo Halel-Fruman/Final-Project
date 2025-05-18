@@ -32,8 +32,8 @@ import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
 import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx"; // 
 import { useNavigate } from "react-router-dom";
-import NotFound from "./pages/Erorrs/NotFound.jsx";
-import ServiceUnavailablePage from "./pages/Erorrs/Service.jsx"; // import the ServiceUnavailablePage component
+import NotFound from "./pages/Errors/NotFound.jsx";
+import ServiceUnavailablePage from "./pages/Errors/Service.jsx"; // import the ServiceUnavailablePage component
 
 const App = () => {
   const { t, i18n } = useTranslation(); // use the useTranslation hook to get the i18n object

@@ -173,10 +173,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   <span className="text-2xl text-red-600 font-bold">
                     ₪{discountedPrice.toFixed(2)}
                   </span>
-                  <span className="line-through text-gray-500 text-lg">
+                  <span className="line-through text-gray-700 text-lg">
                     ₪{productPrice.toFixed(2)}
                   </span>
-                  <span className="text-sm text-green-700 font-semibold">
+                  <span className="text-sm text-green-800 font-semibold">
                     -{discountPercentage}%
                   </span>
                 </>

@@ -111,7 +111,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
 
   return (
     <div className="bg-gray-50">
-      <header
+      <header id="home"
+        aria-label="Hero Section"
         className="relative bg-primaryColor text-white"
         style={{
           backgroundImage: `url(${backgroundImage})`,
@@ -217,11 +218,11 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                           <span className="text-red-600 text-xl font-bold">
                             ₪{discountedPrice.toFixed(2)}
                           </span>
-                          <span className="text-sm text-gray-500 line-through">
+                          <span className="text-sm text-gray-700 line-through">
                             ₪{product.price.toFixed(2)}
                           </span>
-                          <span className="text-green-600 text-sm font-medium">
-                            -{discountPercentage}%
+                          <span className="text-green-900 text-sm font-medium">
+                            {discountPercentage}%-
                           </span>
                         </div>
                       </div>

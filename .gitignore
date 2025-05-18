@@ -29,3 +29,4 @@ yarn-debug.log*
 yarn-error.log*
 DataBase/.env
 DataBase/.env
+json.json
