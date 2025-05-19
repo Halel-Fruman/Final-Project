@@ -5,7 +5,6 @@ import toast from "react-hot-toast";
 
 export default function Register({ setToken, setUserId, onClose }) {
   const { t } = useTranslation();
-
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -14,6 +13,8 @@ export default function Register({ setToken, setUserId, onClose }) {
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
 
+  // Handle form submission
+  // This function is called when the user submits the registration form
   const handleSubmit = async (e) => {
     e.preventDefault();
 
@@ -23,7 +24,8 @@ export default function Register({ setToken, setUserId, onClose }) {
     }
 
     setLoading(true);
-
+    // Send registration data to the server
+    // The server will handle the registration process
     try {
       const response = await fetch("/api/User/register", {
         method: "POST",
@@ -36,24 +38,26 @@ export default function Register({ setToken, setUserId, onClose }) {
           last_name: lastName,
         }),
       });
-
+      // Check if the response is successful
       if (!response.ok) {
-        if (response.status === 409) {
+        if (response.status === 409) { // Conflict, email already exists
           toast.error(t("register.errors.emailExists"));
-        } else if (response.status === 503) {
+        } else if (response.status === 503) { // Service unavailable
           toast.error(t("register.errors.serverUnavailable"));
         } else {
           toast.error(t("register.errors.failed"));
         }
         return;
       }
-
+      // Parse the response data
+      // The server should return a token and userId upon successful registration
       const data = await response.json();
       localStorage.setItem("token", data.token);
       localStorage.setItem("userId", data.userId);
       setToken(data.token);
       setUserId(data.userId);
 
+      // Show success message and close the modal
       toast.success(t("register.success"));
       if (onClose) onClose();
     } catch (err) {
@@ -64,8 +68,9 @@ export default function Register({ setToken, setUserId, onClose }) {
     }
   };
 
+
   return (
-    <div className="relative bg-white rounded-lg max-w-md w-full p-4">
+    <div className="relative p-6 bg-white rounded-md w-full max-w-md h-full overflow-auto mx-auto">
       {onClose && (
         <button
           onClick={onClose}
@@ -76,12 +81,12 @@ export default function Register({ setToken, setUserId, onClose }) {
       )}
 
       <div className="sm:mx-auto sm:w-full sm:max-w-sm">
-        <DialogTitle className="mt-10 text-center text-2xl font-bold tracking-tight text-gray-900">
+        <DialogTitle className="mt-5 text-center text-2xl font-bold tracking-tight text-gray-900">
           {t("register.title")}
         </DialogTitle>
       </div>
 
-      <form onSubmit={handleSubmit} className="mt-4 space-y-6">
+      <form onSubmit={handleSubmit} className="mt-4 h-10/12 space-y-6">
         {/* First name */}
         <div>
           <label htmlFor="firstName" className="block text-sm font-medium text-gray-900">
@@ -94,7 +99,7 @@ export default function Register({ setToken, setUserId, onClose }) {
             required
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm"
           />
         </div>
 
@@ -110,7 +115,7 @@ export default function Register({ setToken, setUserId, onClose }) {
             required
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm"
           />
         </div>
 
@@ -126,7 +131,7 @@ export default function Register({ setToken, setUserId, onClose }) {
             required
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm"
           />
         </div>
 
@@ -143,7 +148,7 @@ export default function Register({ setToken, setUserId, onClose }) {
             value={email}
             autoComplete="email"
             onChange={(e) => setEmail(e.target.value)}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm"
           />
         </div>
 
@@ -160,7 +165,7 @@ export default function Register({ setToken, setUserId, onClose }) {
             autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm"
           />
         </div>
 
@@ -177,7 +182,7 @@ export default function Register({ setToken, setUserId, onClose }) {
             value={confirmPassword}
             autoComplete="new-password"
             onChange={(e) => setConfirmPassword(e.target.value)}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm"
           />
         </div>
 
@@ -186,7 +191,7 @@ export default function Register({ setToken, setUserId, onClose }) {
           <button
             type="submit"
             disabled={loading}
-            className={`w-full py-2 text-white font-bold text-xl rounded-md shadow-sm ${
+            className={`w-full py-2 text-white font-bold text-xl rounded-full shadow-sm ${
               loading
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-primaryColor hover:bg-secondaryColor"

@@ -1,4 +1,5 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useMemo } from "react";
+
 import { useTranslation } from "react-i18next";
 import { Link, useNavigate } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -16,8 +17,24 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [isOnSaleOnly, setIsOnSaleOnly] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [searchText, setSearchText] = useState("");
   const navigate = useNavigate();
 
+  // Function to shuffle an array
+  // This is used to randomize the order of products displayed
+  const shuffleArray = (array) => {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+  };
+
+  // Fetch all products from the API
+  // This is done once when the component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -34,10 +51,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchProducts();
   }, []);
 
+  // Check if there is an error and navigate to the error page
+  // This is done to handle any errors that occur during the fetch
   useEffect(() => {
     if (error) navigate("/503");
   }, [error, navigate]);
 
+  // Fetch categories from the API
+  // This is done once when the component mounts
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -51,6 +72,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchCategories();
   }, []);
 
+  // Generate store options based on the products
+  // This is done to create a unique list of stores from the products
   const storeOptions = Array.from(
     new Set(
       allProducts.map((p) => {
@@ -64,6 +87,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     )
   ).map((str) => JSON.parse(str));
 
+  // Filter products based on selected categories, stores, and other criteria
+  // This is done to display only the products that match the user's filters
   const productsToShow = allProducts.filter((product) => {
     const categoryMatch =
       selectedCategories.length === 0 ||
@@ -72,15 +97,35 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       selectedStores.length === 0 || selectedStores.includes(product.storeId);
     const activeDiscount = getActiveDiscount(product.discounts);
     const onSaleMatch = !isOnSaleOnly || !!activeDiscount;
-    return categoryMatch && storeMatch && onSaleMatch;
+    const price = product.price;
+    const priceMatch =
+      (!minPrice || price >= parseFloat(minPrice)) &&
+      (!maxPrice || price <= parseFloat(maxPrice));
+    const name = product.name?.[i18n.language]?.toLowerCase() || "";
+    const searchMatch = name.includes(searchText.toLowerCase());
+
+    return (
+      categoryMatch && storeMatch && onSaleMatch && priceMatch && searchMatch
+    );
   });
 
+  // Shuffle the products to show
+  // This is done to randomize the order of products displayed
+  const shuffledProductsToShow = useMemo(
+    () => shuffleArray(productsToShow),
+    [productsToShow]
+  );
+
+  // Handle the wishlist toggle
+  // This is done to add or remove products from the wishlist
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
     );
     addToWishlist(product, isInWishlist);
   };
+  // Handle the error state
+  // This is done to display an error message if there is an error
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -91,6 +136,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   }
 
+  //skeleton loading state
+  // This is done to display a loading state while the products are being fetched
   if (isLoading) {
     return (
       <main className="px-4 py-10 sm:px-6 lg:px-12">
@@ -109,9 +156,12 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   }
 
+  // Render the main content of the page
+  // This is done to display the main content of the page
   return (
     <div className="bg-gray-50">
-      <header id="home"
+      <header
+        id="home"
         aria-label="Hero Section"
         className="relative bg-primaryColor text-white"
         style={{
@@ -131,7 +181,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             className="mt-4 text-xl sm:text-2xl md:text-5xl text-secondaryColor"
             dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
           <button
-            className="mt-6 bg-white text-black py-2 px-6 rounded-lg font-semibold shadow-lg hover:bg-gray-200 transition"
+            className="mt-6 bg-white text-black py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-gray-200 transition"
             onClick={() => {
               document
                 .getElementById("products-section")
@@ -146,7 +196,9 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
         <h2 className="text-center text-2xl font-bold mb-8">
           {t("featured_products")}
         </h2>
-
+        {/* This is the filter bar component
+        // It allows users to filter products by categories, stores, price range, and search text
+        // This is done to provide a way for users to filter products based on their preferences*/}
         <FilterBar
           categories={categories}
           stores={storeOptions}
@@ -156,18 +208,25 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           setSelectedStores={setSelectedStores}
           isOnSaleOnly={isOnSaleOnly}
           setIsOnSaleOnly={setIsOnSaleOnly}
+          minPrice={minPrice}
+          setMinPrice={setMinPrice}
+          maxPrice={maxPrice}
+          setMaxPrice={setMaxPrice}
+          searchText={searchText}
+          setSearchText={setSearchText}
         />
 
         {productsToShow.length === 0 ? (
           <p className="text-center text-gray-500">{t("no_products_found")}</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {productsToShow.map((product) => {
+            {shuffledProductsToShow.map((product) => {
               const isInWishlist = wishlistLoading
                 ? false
                 : wishlist?.some(
                     (item) => String(item.productId) === String(product._id)
                   );
+
 
               const activeDiscount = getActiveDiscount(product.discounts);
               const isOnSale = !!activeDiscount;

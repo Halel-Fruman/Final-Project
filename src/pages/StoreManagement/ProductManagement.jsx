@@ -1,3 +1,4 @@
+// קובץ: ProductManagement.jsx
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
@@ -15,10 +16,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
   const [searchQuery, setSearchQuery] = useState("");
   const { showAlert } = useAlert();
   const [editingProduct, setEditingProduct] = useState(null);
-  const location = useLocation();
-  const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editProductId, setEditProductId] = useState(null);
+
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true); // נשתמש באותו מודאל של הוספה
@@ -79,6 +77,47 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
       .then((res) => setCategories(res.data))
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
   }, [storeId]);
+
+  const handleEdit = (product) => {
+    setEditingProduct(product);
+    setIsAddingProduct(true);
+  };
+
+  const handleDelete = (productId) => {
+    if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {
+      axios
+        .delete(`/api/products/${storeId}/${productId}`)
+        .then(() => {
+          setProducts(products.filter((p) => p._id !== productId));
+          showAlert("המוצר נמחק בהצלחה", "success");
+        })
+        .catch(() => {
+          showAlert("אירעה שגיאה במחיקת המוצר", "error");
+        });
+    }
+  };
+
+  const resetNewProductForm = () => {
+    setNewProduct({
+      nameEn: "",
+      nameHe: "",
+      price: "",
+      stock: "",
+      manufacturingCost: "",
+      descriptionEn: "",
+      descriptionHe: "",
+      selectedCategories: [],
+      allowBackorder: false,
+      internationalShipping: false,
+      images: [],
+      newImageUrl: "",
+      discountPercentage: "",
+      discountStart: "",
+      discountEnd: "",
+      highlightHe: [],
+      highlightEn: [],
+    });
+  };
 
   const handleSaveProduct = () => {
     if (
@@ -183,42 +222,6 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
     }
   }, [editingProduct]);
 
-  const resetNewProductForm = () => {
-    setNewProduct({
-      nameEn: "",
-      nameHe: "",
-      price: "",
-      stock: "",
-      manufacturingCost: "",
-      descriptionEn: "",
-      descriptionHe: "",
-      selectedCategories: [],
-      allowBackorder: false,
-      internationalShipping: false,
-      images: [],
-      newImageUrl: "",
-      discountPercentage: "",
-      discountStart: "",
-      discountEnd: "",
-      highlightHe: [],
-      highlightEn: [],
-    });
-  };
-
-  const handleDelete = (productId) => {
-    if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {
-      axios
-        .delete(`/api/products/${storeId}/${productId}`)
-        .then(() => {
-          setProducts(products.filter((p) => p._id !== productId));
-          showAlert("המוצר נמחק בהצלחה", "success");
-        })
-        .catch(() => {
-          showAlert("אירעה שגיאה במחיקת המוצר", "error");
-        });
-    }
-  };
-
   const handleCategoryChange = (e) => {
     const { value, checked } = e.target;
 
@@ -322,14 +325,11 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
         </div>
 
         <button
-  onClick={handleExportProducts}
-  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
-  title ="ייצוא לאקסל"
->
-  <Icon icon="mdi:export" width="20" />
- 
-</button>
-
+          onClick={handleExportProducts}
+          className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded shadow"
+          title="ייצוא לאקסל">
+          <Icon icon="mdi:export" width="20" />
+        </button>
       </div>
       {isAddingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">

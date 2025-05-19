@@ -1,3 +1,4 @@
+// File: src/pages/ProductPage.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -10,24 +11,38 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-
+  const token = localStorage.getItem("token");
+  const isLoggedIn = !!token;
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [rating, setRating] = useState(0);
+  const [about, setAbout] = useState("");
+  const [userAlreadyRated, setUserAlreadyRated] = useState(false);
 
+  // Fetch product details when the component mounts
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
 
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`/api/Products/${id}`);
+        const token = localStorage.getItem("token");
+        const headers = token ? { Authorization: `Bearer ${token}` } : {};
+
+        const response = await fetch(`/api/Products/${id}`, {
+          method: "GET",
+          headers,
+        });
+
         if (!response.ok) throw new Error(t("error.fetchProduct"));
         const data = await response.json();
+        console.log("Product data:", data);
         setProduct(data);
         setSelectedImage(data.images[0]);
         setRating(data.averageRating || 0);
+        setAbout(data.storeAbout?.[i18n.language] || data.storeAbout?.he || "");
+        setUserAlreadyRated(data.userHasRated || false);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -37,12 +52,14 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     fetchProduct();
   }, [id, t]);
 
+  // Redirect to error page if there's an error
   useEffect(() => {
     if (error) {
       navigate("/503");
     }
   }, [error, navigate]);
 
+  // Handle adding/removing from wishlist
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -50,32 +67,63 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     addToWishlist(product, isInWishlist);
   };
 
+  // Handle adding to cart
+  // Check if user is logged in before adding to cart
   const handleAddToCart = () => {
+    const userId = localStorage.getItem("userId");
+    if (!userId) {
+      toast.error(t("cart.mustBeLoggedIn"));
+      return;
+    }
+
     addToCart({ productId: product._id, quantity: 1 });
     toast.success(t("wishlist.addToCart") + " ✅");
   };
 
+  // Handle image click to set selected image
+  // This function is used to set the selected image when a thumbnail is clicked
   const handleImageClick = (image) => {
     setSelectedImage(image);
   };
 
+  // Handle rating the product
+  // This function is used to send the rating to the server
   const handleRating = async (newRating) => {
     try {
+      const token = localStorage.getItem("token");
       const response = await fetch(`/api/products/${id}/rate`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
         body: JSON.stringify({ rating: newRating }),
       });
-      if (!response.ok) throw new Error("Failed to update rating");
-      const updatedProduct = await response.json();
-      setProduct(updatedProduct.product);
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        if (data.message === "You have already rated this product.") {
+          toast.error(t("product.alreadyRated"));
+        } else {
+          toast.error(t("product.ratingError"));
+        }
+        return;
+      }
+
+      setProduct(data.product);
       setRating(newRating);
+      toast.success(t("product.ratingSuccess"));
     } catch (err) {
       console.error("Error updating rating:", err.message);
+      toast.error(t("product.ratingError"));
     }
   };
 
-  if (isLoading)
+
+  // skeleton loading state
+  // This is used to show a loading state while the product data is being fetched
+  if (isLoading) {
     return (
       <main className="bg-gray-50">
         <div className="container mx-auto py-12 animate-pulse">
@@ -124,9 +172,12 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
         </div>
       </main>
     );
+  }
 
+  // Error handling
   if (!product) return <div>{t("product.notFound")}</div>;
 
+  // Main product page content
   const language = i18n.language;
   const productName = product.name[language] || product.name["en"];
   const productDetails =
@@ -145,6 +196,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     return start <= currentDate && currentDate <= end;
   });
 
+  // Check if the product is on sale
+  // This is used to check if the product has an active discount
   const isOnSale = !!activeDiscount;
   const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
   const discountedPrice = isOnSale
@@ -155,12 +208,27 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     <main className="bg-gray-50">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
-        <div className="flex-shrink-0 w-full lg:w-1/2 flex justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
-        <img
-               src={selectedImage || "https://placehold.co/300"}
-               alt={productName}  
-               className="object-contain max-h-128 max-w-full rounded-md border"
-               />
+          <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
+            <img
+              src={selectedImage || "https://placehold.co/300"}
+              alt={productName}
+              className="object-contain max-h-128 max-w-full rounded-md border"
+            />
+            <div className="flex  m-4 flex-wrap gap-2 ">
+              {product.images.map((image, index) => (
+                <img
+                  key={index}
+                  src={image}
+                  alt={`Thumbnail ${index + 1}`}
+                  onClick={() => handleImageClick(image)}
+                  className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
+                    selectedImage === image
+                      ? "border-4 border-primaryColor"
+                      : "border-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
@@ -193,8 +261,14 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   key={i}
                   className={`h-6 w-6 cursor-pointer ${
                     i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"
-                  }`}
-                  onClick={() => handleRating(i + 1)}
+                  } ${!isLoggedIn ? "cursor-not-allowed opacity-50" : ""}`}
+                  onClick={() => {
+                    if (isLoggedIn) {
+                      handleRating(i + 1);
+                    } else {
+                      toast.error(t("login.requiredToRate"));
+                    }
+                  }}
                 />
               ))}
               <span className="ml-2 text-gray-600">
@@ -213,21 +287,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   ))}
                 </ul>
               </div>
-              <div className="flex justify-end mb-4 flex-wrap gap-2 mr-auto">
-                {product.images.map((image, index) => (
-                  <img
-                    key={index}
-                    src={image}
-                    alt={`Thumbnail ${index + 1}`}
-                    onClick={() => handleImageClick(image)}
-                    className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
-                      selectedImage === image
-                        ? "border-4 border-primaryColor"
-                        : "border-gray-300"
-                    }`}
-                  />
-                ))}
-              </div>
             </div>
 
             <div className="mb-6">
@@ -240,7 +299,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
-                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-lg text-xl font-bold hover:bg-primaryColor transition">
+                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-full text-xl font-bold hover:bg-primaryColor transition">
                 {t("product.addToCart")}
               </button>
               <button
@@ -255,6 +314,12 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
                 )}
               </button>
+            </div>
+            <div className="my-6">
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                {t("product.about")}
+              </h3>
+              <p className="text-gray-700">{about}</p>
             </div>
           </div>
         </div>

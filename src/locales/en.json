@@ -9,6 +9,9 @@
   "category": "Category",
   "store": "Store",
   "on_sale_only": "On Sale Only",
+  "search": "Search",
+  "min_price": "Min Price",
+  "max_price": "Max Price",
 
   "modal": {
     "close": "Close"
@@ -135,7 +138,8 @@
     "emailRequired": "Email is required",
     "passwordRequired": "Password is required",
     "serverUnavailable": "Server is currently unavailable. Please try again later.",
-    "networkError": "Network error. Please check your connection."
+    "networkError": "Network error. Please check your connection.",
+    "requiredToRate": "You must be logged in to rate products."
   },
   "addAddress": {
     "title": "Add Address",
@@ -182,8 +186,11 @@
     "highlights": "Highlight",
     "details": "Details",
     "onSale": "Sale Price",
-
-    "reviews": "Reviews"
+    "alreadyRated": "You have already rated this product.",
+    "ratingError": "Failed to submit rating.",
+    "ratingSuccess": "Thank you for your rating!",
+    "reviews": "Reviews",
+    "about": "About the Store"
   },
 
   "sysadmin": {
@@ -193,6 +200,11 @@
     "stores": "Stores",
     "store_name": "Store Name",
     "store_address": "Store Address",
+    "about": "About the Store",
+    "store_about_he": "Store Description (Hebrew)",
+    "store_about_en": "Store Description (English)",
+    "store_about_placeholder_he": "Store Description in Hebrew",
+    "store_about_placeholder_en": "Store Description in English",
     "managers": "Managers",
     "manager_name": "Manager Name",
     "manager_email": "Manager Email",
@@ -223,6 +235,10 @@
       "storeName": "Store Name",
       "price": "Price",
       "sold": "Quantity Sold",
+      "delivery_company_home": "Home Delivery Company",
+      "delivery_price_home": "Home Delivery Price",
+      "delivery_company_pickup": "Pickup Point Company",
+      "delivery_price_pickup": "Pickup Point Price",
       "errors": {
         "fetchFailed": "Failed to fetch statistics data."
       },
@@ -252,7 +268,8 @@
     "continueShopping": "Continue Shopping",
     "removed": "Item removed from cart",
     "quantity_updated": "Quantity updated successfully",
-    "quantity_update_failed": "Error updating quantity"
+    "quantity_update_failed": "Error updating quantity",
+    "mustBeLoggedIn": "You must be logged in to add items to the cart"
   },
   "orders": {
     "title": "My Orders",

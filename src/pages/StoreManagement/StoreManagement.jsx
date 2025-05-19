@@ -7,6 +7,7 @@ import OrderManagement from "./OrderManagement.jsx";
 import { useTranslation } from "react-i18next";
 import StoreDashboard from "./StoreDashboard.jsx";
 import StoreAnalytics from "./StoreAnalytics.jsx";
+import { refreshAccessToken } from "../../utils/authHelpers";
 import { useLocation } from "react-router-dom";
 
 const StoreManagement = () => {
@@ -19,8 +20,8 @@ const StoreManagement = () => {
   const [menuOpen, setMenuOpen] = useState(false);
   const [storeId, setStoreId] = useState(null);
   const [userEmail, setUserEmail] = useState(null);
-  const [storeName, setStoreName] = useState("לא נטען"); // מחרוזת בלבד
-
+  const [storeName, setStoreName] = useState("לא נטען");
+  const [isFetchingStore, setIsFetchingStore] = useState(true);
   const { t, i18n } = useTranslation();
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
@@ -35,33 +36,44 @@ const StoreManagement = () => {
   useEffect(() => {
     const fetchStoreById = async () => {
       try {
-        const token = localStorage.getItem("token");
+        setIsFetchingStore(true);
+        let accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) accessToken = await refreshAccessToken();
+        if (!accessToken) throw new Error("No valid access token");
 
         const res = await fetch(`/api/Stores/${paramStoreId}`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
+            Authorization: `Bearer ${accessToken}`,
           },
         });
 
         if (!res.ok) throw new Error("Store not found");
         const store = await res.json();
         setStoreId(store._id);
-        setStoreName( store.name?.[i18n.language] || store.name?.he || store.name?.en);
+        setStoreName(
+          store.name?.[i18n.language] || store.name?.he || store.name?.en
+        );
       } catch (error) {
         console.error("Failed to load store by ID", error.message);
+      } finally {
+        setIsFetchingStore(false);
       }
     };
 
     if (paramStoreId) {
       fetchStoreById();
     }
-  }, [paramStoreId]);
+  }, [paramStoreId, i18n.language]);
 
   const fetchUserEmail = async (userId) => {
     try {
+      let accessToken = localStorage.getItem("accessToken");
+      if (!accessToken) accessToken = await refreshAccessToken();
+      if (!accessToken) throw new Error("No valid access token");
+
       const response = await fetch(`/api/user/${userId}`, {
-        headers: { Authorization: `Bearer ${token}` },
+        headers: { Authorization: `Bearer ${accessToken}` },
       });
       if (!response.ok) throw new Error("Failed to fetch user data");
       const userData = await response.json();
@@ -84,7 +96,13 @@ const StoreManagement = () => {
   useEffect(() => {
     const fetchStoreId = async () => {
       try {
-        const response = await fetch("/api/Stores");
+        let accessToken = localStorage.getItem("accessToken");
+        if (!accessToken) accessToken = await refreshAccessToken();
+        if (!accessToken) throw new Error("No valid access token");
+
+        const response = await fetch("/api/Stores", {
+          headers: { Authorization: `Bearer ${accessToken}` },
+        });
         const stores = await response.json();
 
         const store = stores.find(
@@ -109,18 +127,21 @@ const StoreManagement = () => {
         }
       } catch (err) {
         console.error("שגיאה בשליפת חנויות:", err);
+      } finally {
+        if (!paramStoreId) setIsFetchingStore(false);
       }
     };
 
-    if (userEmail) {
+    if (userEmail && !paramStoreId) {
+      setIsFetchingStore(true);
       fetchStoreId();
     }
-  }, [userEmail, i18n.language]); // מתעדכן גם כשהשפה משתנה
+  }, [userEmail, i18n.language, paramStoreId]);
 
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
-        return <StoreDashboard key="dashboard" storeId={storeId}/>;
+        return <StoreDashboard key="dashboard" storeId={storeId} />;
       case "products":
         return <ProductManagement
          key="products" 
@@ -146,7 +167,7 @@ const StoreManagement = () => {
           />
         );
       case "store-stats":
-        return <StoreAnalytics key="store-stats"  storeId={storeId}/>        ;
+        return <StoreAnalytics key="store-stats" storeId={storeId} />;
       default:
         return <div className="p-6">בחר קטגוריה מהתפריט</div>;
     }
@@ -174,7 +195,6 @@ const StoreManagement = () => {
 
   return (
     <div className="flex flex-col lg:flex-row h-screen bg-gray-100">
-      {/* Top bar for mobile */}
       <div className="lg:hidden flex justify-between items-center bg-white p-4 shadow">
         <span className="font-bold">
           {storeId ? `ניהול "${storeName}"` : "ניהול חנות"}
@@ -184,7 +204,6 @@ const StoreManagement = () => {
         </button>
       </div>
 
-      {/* Sidebar for desktop */}
       <aside
         className={`bg-white border-r shadow-md w-full lg:w-64 p-4 transition-all duration-300 ${
           menuOpen ? "block" : "hidden"
@@ -192,9 +211,7 @@ const StoreManagement = () => {
         <div className="text-lg font-bold hidden lg:block">
           ניהול חנות: {storeId ? `"${storeName}"` : "לא נטען"}
         </div>
-        <nav  className="mt-4 flex flex-col gap-1"
-        aria-label="Sidebar"
-        >
+        <nav className="mt-4 flex flex-col gap-1" aria-label="Sidebar">
           {tabs.map((tab) => (
             <button
               key={tab.id}
@@ -212,10 +229,16 @@ const StoreManagement = () => {
         </nav>
       </aside>
 
-      {/* Main content */}
       <main className="flex-1 p-4 overflow-y-auto">
         <div className="bg-white shadow-md rounded-lg p-2 min-h-[80vh]">
-          {storeId ? (
+          {isFetchingStore ? (
+            <div className="flex justify-center items-center h-[50vh]">
+              <Icon
+                icon="line-md:loading-twotone-loop"
+                className="w-12 h-12 text-primaryColor animate-spin"
+              />
+            </div>
+          ) : storeId ? (
             renderContent()
           ) : (
             <div className="text-center text-red-600">
@@ -229,3 +252,4 @@ const StoreManagement = () => {
 };
 
 export default StoreManagement;
+//

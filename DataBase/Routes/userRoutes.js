@@ -1,23 +1,25 @@
 const express = require("express");
-const UserController = require("../Controllers/userController"); // קובץ חדש לשליטה בלוגיקה של משתמשים
-const authenticateToken = require("../Middleware/authenticateToken"); // ייבוא המידלוור
-
+const UserController = require("../Controllers/userController"); 
+const authenticateToken = require("../Middleware/authenticateToken");
 const router = express.Router();
 
 //  login
 router.post("/login", UserController.login);
+
+//clear cart
+router.put('/:id/clear-cart', authenticateToken, UserController.clearUserCart);
 
 // register
 router.post("/register", UserController.register);
 // verify token
 router.get("/verify-token", UserController.verifyToken);
 
-// שינוי רול של משתמש
 router.put(
   "/:userId/change-role",
   authenticateToken,
   UserController.changeRole
 );
+
 
 // get user
 router.get("/:userId", authenticateToken, UserController.getUser);
@@ -27,6 +29,10 @@ router.get("/", authenticateToken, UserController.getUsers);
 
 // edit
 router.put("/:userId/edit", authenticateToken, UserController.editUser);
+
+// delete user 
+router.delete("/:userId",authenticateToken,UserController.deleteUser);
+
 
 // change password
 router.put(
@@ -80,6 +86,7 @@ router.patch("/:userId/cart/update-quantity", UserController.updateCartItemQuant
 
 // remove from cart
 router.delete("/:userId/cart", UserController.removeFromCart);
+
 router.post("/:userId/add-transaction", UserController.addTransactionToUser);
 
 module.exports = router;
