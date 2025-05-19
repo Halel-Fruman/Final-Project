@@ -13,6 +13,8 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
   const [editingCity, setEditingCity] = useState("");
   const [editingStreetAddress, setEditingStreetAddress] = useState("");
 
+  // Function to handle adding a new address
+  // This function is called when the user submits the new address form
   const handleAddAddress = async () => {
     try {
       const updatedAddresses = await addAddress({
@@ -31,6 +33,8 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
     }
   };
 
+  // Function to handle editing an existing address
+  // This function is called when the user submits the edited address form
   const handleEditAddress = async () => {
     try {
       const updated = [...addresses];
@@ -50,6 +54,8 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
     }
   };
 
+  // Function to handle deleting an address
+  // This function is called when the user clicks the delete button for an address
   const handleDeleteAddress = async (index) => {
     try {
       const updatedAddresses = await deleteAddress({ userId, token, index });
@@ -61,6 +67,8 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
     }
   };
 
+  // Render the address manager component
+  // This component displays the list of addresses and allows the user to add, edit, or delete addresses
   return (
     <div className="mb-4">
       <div className="card">
@@ -70,7 +78,7 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
               {t("personal_area.fields.addresses")}
             </h2>
           </label>
-
+          {/* Display the list of addresses If there are no addresses, display a message*/}
           {addresses?.length > 0 ? (
             addresses.map((address, index) => (
               <div key={index} className="card mb-3 p-2">
@@ -174,7 +182,6 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
               />
               <div className="flex gap-2">
                 <button
-
                   className="self-center bg-white  text-primaryColor rounded-full hover:bg-primaryColor hover:text-white  "
                   onClick={handleAddAddress}
                   aria-label={t("personal_area.actions.add")}>
@@ -185,7 +192,6 @@ const AddressManager = ({ addresses, userId, onUpdate, token }) => {
                   />
                 </button>
                 <button
-
                   className="self-center bg-white text-gray-600  rounded-full rounded hover:bg-gray-600 hover:text-white "
                   aria-label={t("personal_area.actions.cancel")}
                   onClick={() => setShowAddAddress(false)}>

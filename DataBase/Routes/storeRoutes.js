@@ -4,8 +4,8 @@ const router = express.Router();
 const Products = require("../models/Products");
 const UserController = require("../Controllers/userController"); // קובץ חדש לשליטה בלוגיקה של משתמשים
 const User = require("../models/User");
-const authenticateToken = require("../middleware/authenticateToken");
-const authorizeStoreAccess = require("../middleware/authorizeStoreAccess");
+const authenticateToken = require("../Middleware/authenticateToken");
+const authorizeStoreAccess = require("../Middleware/authorizeStoreAccess");
 
 
 // נתיב לשליפת כל החנויות
@@ -27,10 +27,26 @@ const updateUserRole = async (userId, role) => {
   return user;
 };
 router.post("/", async (req, res) => {
-  const { name, address, email, manager } = req.body;
+  const { name, address, email, manager, deliveryOptions } = req.body;
 
   try {
-    const newStore = new Store({ name, address, email, manager });
+    const newStore = new Store({
+      name,
+      address,
+      email,
+      manager,
+      deliveryOptions: {
+        homeDelivery: {
+          company: deliveryOptions?.homeDelivery?.company || "",
+          price: deliveryOptions?.homeDelivery?.price || 0,
+        },
+        pickupPoint: {
+          company: deliveryOptions?.pickupPoint?.company || "",
+          price: deliveryOptions?.pickupPoint?.price || 0,
+        },
+      },
+    });
+
     await newStore.save();
 
     for (const item of manager) {
@@ -41,19 +57,14 @@ router.post("/", async (req, res) => {
         console.warn("User not found for email:", item.emailAddress);
       }
     }
-console.log("storeName to save:", {
-  he: newStore.name.he,
-  en: newStore.name.en,
-});
 
     const newStoreProducts = new Products({
-  storeId: newStore._id,
-  storeName: {
-    he: newStore.name.he,
-    en: newStore.name.en,
-  },
-  products: [],
-});    console.log("Products to be saved:", newStoreProducts.products);
+      storeId: newStore._id,
+      storeName: {
+        he: newStore.name.he,
+        en: newStore.name.en,
+      },
+    });
 
     await newStoreProducts.save();
 
@@ -66,15 +77,31 @@ console.log("storeName to save:", {
 
 
 
-// עדכון פרטי חנות
-router.put("/:id",authenticateToken, authorizeStoreAccess, async (req, res) => {
-  const { name, address, email, manager } = req.body;
+router.put("/:id", authenticateToken, authorizeStoreAccess, async (req, res) => {
+  const { name, address, email, manager, deliveryOptions } = req.body;
+
   try {
     const updatedStore = await Store.findByIdAndUpdate(
       req.params.id,
-      { name, address, email, manager }, // עדכון כל השדות, כולל המנהלים
+      {
+        name,
+        address,
+        email,
+        manager,
+        deliveryOptions: {
+          homeDelivery: {
+            company: deliveryOptions?.homeDelivery?.company || "",
+            price: deliveryOptions?.homeDelivery?.price || 0,
+          },
+          pickupPoint: {
+            company: deliveryOptions?.pickupPoint?.company || "",
+            price: deliveryOptions?.pickupPoint?.price || 0,
+          },
+        },
+      },
       { new: true }
     );
+
     res.status(200).json(updatedStore);
   } catch (error) {
     res.status(500).json({ error: "Error updating store: " + error.message });
@@ -106,4 +133,17 @@ router.get("/:id",authenticateToken, authorizeStoreAccess, async (req, res) => {
   }
 });
 
+
+router.get("/:id/shipping-info", async (req, res) => {
+  try {
+    const store = await Store.findById(req.params.id, "deliveryOptions");
+    if (!store)
+      return res.status(404).json({ error: "Store not found" });
+
+    res.status(200).json(store.deliveryOptions || {});
+  } catch (error) {
+    console.error("Error fetching shipping info:", error.message);
+    res.status(500).json({ error: "Failed to fetch shipping info" });
+  }
+});
 module.exports = router; // ייצוא הנתיב

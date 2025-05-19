@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import {
   FaExclamationCircle,
@@ -11,6 +10,7 @@ import OrderDetailsModal from "./OrderDetailsModal";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { Icon } from "@iconify/react";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
 const OrderManagement = ({ storeId, statusFilter = [], title }) => {
   const [orders, setOrders] = useState([]);
@@ -22,18 +22,16 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
   const [pagetitle, setpagetitle] = useState(title);
 
   useEffect(() => {
-    axios
-      .get(`/api/Transactions?store=${storeId}`)
-      .then((res) => {
-        const storeData = res.data.find((store) => store.storeId === storeId);
+    fetchWithTokenRefresh(`/api/Transactions?store=${storeId}`)
+      .then((res) => res.json())
+      .then((data) => {
+        const storeData = data.find((store) => store.storeId === storeId);
         if (!storeData) return;
 
         const filteredOrders = storeData.transactions.filter((order) => {
-          // אם נשלח סטטוסים לסינון – נציג רק אותם
           if (statusFilter.length > 0) {
             return statusFilter.includes(order.status);
           }
-          // אחרת – ברירת מחדל: לא להציג הזמנות שהושלמו או בוטלו
           return order.status !== "completed" && order.status !== "canceled";
         });
         setOrders(filteredOrders);
@@ -57,49 +55,61 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
           : order
       )
     );
-    setSelectedOrder(null); // סוגר את המודל עם עדכון מיידי בטבלה
+    setSelectedOrder(null);
   };
 
-  const updateDeliveryStatus = (transactionId, newStatus) => {
-    axios
-      .put(`/api/Transactions/${transactionId}/updateDeliveryStatus`, {
-        deliveryStatus: newStatus, // השם הנכון!
-      })
-      .then(() => {
-        setOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order.transactionId === transactionId
-              ? {
-                  ...order,
-                  delivery: {
-                    ...order.delivery,
-                    deliveryStatus: newStatus,
-                  },
-                }
-              : order
-          )
-        );
-        showAlert("סטטוס המשלוח עודכן בהצלחה!", "success");
-      })
-      .catch(() => showAlert("שגיאה בעדכון סטטוס המשלוח", "error"));
+  const updateDeliveryStatus = async (transactionId, newStatus) => {
+    try {
+      await fetchWithTokenRefresh(
+        `/api/Transactions/${transactionId}/updateDeliveryStatus`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ deliveryStatus: newStatus }),
+        }
+      );
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.transactionId === transactionId
+            ? {
+                ...order,
+                delivery: {
+                  ...order.delivery,
+                  deliveryStatus: newStatus,
+                },
+              }
+            : order
+        )
+      );
+      showAlert("סטטוס המשלוח עודכן בהצלחה!", "success");
+    } catch {
+      showAlert("שגיאה בעדכון סטטוס המשלוח", "error");
+    }
   };
 
-  const updateTransactionStatus = (transactionId, newStatus) => {
-    axios
-      .put(`/api/Transactions/${transactionId}/updateTransactionStatus`, {
-        status: newStatus,
-      })
-      .then(() => {
-        setOrders((prevOrders) =>
-          prevOrders.map((order) =>
-            order.transactionId === transactionId
-              ? { ...order, status: newStatus }
-              : order
-          )
-        );
-        showAlert("סטטוס עסקה עודכן בהצלחה!", "success");
-      })
-      .catch(() => showAlert("שגיאה בעדכון סטטוס העסקה", "error"));
+  const updateTransactionStatus = async (transactionId, newStatus) => {
+    try {
+      await fetchWithTokenRefresh(
+        `/api/Transactions/${transactionId}/updateTransactionStatus`,
+        {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        }
+      );
+
+      setOrders((prevOrders) =>
+        prevOrders.map((order) =>
+          order.transactionId === transactionId
+            ? { ...order, status: newStatus }
+            : order
+        )
+      );
+      showAlert("סטטוס עסקה עודכן בהצלחה!", "success");
+    } catch {
+      showAlert("שגיאה בעדכון סטטוס העסקה", "error");
+    }
   };
 
   const getStatusIcon = (status) => {
@@ -123,7 +133,7 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
     const now = new Date();
     const createdDate = new Date(createdAt);
     const diffInDays = (now - createdDate) / (1000 * 60 * 60 * 24);
-    return diffInDays >= 3; // מעל 3 ימים ממתינה
+    return diffInDays >= 3;
   };
 
   const handleExportOrders = () => {
@@ -153,13 +163,9 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
 
     const headers = Object.keys(data[0]);
     const worksheet = XLSX.utils.json_to_sheet(data);
-
-    // התאמה לפי כותרות בלבד
     worksheet["!cols"] = headers.map((key) => ({ wch: key.length + 2 }));
-
     const workbook = XLSX.utils.book_new();
     XLSX.utils.book_append_sheet(workbook, worksheet, "Orders");
-
     const excelBuffer = XLSX.write(workbook, {
       bookType: "xlsx",
       type: "array",
@@ -178,10 +184,7 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
         <button
           className="bg-primaryColor text-xl font-bold text-white px-4 py-2 rounded shadow"
           onClick={toggleSortOrder}>
-            <h2>
-
-          מיין לפי תאריך {sortOrder === "asc" ? "⬆" : "⬇"}
-            </h2>
+          <h2>מיין לפי תאריך {sortOrder === "asc" ? "⬆" : "⬇"}</h2>
         </button>
 
         <select

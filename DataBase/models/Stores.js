@@ -1,10 +1,11 @@
 const mongoose = require('mongoose');
 
-const storeSchema = new mongoose.Schema({
-  name: {
-    he: { type: String, required: true, unique: true },
-    en: { type: String, required: true, unique: true },
-  },
+const storeSchema = new mongoose.Schema(
+  {
+    name: {
+      he: { type: String, required: true, unique: true },
+      en: { type: String, required: true, unique: true },
+    },
     address: {
       type: String,
       required: true,
@@ -22,12 +23,23 @@ const storeSchema = new mongoose.Schema({
         emailAddress: {
           type: String,
           required: true,
-          match: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/, // אימות כתובת מייל
+          match: /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}/,
         },
       },
     ],
-  }, { timestamps: true });  // שדות תאריך עדכון
+    deliveryOptions: {
+      homeDelivery: {
+        company: { type: String, required: false },
+        price: { type: Number, required: false, default: 0 },
+      },
+      pickupPoint: {
+        company: { type: String, required: false },
+        price: { type: Number, required: false, default: 0 },
+      },
+    },
+  },
+  { timestamps: true }
+);
 
-  const Stores = mongoose.model('Stores', storeSchema, 'Stores');
-  module.exports = Stores;
-
+const Stores = mongoose.model('Stores', storeSchema, 'Stores');
+module.exports = Stores;

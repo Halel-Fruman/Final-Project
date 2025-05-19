@@ -14,6 +14,8 @@ const WishlistComponent = ({
   const [isLoading, setIsLoading] = useState(true);
   const [missingCount, setMissingCount] = useState(0);
 
+  // Function to handle removing a product from the wishlist
+  // This function is called when the user clicks the remove button
   const handleRemoveFromWishlist = useCallback(
     async (product) => {
       await removeFromWishlist(product, true);
@@ -22,6 +24,8 @@ const WishlistComponent = ({
     [removeFromWishlist, refreshWishlist]
   );
 
+  // Fetch products from the wishlist
+  // This function is called when the component mounts or when the wishlist changes
   useEffect(() => {
     let hasCleaned = false;
 
@@ -57,6 +61,8 @@ const WishlistComponent = ({
     }
   }, [wishlist, handleRemoveFromWishlist]);
 
+  // Show loading spinner if products are being fetched
+  // If no products are found, show a message indicating the wishlist is empty
   if (isLoading)
     return (
       <div className="text-center py-10">
@@ -66,6 +72,8 @@ const WishlistComponent = ({
     );
   if (!products || products.length === 0) return <p>{t("wishlist.empty")}</p>;
 
+  // Render the wishlist component
+  // This component displays the list of products in the wishlist
   return (
     <div className="container mx-auto py-6">
       <h2 className="text-2xl font-bold text-center mb-4">
@@ -80,6 +88,7 @@ const WishlistComponent = ({
         </p>
       )}
 
+      //
       {/* Desktop Table */}
       <div className="hidden md:block">
         <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg">

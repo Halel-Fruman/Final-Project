@@ -177,17 +177,19 @@ const addTransaction = async (req, res) => {
   const { storeId, storeName, transaction } = req.body;
 
   if (!storeId || !storeName || !transaction || !transaction.transactionId) {
+	console.log("storeId",storeId );
+	console.log (transaction.transactionId);
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
     let storeDoc = await StoreTransactions.findOne({ storeId });
     let newTransaction;
-
+	
     if (!storeDoc) {
       const orderCounter = 1;
-      const orderId = `${transaction.transactionId}-${storeName
-        .slice(0, 3)
+      const orderId = `${storeName.en
+        .trim().replace(/\s+/g, '')
         .toUpperCase()}-${orderCounter}`;
       newTransaction = { ...transaction, orderId };
 
@@ -195,7 +197,7 @@ const addTransaction = async (req, res) => {
         storeId,
         storeName,
         orderCounter,
-        ordersStart: storeName[i18n.en].trim().replace(/\s+/g, '').toUpperCase(),
+        ordersStart: storeName.en.trim().replace(/\s+/g, '').toUpperCase(),
         transactions: [newTransaction],
       });
     } else {
@@ -217,31 +219,6 @@ const addTransaction = async (req, res) => {
     res
       .status(500)
       .json({ message: "Error adding transaction", error: error.message });
-  }
-};
-
-
-
-/////
-exports.updateTransaction = async (req, res) => {
-  try {
-    const { transactionId } = req.params;
-    const updatedData = req.body;
-
-    const updatedTransaction = await Transaction.findOneAndUpdate(
-      { transactionId },
-      updatedData,
-      { new: true }
-    );
-
-    if (!updatedTransaction) {
-      return res.status(404).json({ message: 'Transaction not found' });
-    }
-
-    res.json(updatedTransaction);
-  } catch (error) {
-    console.error('Error updating transaction:', error);
-    res.status(500).json({ message: 'Server error' });
   }
 };
 

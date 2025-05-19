@@ -39,10 +39,8 @@ const Header = ({
     <header
       id="general"
       className="bg-gray-50 shadow border-b-2 border-gray-200"
-      aria-label="Navigation Header"
-      >
-
-      <nav className="container mx-auto flex items-center justify-between py-4 px-6">
+      aria-label="Navigation Header">
+      <nav className="w-full px-6 flex items-center justify-between py-4">
         {/* Logo */}
         <Link to="/" className="flex items-center">
           <img src={logo} alt="Logo" className="h-12 w-12" />
@@ -255,10 +253,11 @@ const Header = ({
       <Dialog
         open={isRegisterModalOpen}
         onClose={() => setIsRegisterModalOpen(false)}
-        className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="fixed inset-0 bg-black bg-opacity-50" />
-        <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6">
-          <Register
+        className="fixed inset-0 z-50 flex p-4 items-center justify-center max-h-screen overflow-y-scroll">
+        <div className="fixed inset-0 bg-black bg-opacity-50 max-h-screen" />
+        <DialogPanel className="relative bg-white rounded-lg shadow-lg  max-w-md w-full h-full max-h-screen p-6 overflow-y-auto">
+
+        <Register
             setToken={setToken}
             setUserId={setUserId}
             onClose={() => setIsRegisterModalOpen(false)}
@@ -270,3 +269,4 @@ const Header = ({
 };
 
 export default Header;
+
