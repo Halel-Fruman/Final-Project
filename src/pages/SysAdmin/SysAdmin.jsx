@@ -352,7 +352,7 @@ const SysAdmin = () => {
                 onChange={(e) => handleFieldChange("email", e.target.value)}
               />
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4 mb-4">
               <div>
                 <label className="block mb-1">
                   {t("sysadmin.delivery_company_home")}
@@ -403,55 +403,9 @@ const SysAdmin = () => {
                 />
               </div>
 
-              <div>
-                <label className="block mb-1">
-                  {t("sysadmin.delivery_company_pickup")}
-                </label>
-                <input
-                  type="text"
-                  className="w-full border px-3 py-2"
-                  value={
-                    selectedStore?.deliveryOptions?.pickupPoint?.company || ""
-                  }
-                  onChange={(e) =>
-                    setSelectedStore((prev) => ({
-                      ...prev,
-                      deliveryOptions: {
-                        ...prev.deliveryOptions,
-                        pickupPoint: {
-                          ...prev.deliveryOptions?.pickupPoint,
-                          company: e.target.value,
-                        },
-                      },
-                    }))
-                  }
-                />
-              </div>
 
-              <div>
-                <label className="block mb-1">
-                  {t("sysadmin.delivery_price_pickup")}
-                </label>
-                <input
-                  type="number"
-                  className="w-full border px-3 py-2"
-                  value={
-                    selectedStore?.deliveryOptions?.pickupPoint?.price || 0
-                  }
-                  onChange={(e) =>
-                    setSelectedStore((prev) => ({
-                      ...prev,
-                      deliveryOptions: {
-                        ...prev.deliveryOptions,
-                        pickupPoint: {
-                          ...prev.deliveryOptions?.pickupPoint,
-                          price: Number(e.target.value),
-                        },
-                      },
-                    }))
-                  }
-                />
-              </div>
+
+
             </div>
             <div className="mb-4">
               <label className="block mb-1">

@@ -6,12 +6,13 @@ import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const token = localStorage.getItem("token");
+  const token = localStorage.getItem("accessToken");
   const isLoggedIn = !!token;
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -27,7 +28,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
     const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const token = localStorage.getItem("accessToken");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
 
         const response = await fetch(`/api/Products/${id}`, {
@@ -90,12 +91,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   // This function is used to send the rating to the server
   const handleRating = async (newRating) => {
     try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(`/api/products/${id}/rate`, {
+      const response = await fetchWithTokenRefresh(`/api/products/${id}/rate`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
         },
         body: JSON.stringify({ rating: newRating }),
       });
@@ -119,7 +118,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       toast.error(t("product.ratingError"));
     }
   };
-
 
   // skeleton loading state
   // This is used to show a loading state while the product data is being fetched

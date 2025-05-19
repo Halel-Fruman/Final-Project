@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
+import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
 
 const OrderHistory = ({ user, addToCart }) => {
   const { t, i18n } = useTranslation();
@@ -14,9 +15,10 @@ const OrderHistory = ({ user, addToCart }) => {
       try {
         const groups = {};
         for (const txId of user.transactions) {
-          const res = await fetch(
+          const res = await fetchWithTokenRefresh(
             `/api/Transactions/by-transactionId/${txId}`
           );
+
           if (res.ok) {
             const txs = await res.json();
             if (txs?.length) {
@@ -49,7 +51,7 @@ const OrderHistory = ({ user, addToCart }) => {
       const detailsMap = {};
       for (const id of Object.keys(allProducts)) {
         try {
-          const res = await fetch(`/api/Products/${id}`);
+          const res = await fetchWithTokenRefresh(`/api/Products/${id}`);
           const data = await res.json();
           detailsMap[id] = data;
         } catch {
@@ -84,7 +86,8 @@ const OrderHistory = ({ user, addToCart }) => {
             <div key={i} className="bg-white border-b">
               <div className="flex flex-col md:flex-row justify-between items-center bg-gray-100 px-6 py-3 text-lg text-gray-900 border-b">
                 <span>
-                  {t("orders.store")}: <strong>{order.storeName[i18n.language]}</strong>
+                  {t("orders.store")}:{" "}
+                  <strong>{order.storeName[i18n.language]}</strong>
                 </span>
                 <span>
                   {t("orders.date")}:{" "}

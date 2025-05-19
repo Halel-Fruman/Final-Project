@@ -1,3 +1,20 @@
+import toast from "react-hot-toast";
+
+// פונקציית עזר ל־logout מלא
+export function forceLogout() {
+  localStorage.removeItem("accessToken");
+  localStorage.removeItem("refreshToken");
+  localStorage.removeItem("userId");
+  localStorage.removeItem("role");
+
+  toast.error("פג תוקף החיבור, נא התחבר מחדש");
+
+  // רענון הדף או ניווט לעמוד הבית
+  setTimeout(() => {
+    window.location.href = "/shop"; // או "/login" אם יש לך עמוד התחברות נפרד
+  }, 2000);
+}
+
 export async function refreshAccessToken() {
   const refreshToken = localStorage.getItem("refreshToken");
   if (!refreshToken) return null;
@@ -31,10 +48,15 @@ export async function fetchWithTokenRefresh(url, options = {}) {
 
   try {
     const response = await fetch(url, { ...options, headers });
+
+    // אם הטוקן נגמר, ננסה לרענן
     if (response.status !== 401) return response;
 
     const newToken = await refreshAccessToken();
-    if (!newToken) throw new Error("Failed to refresh token");
+    if (!newToken) {
+      forceLogout(); // ⬅️ מפעיל טוסט ו־logout
+      return new Response(null, { status: 401 });
+    }
 
     const retryHeaders = {
       ...options.headers,
@@ -44,6 +66,9 @@ export async function fetchWithTokenRefresh(url, options = {}) {
     return await fetch(url, { ...options, headers: retryHeaders });
   } catch (err) {
     console.error("fetchWithTokenRefresh error:", err);
+    toast.error("שגיאה בבקשת הרשת");
     throw err;
   }
 }
+
+window.fetchWithTokenRefresh = fetchWithTokenRefresh;

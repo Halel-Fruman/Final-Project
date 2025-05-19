@@ -1,12 +1,14 @@
 import React, { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
-
 import { Icon } from "@iconify/react";
 import ProductManagement from "./ProductManagement.jsx";
 import OrderManagement from "./OrderManagement.jsx";
 import { useTranslation } from "react-i18next";
 import StoreDashboard from "./StoreDashboard.jsx";
 import StoreAnalytics from "./StoreAnalytics.jsx";
+import StoreSettings from "./StoreSettings.jsx";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
+import { useNavigate } from "react-router-dom";
 import { refreshAccessToken } from "../../utils/authHelpers";
 import { useLocation } from "react-router-dom";
 
@@ -24,6 +26,7 @@ const StoreManagement = () => {
   const [isFetchingStore, setIsFetchingStore] = useState(true);
   const { t, i18n } = useTranslation();
   const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
 
@@ -37,18 +40,18 @@ const StoreManagement = () => {
     const fetchStoreById = async () => {
       try {
         setIsFetchingStore(true);
-        let accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) accessToken = await refreshAccessToken();
-        if (!accessToken) throw new Error("No valid access token");
-
-        const res = await fetch(`/api/Stores/${paramStoreId}`, {
+        const res = await fetchWithTokenRefresh(`/api/Stores/${paramStoreId}`, {
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${accessToken}`,
           },
         });
 
+        if (res.status === 401 || res.status === 403) {
+          return navigate("/");
+        }
+
         if (!res.ok) throw new Error("Store not found");
+
         const store = await res.json();
         setStoreId(store._id);
         setStoreName(
@@ -56,6 +59,7 @@ const StoreManagement = () => {
         );
       } catch (error) {
         console.error("Failed to load store by ID", error.message);
+        navigate("/"); // fallback גם בשגיאה כללית
       } finally {
         setIsFetchingStore(false);
       }
@@ -68,13 +72,7 @@ const StoreManagement = () => {
 
   const fetchUserEmail = async (userId) => {
     try {
-      let accessToken = localStorage.getItem("accessToken");
-      if (!accessToken) accessToken = await refreshAccessToken();
-      if (!accessToken) throw new Error("No valid access token");
-
-      const response = await fetch(`/api/user/${userId}`, {
-        headers: { Authorization: `Bearer ${accessToken}` },
-      });
+      const response = await fetchWithTokenRefresh(`/api/user/${userId}`);
       if (!response.ok) throw new Error("Failed to fetch user data");
       const userData = await response.json();
       return userData.email;
@@ -96,13 +94,7 @@ const StoreManagement = () => {
   useEffect(() => {
     const fetchStoreId = async () => {
       try {
-        let accessToken = localStorage.getItem("accessToken");
-        if (!accessToken) accessToken = await refreshAccessToken();
-        if (!accessToken) throw new Error("No valid access token");
-
-        const response = await fetch("/api/Stores", {
-          headers: { Authorization: `Bearer ${accessToken}` },
-        });
+        const response = await fetchWithTokenRefresh("/api/Stores");
         const stores = await response.json();
 
         const store = stores.find(
@@ -168,6 +160,14 @@ const StoreManagement = () => {
         );
       case "store-stats":
         return <StoreAnalytics key="store-stats" storeId={storeId} />;
+      case "settings":
+        return (
+          <StoreSettings
+            key="settings"
+            storeId={storeId}
+            token={localStorage.getItem("accessToken")}
+          />
+        );
       default:
         return <div className="p-6">בחר קטגוריה מהתפריט</div>;
     }
@@ -191,6 +191,11 @@ const StoreManagement = () => {
       label: "סטטיסטיקות חנות",
       icon: "material-symbols:bar-chart-outline",
     },
+    {
+      id: "settings",
+      label: "הגדרות חנות",
+      icon: "material-symbols:settings-outline",
+    },
   ];
 
   return (
@@ -209,7 +214,7 @@ const StoreManagement = () => {
           menuOpen ? "block" : "hidden"
         } lg:block`}>
         <div className="text-lg font-bold hidden lg:block">
-          ניהול חנות: {storeId ? `"${storeName}"` : "לא נטען"}
+          ניהול חנות: {storeId ? `"${storeName}"` : ""}
         </div>
         <nav className="mt-4 flex flex-col gap-1" aria-label="Sidebar">
           {tabs.map((tab) => (
@@ -252,4 +257,3 @@ const StoreManagement = () => {
 };
 
 export default StoreManagement;
-//

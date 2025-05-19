@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
 
 const PasswordManager = ({ userId, token }) => {
   const { t } = useTranslation();
@@ -14,14 +15,10 @@ const PasswordManager = ({ userId, token }) => {
     }
 
     try {
-      const response = await fetch(
+      const response = await fetchWithTokenRefresh(
         `/api/User/${userId}/change-password`,
         {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({ currentPassword, newPassword }),
         }
       );
@@ -80,7 +77,6 @@ const PasswordManager = ({ userId, token }) => {
               onClick={handlePasswordChange}>
               {t("personal_area.save")}
             </button>
-
           </div>
         </form>
       }
