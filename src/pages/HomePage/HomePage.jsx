@@ -159,7 +159,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   // Render the main content of the page
   // This is done to display the main content of the page
   return (
-    <div className="bg-gray-50">
+    <div className="bg-primaryColor bg-opacity-10">
       <header
         id="home"
         aria-label="Hero Section"

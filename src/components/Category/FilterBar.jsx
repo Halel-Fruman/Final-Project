@@ -50,7 +50,7 @@ const FilterBar = ({
     return (
       <Menu as="div" className="relative inline-block text-left">
         <Menu.Button
-          className="inline-flex items-center rounded-full border border-secondaryColor bg-secondaryColor bg-opacity-10 px-4 py-2 text-sm font-medium text-black hover:bg-secondary bg-opacity-10 shadow-sm"
+          className="inline-flex items-center rounded-full border border-secondaryColor bg-primaryColor bg-opacity-30 px-4 py-2 text-sm font-medium text-black hover:bg-secondary  shadow-sm"
           aria-haspopup="true"
           aria-expanded="true">
           {label}
@@ -103,7 +103,7 @@ const FilterBar = ({
 
   return (
     <div
-      className="divide-y bg-primaryColor bg-opacity-10 rounded-lg px-4 py-3 shadow mb-6 w-full mx-auto"
+      className="divide-y bg-primaryColor bg-opacity-30 rounded-lg px-4 py-3 shadow mb-6 w-full mx-auto"
       role="region"
       aria-label={t("filters")}>
       {/* Dropdowns row */}
@@ -143,7 +143,7 @@ const FilterBar = ({
 
         {/* Price range filter */}
         <div className="flex items-center gap-2">
-          <label htmlFor="min-price" className="text-md font-bold text-gray-700">
+          <label htmlFor="min-price" className="text-md font-bold text-gray-900">
             {t("min_price")}:
           </label>
           <input
@@ -153,7 +153,7 @@ const FilterBar = ({
             value={minPrice}
             onChange={(e) => setMinPrice(e.target.value)}
           />
-          <label htmlFor="max-price" className="text-md font-bold text-gray-700">
+          <label htmlFor="max-price" className="text-md font-bold text-gray-900">
             {t("max_price")}:
           </label>
           <input

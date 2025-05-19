@@ -1,5 +1,5 @@
 import React from "react";
-import { Dialog } from "@headlessui/react";
+import { Dialog, DialogPanel } from "@headlessui/react";
 //  Modal component
 const Modal = ({ isOpen, onClose, children }) => {
   return (
@@ -9,7 +9,7 @@ const Modal = ({ isOpen, onClose, children }) => {
 
       {/* Modal Content */}
       <div className="fixed inset-0 flex items-center justify-center p-4">
-        <Dialog.Panel className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+        <DialogPanel className="bg-white rounded-lg shadow-lg max-w-md w-full p-6">
           <button
             onClick={onClose}
             aria-label="Close Modal"
@@ -17,7 +17,7 @@ const Modal = ({ isOpen, onClose, children }) => {
             ✕
           </button>
           {children}
-        </Dialog.Panel>
+        </DialogPanel>
       </div>
     </Dialog>
   );
