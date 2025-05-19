@@ -16,11 +16,14 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
   const [searchQuery, setSearchQuery] = useState("");
   const { showAlert } = useAlert();
   const [editingProduct, setEditingProduct] = useState(null);
+const [isEditing, setIsEditing] = useState(false);
+const [editProductId, setEditProductId] = useState(null);
 
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true); // נשתמש באותו מודאל של הוספה
   };
+  
 
   const [newProduct, setNewProduct] = useState(() => {
     const safe = autofill || {};
@@ -46,23 +49,20 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
   });
 
   
-  useEffect(() => {
-    const state = location.state;
-    if (state?.openAddProductForm && autofill) {
+ useEffect(() => {
+  const handler = (e) => {
+    const data = e.detail;
+    if (data) {
       setIsAddingProduct(true);
-      setNewProduct((prev) => ({ ...prev, ...autofill }));
-      navigate(location.pathname, { replace: true, state: {} });
-    } else if (state?.openEditProductForm && state?.editProductData) {
-      setIsEditing(true);
-      setEditProductId(state.editProductData.productId);
-      setNewProduct((prev) => ({
-        ...prev,
-        ...state.editProductData.updates
-      }));
-      navigate(location.pathname, { replace: true, state: {} });
+      setEditingProduct(null);
+      setNewProduct((prev) => ({ ...prev, ...data }));
     }
-  }, [location.state]);
-  
+  };
+
+  window.addEventListener("autofillProductForm", handler);
+  return () => window.removeEventListener("autofillProductForm", handler);
+}, []);
+
   
   
 
@@ -78,10 +78,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) =
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
   }, [storeId]);
 
-  const handleEdit = (product) => {
-    setEditingProduct(product);
-    setIsAddingProduct(true);
-  };
+  
 
   const handleDelete = (productId) => {
     if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {

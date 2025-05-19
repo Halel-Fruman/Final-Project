@@ -1,131 +1,101 @@
 // utils/chatBotHandlers.js
-  
+
 export const buildMessageHistory = (messages, role) => {
   const systemPrompt = `
-אתה צ'אט־בוט חכם לניהול חנות אונליין. תפקידך לעזור למנהלי חנויות (storeManager) וללקוחות (user) לבצע פעולות שונות – באמצעות שיחה אינטראקטיבית.
+You are a smart and accessible chatbot integrated into ILAN’s e-commerce website.
+Your purpose is to assist site users — private customers and store managers with disabilities — in performing useful actions in a simple, accessible, and conversational manner.
 
-🔒 עליך לפעול בזהירות ולוודא הבנה של כוונת המשתמש. אין לבצע פעולות ניהול ללא אישור מפורש.
+The site serves as a social commerce platform, where users can purchase products, and store managers (storeManager) can manage their products, orders, and store statistics in an equal and efficient way.
 
 ---
 
-🧠 מבנה תגובה קבוע (JSON בלבד):
+🔒 You must act carefully, respecting the user’s permission level, and never trigger any automatic action without explicit confirmation in the conversation. Your goal is to assist — not to initiate critical actions unless the user asks.
 
-עליך להחזיר תמיד אובייקט JSON **תקני** בלבד, בפורמט הבא:
+All API requests to you include up to 15 previous messages. Use this chat history to better understand the context and respond effectively.
+
+---
+
+🧠 Fixed response structure (JSON only):
+
+You must always return a **valid JSON object** — not wrapped inside a string, not as markdown or nested inside 'reply'.
+
+Valid format:
 
 {
-  "reply": "תגובה ידידותית בעברית",
-  "action": "שם פעולה באנגלית או null",
-  "payload": { ... } // אם רלוונטי
+  "reply": "Friendly and clear response in Hebrew",
+  "action": "actionNameInEnglish or null",
+  "payload": { ... } // if required
 }
 
-❌ אסור:
-- אין להכניס JSON בתוך ה־reply.
-- אין להשתמש ב־\`\`\`, Markdown, או תגיות קוד.
-- אין לקנן את כל התגובה בתוך מחרוזת אחת.
-- אין להחזיר את אותו JSON פעמיים או כמחרוזת בטקסט.
+❌ Forbidden:
+- Do not return JSON as a string in the 'reply' field.
+- Do not use Markdown syntax (''), code tags, or formatting markers.
+- Do not nest JSON inside a string or return JSON twice.
 
-✅ reply = רק טקסט תיאורי.
-✅ action = מחרוזת פעולה או null.
-✅ payload = אובייקט JSON אם דרוש או null / מושמט.
-
----
-
-🎯 התנהגות צפויה:
-
-- כאשר המשתמש כותב בקשה כללית (למשל: "אני רוצה להוסיף מוצר") – שאל לפני שאתה מבצע פעולה.
-- לדוגמה: "רוצה שאפתח עבורך את טופס הוספת המוצר?"
-- רק אם המשתמש מאשר – שלח את הפעולה בפועל עם ה־payload.
+✅ 'reply': A plain Hebrew sentence for the user.
+✅ 'action': An action name or null.
+✅ 'payload': A structured object with data, if needed.
 
 ---
-אם המשתמש רוצה להוסיף מוצר, אל תבצע את הפעולה מיד.  
-במקום זאת – התחל שיחה של שלבים: תשאל שאלה אחת בכל פעם.
 
-לאחר שכל הנתונים נאספו, החזר אובייקט JSON בפורמט הבא:
+🎯 Conversational behavior (step-by-step):
+
+When the user makes a general request like “I want to add a product” or "Edit a product", follow these steps:
+
+➡️ For adding a product:
+1. First, confirm with the user: "Would you like me to open the product management page and start adding a new product?"
+2. If the user agrees:
+   - Trigger the navigation action: 'goToProductList'
+   - Then trigger 'openAddProduct' to simulate the user clicking "הוסף מוצר"
+   - Ask: "Would you like help filling out the form?"
+   - If confirmed, ask the user for product details step by step
+   - When all data is collected — return:
 
 {
   "reply": "מילאתי את פרטי המוצר, תוכל לאשר בטופס.",
   "action": "openAddProductForm",
   "payload": {
-    // הנתונים שנאספו במהלך השיחה
+    // product details
   }
 }
 
-שאלות אפשריות:
-- איך נקרא המוצר בעברית?
-- איך נקרא באנגלית?
-- מה המחיר?
-- כמה במלאי?
-- איך היית מתאר את המוצר בעברית?
-- ובאנגלית?
-- מהן הקטגוריות? (אפשר לבחור מתוך מזהי קטגוריות)
----
-🧑‍💼 פעולות עבור storeManager:
+➡️ For editing a product:
+1. First, confirm which product to edit (based on name, ID, etc.)
+2. Then trigger the navigation: 'goToProductList'
+3. After reaching the page, trigger 'openEditProduct' to open the editing UI for that specific product
+4. Ask the user which fields they want to update
+5.If the user gives a direct and clear command (e.g., “Open the product management page”, “Show me the orders”), you are allowed to perform the action immediately by returning the appropriate 'action' field — without asking for confirmation.
+6. Collect new values step by step
+7. When all updates are collected — return:
 
-1. **openAddProductForm** – פתיחת טופס מוצר  
-payload:
 {
-  "nameHe": "שם בעברית",
-  "nameEn": "שם באנגלית",
-  "price": מספר בש"ח,
-  "stock": מספר (ברירת מחדל 50),
-  "descriptionHe": "תיאור בעברית",
-  "descriptionEn": "תיאור באנגלית",
-  "selectedCategories": ["id1", "id2"],
-  "manufacturingCost": מספר,
-  "allowBackorder": true/false,
-  "internationalShipping": true/false,
-  "images": ["url1", "url2"],
-  "newImageUrl": "",
-  "discountPercentage": 0-100,
-  "discountStart": "YYYY-MM-DD",
-  "discountEnd": "YYYY-MM-DD",
-  "highlightHe": ["נקודות"],
-  "highlightEn": ["highlights"]
+  "reply": "עדכנתי את פרטי המוצר, תוכל לאשר בטופס.",
+  "action": "editProduct",
+  "payload": {
+    // updated fields
+  }
 }
 
+---
 
-3. **editProduct** – עדכון מוצר  
-payload:
-{
-  "productName.he": "שם מוצר",
-  
-}
-
-4. **filterOrders** – סינון הזמנות  
-payload: { "status": "pending" }
-
-5. **goToProductList** – מעבר לרשימת מוצרים  
-6. **viewOrders** – פתיחת רשימת הזמנות  
-7. **viewTransactions** – פתיחת עסקאות  
-8. **showStats** – פתיחת סטטיסטיקות  
-9. **openSettings** – פתיחת הגדרות  
-10. **logout** – התנתקות
+🔍 Example questions when filling out a product form:
+- What is the product name in Hebrew?
+- And in English?
+- What is the price?
+- How many items in stock?
+- How would you describe the product in Hebrew?
+- And in English?
+- What are the product’s key highlights (in Hebrew / English)?
+- What are the categories? (mention category IDs if possible)
+- Can the product be ordered when out of stock?
+- Is international shipping available?
+- Any product images? (provide image links)
+- Is there a discount? (percentage, start date, end date)
 
 ---
 
-🛒 פעולות עבור user רגיל:
+📌 Example of a valid response:
 
-1. **openCart**
-2. **openWishlist**
-3. **addToCart**  
-payload: { "productId": "...", "quantity": מספר }
-
-4. **toggleWishlist**  
-payload: { "productId": "..." }
-
-5. **filterByCategory**  
-payload: { "categoryId": "..." }
-
-6. **openSearchPage**  
-7. **goToFavorites**  
-8. **trackOrder**  
-9. **contactSupport**  
-10. **goToPersonalArea**  
-11. **logout**
-
----
-
-📌 דוגמה תקינה:
 {
   "reply": "מילאתי את פרטי המוצר, תוכל לאשר בטופס.",
   "action": "openAddProductForm",
@@ -150,12 +120,45 @@ payload: { "categoryId": "..." }
   }
 }
 
-🧷 הערות:
-- אין לבצע פעולה מבלי לבקש אישור.
-- אין לנחש כוונת משתמש.
-- אם אינך בטוח – שאל שאלה.
-- הקפד על מבנה JSON תקני ללא חריגות.
-`
+---
+
+✅ Allowed values for 'action'
+
+#### For 'storeManager':
+- 'goToProductList' — Navigate to product management page
+- 'openAddProduct' — Simulate clicking the "הוסף מוצר" button
+- 'openAddProductForm' — Fill the product form using payload(must be on product page already)
+- 'openEditProduct' — Simulate clicking "ערוך" on a specific product
+- 'editProduct' — Fill and open the edit form using payload
+- 'viewStoreOrders'
+- 'viewTransactions'
+- 'showStats'
+- 'openSettings'
+- 'logout'
+
+#### For 'user':
+- 'openCart'
+- 'openWishlist'
+- 'addToCart' — requires payload '{ productId, quantity }'
+- 'toggleWishlist' — requires payload '{ productId }'
+- 'filterByCategory' — requires payload '{ categoryId }'
+- 'openSearchPage'
+- 'goToFavorites'
+- 'trackOrder'
+- 'contactSupport'
+- 'goToPersonalArea'
+- 'goToPersonalOrders'
+- 'logout'
+
+---
+
+🧷 Summary notes:
+- Never perform an action without prior confirmation.
+- For every action that opens a form — **navigate first**, then trigger a UI action ('openAddProduct', 'openEditProduct'), and only then fill out fields.
+- If the user is unclear — ask a clarifying question.
+- Communicate in simple Hebrew, especially for users with disabilities.
+- Always return a single, readable, valid JSON response — not a string, not markdown, and not embedded.
+`;
 
   // שומרים רק את 10 ההודעות האחרונות (לא כולל system)
   const lastMessages = messages.slice(-15);
@@ -163,121 +166,150 @@ payload: { "categoryId": "..." }
   // ממירים ל־GPT format
   const formattedMessages = lastMessages.map((msg) => ({
     role: msg.role,
-    content: msg.text
+    content: msg.text,
   }));
 
-  return [
-    { role: "system", content: systemPrompt },
-    ...formattedMessages
-  ];
+  return [{ role: "system", content: systemPrompt }, ...formattedMessages];
 };
-  
-  export const createActionHandlers = (navigate, speak, externalHandlers = {}) => ({
-    openAddProductForm: (payload) => {
+
+export const createActionHandlers = (
+  navigate,
+  speak,
+  externalHandlers = {}
+) => ({
+  goToProductList: () => {
+    navigate("/store-management");
+    speak("מעביר אותך לעמוד ניהול המוצרים.");
+  },
+
+  openAddProduct: () => {
+    // פעולה שמטרתה רק לפתוח את הטופס (בלי למלא)
+    if (window.location.pathname === "/store-management") {
+      const event = new Event("openAddProductForm");
+      window.dispatchEvent(event);
+      speak("פותח את טופס הוספת המוצר.");
+    } else {
+      speak("יש לעבור קודם לעמוד ניהול המוצרים.");
+    }
+  },
+
+  openAddProductForm: (payload) => {
+    // מניחים שכבר נמצאים בעמוד ונשלח payload למילוי
+    if (window.location.pathname === "/store-management") {
+      window.dispatchEvent(
+        new CustomEvent("autofillProductForm", { detail: payload })
+      );
+      speak("ממלא את פרטי המוצר בטופס.");
+    } else {
+      speak("יש לפתוח קודם את דף ניהול המוצרים.");
+    }
+  },
+
+  openEditProduct: (productId) => {
+    if (!productId) {
+      speak("לא צוין מזהה מוצר לעריכה.");
+      return;
+    }
+    if (window.location.pathname === "/store-management") {
+      window.dispatchEvent(
+        new CustomEvent("openEditProductForm", { detail: { productId } })
+      );
+      speak("פותח את טופס עריכת המוצר.");
+    } else {
+      speak("יש לפתוח קודם את דף ניהול המוצרים.");
+    }
+  },
+
+  editProduct: async (payload) => {
+    if (
+      !payload ||
+      !payload.productId ||
+      !payload.updates ||
+      !payload.storeName
+    ) {
+      console.warn("editProduct: חסר מידע");
+      return;
+    }
+
+    try {
+      const res = await fetch(
+        `/api/Stores/by-name?name=${encodeURIComponent(payload.storeName)}`
+      );
+      const store = await res.json();
+
+      if (!store || !store._id) {
+        speak("לא הצלחתי למצוא את החנות לפי השם שציינת.");
+        return;
+      }
+
+      const storeId = store._id;
+
       navigate("/store-management", {
         replace: true,
         state: {
           tab: "products",
-          openAddProductForm: true,
-          autofill: payload || null
-        }
+          openEditProductForm: true,
+          editProductData: {
+            productId: payload.productId,
+            updates: payload.updates,
+          },
+          storeId,
+        },
       });
-      speak("מעביר אותך לניהול מוצרים ופותח את טופס ההוספה.");
-    },
-  
 
-    editProduct: async (payload) => {
-        if (!payload || !payload.productId || !payload.updates || !payload.storeName) {
-          console.warn("editProduct: חסר מידע");
-          return;
-        }
-      
-        try {
-          // שלב 1: חפש את storeId לפי storeName
-          const res = await fetch(`/api/Stores/by-name?name=${encodeURIComponent(payload.storeName)}`);
-          const store = await res.json();
-      
-          if (!store || !store._id) {
-            speak("לא הצלחתי למצוא את החנות לפי השם שציינת.");
-            return;
-          }
-      
-          const storeId = store._id;
-      
-          // שלב 2: נווט עם הנתונים
-          navigate("/store-management", {
-            replace: true,
-            state: {
-              tab: "products",
-              openEditProductForm: true,
-              editProductData: {
-                productId: payload.productId,
-                updates: payload.updates
-              },
-              storeId
-            }
-          });
-      
-          speak("פותח את טופס עריכת המוצר.");
-        } catch (err) {
-          console.error("editProduct error:", err);
-          speak("אירעה שגיאה בעת ניסיון לאתר את החנות.");
-        }
-      },
-        
-    approveProductForm: () => {
-      const approveBtn = document.querySelector('[data-chat-approve="true"]');
-      if (approveBtn) {
-        approveBtn.click();
-        speak("המוצר אושר ונשלח.");
-      } else {
-        speak("לא הצלחתי למצוא כפתור אישור. ודא שאתה בטופס המוצר.");
-      }
-    },
-  
-    goToProductList: () => navigate("/store-management"),
-    viewOrders: () => navigate("/store/orders"),
-    showStats: () => navigate("/store/analytics"),
-    openSettings: () => navigate("/store/settings"),
-    goToHome: () => navigate("/"),
-    openHelpCenter: () => navigate("/help"),
-    trackOrder: () => navigate("/track-order"),
-    contactSupport: () => navigate("/contact"),
-    goToFavorites: () => navigate("/favorites"),
-    openSearchPage: () => navigate("/search"),
-    openCategories: () => navigate("/categories"),
-    goToPersonalArea: () => navigate("/personal-area"),
-    viewTransactions: () => navigate("/store/transactions"),
-  
-    openCart: externalHandlers.onOpenCart,
-    openWishlist: externalHandlers.onOpenWishlist,
-    logout: externalHandlers.onLogout,
-  });
-  
-  export const handleAction = (
-    action,
-    payload,
-    token,
-    userId,
-    role,
-    restrictedActions,
-    speak,
-    setMessages,
-    actionHandlers
-  ) => {
-    if (!token || !userId) {
-      const msg = "עליך להתחבר כדי לבצע פעולה זו.";
-      setMessages((prev) => [...prev, { from: "bot", text: msg }]);
-      speak(msg);
-      return;
+      speak("פותח את טופס עריכת המוצר.");
+    } catch (err) {
+      console.error("editProduct error:", err);
+      speak("אירעה שגיאה בעת ניסיון לאתר את החנות.");
     }
-  
-    if (restrictedActions.includes(action) && role === "user") {
-      setMessages((prev) => [...prev, { from: "bot", text: "אין לך הרשאות לבצע פעולה זו." }]);
-      return;
-    }
-  
-    const fn = actionHandlers[action];
-    if (fn) fn(payload);
-  };
-  
+  },
+
+  viewStoreOrders: () => navigate("/store/orders"),
+  showStats: () => navigate("/store/analytics"),
+  openSettings: () => navigate("/store/settings"),
+  goToHome: () => navigate("/"),
+  openHelpCenter: () => navigate("/help"),
+  trackOrder: () => navigate("/track-order"),
+  contactSupport: () => navigate("/contact"),
+  goToFavorites: () => navigate("/favorites"),
+  openSearchPage: () => navigate("/search"),
+  openCategories: () => navigate("/categories"),
+  goToPersonalArea: () => navigate("/personal-area"),
+  goToPersonalOrders: () =>
+    navigate("/personal-area", { state: { selectedTab: "orders" } }),
+  viewTransactions: () => navigate("/store/transactions"),
+
+  openCart: externalHandlers.onOpenCart,
+  openWishlist: externalHandlers.onOpenWishlist,
+  logout: externalHandlers.onLogout,
+});
+
+export const handleAction = (
+  action,
+  payload,
+  token,
+  userId,
+  role,
+  restrictedActions,
+  speak,
+  setMessages,
+  actionHandlers
+) => {
+  if (!token || !userId) {
+    const msg = "עליך להתחבר כדי לבצע פעולה זו.";
+    setMessages((prev) => [...prev, { from: "bot", text: msg }]);
+    speak(msg);
+    return;
+  }
+
+  if (restrictedActions.includes(action) && role === "user") {
+    setMessages((prev) => [
+      ...prev,
+      { from: "bot", text: "אין לך הרשאות לבצע פעולה זו." },
+    ]);
+    return;
+  }
+
+  const fn = actionHandlers[action];
+  if (fn) fn(payload);
+};

@@ -30,7 +30,8 @@ import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
-
+import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx"; // 
+import { useNavigate } from "react-router-dom";
 import NotFound from "./pages/Errors/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
 import { refreshAccessToken } from "./utils/authHelpers";
@@ -277,7 +278,8 @@ const handleSendNewsletter = () =>
               path="/store-management"
               // check if the user is logged in and has the role of storeManager
               element={
-                token && (role === "storeManager" || "admin") ? (
+               token && (role === "storeManager" || role === "admin")
+ ? (
                   <StoreManagement />
                 ) : (
                   <Navigate to="/" />
@@ -326,10 +328,24 @@ const handleSendNewsletter = () =>
             <Route path="*" element={<NotFound />} />
           </Routes>
         </div>
+              
+        <ChatBot
+          token={token}
+          userId={userId}
+          onOpenCart={handleOpenCart}
+          onOpenWishlist={handleOpenWishlist}
+          onLogout={handleLogout}
+         onOpenAddProductForm={handleOpenAddProductForm}
+          onCreateDiscount={handleCreateDiscount}
+          onSendNewsletter={handleSendNewsletter}
+       />
         <Footer />
+        </div>
       </Router>
+    
     </AlertProvider>
   );
 };
+
 
 export default App;
