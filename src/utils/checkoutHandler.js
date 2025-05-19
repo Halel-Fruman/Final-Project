@@ -1,3 +1,5 @@
+import { fetchWithTokenRefresh } from "../utils/authHelpers";
+
 export const processCheckout = async ({
   cartItems,
   userData,
@@ -7,7 +9,6 @@ export const processCheckout = async ({
   token,
   setCartItems,
 }) => {
-
   if (!userData || !selectedAddress) {
     throw new Error("User data or selected address missing");
   }
@@ -20,7 +21,7 @@ export const processCheckout = async ({
         storeId,
         storeName: item.storeName,
         storeEmail: item.storeEmail,
-        deliveryMethod:deliveryMethods[storeId],
+        deliveryMethod: deliveryMethods[storeId],
         products: [],
         totalAmount: 0,
       };
@@ -52,12 +53,12 @@ export const processCheckout = async ({
       buyerDetails: commonBuyerDetails,
       products: storeData.products,
       delivery: {
-        deliveryMethod:storeData.deliveryMethod,
+        deliveryMethod: storeData.deliveryMethod,
         deliveryStatus: "pending",
       },
     };
 
-    const storeRes = await fetch("/api/Transactions/add", {
+    const storeRes = await fetchWithTokenRefresh("/api/Transactions/add", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -71,10 +72,9 @@ export const processCheckout = async ({
     });
 
     if (!storeRes.ok) throw new Error("Failed to add transaction to store");
-
     const { newTransaction } = await storeRes.json();
 
-    const userRes = await fetch(
+    const userRes = await fetchWithTokenRefresh(
       `/api/User/${userData._id}/add-transaction`,
       {
         method: "POST",
@@ -87,8 +87,7 @@ export const processCheckout = async ({
     );
     if (!userRes.ok) throw new Error("Failed to add transaction to user");
 
-    // Send confirmation email to the user
-    await fetch("/api/email/send-confirmation", {
+    await fetchWithTokenRefresh("/api/email/send-confirmation", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${token}`,
@@ -109,16 +108,16 @@ export const processCheckout = async ({
       storeName: storeData.storeName,
     });
   }
-await fetch(`/api/User/${userData._id}/clear-cart`, {
-  method: "PUT",
-  headers: {
-    Authorization: `Bearer ${token}`,
-  },
-});
-localStorage.removeItem("cart");
-setCartItems([]);
+
+  await fetchWithTokenRefresh(`/api/User/${userData._id}/clear-cart`, {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+
+  localStorage.removeItem("cart");
+  setCartItems([]);
 
   return results;
 };
-
-

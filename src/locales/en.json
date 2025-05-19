@@ -245,6 +245,21 @@
       "noData": "No data available for the selected period."
     }
   },
+  "store_settings": {
+  "title": "Store Settings",
+  "loading": "Loading...",
+  "about_he": "Store Description (Hebrew)",
+  "about_en": "Store Description (English)",
+  "courier": "Courier Delivery",
+  "pickup_point": "Pickup Point",
+  "company_name": "Company Name",
+  "price": "Price (₪)",
+  "save_button": "Save Changes",
+  "save_success": "Store updated successfully",
+  "save_error": "Failed to update store",
+  "load_error": "Failed to load store details"
+},
+
 
   "storemanage": {
     "manage_products": "Manage Products",

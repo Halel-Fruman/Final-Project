@@ -204,12 +204,11 @@
     "store_about_placeholder_he": "הכנס טקסט בעברית",
     "store_about_placeholder_en": "הכנס טקסט באנגלית",
 
-
     "managers": "מנהלים",
     "manager_name": "שם המנהל",
     "manager_email": "אימייל של המנהל",
-    "delivery_company_home": "חברת משלוח לבית",
-    "delivery_price_home": "מחיר משלוח לבית",
+    "delivery_company_home": "חברת משלוח עד הבית",
+    "delivery_price_home": "מחיר משלוח עד הבית",
     "delivery_company_pickup": "חברת משלוח לנקודת איסוף",
     "delivery_price_pickup": "מחיר לנקודת איסוף",
     "actions": "פעולות",
@@ -255,7 +254,20 @@
     "products": "מוצרים",
     "delete": "מחק"
   },
-
+  "store_settings": {
+    "title": "הגדרות החנות",
+    "loading": "טוען...",
+    "about_he": "תיאור החנות (עברית)",
+    "about_en": "תיאור החנות (אנגלית)",
+    "courier": "משלוח עד הבית",
+    "pickup_point": "משלוח לנקודת איסוף",
+    "company_name": "שם החברה",
+    "price": "מחיר (₪)",
+    "save_button": "שמור שינויים",
+    "save_success": "החנות עודכנה בהצלחה",
+    "save_error": "שגיאה בעדכון החנות",
+    "load_error": "שגיאה בטעינת פרטי החנות"
+  },
   "cart": {
     "title": "עגלת קניות",
     "close": "סגור",
@@ -324,6 +336,7 @@
     "deliveryPrice": "מחיר משלוח",
     "deliveryMethod": "שיטת משלוח",
     "remove": "הסר",
+    "finalizingTransaction": "ממתין לאישור התשלום",
     "deliveryMethods": {
       "title": "שיטת משלוח",
       "pickup": "איסוף עצמי",
@@ -331,7 +344,7 @@
       "courier": "משלוח עד הבית",
       "delivery_box": "נקודת איסוף",
       "pickupFromStore": "איסוף מהחנות",
-
+      "pickupPoint": "איסוף מהחנות",
       "selectDeliveryMethod": "בחר שיטת משלוח",
       "selectAddress": "בחר כתובת"
     }
