@@ -25,14 +25,13 @@ import Sidebar from "./pages/SysAdmin/Sidebar.jsx";
 import Modal from "./components/Modal";
 import LoginPage from "./pages/PersonalArea/LoginPage";
 import RegisterPage from "./pages/Registeration/RegisterPage";
-import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
 import NotFound from "./pages/Errors/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
-import { refreshAccessToken } from "./utils/authHelpers";
+import { refreshAccessToken, fetchWithTokenRefresh } from "./utils/authHelpers";
 
 const App = () => {
   const { t, i18n } = useTranslation();
@@ -60,35 +59,30 @@ const App = () => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      let accessToken = localStorage.getItem("accessToken");
       const storedUserId = localStorage.getItem("userId");
       const storedUserRole = localStorage.getItem("role");
 
-      if (!accessToken && localStorage.getItem("refreshToken")) {
-        accessToken = await refreshAccessToken();
+      if (!storedUserId || !localStorage.getItem("refreshToken")) {
+        handleLogout();
+        return;
       }
 
-      if (accessToken && storedUserId) {
-        try {
-          const response = await fetch("/api/User/verify-token", {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-
-          if (response.ok) {
-            setToken(accessToken);
-            setUserId(storedUserId);
-            setRole(storedUserRole);
-          } else {
-            handleLogout();
-          }
-        } catch (error) {
-          console.error("Error verifying token:", error);
+      try {
+        const res = await fetchWithTokenRefresh("/api/User/verify-token");
+        if (res.ok) {
+          const accessToken = localStorage.getItem("accessToken");
+          setToken(accessToken);
+          setUserId(storedUserId);
+          setRole(storedUserRole);
+        } else {
           handleLogout();
         }
+      } catch (err) {
+        console.error("Error verifying token:", err);
+        handleLogout();
       }
     };
+
     verifyToken();
   }, []);
 
@@ -294,16 +288,7 @@ const App = () => {
                   )
                 }
               />
-              <Route
-                path="/add-address"
-                element={
-                  token ? (
-                    <AddAddressPage userId={userId} token={token} />
-                  ) : (
-                    <Navigate to="/" />
-                  )
-                }
-              />
+
               <Route path="/503" element={<ServiceUnavailablePage />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
