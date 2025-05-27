@@ -25,7 +25,6 @@ import Sidebar from "./pages/SysAdmin/Sidebar.jsx";
 import Modal from "./components/Modal";
 import LoginPage from "./pages/PersonalArea/LoginPage";
 import RegisterPage from "./pages/Registeration/RegisterPage";
-import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
@@ -34,7 +33,7 @@ import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx"; //
 import { useNavigate } from "react-router-dom";
 import NotFound from "./pages/Errors/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
-import { refreshAccessToken } from "./utils/authHelpers";
+import { refreshAccessToken, fetchWithTokenRefresh } from "./utils/authHelpers";
 
 const App = () => {
   const { t, i18n } = useTranslation();
@@ -62,35 +61,30 @@ const App = () => {
 
   useEffect(() => {
     const verifyToken = async () => {
-      let accessToken = localStorage.getItem("accessToken");
       const storedUserId = localStorage.getItem("userId");
       const storedUserRole = localStorage.getItem("role");
 
-      if (!accessToken && localStorage.getItem("refreshToken")) {
-        accessToken = await refreshAccessToken();
+      if (!storedUserId || !localStorage.getItem("refreshToken")) {
+        handleLogout();
+        return;
       }
 
-      if (accessToken && storedUserId) {
-        try {
-          const response = await fetch("/api/User/verify-token", {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-          });
-
-          if (response.ok) {
-            setToken(accessToken);
-            setUserId(storedUserId);
-            setRole(storedUserRole);
-          } else {
-            handleLogout();
-          }
-        } catch (error) {
-          console.error("Error verifying token:", error);
+      try {
+        const res = await fetchWithTokenRefresh("/api/User/verify-token");
+        if (res.ok) {
+          const accessToken = localStorage.getItem("accessToken");
+          setToken(accessToken);
+          setUserId(storedUserId);
+          setRole(storedUserRole);
+        } else {
           handleLogout();
         }
+      } catch (err) {
+        console.error("Error verifying token:", err);
+        handleLogout();
       }
     };
+
     verifyToken();
   }, []);
 
@@ -308,28 +302,56 @@ const handleSendNewsletter = () =>
                     addToCart={handleAddToCart}
                     token={token}
                   />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
-            />
-            <Route
-              path="/add-address"
-              element={
-                token ? (
-                  <AddAddressPage userId={userId} token={token} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
-            />
-            <Route path="/503" element={<ServiceUnavailablePage />} />
 
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-              
-        <ChatBot
+                }
+              />
+              <Route path="/confirmation" element={<ConfirmationPage />} />
+              <Route
+                path="/SysAdmin"
+                element={
+                  token && role === "admin" ? (
+                    <Sidebar token={token} />
+                  ) : (
+                    <Navigate to="/" />
+                  )
+                }
+              />
+              <Route
+                path="/store-management"
+                element={
+                  token && (role === "storeManager" || role === "admin") ? (
+                    <StoreManagement />
+                  ) : (
+                    <Navigate to="/" />
+                  )
+                }
+              />
+              <Route
+                path="/store-management/:storeId"
+                element={
+                  token && role === "admin" ? (
+                    <StoreManagement />
+                  ) : (
+                    <Navigate to="/" />
+                  )
+                }
+              />
+              <Route
+                path="/personal-area"
+                element={
+                  token ? (
+                    <PersonalArea
+                      userId={userId}
+                      addToWishlist={addToWishlist}
+                      addToCart={handleAddToCart}
+                      token={token}
+                    />
+                  ) : (
+                    <Navigate to="/" />
+                  )
+                }
+              />
+ <ChatBot
           token={token}
           userId={userId}
           onOpenCart={handleOpenCart}
@@ -339,7 +361,12 @@ const handleSendNewsletter = () =>
           onCreateDiscount={handleCreateDiscount}
           onSendNewsletter={handleSendNewsletter}
        />
-        <Footer />
+
+              <Route path="/503" element={<ServiceUnavailablePage />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+          <Footer />
         </div>
       </Router>
     

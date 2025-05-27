@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
 const EditableField = ({ title, field, value, userId, onSave }) => {
   const [editing, setEditing] = useState(false); // editing state to manage the editing mode
@@ -8,17 +9,8 @@ const EditableField = ({ title, field, value, userId, onSave }) => {
   const handleSave = async () => {
     // send a PUT request to the server with the updated field value
     try {
-      const response = await fetch(
-        `/api/User/${userId}/edit`,
-        {
-          method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ field, value: newValue }),
-        }
-      );
+      const response = await fetchWithTokenRefresh(`/api/User/${userId}/edit`);
+
       // if the response is not ok, throw an error
       if (!response.ok) {
         throw new Error("Failed to update field");

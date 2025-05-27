@@ -1,9 +1,9 @@
-// utils/Cart.js
+import { fetchWithTokenRefresh } from "../utils/authHelpers";
 
-// login function to send a POST request to the server with the email and password
+// קריאת עגלה
 export const fetchCart = async (userId, token) => {
   try {
-    const response = await fetch(`/api/User/${userId}/cart`, {
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -21,16 +21,16 @@ export const fetchCart = async (userId, token) => {
   }
 };
 
-// saveCart function to send a PUT request to the server with the updated cart items
+// שמירת עגלה
 export const saveCart = async (userId, token, cartItems) => {
   try {
     if (cartItems.length === 0) {
       console.log("Cart is empty. Skipping save.");
       return;
     }
-    // send a PUT request to the server with the updated cart items
-    const response = await fetch(`/api/User/${userId}/cart`, {
-      method: "PUT", // update the cart
+
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -47,98 +47,102 @@ export const saveCart = async (userId, token, cartItems) => {
     console.error("Error saving cart:", error.message);
   }
 };
-// add product to cart function to send a POST request to the server with the product ID
+
+// הוספה לעגלה
 export const addToCart = async (userId, token, product) => {
   try {
-    // send a POST request to the server with the product ID
-    const response = await fetch(`/api/User/${userId}/cart`, {
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-
-      body: JSON.stringify({ productId: product.productId , quantity: product.quantity}),
-
+      body: JSON.stringify({
+        productId: product.productId,
+        quantity: product.quantity,
+      }),
     });
-    // if the response is not ok, throw an error
+
     if (!response.ok) {
       throw new Error("Failed to add to cart.");
     }
 
-    const updatedCart = await response.json();
-    return updatedCart;
+    return await response.json();
   } catch (error) {
     console.error("Error adding to cart:", error.message);
     return null;
   }
 };
 
-// remove product from cart
+// הסרה מהעגלה
 export const removeFromCart = async (userId, token, productId) => {
-  console.log("Removing product from cart:", { productId });
-  // send a DELETE request to the server to remove the product from the cart
   try {
-    const response = await fetch(`/api/User/${userId}/cart`, {
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ productId: productId, quantity: 1 }),
+      body: JSON.stringify({ productId, quantity: 1 }),
     });
-    //  if the response is not ok, throw an error
+
     if (!response.ok) {
       throw new Error("Failed to remove item from cart.");
     }
-    // return the updated cart
-    const updatedCart = await response.json();
-    return updatedCart;
+
+    return await response.json();
   } catch (error) {
     console.error("Error removing item from cart:", error.message);
     return null;
   }
 };
-// utils/cartHelpers.js
 
-export const updateCartItemQuantity = async (userId, productId, quantity, token) => {
+// עדכון כמות
+export const updateCartItemQuantity = async (
+  userId,
+  productId,
+  quantity,
+  token
+) => {
   try {
-    const res = await fetch(`/api/User/${userId}/cart/update-quantity`, {
-      method: "PATCH",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${token}`,
-      },
-      body: JSON.stringify({ productId, quantity }),
-    });
+    const res = await fetchWithTokenRefresh(
+      `/api/User/${userId}/cart/update-quantity`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId, quantity }),
+      }
+    );
 
     if (!res.ok) {
       throw new Error("Failed to update cart quantity");
     }
 
-    const data = await res.json();
-    return data; // מחזיר את העגלה המעודכנת
+    return await res.json();
   } catch (err) {
     console.error("Error updating cart quantity:", err.message);
     throw err;
   }
 };
 
-
-// calculate the total price of the cart
+// חישוב סה״כ
 export const calculateCartTotal = (cartItems) => {
   return cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
     0
   );
 };
-// fetch the product details from the server
+
+// שליפת פרטי מוצר (ציבורי - לא צריך refresh)
 export const fetchProductDetails = async (productId) => {
   if (!productId) {
     console.error("fetchProductDetails called with undefined productId");
     return null;
   }
-  // fetch the product details from the server
+
   try {
     const response = await fetch(`/api/Products/${productId}`);
     if (!response.ok) {
