@@ -29,6 +29,8 @@ import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
+import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx"; // 
+import { useNavigate } from "react-router-dom";
 import NotFound from "./pages/Errors/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
 import { refreshAccessToken, fetchWithTokenRefresh } from "./utils/authHelpers";
@@ -90,6 +92,18 @@ const App = () => {
   const handleCloseCart = () => setIsCartOpen(false);
   const handleOpenWishlist = () => setIsWishlistOpen(true);
   const handleCloseWishlist = () => setIsWishlistOpen(false);
+  
+
+const handleOpenAddProductForm = () =>
+  window.dispatchEvent(new CustomEvent("openAddProductForm"));
+
+const handleCreateDiscount = () =>
+  window.dispatchEvent(new CustomEvent("createDiscount"));
+
+const handleSendNewsletter = () =>
+  window.dispatchEvent(new CustomEvent("sendNewsletter"));
+ 
+
 
   const loadCart = useCallback(async () => {
     if (userId && token) {
@@ -195,51 +209,100 @@ const App = () => {
             />
           </Modal>
 
-          <Modal
-            isOpen={isRegisterModalOpen}
-            onClose={() => setIsRegisterModalOpen(false)}>
-            <RegisterPage
-              setToken={setToken}
-              setUserId={setUserId}
-              onClose={() => setIsRegisterModalOpen(false)}
+        {/*Modal component to display the register modal */}
+        <Modal
+          isOpen={isRegisterModalOpen}
+          onClose={() => setIsRegisterModalOpen(false)}>
+          <RegisterPage
+            setToken={setToken}
+            setUserId={setUserId}
+            onClose={() => setIsRegisterModalOpen(false)}
+          />
+        </Modal>
+        {/*div element to wrap the content of the application */}
+        <div className="app-content">
+          {/*Routes component to define the routes of the application */}
+          <Routes>
+            <Route
+              path="/"
+              element={
+                <HomePage
+                  addToWishlist={addToWishlist}
+                  wishlist={wishlist}
+                  wishlistLoading={wishlistLoading}
+                  addToCart={handleAddToCart}
+                />
+              }
             />
-          </Modal>
+            <Route
+              path="/Products/:id"
+              element={
+                <ProductPage
+                  addToWishlist={addToWishlist}
+                  wishlist={wishlist}
+                  addToCart={handleAddToCart}
+                />
+              }
+            />
+            <Route
+              path="/checkout"
+              element={
+                <CheckoutPage
+                  cartItems={cartItems}
+                  fetchProductDetails={fetchProductDetails}
+                  userId={userId}
+                  token={token}
+                />
+              }
+            />
+            <Route path="/confirmation" element={<ConfirmationPage />} />
 
-          <div className="app-content">
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <HomePage
-                    addToWishlist={addToWishlist}
-                    wishlist={wishlist}
-                    wishlistLoading={wishlistLoading}
-                    addToCart={handleAddToCart}
-                  />
-                }
-              />
-              <Route
-                path="/Products/:id"
-                element={
-                  <ProductPage
-                    addToWishlist={addToWishlist}
-                    wishlist={wishlist}
-                    addToCart={handleAddToCart}
-                  />
-                }
-              />
-              <Route
-                path="/checkout"
-                element={
-                  <CheckoutPage
-                    cartItems={cartItems}
-                    fetchProductDetails={fetchProductDetails}
+            <Route
+              path="/SysAdmin"
+              // check if the user is logged in and has the role of admin
+              element={
+                token && role === "admin" ? (
+                  <Sidebar token={token} />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/store-management"
+              // check if the user is logged in and has the role of storeManager
+              element={
+               token && (role === "storeManager" || role === "admin")
+ ? (
+                  <StoreManagement />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+            <Route
+              path="/store-management/:storeId"
+              element={
+                token && role === "admin" ? (
+                  <StoreManagement />
+                ) : (
+                  <Navigate to="/" />
+                )
+              }
+            />
+
+            <Route
+              path="/personal-area"
+              // check if the user is logged in
+              element={
+                token ? (
+                  <PersonalArea
                     userId={userId}
-                    token={token}
+                    addToWishlist={addToWishlist}
                     addToCart={handleAddToCart}
-                    setCartItems={setCartItems}
-                    removeFromCart={handleRemoveFromCart}
+                    token={token}
                   />
+
                 }
               />
               <Route path="/confirmation" element={<ConfirmationPage />} />
@@ -288,6 +351,16 @@ const App = () => {
                   )
                 }
               />
+ <ChatBot
+          token={token}
+          userId={userId}
+          onOpenCart={handleOpenCart}
+          onOpenWishlist={handleOpenWishlist}
+          onLogout={handleLogout}
+         onOpenAddProductForm={handleOpenAddProductForm}
+          onCreateDiscount={handleCreateDiscount}
+          onSendNewsletter={handleSendNewsletter}
+       />
 
               <Route path="/503" element={<ServiceUnavailablePage />} />
               <Route path="*" element={<NotFound />} />
@@ -296,8 +369,10 @@ const App = () => {
           <Footer />
         </div>
       </Router>
+    
     </AlertProvider>
   );
 };
+
 
 export default App;
