@@ -31,7 +31,7 @@ import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
 import NotFound from "./pages/Errors/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
-import { refreshAccessToken, fetchWithTokenRefresh } from "./utils/authHelpers";
+import { fetchWithTokenRefresh } from "./utils/authHelpers";
 
 const App = () => {
   const { t, i18n } = useTranslation();
@@ -150,7 +150,7 @@ const App = () => {
     <AlertProvider>
       <Router basename="/shop">
         <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
-        <div className="flex flex-col bg-gray-50 min-h-screen">
+        <div className="flex flex-col bg-gray-50 max-w-[1920px] justify-self-center min-h-screen">
           <Header
             onLoginClick={() => setIsLoginModalOpen(true)}
             onRegisterClick={() => setIsRegisterModalOpen(true)}
