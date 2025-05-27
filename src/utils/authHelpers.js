@@ -1,23 +1,29 @@
 import toast from "react-hot-toast";
 
-// פונקציית עזר ל־logout מלא
+let logoutTriggered = false; // מונע הפעלה כפולה
+
 export function forceLogout() {
+  if (logoutTriggered) return; // מניעת קריאות כפולות
+  logoutTriggered = true;
+
+  toast.error("פג תוקף ההתחברות, נא התחבר מחדש");
+
   localStorage.removeItem("accessToken");
   localStorage.removeItem("refreshToken");
   localStorage.removeItem("userId");
   localStorage.removeItem("role");
 
-  toast.error("פג תוקף החיבור, נא התחבר מחדש");
-
-  // רענון הדף או ניווט לעמוד הבית
   setTimeout(() => {
-    window.location.href = "/shop"; // או "/login" אם יש לך עמוד התחברות נפרד
-  }, 2000);
+    window.location.href = "/shop"; // הפניה לדף הבית
+  }, 1500);
 }
 
 export async function refreshAccessToken() {
   const refreshToken = localStorage.getItem("refreshToken");
-  if (!refreshToken) return null;
+  if (!refreshToken) {
+    forceLogout();
+    return null;
+  }
 
   try {
     const res = await fetch("/api/User/refresh-token", {
@@ -26,13 +32,17 @@ export async function refreshAccessToken() {
       body: JSON.stringify({ refreshToken }),
     });
 
-    if (!res.ok) throw new Error("Failed to refresh token");
+    if (!res.ok) {
+      forceLogout();
+      return null;
+    }
 
     const data = await res.json();
     localStorage.setItem("accessToken", data.token);
     return data.token;
   } catch (err) {
     console.error("Token refresh failed:", err);
+    forceLogout();
     return null;
   }
 }
@@ -47,14 +57,14 @@ export async function fetchWithTokenRefresh(url, options = {}) {
   };
 
   try {
-    const response = await fetch(url, { ...options, headers });
+    let response = await fetch(url, { ...options, headers });
 
-    // אם הטוקן נגמר, ננסה לרענן
-    if (response.status !== 401) return response;
+    if (response.status !== 401) {
+      return response;
+    }
 
     const newToken = await refreshAccessToken();
     if (!newToken) {
-      forceLogout(); // ⬅️ מפעיל טוסט ו־logout
       return new Response(null, { status: 401 });
     }
 
@@ -63,10 +73,17 @@ export async function fetchWithTokenRefresh(url, options = {}) {
       Authorization: `Bearer ${newToken}`,
       "Content-Type": "application/json",
     };
-    return await fetch(url, { ...options, headers: retryHeaders });
+
+    response = await fetch(url, { ...options, headers: retryHeaders });
+
+    if (response.status === 401) {
+      forceLogout();
+    }
+
+    return response;
   } catch (err) {
     console.error("fetchWithTokenRefresh error:", err);
-    toast.error("שגיאה בבקשת הרשת");
+    forceLogout();
     throw err;
   }
 }

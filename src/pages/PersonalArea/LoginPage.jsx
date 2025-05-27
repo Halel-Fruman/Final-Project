@@ -99,7 +99,7 @@ const Login = ({
             onChange={(e) => setEmail(e.target.value)}
             required
             placeholder={t("login.emailPlaceholder")}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor"
           />
         </div>
         <div>
@@ -117,7 +117,7 @@ const Login = ({
             onChange={(e) => setPassword(e.target.value)}
             required
             placeholder={t("login.passwordPlaceholder")}
-            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor"
+            className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm focus:outline-none focus:ring-2 focus:ring-primaryColor"
           />
         </div>
 

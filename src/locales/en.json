@@ -139,7 +139,8 @@
     "passwordRequired": "Password is required",
     "serverUnavailable": "Server is currently unavailable. Please try again later.",
     "networkError": "Network error. Please check your connection.",
-    "requiredToRate": "You must be logged in to rate products."
+    "requiredToRate": "You must be logged in to rate products.",
+    "userNotFound": "User not found. Please check your details."
   },
   "addAddress": {
     "title": "Add Address",
@@ -278,7 +279,7 @@
     "remove": "Remove",
     "empty": "Your cart is empty.",
     "subtotal": "Subtotal",
-    "shipping": "Shipping and taxes calculated at checkout.",
+    "shipping": "Shipping fee calculated at checkout.",
     "checkout": "Checkout",
     "continueShopping": "Continue Shopping",
     "removed": "Item removed from cart",
