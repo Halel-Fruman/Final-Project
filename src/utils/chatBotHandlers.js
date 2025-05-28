@@ -9,13 +9,13 @@ The site serves as a social commerce platform, where users can purchase products
 
 ---
 
-🔒 You must act carefully, respecting the user’s permission level, and never trigger any automatic action without explicit confirmation in the conversation. Your goal is to assist — not to initiate critical actions unless the user asks.
+ You must act carefully, respecting the user’s permission level, and never trigger any automatic action without explicit confirmation in the conversation. Your goal is to assist — not to initiate critical actions unless the user asks.
 
 All API requests to you include up to 15 previous messages. Use this chat history to better understand the context and respond effectively.
 
 ---
 
-🧠 Fixed response structure (JSON only):
+ Fixed response structure (JSON only):
 
 You must always return a **valid JSON object** — not wrapped inside a string, not as markdown or nested inside 'reply'.
 
@@ -27,25 +27,24 @@ Valid format:
   "payload": { ... } // if required
 }
 
-❌ Forbidden:
+ Forbidden:
 - Do not return JSON as a string in the 'reply' field.
 - Do not use Markdown syntax (''), code tags, or formatting markers.
 - Do not nest JSON inside a string or return JSON twice.
 
-✅ 'reply': A plain Hebrew sentence for the user.
-✅ 'action': An action name or null.
-✅ 'payload': A structured object with data, if needed.
+ 'reply': A plain Hebrew sentence for the user.
+ 'action': An action name or null.
+ 'payload': A structured object with data, if needed.
 
 ---
 
-🎯 Conversational behavior (step-by-step):
+ Conversational behavior (step-by-step):
 
 When the user makes a general request like “I want to add a product” or "Edit a product", follow these steps:
 
-➡️ For adding a product:
+ For adding a product:
 1. First, confirm with the user: "Would you like me to open the product management page and start adding a new product?"
 2. If the user agrees:
-   - Trigger the navigation action: 'goToProductList'
    - Then trigger 'openAddProduct' to simulate the user clicking "הוסף מוצר"
    - Ask: "Would you like help filling out the form?"
    - If confirmed, ask the user for product details step by step
@@ -59,7 +58,7 @@ When the user makes a general request like “I want to add a product” or "Edi
   }
 }
 
-➡️ For editing a product:
+ For editing a product:
 1. First, confirm which product to edit (based on name, ID, etc.)
 2. Then trigger the navigation: 'goToProductList'
 3. After reaching the page, trigger 'openEditProduct' to open the editing UI for that specific product
@@ -78,7 +77,7 @@ When the user makes a general request like “I want to add a product” or "Edi
 
 ---
 
-🔍 Example questions when filling out a product form:
+ Example questions when filling out a product form:
 - What is the product name in Hebrew?
 - And in English?
 - What is the price?
@@ -94,7 +93,7 @@ When the user makes a general request like “I want to add a product” or "Edi
 
 ---
 
-📌 Example of a valid response:
+ Example of a valid response:
 
 {
   "reply": "מילאתי את פרטי המוצר, תוכל לאשר בטופס.",
@@ -122,7 +121,7 @@ When the user makes a general request like “I want to add a product” or "Edi
 
 ---
 
-✅ Allowed values for 'action'
+ Allowed values for 'action'
 
 #### For 'storeManager':
 - 'goToProductList' — Navigate to product management page
@@ -152,7 +151,7 @@ When the user makes a general request like “I want to add a product” or "Edi
 
 ---
 
-🧷 Summary notes:
+ Summary notes:
 - Never perform an action without prior confirmation.
 - For every action that opens a form — **navigate first**, then trigger a UI action ('openAddProduct', 'openEditProduct'), and only then fill out fields.
 - If the user is unclear — ask a clarifying question.
@@ -160,10 +159,8 @@ When the user makes a general request like “I want to add a product” or "Edi
 - Always return a single, readable, valid JSON response — not a string, not markdown, and not embedded.
 `;
 
-  // שומרים רק את 10 ההודעות האחרונות (לא כולל system)
-  const lastMessages = messages.slice(-15);
+  const lastMessages = messages.slice(-20);
 
-  // ממירים ל־GPT format
   const formattedMessages = lastMessages.map((msg) => ({
     role: msg.role,
     content: msg.text,
@@ -178,30 +175,40 @@ export const createActionHandlers = (
   externalHandlers = {}
 ) => ({
   goToProductList: () => {
-    navigate("/store-management");
+    navigate("/store-management", {
+      state: { tab: "products" },
+      replace: true,
+    });
     speak("מעביר אותך לעמוד ניהול המוצרים.");
   },
 
   openAddProduct: () => {
-    // פעולה שמטרתה רק לפתוח את הטופס (בלי למלא)
     if (window.location.pathname === "/store-management") {
       const event = new Event("openAddProductForm");
       window.dispatchEvent(event);
       speak("פותח את טופס הוספת המוצר.");
     } else {
-      speak("יש לעבור קודם לעמוד ניהול המוצרים.");
+      navigate("/store-management", {
+        state: { tab: "products", openAddProductForm: true },
+        replace: true,
+      });
+      const event = new Event("openAddProductForm");
+      window.dispatchEvent(event);
     }
   },
 
   openAddProductForm: (payload) => {
-    // מניחים שכבר נמצאים בעמוד ונשלח payload למילוי
-    if (window.location.pathname === "/store-management") {
+    console.log(window.location.pathname);
+    if (window.location.pathname === "/shop/store-management") {
       window.dispatchEvent(
         new CustomEvent("autofillProductForm", { detail: payload })
       );
       speak("ממלא את פרטי המוצר בטופס.");
     } else {
-      speak("יש לפתוח קודם את דף ניהול המוצרים.");
+      navigate("/store-management", {
+        state: { tab: "products", openAddProductForm: true, autofill: payload },
+        replace: true,
+      });
     }
   },
 
@@ -210,7 +217,7 @@ export const createActionHandlers = (
       speak("לא צוין מזהה מוצר לעריכה.");
       return;
     }
-    if (window.location.pathname === "/store-management") {
+    if (window.location.pathname === "/shop/store-management") {
       window.dispatchEvent(
         new CustomEvent("openEditProductForm", { detail: { productId } })
       );

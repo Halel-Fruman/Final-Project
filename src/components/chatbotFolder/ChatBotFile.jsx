@@ -39,20 +39,19 @@ const ChatBot = ({
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-  
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const timeout = setTimeout(() => {
         setMessages([
-          { role: "assistant", text: "שלום! איך אפשר לעזור לך היום?" }
+          { role: "assistant", text: "שלום! איך אפשר לעזור לך היום?" },
         ]);
       }, 800); // או 1000ms
-  
+
       return () => clearTimeout(timeout);
     }
   }, [isOpen]);
-  
+
   useEffect(() => {
     if (token) {
       try {
@@ -182,8 +181,7 @@ const ChatBot = ({
       {isHidden ? (
         <button
           className="fixed bottom-4 left-4 z-50 bg-primaryColor text-white px-3 py-1 rounded-full text-sm shadow"
-          onClick={() => setIsHidden(false)}
-        >
+          onClick={() => setIsHidden(false)}>
           פתח את הבוט
         </button>
       ) : (
@@ -196,8 +194,7 @@ const ChatBot = ({
             )}
             <button
               className="w-24 h-24 shadow-lg rounded-full overflow-hidden border-2 border-primaryColor bg-transparent p-0"
-              onClick={toggleChat}
-            >
+              onClick={toggleChat}>
               <img
                 src={chatImage}
                 alt=""
@@ -209,8 +206,7 @@ const ChatBot = ({
                 setIsHidden(true);
                 setIsOpen(false);
               }}
-              className="text-xs text-gray-500 hover:text-red-600 mt-2 underline"
-            >
+              className="text-xs text-gray-500 hover:text-red-600 mt-2 underline">
               הסתר בוט
             </button>
           </div>
@@ -222,8 +218,7 @@ const ChatBot = ({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 60, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="w-80 h-[30rem] bg-white rounded-xl shadow-2xl flex flex-col p-4 mt-2"
-              >
+                className="w-80 h-[30rem] bg-white rounded-xl shadow-2xl flex flex-col p-4 mt-2">
                 <div className="mb-2">
                   <label className="text-xs text-gray-500 block mb-1">
                     בחר קול
@@ -236,8 +231,7 @@ const ChatBot = ({
                       );
                       setSelectedVoice(selected);
                     }}
-                    value={selectedVoice?.name || ""}
-                  >
+                    value={selectedVoice?.name || ""}>
                     <option value="">ברירת מחדל</option>
                     {voices.map((v) => (
                       <option key={v.name} value={v.name}>
@@ -267,8 +261,7 @@ const ChatBot = ({
                         msg.role === "user"
                           ? "bg-blue-100 self-end"
                           : "bg-secondaryColor self-start"
-                      }`}
-                    >
+                      }`}>
                       {msg.text}
                     </motion.div>
                   ))}
@@ -282,8 +275,7 @@ const ChatBot = ({
                   <button
                     onClick={startListening}
                     className="text-primaryColor text-xl"
-                    aria-label="דבר"
-                  >
+                    aria-label="דבר">
                     <FaMicrophone />
                   </button>
                   <input
@@ -297,8 +289,7 @@ const ChatBot = ({
                   <button
                     onClick={() => sendMessage()}
                     className="text-primaryColor text-xl"
-                    aria-label="שלח"
-                  >
+                    aria-label="שלח">
                     <FaPaperPlane />
                   </button>
                 </div>

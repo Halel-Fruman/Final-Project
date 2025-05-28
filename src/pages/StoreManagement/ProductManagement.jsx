@@ -7,23 +7,28 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useLocation, useNavigate } from "react-router-dom";
 
-
-
-const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {}}) => {
+const ProductManagement = ({
+  storeId,
+  autoOpenAddForm = false,
+  autofill = {},
+}) => {
   const [products, setProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [isAddingProduct, setIsAddingProduct] = useState(autoOpenAddForm || false);
+  const [isAddingProduct, setIsAddingProduct] = useState(
+    autoOpenAddForm || false
+  );
   const [searchQuery, setSearchQuery] = useState("");
   const { showAlert } = useAlert();
   const [editingProduct, setEditingProduct] = useState(null);
-const [isEditing, setIsEditing] = useState(false);
-const [editProductId, setEditProductId] = useState(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [editProductId, setEditProductId] = useState(null);
+  const navigate = useNavigate();
+  const [autofillPayload, setAutofillPayload] = useState(null);
 
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true); // נשתמש באותו מודאל של הוספה
   };
-  
 
   const [newProduct, setNewProduct] = useState(() => {
     const safe = autofill || {};
@@ -48,23 +53,45 @@ const [editProductId, setEditProductId] = useState(null);
     };
   });
 
-  
- useEffect(() => {
-  const handler = (e) => {
-    const data = e.detail;
-    if (data) {
+  useEffect(() => {
+    const handler = (e) => {
+      const data = e.detail;
+      if (data) {
+        setAutofillPayload(data);
+        setIsAddingProduct(true);
+      }
+    };
+
+    window.addEventListener("autofillProductForm", handler);
+    return () => window.removeEventListener("autofillProductForm", handler);
+  }, []);
+  useEffect(() => {
+    if (isAddingProduct && autofillPayload) {
+      setNewProduct((prev) => ({ ...prev, ...autofillPayload }));
+      setAutofillPayload(null);
+    }
+  }, [isAddingProduct, autofillPayload]);
+
+  useEffect(() => {
+    const handleOpenAdd = () => {
       setIsAddingProduct(true);
       setEditingProduct(null);
-      setNewProduct((prev) => ({ ...prev, ...data }));
+      console.log("Open Add Product Form triggered");
+    };
+
+    window.addEventListener("openAddProduct", handleOpenAdd);
+    return () => window.removeEventListener("openAddProduct", handleOpenAdd);
+  }, []);
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.state?.openAddProductForm) {
+      setIsAddingProduct(true);
+      setEditingProduct(null);
+
+      navigate(location.pathname, { replace: true });
     }
-  };
-
-  window.addEventListener("autofillProductForm", handler);
-  return () => window.removeEventListener("autofillProductForm", handler);
-}, []);
-
-  
-  
+  }, [location, navigate]);
 
   useEffect(() => {
     axios
@@ -77,8 +104,6 @@ const [editProductId, setEditProductId] = useState(null);
       .then((res) => setCategories(res.data))
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
   }, [storeId]);
-
-  
 
   const handleDelete = (productId) => {
     if (window.confirm("האם אתה בטוח שברצונך למחוק את המוצר?")) {
@@ -225,7 +250,7 @@ const [editProductId, setEditProductId] = useState(null);
     setNewProduct((prev) => {
       let selected = [...prev.selectedCategories];
 
-      if (checked) selected.push(value); // value הוא _id
+      if (checked) selected.push(value);
       else selected = selected.filter((id) => id !== value);
       return { ...prev, selectedCategories: selected };
     });
@@ -241,11 +266,11 @@ const [editProductId, setEditProductId] = useState(null);
         setEditProductId(null);
         setEditingProduct(null);
         resetNewProductForm();
+        window.history.replaceState({}, document.title);
       },
       () => {}
     );
   };
-  
 
   const filteredProducts = products.filter((product) => {
     const nameHe = product.name?.he?.toLowerCase() || "";
@@ -282,9 +307,8 @@ const [editProductId, setEditProductId] = useState(null);
 
     const worksheet = XLSX.utils.json_to_sheet(data);
 
-    // חישוב רוחב עמודות לפי אורך כותרת בלבד
     worksheet["!cols"] = headers.map((key) => ({
-      wch: key.length + 2, // תוספת קטנה לנשימה
+      wch: key.length + 2,
     }));
 
     const workbook = XLSX.utils.book_new();
@@ -427,7 +451,6 @@ const [editProductId, setEditProductId] = useState(null);
               />
             </div>
 
-            {/* מחיר + עלות ייצור */}
             <div className="mb-4 grid grid-cols-2 gap-4">
               <div>
                 <label className="block mb-1">מחיר</label>
@@ -461,7 +484,6 @@ const [editProductId, setEditProductId] = useState(null);
               </div>
             </div>
 
-            {/* שדות מבצע */}
             <div className="mb-4 grid grid-cols-3 gap-4">
               <div>
                 <label className="block mb-1">אחוז מבצע</label>
@@ -510,7 +532,6 @@ const [editProductId, setEditProductId] = useState(null);
               </div>
             </div>
 
-            {/* מלאי + Backorder + משלוח */}
             <div className="mb-4 grid grid-cols-3 gap-4">
               <div>
                 <label className="block mb-1">מלאי</label>
@@ -637,7 +658,6 @@ const [editProductId, setEditProductId] = useState(null);
 
                       const data = await response.json();
                       if (response.ok && data.imageUrl) {
-                        let fileName = data.imageUrl;
                         setNewProduct((prev) => ({
                           ...prev,
                           images: [
@@ -693,8 +713,7 @@ const [editProductId, setEditProductId] = useState(null);
               <button
                 className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
                 onClick={handleSaveProduct}
-                data-chat-approve="true"
->
+                data-chat-approve="true">
                 {editingProduct ? "שמור שינויים" : "הוסף מוצר"}
               </button>
             </div>
