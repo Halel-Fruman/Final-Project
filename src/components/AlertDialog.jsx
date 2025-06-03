@@ -23,7 +23,6 @@ export const AlertProvider = ({ children }) => {
     onConfirm = null,
     onCancel = null
   ) => {
-    console.log("כשהולכים להציג את האלר");
     // Set the alert state with the specified message and type
     setAlert({
       open: true,

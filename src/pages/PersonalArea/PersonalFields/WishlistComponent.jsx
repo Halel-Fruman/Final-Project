@@ -88,7 +88,6 @@ const WishlistComponent = ({
         </p>
       )}
 
-      //
       {/* Desktop Table */}
       <div className="hidden md:block">
         <table className="table-auto w-full border-collapse border border-gray-200 shadow-lg">

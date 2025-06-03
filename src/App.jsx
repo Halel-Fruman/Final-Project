@@ -30,9 +30,11 @@ import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
 import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
+import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx";
+import { useNavigate } from "react-router-dom";
 import NotFound from "./pages/Errors/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
-import { refreshAccessToken } from "./utils/authHelpers";
+import { fetchWithTokenRefresh } from "./utils/authHelpers";
 
 const App = () => {
   const { t, i18n } = useTranslation();
@@ -97,6 +99,15 @@ const App = () => {
   const handleOpenWishlist = () => setIsWishlistOpen(true);
   const handleCloseWishlist = () => setIsWishlistOpen(false);
 
+  const handleOpenAddProductForm = () =>
+    window.dispatchEvent(new CustomEvent("openAddProductForm"));
+
+  const handleCreateDiscount = () =>
+    window.dispatchEvent(new CustomEvent("createDiscount"));
+
+  const handleSendNewsletter = () =>
+    window.dispatchEvent(new CustomEvent("sendNewsletter"));
+
   const loadCart = useCallback(async () => {
     if (userId && token) {
       const data = await fetchCart(userId, token);
@@ -156,7 +167,7 @@ const App = () => {
     <AlertProvider>
       <Router basename="/shop">
         <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
-        <div className="flex flex-col bg-gray-50 min-h-screen">
+        <div className="flex flex-col bg-gray-50 max-w-[1920px] justify-self-center min-h-screen">
           <Header
             onLoginClick={() => setIsLoginModalOpen(true)}
             onRegisterClick={() => setIsRegisterModalOpen(true)}
@@ -201,6 +212,7 @@ const App = () => {
             />
           </Modal>
 
+          {/*Modal component to display the register modal */}
           <Modal
             isOpen={isRegisterModalOpen}
             onClose={() => setIsRegisterModalOpen(false)}>
@@ -210,8 +222,9 @@ const App = () => {
               onClose={() => setIsRegisterModalOpen(false)}
             />
           </Modal>
-
+          {/*div element to wrap the content of the application */}
           <div className="app-content">
+            {/*Routes component to define the routes of the application */}
             <Routes>
               <Route
                 path="/"
@@ -242,47 +255,14 @@ const App = () => {
                     fetchProductDetails={fetchProductDetails}
                     userId={userId}
                     token={token}
-                    addToCart={handleAddToCart}
-                    setCartItems={setCartItems}
-                    removeFromCart={handleRemoveFromCart}
                   />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
-            />
-            <Route
-              path="/add-address"
-              element={
-                token ? (
-                  <AddAddressPage userId={userId} token={token} />
-                ) : (
-                  <Navigate to="/" />
-                )
-              }
-            />
-            <Route path="/503" element={<ServiceUnavailablePage />} />
-
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </div>
-              
-        <ChatBot
-          token={token}
-          userId={userId}
-          onOpenCart={handleOpenCart}
-          onOpenWishlist={handleOpenWishlist}
-          onLogout={handleLogout}
-         onOpenAddProductForm={handleOpenAddProductForm}
-          onCreateDiscount={handleCreateDiscount}
-          onSendNewsletter={handleSendNewsletter}
-       />
-        <Footer />
                 }
               />
               <Route path="/confirmation" element={<ConfirmationPage />} />
+
               <Route
                 path="/SysAdmin"
+                // check if the user is logged in and has the role of admin
                 element={
                   token && role === "admin" ? (
                     <Sidebar token={token} />
@@ -293,6 +273,7 @@ const App = () => {
               />
               <Route
                 path="/store-management"
+                // check if the user is logged in and has the role of storeManager
                 element={
                   token && (role === "storeManager" || role === "admin") ? (
                     <StoreManagement />
@@ -311,6 +292,7 @@ const App = () => {
                   )
                 }
               />
+
               <Route
                 path="/personal-area"
                 element={
@@ -331,6 +313,16 @@ const App = () => {
               <Route path="*" element={<NotFound />} />
             </Routes>
           </div>
+          <ChatBot
+            token={token}
+            userId={userId}
+            onOpenCart={handleOpenCart}
+            onOpenWishlist={handleOpenWishlist}
+            onLogout={handleLogout}
+            onOpenAddProductForm={handleOpenAddProductForm}
+            onCreateDiscount={handleCreateDiscount}
+            onSendNewsletter={handleSendNewsletter}
+          />
           <Footer />
         </div>
       </Router>
