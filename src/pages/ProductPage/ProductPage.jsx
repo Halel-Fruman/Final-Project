@@ -1,6 +1,6 @@
 // File: src/pages/ProductPage.jsx
 import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -12,6 +12,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const location = useLocation();
   const token = localStorage.getItem("accessToken");
   const isLoggedIn = !!token;
   const [product, setProduct] = useState(null);
@@ -21,6 +22,9 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const [rating, setRating] = useState(0);
   const [about, setAbout] = useState("");
   const [userAlreadyRated, setUserAlreadyRated] = useState(false);
+
+  // Store previous filter state from location
+  const previousFilters = location.state || {};
 
   // Fetch product details when the component mounts
   useEffect(() => {
@@ -38,7 +42,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
         if (!response.ok) throw new Error(t("error.fetchProduct"));
         const data = await response.json();
-        console.log("Product data:", data);
         setProduct(data);
         setSelectedImage(data.images[0]);
         setRating(data.averageRating || 0);
@@ -60,7 +63,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     }
   }, [error, navigate]);
 
-  // Handle adding/removing from wishlist
+
+
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -68,8 +72,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     addToWishlist(product, isInWishlist);
   };
 
-  // Handle adding to cart
-  // Check if user is logged in before adding to cart
   const handleAddToCart = () => {
     const userId = localStorage.getItem("userId");
     if (!userId) {
@@ -81,14 +83,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     toast.success(t("wishlist.addToCart") + " ✅");
   };
 
-  // Handle image click to set selected image
-  // This function is used to set the selected image when a thumbnail is clicked
   const handleImageClick = (image) => {
     setSelectedImage(image);
   };
 
-  // Handle rating the product
-  // This function is used to send the rating to the server
   const handleRating = async (newRating) => {
     try {
       const response = await fetchWithTokenRefresh(`/api/products/${id}/rate`, {
@@ -119,8 +117,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     }
   };
 
-  // skeleton loading state
-  // This is used to show a loading state while the product data is being fetched
   if (isLoading) {
     return (
       <main className="bg-gray-50">
@@ -172,10 +168,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     );
   }
 
-  // Error handling
   if (!product) return <div>{t("product.notFound")}</div>;
 
-  // Main product page content
   const language = i18n.language;
   const productName = product.name[language] || product.name["en"];
   const productDetails =
@@ -194,8 +188,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     return start <= currentDate && currentDate <= end;
   });
 
-  // Check if the product is on sale
-  // This is used to check if the product has an active discount
   const isOnSale = !!activeDiscount;
   const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
   const discountedPrice = isOnSale
@@ -313,6 +305,9 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                 )}
               </button>
             </div>
+
+
+
             <div className="my-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {t("product.about")}

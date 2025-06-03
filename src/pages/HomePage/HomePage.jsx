@@ -1,40 +1,67 @@
 import React, { useEffect, useState, useMemo } from "react";
-
 import { useTranslation } from "react-i18next";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import backgroundImage from "../../backgroung.jpg";
 import FilterBar from "../../components/Category/FilterBar";
 import { getActiveDiscount } from "../../utils/discountHelpers";
 
+// This component renders the home page with a hero section, product listings, and filters.
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
   const [allProducts, setAllProducts] = useState([]);
   const [categories, setCategories] = useState([]);
-  const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedStores, setSelectedStores] = useState([]);
-  const [isOnSaleOnly, setIsOnSaleOnly] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState(() =>
+    JSON.parse(sessionStorage.getItem("selectedCategories") || "[]")
+  );
+  const [selectedStores, setSelectedStores] = useState(() =>
+    JSON.parse(sessionStorage.getItem("selectedStores") || "[]")
+  );
+  const [isOnSaleOnly, setIsOnSaleOnly] = useState(
+    sessionStorage.getItem("isOnSaleOnly") === "true"
+  );
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [minPrice, setMinPrice] = useState("");
-  const [maxPrice, setMaxPrice] = useState("");
-  const [searchText, setSearchText] = useState("");
+  const [minPrice, setMinPrice] = useState(
+    sessionStorage.getItem("minPrice") || ""
+  );
+  const [maxPrice, setMaxPrice] = useState(
+    sessionStorage.getItem("maxPrice") || ""
+  );
+  const [searchText, setSearchText] = useState(
+    sessionStorage.getItem("searchText") || ""
+  );
   const navigate = useNavigate();
 
-  // Function to shuffle an array
-  // This is used to randomize the order of products displayed
-  const shuffleArray = (array) => {
-    const shuffled = [...array];
-    for (let i = shuffled.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
-    }
-    return shuffled;
-  };
+  useEffect(() => {
+    sessionStorage.setItem(
+      "selectedCategories",
+      JSON.stringify(selectedCategories)
+    );
+  }, [selectedCategories]);
 
-  // Fetch all products from the API
-  // This is done once when the component mounts
+  useEffect(() => {
+    sessionStorage.setItem("selectedStores", JSON.stringify(selectedStores));
+  }, [selectedStores]);
+
+  useEffect(() => {
+    sessionStorage.setItem("searchText", searchText);
+  }, [searchText]);
+
+  useEffect(() => {
+    sessionStorage.setItem("minPrice", minPrice);
+  }, [minPrice]);
+
+  useEffect(() => {
+    sessionStorage.setItem("maxPrice", maxPrice);
+  }, [maxPrice]);
+
+  useEffect(() => {
+    sessionStorage.setItem("isOnSaleOnly", isOnSaleOnly);
+  }, [isOnSaleOnly]);
+
+  // Fetch all products and handle loading/error states
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -51,14 +78,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchProducts();
   }, []);
 
-  // Check if there is an error and navigate to the error page
-  // This is done to handle any errors that occur during the fetch
-  useEffect(() => {
-    if (error) navigate("/503");
-  }, [error, navigate]);
-
-  // Fetch categories from the API
-  // This is done once when the component mounts
+  // Fetch categories for the filter bar
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -72,8 +92,20 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchCategories();
   }, []);
 
-  // Generate store options based on the products
-  // This is done to create a unique list of stores from the products
+  // Restore scroll position after loading products
+  // This is useful for maintaining user experience when navigating back to the home page
+  useEffect(() => {
+    const scrollPosition = sessionStorage.getItem("scrollPosition");
+    if (scrollPosition) {
+      window.scrollTo({
+        top: parseInt(scrollPosition, 10),
+        behavior: "instant",
+      });
+      // sessionStorage.removeItem("scrollPosition");
+    }
+  }, [isLoading]);
+
+  // Generate store options for the filter bar
   const storeOptions = Array.from(
     new Set(
       allProducts.map((p) => {
@@ -87,8 +119,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     )
   ).map((str) => JSON.parse(str));
 
-  // Filter products based on selected categories, stores, and other criteria
-  // This is done to display only the products that match the user's filters
   const productsToShow = allProducts.filter((product) => {
     const categoryMatch =
       selectedCategories.length === 0 ||
@@ -109,23 +139,32 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   });
 
-  // Shuffle the products to show
-  // This is done to randomize the order of products displayed
-  const shuffledProductsToShow = useMemo(
-    () => shuffleArray(productsToShow),
-    [productsToShow]
-  );
-
-  // Handle the wishlist toggle
-  // This is done to add or remove products from the wishlist
+  const sortedProductsToShow = useMemo(() => {
+    return [...productsToShow].sort((a, b) =>
+      String(a._id)
+        .split("")
+        .reverse()
+        .join("")
+        .localeCompare(String(b._id).split("").reverse().join(""))
+    );
+  }, [productsToShow]);
+  // Function to toggle wishlist status for a product
+  // This function checks if the product is already in the wishlist and adds/removes it accordingly
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
     );
     addToWishlist(product, isInWishlist);
   };
-  // Handle the error state
-  // This is done to display an error message if there is an error
+
+  // Function to handle product click, which navigates to the product details page
+  // It also saves the current scroll position to sessionStorage for later restoration
+  const handleProductClick = (product) => {
+    sessionStorage.setItem("scrollPosition", window.scrollY);
+    navigate(`/products/${product._id}`);
+  };
+
+  // Handle error state
   if (error) {
     return (
       <div className="flex items-center justify-center h-screen">
@@ -135,9 +174,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       </div>
     );
   }
-
-  //skeleton loading state
-  // This is done to display a loading state while the products are being fetched
+  // Handle loading state
+  // This displays a loading skeleton while products are being fetched
   if (isLoading) {
     return (
       <main className="px-4 py-10 sm:px-6 lg:px-12">
@@ -155,9 +193,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       </main>
     );
   }
+  // Render the home page with hero section, product listings, and filter bar
 
-  // Render the main content of the page
-  // This is done to display the main content of the page
   return (
     <div className="bg-primaryColor bg-opacity-10">
       <header
@@ -196,9 +233,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
         <h2 className="text-center text-2xl font-bold mb-8">
           {t("featured_products")}
         </h2>
-        {/* This is the filter bar component
-        // It allows users to filter products by categories, stores, price range, and search text
-        // This is done to provide a way for users to filter products based on their preferences*/}
         <FilterBar
           categories={categories}
           stores={storeOptions}
@@ -220,13 +254,12 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           <p className="text-center text-gray-500">{t("no_products_found")}</p>
         ) : (
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-            {shuffledProductsToShow.map((product) => {
+            {sortedProductsToShow.map((product) => {
               const isInWishlist = wishlistLoading
                 ? false
                 : wishlist?.some(
                     (item) => String(item.productId) === String(product._id)
                   );
-
 
               const activeDiscount = getActiveDiscount(product.discounts);
               const isOnSale = !!activeDiscount;
@@ -255,15 +288,15 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                       )}
                     </button>
 
-                    <Link to={`/products/${product._id}`}>
-                      <div className="aspect-w-1 aspect-h-1 rounded-lg">
-                        <img
-                          src={product.images[0]}
-                          alt={product.name[i18n.language]}
-                          className="object-cover w-full h-56 sm:h-64 lg:h-72"
-                        />
-                      </div>
-                    </Link>
+                    <div
+                      onClick={() => handleProductClick(product)}
+                      className="cursor-pointer aspect-w-1 aspect-h-1 rounded-lg">
+                      <img
+                        src={product.images[0]}
+                        alt={product.name[i18n.language]}
+                        className="object-cover w-full h-56 sm:h-64 lg:h-72"
+                      />
+                    </div>
                   </article>
 
                   <div className="p-4 text-center">
