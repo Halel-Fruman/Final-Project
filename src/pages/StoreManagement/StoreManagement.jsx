@@ -6,11 +6,11 @@ import OrderManagement from "./OrderManagement.jsx";
 import { useTranslation } from "react-i18next";
 import StoreDashboard from "./StoreDashboard.jsx";
 import StoreAnalytics from "./StoreAnalytics.jsx";
+import { useLocation } from "react-router-dom";
+
 import StoreSettings from "./StoreSettings.jsx";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 import { useNavigate } from "react-router-dom";
-import { refreshAccessToken } from "../../utils/authHelpers";
-import { useLocation } from "react-router-dom";
 
 const StoreManagement = () => {
   const { storeId: paramStoreId } = useParams();
@@ -26,7 +26,6 @@ const StoreManagement = () => {
   const [isFetchingStore, setIsFetchingStore] = useState(true);
   const { t, i18n } = useTranslation();
   const userId = localStorage.getItem("userId");
-  const navigate = useNavigate();
   const token = localStorage.getItem("token");
 
 
@@ -35,6 +34,8 @@ const StoreManagement = () => {
   }, [tab]);
   
 
+
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchStoreById = async () => {
