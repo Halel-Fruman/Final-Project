@@ -3,6 +3,12 @@ const User = require("../models/User");
 const StoreProducts = require("../models/Products");
 const jwt = require("jsonwebtoken"); // import jwt
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key"; // set the secret key
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const sendEmail = require("../sendEmail"); // כמו באיפוס סיסמה
+const crypto = require("crypto");
+
+const BASE_URL = process.env.REACT_APP_BASE_URL || "https://yourdomain.com";
+
 
 // UserController.js
 const UserController = {
@@ -22,6 +28,45 @@ const UserController = {
     });
   },
   ////
+refreshTokenHandler: async (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken)
+      return res.status(401).json({ error: "Missing refresh token" });
+
+    try {
+      const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
+      const user = await User.findById(decoded.userId);
+      if (!user || user.refreshToken !== refreshToken)
+        return res.status(403).json({ error: "Invalid refresh token" });
+
+      const newAccessToken = jwt.sign(
+        { userId: user._id, role: user.role },
+        SECRET_KEY,
+        { expiresIn: "15m" }
+      );
+      res.status(200).json({ token: newAccessToken });
+    } catch (err) {
+      res.status(403).json({ error: "Invalid or expired token" });
+    }
+  },
+
+  logoutHandler: async (req, res) => {
+    const { refreshToken } = req.body;
+    if (!refreshToken)
+      return res.status(400).json({ error: "Missing refresh token" });
+
+    try {
+      const decoded = jwt.verify(refreshToken, REFRESH_SECRET);
+      const user = await User.findById(decoded.userId);
+      if (user) {
+        user.refreshToken = null;
+        await user.save();
+      }
+      res.status(200).json({ message: "Logged out successfully" });
+    } catch (err) {
+      res.status(400).json({ error: "Invalid token" });
+    }
+  },
 
   // UserController.js
 
@@ -95,23 +140,39 @@ const UserController = {
   //  login function to authenticate the user
   login: async (req, res) => {
     const { email, password } = req.body;
-    console.log(email);
-    // find the user by email
+
     try {
       const user = await User.findOne({ email });
-      console.log(user);
       if (!user) return res.status(404).send("User not found");
-      // compare the password with the hashed password
+
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).send("Invalid credentials");
-      // create a token with the user id
-      const token = jwt.sign({  userId: user._id, role: user.role }, SECRET_KEY, { expiresIn: "2h" });
-      res.status(200).json({ token, userId: user._id, role: user.role });
+
+      const accessToken = jwt.sign(
+        { userId: user._id, role: user.role },
+        SECRET_KEY,
+        { expiresIn: "15m" }
+      );
+
+      const refreshToken = jwt.sign(
+        { userId: user._id },
+        REFRESH_SECRET,
+        { expiresIn: "1d" }
+      );
+
+      user.refreshToken = refreshToken;
+      await user.save();
+
+      res.status(200).json({
+        accessToken,
+        refreshToken,
+        userId: user._id,
+        role: user.role,
+      });
     } catch (error) {
       res.status(500).send("Error logging in: " + error.message);
     }
-  },
-  //
+  },  //
   getUser: async (req, res) => {
     try {
       const { userId } = req.params;
@@ -120,7 +181,6 @@ const UserController = {
         console.log("User not found");
         return res.status(404).json({ error: "User not found" });
       }
-      console.log(`User found: ${user}`);
       res.status(200).json(user);
     } catch (error) {
       console.error("Error fetching user:", error.message);
@@ -134,7 +194,6 @@ const UserController = {
         console.log("No users found");
         return res.status(404).json({ error: "No users found" });
       }
-      console.log(`Users found: ${users.length}`);
       res.status(200).json(users);
     } catch (error) {
       console.error("Error fetching users:", error.message);
@@ -290,40 +349,57 @@ deleteUser: async (req, res) => {
       res.status(500).send("Error deleting address: " + error.message);
     }
   },
-  // register a new user
-  register: async (req, res) => {
-    const { email, password, phoneNumber, first_name, last_name } = req.body;
-    console.log(req.body);
 
-    try {
-      // check if the email already exists
-      const existingUser = await User.findOne({ email });
-      if (existingUser) {
-        return res.status(409).json({ message: "Email already exists" });
-      }
 
-      // hash the password before saving the user
-      const hashedPassword = await bcrypt.hash(password, 10);
-      const newUser = new User({
-        email,
-        password: hashedPassword,
-        phoneNumber,
-        first_name,
-        last_name,
-        addresses: [],
-      });
+register: async (req, res) => {
+  const { email, password, phoneNumber, first_name, last_name } = req.body;
 
-      await newUser.save();
-
-      res
-        .status(201)
-        .json({ message: "User registered successfully", userId: newUser._id });
-    } catch (error) {
-      res
-        .status(500)
-        .json({ message: "Error registering user: " + error.message });
+  try {
+    const existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(409).json({ message: "Email already exists" });
     }
-  },
+
+    const hashedPassword = await bcrypt.hash(password, 10);
+    const verificationToken = crypto.randomBytes(32).toString("hex");
+
+    const newUser = new User({
+      email,
+      password: hashedPassword,
+      phoneNumber,
+      first_name,
+      last_name,
+      addresses: [],
+      emailVerified: false,
+      emailVerificationToken: verificationToken,
+      emailVerificationExpires: Date.now() + 1000 * 60 * 60, // שעה
+    });
+
+    await newUser.save();
+
+    const verifyLink = `${BASE_URL}/verify-email/${verificationToken}`;
+
+    await sendEmail({
+      to: email,
+      subject: "אימות כתובת אימייל",
+      html: `
+        <div dir="rtl" style="font-family: Arial, sans-serif; max-width: 600px; margin: auto;">
+          <h2 style="color: #333;">ברוך הבא!</h2>
+          <p>כדי להשלים את ההרשמה, לחץ על הקישור הבא כדי לאמת את כתובת המייל שלך:</p>
+          <a href="${verifyLink}" style="color: #1a73e8; font-weight: bold;">לאימות לחץ כאן</a>
+        </div>
+      `,
+    });
+
+    res.status(201).json({
+      message: "User registered. Please check your email to verify.",
+      userId: newUser._id,
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+},
   // add a product to the wishlist of a user by id
   addToWishlist: async (req, res) => {
     const { userId } = req.params;
@@ -609,6 +685,32 @@ clearUserCart: async (req, res) => {
         });
     }
   },
+	verifyEmail : async (req, res) => {
+  const { token } = req.params;
+
+  try {
+    const user = await User.findOne({
+      emailVerificationToken: token,
+      emailVerificationExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      return res.status(400).json({ message: "Invalid or expired token" });
+    }
+
+    user.emailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+
+    await user.save();
+
+    res.json({ message: "Email successfully verified!" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
 };
 
 module.exports = UserController;

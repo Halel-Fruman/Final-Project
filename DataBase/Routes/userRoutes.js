@@ -3,8 +3,13 @@ const UserController = require("../Controllers/userController");
 const authenticateToken = require("../Middleware/authenticateToken");
 const router = express.Router();
 
+router.post("/refresh-token", UserController.refreshTokenHandler);
+
 //  login
 router.post("/login", UserController.login);
+
+router.post("/logout", UserController.logoutHandler);
+
 
 //clear cart
 router.put('/:id/clear-cart', authenticateToken, UserController.clearUserCart);

@@ -12,6 +12,7 @@
   "search": "Search",
   "min_price": "Min Price",
   "max_price": "Max Price",
+  "in_stock_only": "In Stock Only",
 
   "modal": {
     "close": "Close"
@@ -120,6 +121,14 @@
       "serverUnavailable": "Server is currently unavailable. Please try again later."
     }
   },
+  "verify_email": {
+    "loading": "Verifying your email...",
+    "success_title": "Email Verified!",
+    "success_message": "Your email has been successfully verified. You can now log in.",
+    "error_title": "Verification Failed",
+    "error_message": "The verification link is invalid or expired.",
+    "redirecting": "Redirecting to Home page..."
+  },
   "loading": "Loading...",
   "login": {
     "title": "Login",
@@ -140,7 +149,12 @@
     "serverUnavailable": "Server is currently unavailable. Please try again later.",
     "networkError": "Network error. Please check your connection.",
     "requiredToRate": "You must be logged in to rate products.",
-    "userNotFound": "User not found. Please check your details."
+    "userNotFound": "User not found. Please check your details.",
+    "emailNotVerified": "Please verify your email before logging in",
+    "resendVerificationText": "Didn't receive the verification email?",
+    "resendVerificationButton": "Resend verification email",
+    "verificationEmailSent": "Verification email sent successfully",
+    "verificationEmailError": "Failed to send verification email"
   },
   "addAddress": {
     "title": "Add Address",
@@ -191,7 +205,8 @@
     "ratingError": "Failed to submit rating.",
     "ratingSuccess": "Thank you for your rating!",
     "reviews": "Reviews",
-    "about": "About the Store"
+    "about": "About the Store",
+    "outOfStock: ": "Temporarily Out of Stock"
   },
 
   "sysadmin": {
@@ -247,20 +262,19 @@
     }
   },
   "store_settings": {
-  "title": "Store Settings",
-  "loading": "Loading...",
-  "about_he": "Store Description (Hebrew)",
-  "about_en": "Store Description (English)",
-  "courier": "Courier Delivery",
-  "pickup_point": "Pickup Point",
-  "company_name": "Company Name",
-  "price": "Price (₪)",
-  "save_button": "Save Changes",
-  "save_success": "Store updated successfully",
-  "save_error": "Failed to update store",
-  "load_error": "Failed to load store details"
-},
-
+    "title": "Store Settings",
+    "loading": "Loading...",
+    "about_he": "Store Description (Hebrew)",
+    "about_en": "Store Description (English)",
+    "courier": "Courier Delivery",
+    "pickup_point": "Pickup Point",
+    "company_name": "Company Name",
+    "price": "Price (₪)",
+    "save_button": "Save Changes",
+    "save_success": "Store updated successfully",
+    "save_error": "Failed to update store",
+    "load_error": "Failed to load store details"
+  },
 
   "storemanage": {
     "manage_products": "Manage Products",

@@ -27,22 +27,19 @@ const updateUserRole = async (userId, role) => {
   return user;
 };
 router.post("/", async (req, res) => {
-  const { name, address, email, manager, deliveryOptions } = req.body;
+  const { name, address, email, manager, deliveryOptions, about } = req.body;
 
   try {
     const newStore = new Store({
       name,
       address,
       email,
+      about,
       manager,
       deliveryOptions: {
         homeDelivery: {
           company: deliveryOptions?.homeDelivery?.company || "",
           price: deliveryOptions?.homeDelivery?.price || 0,
-        },
-        pickupPoint: {
-          company: deliveryOptions?.pickupPoint?.company || "",
-          price: deliveryOptions?.pickupPoint?.price || 0,
         },
       },
     });
@@ -59,14 +56,17 @@ router.post("/", async (req, res) => {
     }
 
     const newStoreProducts = new Products({
-      storeId: newStore._id,
+      storeId: newStore._id, // קישור לחנות
       storeName: {
         he: newStore.name.he,
         en: newStore.name.en,
       },
+     
+      products: [], 
     });
 
     await newStoreProducts.save();
+
 
     res.status(201).json(newStore);
   } catch (error) {
@@ -78,7 +78,7 @@ router.post("/", async (req, res) => {
 
 
 router.put("/:id", authenticateToken, authorizeStoreAccess, async (req, res) => {
-  const { name, address, email, manager, deliveryOptions } = req.body;
+  const { name, address, email, manager, deliveryOptions,about } = req.body;
 
   try {
     const updatedStore = await Store.findByIdAndUpdate(
@@ -87,17 +87,14 @@ router.put("/:id", authenticateToken, authorizeStoreAccess, async (req, res) => 
         name,
         address,
         email,
+	about,
         manager,
         deliveryOptions: {
           homeDelivery: {
             company: deliveryOptions?.homeDelivery?.company || "",
             price: deliveryOptions?.homeDelivery?.price || 0,
           },
-          pickupPoint: {
-            company: deliveryOptions?.pickupPoint?.company || "",
-            price: deliveryOptions?.pickupPoint?.price || 0,
-          },
-        },
+                  },
       },
       { new: true }
     );

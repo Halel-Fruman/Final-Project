@@ -63,8 +63,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     }
   }, [error, navigate]);
 
-
-
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -204,6 +202,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               alt={productName}
               className="object-contain max-h-128 max-w-full rounded-md border"
             />
+
             <div className="flex  m-4 flex-wrap gap-2 ">
               {product.images.map((image, index) => (
                 <img
@@ -224,6 +223,11 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <h1 className="text-3xl font-bold text-gray-900 mb-4">
               {productName}
             </h1>
+            {product.stock <= 0 && !product.allowBackorder && (
+              <span className="absolute  right-6 bg-red-600 text-white px-4 py-1 rounded-full text-sm font-semibold shadow">
+                {t("product.outOfStock")}
+              </span>
+            )}
 
             <div className="mb-2 flex items-center gap-4">
               {isOnSale ? (
@@ -289,9 +293,17 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
-                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-full text-xl font-bold hover:bg-primaryColor transition">
-                {t("product.addToCart")}
+                disabled={product.stock <= 0}
+                className={`lg:w-1/2 py-2 px-4 rounded-full text-xl font-bold transition ${
+                  product.stock <= 0 && !product.allowBackorder
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-primaryColor text-white hover:bg-primaryColor"
+                }`}>
+                {product.stock <= 0 && !product.allowBackorder
+                  ? t("product.outOfStock")
+                  : t("product.addToCart")}
               </button>
+
               <button
                 onClick={toggleWishlist}
                 className="self-center bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition"
@@ -305,8 +317,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                 )}
               </button>
             </div>
-
-
 
             <div className="my-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">

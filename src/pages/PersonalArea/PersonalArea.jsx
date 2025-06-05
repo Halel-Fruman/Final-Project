@@ -89,7 +89,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
             <div
               className={`lg:block ${
                 isSidebarOpen ? "block" : "hidden"
-              } bg-white shadow-lg rounded-lg mb-2 lg:rounded-none`}>
+              } bg-white shadow-lg rounded-full mb-2 lg:rounded-full`}>
               <Sidebar
                 currentView={currentView}
                 onViewChange={(view) => {

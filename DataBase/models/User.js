@@ -26,7 +26,12 @@ const userSchema = new mongoose.Schema({
       addedAt: { type: Date, default: Date.now },
     },
   ],
-  transactions: { type: [String], default: [] }, // מערך העסקאות
+  transactions: { type: [String], default: [] }, 
+    refreshToken: { type: String },
+  resetPasswordToken: String,
+  resetPasswordExpires: Date,
+
+
 });
 
 module.exports = mongoose.model("User", userSchema, "User");

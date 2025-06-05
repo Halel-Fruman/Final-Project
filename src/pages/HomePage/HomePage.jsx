@@ -32,7 +32,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [searchText, setSearchText] = useState(
     sessionStorage.getItem("searchText") || ""
   );
+  const [inStockOnly, setInStockOnly] = useState(
+    sessionStorage.getItem("inStockOnly") === "true"
+  );
+
   const navigate = useNavigate();
+  useEffect(() => {
+    sessionStorage.setItem("inStockOnly", inStockOnly);
+  }, [inStockOnly]);
 
   useEffect(() => {
     sessionStorage.setItem(
@@ -77,6 +84,12 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     };
     fetchProducts();
   }, []);
+
+  // Check if there is an error and navigate to the error page
+  // This is done to handle any errors that occur during the fetch
+  useEffect(() => {
+    if (error) navigate("/503");
+  }, [error, navigate]);
 
   // Fetch categories for the filter bar
   useEffect(() => {
@@ -133,9 +146,16 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       (!maxPrice || price <= parseFloat(maxPrice));
     const name = product.name?.[i18n.language]?.toLowerCase() || "";
     const searchMatch = name.includes(searchText.toLowerCase());
+    const stockMatch =
+      !inStockOnly || product.stock > 0 || product.allowBackorder;
 
     return (
-      categoryMatch && storeMatch && onSaleMatch && priceMatch && searchMatch
+      categoryMatch &&
+      storeMatch &&
+      onSaleMatch &&
+      priceMatch &&
+      searchMatch &&
+      stockMatch
     );
   });
 
@@ -233,6 +253,9 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
         <h2 className="text-center text-2xl font-bold mb-8">
           {t("featured_products")}
         </h2>
+        {/* This is the filter bar component
+        // It allows users to filter products by categories, stores, price range, and search text
+        // This is done to provide a way for users to filter products based on their preferences*/}
         <FilterBar
           categories={categories}
           stores={storeOptions}
@@ -248,6 +271,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
           setMaxPrice={setMaxPrice}
           searchText={searchText}
           setSearchText={setSearchText}
+          inStockOnly={inStockOnly}
+          setInStockOnly={setInStockOnly}
         />
 
         {productsToShow.length === 0 ? (

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -7,12 +7,6 @@ import {
 } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Toaster, toast } from "react-hot-toast";
-import HomePage from "./pages/HomePage/HomePage";
-import ProductPage from "./pages/ProductPage/ProductPage";
-import PersonalArea from "./pages/PersonalArea/PersonalArea.jsx";
-import CartModal from "./components/CartModal";
-import Header from "./components/Header/Header";
-import Footer from "./components/Footer/Footer";
 import {
   fetchCart,
   addToCart,
@@ -21,17 +15,40 @@ import {
 } from "./utils/Cart";
 import { fetchWishlist, updateWishlist } from "./utils/Wishlist";
 import { AlertProvider } from "./components/AlertDialog.jsx";
-import Sidebar from "./pages/SysAdmin/Sidebar.jsx";
-import Modal from "./components/Modal";
-import LoginPage from "./pages/PersonalArea/LoginPage";
-import RegisterPage from "./pages/Registeration/RegisterPage";
-import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
-import WishlistModal from "./components/WishlistModal";
-import CheckoutPage from "./pages/Checkout/Checkout";
-import ConfirmationPage from "./pages/Checkout/ComfirmationPage.jsx";
-import NotFound from "./pages/Errors/NotFound.jsx";
-import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
 import { fetchWithTokenRefresh } from "./utils/authHelpers";
+
+// Lazy-loaded components and pages
+const Header = lazy(() => import("./components/Header/Header"));
+const Footer = lazy(() => import("./components/Footer/Footer"));
+const CartModal = lazy(() => import("./components/CartModal"));
+const WishlistModal = lazy(() => import("./components/WishlistModal"));
+const Modal = lazy(() => import("./components/Modal"));
+const HomePage = lazy(() => import("./pages/HomePage/HomePage"));
+const ProductPage = lazy(() => import("./pages/ProductPage/ProductPage"));
+const PersonalArea = lazy(() =>
+  import("./pages/PersonalArea/PersonalArea.jsx")
+);
+const CheckoutPage = lazy(() => import("./pages/Checkout/Checkout"));
+const ConfirmationPage = lazy(() =>
+  import("./pages/Checkout/ComfirmationPage.jsx")
+);
+const Sidebar = lazy(() => import("./pages/SysAdmin/Sidebar.jsx"));
+const StoreManagement = lazy(() =>
+  import("./pages/StoreManagement/StoreManagement.jsx")
+);
+const ForgotPassword = lazy(() =>
+  import("./pages/Registeration/ForgotPassword.jsx")
+);
+const ResetPassword = lazy(() =>
+  import("./pages/Registeration/ResetPassword.jsx")
+);
+const VerifyEmailPage = lazy(() =>
+  import("./pages/Registeration/VerifyEmailPage.jsx")
+);
+const LoginPage = lazy(() => import("./pages/PersonalArea/LoginPage"));
+const RegisterPage = lazy(() => import("./pages/Registeration/RegisterPage"));
+const NotFound = lazy(() => import("./pages/Errors/NotFound.jsx"));
+const ServiceUnavailablePage = lazy(() => import("./pages/Errors/Service.jsx"));
 
 const App = () => {
   const { t, i18n } = useTranslation();
@@ -47,10 +64,7 @@ const App = () => {
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
   const handleLogout = () => {
-    localStorage.removeItem("accessToken");
-    localStorage.removeItem("refreshToken");
-    localStorage.removeItem("userId");
-    localStorage.removeItem("role");
+    localStorage.clear();
     setCartItems([]);
     setToken(null);
     setUserId(null);
@@ -61,7 +75,6 @@ const App = () => {
     const verifyToken = async () => {
       const storedUserId = localStorage.getItem("userId");
       const storedUserRole = localStorage.getItem("role");
-
       if (!storedUserId || !localStorage.getItem("refreshToken")) {
         handleLogout();
         return;
@@ -70,26 +83,22 @@ const App = () => {
       try {
         const res = await fetchWithTokenRefresh("/api/User/verify-token");
         if (res.ok) {
-          const accessToken = localStorage.getItem("accessToken");
-          setToken(accessToken);
+          setToken(localStorage.getItem("accessToken"));
           setUserId(storedUserId);
           setRole(storedUserRole);
         } else {
           handleLogout();
         }
-      } catch (err) {
-        console.error("Error verifying token:", err);
+      } catch {
         handleLogout();
       }
     };
-
     verifyToken();
   }, []);
 
-  const handleOpenCart = () => setIsCartOpen(true);
-  const handleCloseCart = () => setIsCartOpen(false);
-  const handleOpenWishlist = () => setIsWishlistOpen(true);
-  const handleCloseWishlist = () => setIsWishlistOpen(false);
+  useEffect(() => {
+    document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
+  }, [i18n.language]);
 
   const loadCart = useCallback(async () => {
     if (userId && token) {
@@ -110,10 +119,6 @@ const App = () => {
       loadCart();
     }
   };
-
-  useEffect(() => {
-    document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
-  }, [i18n.language]);
 
   const loadWishlist = useCallback(async () => {
     setWishlistLoading(true);
@@ -151,149 +156,177 @@ const App = () => {
       <Router basename="/shop">
         <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
         <div className="flex flex-col bg-gray-50 max-w-[1920px] justify-self-center min-h-screen">
-          <Header
-            onLoginClick={() => setIsLoginModalOpen(true)}
-            onRegisterClick={() => setIsRegisterModalOpen(true)}
-            onCartClick={handleOpenCart}
-            cartItems={cartItems}
-            wishlist={wishlist}
-            onWishlistClick={handleOpenWishlist}
-            setToken={setToken}
-            setUserId={setUserId}
-            setUserRole={setRole}
-            onLogout={handleLogout}
-            isLoggedIn={!!token}
-            role={role}
-          />
-
-          <CartModal
-            isOpen={isCartOpen}
-            onClose={handleCloseCart}
-            cartItems={cartItems}
-            onRemoveFromCart={handleRemoveFromCart}
-            fetchProductDetails={fetchProductDetails}
-            userId={userId}
-          />
-
-          <WishlistModal
-            isOpen={isWishlistOpen}
-            onClose={handleCloseWishlist}
-            wishlist={wishlist}
-            fetchProductDetails={fetchProductDetails}
-            onAddToCart={handleAddToCart}
-            onRemoveFromWishlist={(product) => addToWishlist(product, true)}
-          />
-
-          <Modal
-            isOpen={isLoginModalOpen}
-            onClose={() => setIsLoginModalOpen(false)}>
-            <LoginPage
+          <Suspense fallback={null}>
+            <Header
+              onLoginClick={() => setIsLoginModalOpen(true)}
+              onRegisterClick={() => setIsRegisterModalOpen(true)}
+              onCartClick={() => setIsCartOpen(true)}
+              cartItems={cartItems}
+              wishlist={wishlist}
+              onWishlistClick={() => setIsWishlistOpen(true)}
               setToken={setToken}
               setUserId={setUserId}
               setUserRole={setRole}
-              onClose={() => setIsLoginModalOpen(false)}
+              onLogout={handleLogout}
+              isLoggedIn={!!token}
+              role={role}
             />
-          </Modal>
+          </Suspense>
 
-          <Modal
-            isOpen={isRegisterModalOpen}
-            onClose={() => setIsRegisterModalOpen(false)}>
-            <RegisterPage
-              setToken={setToken}
-              setUserId={setUserId}
-              onClose={() => setIsRegisterModalOpen(false)}
+          <Suspense fallback={null}>
+            <CartModal
+              isOpen={isCartOpen}
+              onClose={() => setIsCartOpen(false)}
+              cartItems={cartItems}
+              onRemoveFromCart={handleRemoveFromCart}
+              fetchProductDetails={fetchProductDetails}
+              userId={userId}
             />
-          </Modal>
+          </Suspense>
+
+          <Suspense fallback={null}>
+            <WishlistModal
+              isOpen={isWishlistOpen}
+              onClose={() => setIsWishlistOpen(false)}
+              wishlist={wishlist}
+              fetchProductDetails={fetchProductDetails}
+              onAddToCart={handleAddToCart}
+              onRemoveFromWishlist={(product) => addToWishlist(product, true)}
+            />
+          </Suspense>
+
+          <Suspense fallback={null}>
+            <Modal
+              isOpen={isLoginModalOpen}
+              onClose={() => setIsLoginModalOpen(false)}>
+              <LoginPage
+                setToken={setToken}
+                setUserId={setUserId}
+                setUserRole={setRole}
+                onClose={() => setIsLoginModalOpen(false)}
+              />
+            </Modal>
+          </Suspense>
+
+          <Suspense fallback={null}>
+            <Modal
+              isOpen={isRegisterModalOpen}
+              onClose={() => setIsRegisterModalOpen(false)}>
+              <RegisterPage
+                setToken={setToken}
+                setUserId={setUserId}
+                onClose={() => setIsRegisterModalOpen(false)}
+              />
+            </Modal>
+          </Suspense>
 
           <div className="app-content">
-            <Routes>
-              <Route
-                path="/"
-                element={
-                  <HomePage
-                    addToWishlist={addToWishlist}
-                    wishlist={wishlist}
-                    wishlistLoading={wishlistLoading}
-                    addToCart={handleAddToCart}
-                  />
-                }
-              />
-              <Route
-                path="/Products/:id"
-                element={
-                  <ProductPage
-                    addToWishlist={addToWishlist}
-                    wishlist={wishlist}
-                    addToCart={handleAddToCart}
-                  />
-                }
-              />
-              <Route
-                path="/checkout"
-                element={
-                  <CheckoutPage
-                    cartItems={cartItems}
-                    fetchProductDetails={fetchProductDetails}
-                    userId={userId}
-                    token={token}
-                    addToCart={handleAddToCart}
-                    setCartItems={setCartItems}
-                    removeFromCart={handleRemoveFromCart}
-                  />
-                }
-              />
-              <Route path="/confirmation" element={<ConfirmationPage />} />
-              <Route
-                path="/SysAdmin"
-                element={
-                  token && role === "admin" ? (
-                    <Sidebar token={token} />
-                  ) : (
-                    <Navigate to="/" />
-                  )
-                }
-              />
-              <Route
-                path="/store-management"
-                element={
-                  token && (role === "storeManager" || role === "admin") ? (
-                    <StoreManagement />
-                  ) : (
-                    <Navigate to="/" />
-                  )
-                }
-              />
-              <Route
-                path="/store-management/:storeId"
-                element={
-                  token && role === "admin" ? (
-                    <StoreManagement />
-                  ) : (
-                    <Navigate to="/" />
-                  )
-                }
-              />
-              <Route
-                path="/personal-area"
-                element={
-                  token ? (
-                    <PersonalArea
-                      userId={userId}
+            <Suspense
+              fallback={
+                <div className="text-center py-10 text-gray-600 text-xl">
+                  {t("loading")}
+                </div>
+              }>
+              <Routes>
+                <Route
+                  path="/"
+                  element={
+                    <HomePage
                       addToWishlist={addToWishlist}
+                      wishlist={wishlist}
+                      wishlistLoading={wishlistLoading}
                       addToCart={handleAddToCart}
-                      token={token}
                     />
-                  ) : (
-                    <Navigate to="/" />
-                  )
-                }
-              />
-
-              <Route path="/503" element={<ServiceUnavailablePage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+                  }
+                />
+                <Route
+                  path="/Products/:id"
+                  element={
+                    <ProductPage
+                      addToWishlist={addToWishlist}
+                      wishlist={wishlist}
+                      addToCart={handleAddToCart}
+                    />
+                  }
+                />
+                <Route
+                  path="/checkout"
+                  element={
+                    <CheckoutPage
+                      cartItems={cartItems}
+                      fetchProductDetails={fetchProductDetails}
+                      userId={userId}
+                      token={token}
+                      addToCart={handleAddToCart}
+                      setCartItems={setCartItems}
+                      removeFromCart={handleRemoveFromCart}
+                    />
+                  }
+                />
+                <Route path="/confirmation" element={<ConfirmationPage />} />
+                <Route
+                  path="/SysAdmin"
+                  element={
+                    token && role === "admin" ? (
+                      <Sidebar token={token} />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
+                />
+                <Route
+                  path="/store-management"
+                  element={
+                    token && (role === "storeManager" || role === "admin") ? (
+                      <StoreManagement />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
+                />
+                <Route
+                  path="/store-management/:storeId"
+                  element={
+                    token && role === "admin" ? (
+                      <StoreManagement />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
+                />
+                <Route
+                  path="/personal-area"
+                  element={
+                    token ? (
+                      <PersonalArea
+                        userId={userId}
+                        addToWishlist={addToWishlist}
+                        addToCart={handleAddToCart}
+                        token={token}
+                      />
+                    ) : (
+                      <Navigate to="/" />
+                    )
+                  }
+                />
+                <Route path="/forgot-password" element={<ForgotPassword />} />
+                <Route
+                  path="/reset-password/:token"
+                  element={<ResetPassword />}
+                />
+                <Route
+                  path="/verify-email/:token"
+                  element={<VerifyEmailPage />}
+                />
+                <Route path="/503" element={<ServiceUnavailablePage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
           </div>
-          <Footer />
+
+          <Suspense fallback={null}>
+            <Footer />
+          </Suspense>
         </div>
       </Router>
     </AlertProvider>

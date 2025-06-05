@@ -65,7 +65,9 @@ const storeProductsSchema = new mongoose.Schema({
     he: { type: String, required: true },
     en: { type: String, required: true },
   }, // שם החנות
- products: {
+  
+
+products: {
     type: [productSchema]
   }});
 
