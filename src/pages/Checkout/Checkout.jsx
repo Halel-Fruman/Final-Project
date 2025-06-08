@@ -1,10 +1,10 @@
 // File: CheckoutPage.jsx
-import React, { useEffect, useState, useMemo } from "react";
+import  { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { addAddress } from "../../utils/Address";
 import { processCheckout } from "../../utils/checkoutHandler";
 import { useNavigate } from "react-router-dom";
-import { set } from "mongoose";
+
 import { Icon } from "@iconify/react";
 import { updateCartItemQuantity } from "../../utils/Cart";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
@@ -94,6 +94,7 @@ const CheckoutPage = ({
     token,
     userId,
     navigate,
+    setCartItems,
   ]);
 
   // Tranzila Iframe component
@@ -181,7 +182,7 @@ const CheckoutPage = ({
       };
 
       createPaymentSession();
-    }, [sum, userId, cartItems, selectedAddress, userData]);
+    }, [sum, userId, cartItems, selectedAddress, userData, deliveryMethods, storeShippingInfo, groupedByStore]);
 
     // Render the Tranzila iframe
     // If formHtml is not available, show a loading spinner
@@ -270,7 +271,7 @@ const CheckoutPage = ({
     if (Object.keys(initialMethods).length > 0) {
       setDeliveryMethods((prev) => ({ ...prev, ...initialMethods }));
     }
-  }, [detailedCart]);
+  }, [detailedCart, deliveryMethods]);
 
   // Group the detailed cart items by storeId
   // This is used to display the items in the summary section

@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, lazy, Suspense } from "react";
+import { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import {
   BrowserRouter as Router,
   Routes,
@@ -155,7 +155,7 @@ const App = () => {
     <AlertProvider>
       <Router basename="/shop">
         <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
-        <div className="flex flex-col bg-gray-50 max-w-[1920px] justify-self-center min-h-screen">
+        <div className="flex flex-col bg-gray-50 w-full max-w-[1920px] min-h-[100dvh] mx-auto">
           <Suspense fallback={null}>
             <Header
               onLoginClick={() => setIsLoginModalOpen(true)}
@@ -223,9 +223,7 @@ const App = () => {
           <div className="app-content">
             <Suspense
               fallback={
-                <div className="text-center py-10 text-gray-600 text-xl">
-                  {t("loading")}
-                </div>
+                null
               }>
               <Routes>
                 <Route
@@ -239,6 +237,7 @@ const App = () => {
                     />
                   }
                 />
+
                 <Route
                   path="/Products/:id"
                   element={

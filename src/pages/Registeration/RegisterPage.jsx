@@ -1,5 +1,5 @@
 import { DialogTitle } from "@headlessui/react";
-import React, { useState } from "react";
+import  { useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 
@@ -184,6 +184,19 @@ export default function Register({ setToken, setUserId, onClose }) {
             onChange={(e) => setConfirmPassword(e.target.value)}
             className="w-full mt-2 px-3 py-2 border border-gray-300 rounded-full shadow-sm"
           />
+        </div>
+        {/* Terms and Conditions */}
+        <div className="flex items-center mt-4">
+          <input
+            id="terms"
+            name="terms"
+            type="checkbox"
+            required
+            className="mr-2"
+          />
+          <label htmlFor="terms" className="text-sm text-gray-600">
+            {t("register.terms")}
+          </label>
         </div>
 
         {/* Submit */}

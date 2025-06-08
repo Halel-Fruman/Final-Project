@@ -1,6 +1,6 @@
-// File: src/pages/ProductPage.jsx
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate, useLocation } from "react-router-dom";
+// ProductPage.jsx – LCP Optimized Version without react-helmet
+import { useEffect, useState } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -8,45 +8,57 @@ import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+const ImageWithFallback = ({ src, alt, className, ...props }) => {
+  const [useFallback, setUseFallback] = useState(false);
+  const webpSrc = src?.replace(/\.(jpg|jpeg|png)$/i, ".webp") || src;
+
+  return (
+    <img
+      src={useFallback ? src : webpSrc}
+      onError={() => setUseFallback(true)}
+      alt={alt}
+      className={className}
+      {...props}
+    />
+  );
+};
+
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
-  const location = useLocation();
   const token = localStorage.getItem("accessToken");
   const isLoggedIn = !!token;
+
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [rating, setRating] = useState(0);
   const [about, setAbout] = useState("");
-  const [userAlreadyRated, setUserAlreadyRated] = useState(false);
 
-  // Store previous filter state from location
-  const previousFilters = location.state || {};
-
-  // Fetch product details when the component mounts
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-
     const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
         const response = await fetch(`/api/Products/${id}`, {
           method: "GET",
           headers,
         });
-
         if (!response.ok) throw new Error(t("error.fetchProduct"));
         const data = await response.json();
         setProduct(data);
         setSelectedImage(data.images[0]);
         setRating(data.averageRating || 0);
         setAbout(data.storeAbout?.[i18n.language] || data.storeAbout?.he || "");
-        setUserAlreadyRated(data.userHasRated || false);
+
+        // ✅ preload image dynamically
+        const preload = document.createElement("link");
+        preload.rel = "preload";
+        preload.as = "image";
+        preload.href = data.images[0]?.replace(/\.(jpg|jpeg|png)$/i, ".webp");
+        document.head.appendChild(preload);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -54,13 +66,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       }
     };
     fetchProduct();
-  }, [id, t]);
+  }, [id, t, i18n.language]);
 
-  // Redirect to error page if there's an error
   useEffect(() => {
-    if (error) {
-      navigate("/503");
-    }
+    if (error) navigate("/503");
   }, [error, navigate]);
 
   const toggleWishlist = () => {
@@ -72,31 +81,21 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
   const handleAddToCart = () => {
     const userId = localStorage.getItem("userId");
-    if (!userId) {
-      toast.error(t("cart.mustBeLoggedIn"));
-      return;
-    }
-
+    if (!userId) return toast.error(t("cart.mustBeLoggedIn"));
     addToCart({ productId: product._id, quantity: 1 });
     toast.success(t("wishlist.addToCart") + " ✅");
   };
 
-  const handleImageClick = (image) => {
-    setSelectedImage(image);
-  };
+  const handleImageClick = (image) => setSelectedImage(image);
 
   const handleRating = async (newRating) => {
     try {
       const response = await fetchWithTokenRefresh(`/api/products/${id}/rate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating: newRating }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         if (data.message === "You have already rated this product.") {
           toast.error(t("product.alreadyRated"));
@@ -105,12 +104,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
         }
         return;
       }
-
       setProduct(data.product);
       setRating(newRating);
       toast.success(t("product.ratingSuccess"));
     } catch (err) {
-      console.error("Error updating rating:", err.message);
       toast.error(t("product.ratingError"));
     }
   };
@@ -120,44 +117,50 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       <main className="bg-gray-50">
         <div className="container mx-auto py-12 animate-pulse">
           <div className="flex flex-col lg:flex-row gap-12 items-start">
-            <div className="w-full lg:w-1/2 flex justify-center">
-              <div className="h-[400px] w-[350px] bg-gray-200 rounded-lg" />
-            </div>
-            <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow w-full lg:min-h-128">
-              <div className="h-8 bg-gray-200 rounded mb-4 w-2/3" />
-              <div className="flex items-center gap-4 mb-4">
-                <div className="h-6 w-20 bg-gray-200 rounded" />
-                <div className="h-6 w-16 bg-gray-300 rounded" />
-                <div className="h-5 w-10 bg-gray-100 rounded" />
-              </div>
-              <div className="flex items-center gap-2 mb-6">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-5 w-5 bg-gray-200 rounded-full" />
+            {/* Skeleton for image + thumbnails */}
+            <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
+              <div className="w-full max-w-lg aspect-[4/3] bg-gray-200 rounded-md mb-4" />
+              <div className="flex flex-wrap gap-2 min-h-[88px]">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="w-20 h-20 bg-gray-300 rounded-md" />
                 ))}
-                <div className="h-4 w-16 bg-gray-200 rounded" />
               </div>
-              <div className="grid lg:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <div className="h-5 bg-gray-200 w-32 mb-2 rounded" />
-                  <div className="space-y-2">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-3 bg-gray-100 rounded w-3/4" />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-20 h-20 bg-gray-200 rounded-md" />
+            </div>
+
+            {/* Skeleton for content */}
+            <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow w-full lg:min-h-128">
+              <div className="h-9 bg-gray-300 w-3/4 mb-4 rounded" />{" "}
+              {/* Title */}
+              <div className="flex items-center gap-4 mb-4 min-h-[2.5rem]">
+                <div className="w-24 h-6 bg-gray-200 rounded" /> {/* Price */}
+                <div className="w-16 h-5 bg-gray-300 rounded" />
+                <div className="w-12 h-5 bg-gray-200 rounded" />
+              </div>
+              <div className="flex items-center mb-4 min-h-[2rem] gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="w-6 h-6 bg-gray-200 rounded-full" />
+                ))}
+                <div className="h-4 w-20 bg-gray-200 rounded" />
+              </div>
+              <div className="mb-6">
+                <div className="h-5 w-32 bg-gray-200 rounded mb-2" />
+                <div className="space-y-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-3 bg-gray-100 rounded w-3/4" />
                   ))}
                 </div>
               </div>
               <div className="mb-6">
-                <div className="h-5 bg-gray-200 w-40 mb-2 rounded" />
-                <div className="h-20 bg-gray-100 rounded" />
+                <div className="h-5 w-40 bg-gray-200 rounded mb-2" />
+                <div className="h-16 bg-gray-100 rounded" />
               </div>
               <div className="flex gap-4 mt-6">
-                <div className="h-12 w-1/2 bg-gray-300 rounded-lg" />
+                <div className="h-12 w-1/2 bg-gray-300 rounded-full" />
                 <div className="h-12 w-12 bg-gray-200 rounded-full" />
+              </div>
+              <div className="my-6">
+                <div className="h-5 w-40 bg-gray-200 rounded mb-2" />
+                <div className="h-20 bg-gray-100 rounded" />
               </div>
             </div>
           </div>
@@ -179,13 +182,11 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     (item) => String(item.productId) === String(product._id)
   );
   const currentDate = new Date();
-
   const activeDiscount = product.discounts?.find((discount) => {
     const start = new Date(discount.startDate);
     const end = new Date(discount.endDate);
     return start <= currentDate && currentDate <= end;
   });
-
   const isOnSale = !!activeDiscount;
   const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
   const discountedPrice = isOnSale
@@ -197,15 +198,16 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
-            <img
-              src={selectedImage || "https://placehold.co/300"}
-              alt={productName}
-              className="object-contain max-h-128 max-w-full rounded-md border"
-            />
-
-            <div className="flex  m-4 flex-wrap gap-2 ">
+            <div className="w-full max-w-lg aspect-[4/3]">
+              <ImageWithFallback
+                src={selectedImage || "https://placehold.co/300"}
+                alt={productName}
+                className="object-cover w-full h-full rounded-md border"
+              />
+            </div>
+            <div className="flex m-4 flex-wrap gap-2 min-h-[88px]">
               {product.images.map((image, index) => (
-                <img
+                <ImageWithFallback
                   key={index}
                   src={image}
                   alt={`Thumbnail ${index + 1}`}
@@ -219,17 +221,19 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               ))}
             </div>
           </div>
+
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 min-h-[3.6rem] line-clamp-2">
               {productName}
             </h1>
+
             {product.stock <= 0 && !product.allowBackorder && (
-              <span className="absolute  right-6 bg-red-600 text-white px-4 py-1 rounded-full text-sm font-semibold shadow">
+              <span className=" right-6 bg-red-600 text-white  px-4 py-1 rounded-full text-sm font-semibold shadow">
                 {t("product.outOfStock")}
               </span>
             )}
 
-            <div className="mb-2 flex items-center gap-4">
+            <div className="mb-2 flex items-center gap-4 min-h-[2.5rem]">
               {isOnSale ? (
                 <>
                   <span className="text-2xl text-red-600 font-bold">
@@ -249,20 +253,18 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               )}
             </div>
 
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-4 min-h-[2rem]">
               {[...Array(5)].map((_, i) => (
                 <StarIcon
                   key={i}
                   className={`h-6 w-6 cursor-pointer ${
                     i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"
                   } ${!isLoggedIn ? "cursor-not-allowed opacity-50" : ""}`}
-                  onClick={() => {
-                    if (isLoggedIn) {
-                      handleRating(i + 1);
-                    } else {
-                      toast.error(t("login.requiredToRate"));
-                    }
-                  }}
+                  onClick={() =>
+                    isLoggedIn
+                      ? handleRating(i + 1)
+                      : toast.error(t("login.requiredToRate"))
+                  }
                 />
               ))}
               <span className="ml-2 text-gray-600">
@@ -270,17 +272,15 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               </span>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-12 ">
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                  {t("product.highlights")}
-                </h2>
-                <ul className="list-disc pl-5 text-gray-700">
-                  {productHighlights.map((highlight, index) => (
-                    <li key={index}>{highlight}</li>
-                  ))}
-                </ul>
-              </div>
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                {t("product.highlights")}
+              </h2>
+              <ul className="list-disc pl-5 text-gray-700">
+                {productHighlights.map((highlight, index) => (
+                  <li key={index}>{highlight}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="mb-6">
@@ -304,18 +304,20 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   : t("product.addToCart")}
               </button>
 
-              <button
-                onClick={toggleWishlist}
-                className="self-center bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition"
-                aria-label={
-                  isInWishlist ? "Remove from wishlist" : "Add to wishlist"
-                }>
-                {isInWishlist ? (
-                  <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
-                ) : (
-                  <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
-                )}
-              </button>
+              <div className="w-12 h-12">
+                <button
+                  onClick={toggleWishlist}
+                  className="w-full h-full bg-white p-3 rounded-full ring-1 ring-secondaryColor shadow-lg hover:bg-gray-100 transition"
+                  aria-label={
+                    isInWishlist ? "Remove from wishlist" : "Add to wishlist"
+                  }>
+                  {isInWishlist ? (
+                    <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
+                  ) : (
+                    <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
+                  )}
+                </button>
+              </div>
             </div>
 
             <div className="my-6">

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
@@ -158,9 +158,7 @@ const OrderHistory = ({ user, addToCart }) => {
                             className="bg-primaryColor text-white text-xl font-bold px-4 py-2 rounded-full hover:bg-secondaryColor">
                             {t("orders.buyAgain")}
                           </button>
-                          <button className="border border-gray-300 text-md px-4 py-2 rounded text-gray-700 hover:bg-gray-100">
-                            {t("orders.shopSimilar")}
-                          </button>
+
                         </div>
                       </div>
                     );

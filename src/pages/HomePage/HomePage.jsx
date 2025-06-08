@@ -1,15 +1,35 @@
-import React, { useEffect, useState, useMemo } from "react";
+// HomePage.jsx - Full version with CLS optimizations applied
+import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
-import backgroundImage from "../../backgroung.jpg";
+import backgroundImage from "../../backgroung.webp";
 import FilterBar from "../../components/Category/FilterBar";
 import { getActiveDiscount } from "../../utils/discountHelpers";
 
-// This component renders the home page with a hero section, product listings, and filters.
+const ProductImage = ({ product, i18n }) => {
+  const [useFallback, setUseFallback] = useState(false);
+  const originalImage = product.images[0];
+  const webpImage = originalImage.replace(/\.(jpg|jpeg|png)$/i, ".webp");
+
+  return (
+    <div className="aspect-[83/96] w-full overflow-hidden">
+      <img
+        src={useFallback ? originalImage : webpImage}
+        onError={() => setUseFallback(true)}
+        alt={product.name[i18n.language]}
+        className="object-cover w-full h-full"
+        loading="lazy"
+      />
+    </div>
+  );
+};
+
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
+  const navigate = useNavigate();
+
   const [allProducts, setAllProducts] = useState([]);
   const [categories, setCategories] = useState([]);
   const [selectedCategories, setSelectedCategories] = useState(() =>
@@ -21,8 +41,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [isOnSaleOnly, setIsOnSaleOnly] = useState(
     sessionStorage.getItem("isOnSaleOnly") === "true"
   );
-  const [isLoading, setIsLoading] = useState(true);
-  const [error, setError] = useState(null);
   const [minPrice, setMinPrice] = useState(
     sessionStorage.getItem("minPrice") || ""
   );
@@ -35,40 +53,30 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [inStockOnly, setInStockOnly] = useState(
     sessionStorage.getItem("inStockOnly") === "true"
   );
-
-  const navigate = useNavigate();
-  useEffect(() => {
-    sessionStorage.setItem("inStockOnly", inStockOnly);
-  }, [inStockOnly]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     sessionStorage.setItem(
       "selectedCategories",
       JSON.stringify(selectedCategories)
     );
-  }, [selectedCategories]);
-
-  useEffect(() => {
     sessionStorage.setItem("selectedStores", JSON.stringify(selectedStores));
-  }, [selectedStores]);
-
-  useEffect(() => {
-    sessionStorage.setItem("searchText", searchText);
-  }, [searchText]);
-
-  useEffect(() => {
-    sessionStorage.setItem("minPrice", minPrice);
-  }, [minPrice]);
-
-  useEffect(() => {
-    sessionStorage.setItem("maxPrice", maxPrice);
-  }, [maxPrice]);
-
-  useEffect(() => {
     sessionStorage.setItem("isOnSaleOnly", isOnSaleOnly);
-  }, [isOnSaleOnly]);
+    sessionStorage.setItem("minPrice", minPrice);
+    sessionStorage.setItem("maxPrice", maxPrice);
+    sessionStorage.setItem("searchText", searchText);
+    sessionStorage.setItem("inStockOnly", inStockOnly);
+  }, [
+    selectedCategories,
+    selectedStores,
+    isOnSaleOnly,
+    minPrice,
+    maxPrice,
+    searchText,
+    inStockOnly,
+  ]);
 
-  // Fetch all products and handle loading/error states
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -85,13 +93,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchProducts();
   }, []);
 
-  // Check if there is an error and navigate to the error page
-  // This is done to handle any errors that occur during the fetch
   useEffect(() => {
     if (error) navigate("/503");
   }, [error, navigate]);
 
-  // Fetch categories for the filter bar
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -105,8 +110,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchCategories();
   }, []);
 
-  // Restore scroll position after loading products
-  // This is useful for maintaining user experience when navigating back to the home page
   useEffect(() => {
     const scrollPosition = sessionStorage.getItem("scrollPosition");
     if (scrollPosition) {
@@ -114,23 +117,24 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
         top: parseInt(scrollPosition, 10),
         behavior: "instant",
       });
-      // sessionStorage.removeItem("scrollPosition");
+      sessionStorage.removeItem("scrollPosition");
     }
   }, [isLoading]);
 
-  // Generate store options for the filter bar
-  const storeOptions = Array.from(
-    new Set(
-      allProducts.map((p) => {
-        const name =
-          p.storeName?.[i18n.language] ||
-          p.storeName?.he ||
-          p.storeName ||
-          "Unknown";
-        return JSON.stringify({ id: p.storeId, name });
-      })
-    )
-  ).map((str) => JSON.parse(str));
+  const storeOptions = useMemo(() => {
+    return Array.from(
+      new Set(
+        allProducts.map((p) => {
+          const name =
+            p.storeName?.[i18n.language] ||
+            p.storeName?.he ||
+            p.storeName ||
+            "Unknown";
+          return JSON.stringify({ id: p.storeId, name });
+        })
+      )
+    ).map((str) => JSON.parse(str));
+  }, [allProducts, i18n.language]);
 
   const productsToShow = allProducts.filter((product) => {
     const categoryMatch =
@@ -148,7 +152,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     const searchMatch = name.includes(searchText.toLowerCase());
     const stockMatch =
       !inStockOnly || product.stock > 0 || product.allowBackorder;
-
     return (
       categoryMatch &&
       storeMatch &&
@@ -168,8 +171,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
         .localeCompare(String(b._id).split("").reverse().join(""))
     );
   }, [productsToShow]);
-  // Function to toggle wishlist status for a product
-  // This function checks if the product is already in the wishlist and adds/removes it accordingly
+
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -177,59 +179,58 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     addToWishlist(product, isInWishlist);
   };
 
-  // Function to handle product click, which navigates to the product details page
-  // It also saves the current scroll position to sessionStorage for later restoration
   const handleProductClick = (product) => {
     sessionStorage.setItem("scrollPosition", window.scrollY);
     navigate(`/products/${product._id}`);
   };
 
-  // Handle error state
-  if (error) {
+  if (isLoading) {
     return (
-      <div className="flex items-center justify-center h-screen">
-        <p className="text-red-600">
-          {t("error")}: {error}
-        </p>
+      <div className="bg-primaryColor bg-opacity-10">
+        <header className="relative h-[700px] overflow-hidden">
+          <img
+            src={backgroundImage}
+            alt=""
+            className="absolute inset-0 w-full h-full object-cover"
+            aria-hidden="true"
+          />
+          <div className="absolute inset-0 bg-black opacity-50 mix-blend-multiply" />
+          <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
+            <div className="h-12 w-2/3 sm:w-1/2 bg-gray-300 rounded mb-4 animate-pulse" />
+            <div className="h-8 w-1/2 sm:w-1/3 bg-gray-300 rounded mb-6 animate-pulse" />
+            <div className="h-10 w-32 bg-white rounded-full animate-pulse" />
+          </div>
+        </header>
+        <main className="px-4 py-10 sm:px-6 lg:px-12">
+          <div className="h-8 w-48 mx-auto mb-8 bg-gray-300 rounded animate-pulse" />
+          <div className="mb-10 h-16 bg-gray-100 rounded animate-pulse" />
+          <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+            {Array.from({ length: 10 }).map((_, index) => (
+              <div
+                key={index}
+                className="relative bg-white rounded-lg p-4 shadow animate-pulse">
+                <div className="absolute top-2 right-2 w-10 h-10 bg-gray-200 rounded-full" />
+                <div className="aspect-[83/96] bg-gray-300 rounded mb-4" />
+                <div className="h-5 bg-gray-300 rounded w-3/4 mb-2" />
+                <div className="h-4 bg-gray-200 rounded w-1/2" />
+              </div>
+            ))}
+          </div>
+        </main>
       </div>
     );
   }
-  // Handle loading state
-  // This displays a loading skeleton while products are being fetched
-  if (isLoading) {
-    return (
-      <main className="px-4 py-10 sm:px-6 lg:px-12">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
-          {Array.from({ length: 10 }).map((_, index) => (
-            <div
-              key={index}
-              className="bg-white rounded-lg p-4 animate-pulse shadow">
-              <div className="h-48 sm:h-56 lg:h-64 bg-gray-300 rounded mb-4" />
-              <div className="h-4 bg-gray-300 rounded w-3/4 mb-2" />
-              <div className="h-4 bg-gray-200 rounded w-1/2" />
-            </div>
-          ))}
-        </div>
-      </main>
-    );
-  }
-  // Render the home page with hero section, product listings, and filter bar
 
   return (
     <div className="bg-primaryColor bg-opacity-10">
-      <header
-        id="home"
-        aria-label="Hero Section"
-        className="relative bg-primaryColor text-white"
-        style={{
-          backgroundImage: `url(${backgroundImage})`,
-          backgroundSize: "cover",
-          backgroundPosition: "center",
-          height: "700px",
-        }}>
-        <div
-          className="absolute inset-0 bg-black opacity-50"
-          style={{ mixBlendMode: "multiply" }}></div>
+      <header className="relative h-[700px] overflow-hidden">
+        <img
+          src={backgroundImage}
+          alt=""
+          className="absolute inset-0 w-full h-full object-cover"
+          aria-hidden="true"
+        />
+        <div className="absolute inset-0 bg-black opacity-50 mix-blend-multiply" />
         <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
           <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8.5xl font-bold text-secondaryColor">
             {t("welcome")}
@@ -239,42 +240,39 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
           <button
             className="mt-6 bg-white text-black py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-gray-200 transition"
-            onClick={() => {
+            onClick={() =>
               document
                 .getElementById("products-section")
-                .scrollIntoView({ behavior: "smooth" });
-            }}>
+                .scrollIntoView({ behavior: "smooth" })
+            }>
             {t("view_products")}
           </button>
         </div>
       </header>
-
       <main id="products-section" className="py-10 px-4 sm:px-6 lg:px-12">
         <h2 className="text-center text-2xl font-bold mb-8">
           {t("featured_products")}
         </h2>
-        {/* This is the filter bar component
-        // It allows users to filter products by categories, stores, price range, and search text
-        // This is done to provide a way for users to filter products based on their preferences*/}
-        <FilterBar
-          categories={categories}
-          stores={storeOptions}
-          selectedCategories={selectedCategories}
-          setSelectedCategories={setSelectedCategories}
-          selectedStores={selectedStores}
-          setSelectedStores={setSelectedStores}
-          isOnSaleOnly={isOnSaleOnly}
-          setIsOnSaleOnly={setIsOnSaleOnly}
-          minPrice={minPrice}
-          setMinPrice={setMinPrice}
-          maxPrice={maxPrice}
-          setMaxPrice={setMaxPrice}
-          searchText={searchText}
-          setSearchText={setSearchText}
-          inStockOnly={inStockOnly}
-          setInStockOnly={setInStockOnly}
-        />
-
+        <div className="mb-10">
+          <FilterBar
+            categories={categories}
+            stores={storeOptions}
+            selectedCategories={selectedCategories}
+            setSelectedCategories={setSelectedCategories}
+            selectedStores={selectedStores}
+            setSelectedStores={setSelectedStores}
+            isOnSaleOnly={isOnSaleOnly}
+            setIsOnSaleOnly={setIsOnSaleOnly}
+            minPrice={minPrice}
+            setMinPrice={setMinPrice}
+            maxPrice={maxPrice}
+            setMaxPrice={setMaxPrice}
+            searchText={searchText}
+            setSearchText={setSearchText}
+            inStockOnly={inStockOnly}
+            setInStockOnly={setInStockOnly}
+          />
+        </div>
         {productsToShow.length === 0 ? (
           <p className="text-center text-gray-500">{t("no_products_found")}</p>
         ) : (
@@ -285,7 +283,6 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                 : wishlist?.some(
                     (item) => String(item.productId) === String(product._id)
                   );
-
               const activeDiscount = getActiveDiscount(product.discounts);
               const isOnSale = !!activeDiscount;
               const discountPercentage = isOnSale
@@ -294,41 +291,37 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
               const discountedPrice = isOnSale
                 ? product.price - product.price * (discountPercentage / 100)
                 : product.price;
-
               return (
                 <div key={product._id} className="flex flex-col">
                   <article className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
-                    <button
-                      onClick={() => toggleWishlist(product)}
-                      title={
-                        isInWishlist
-                          ? t("remove_from_wishlist")
-                          : t("add_to_wishlist")
-                      }
-                      className="absolute top-2 right-2 z-10 bg-white p-2 rounded-full shadow-lg hover:bg-gray-100">
-                      {isInWishlist ? (
-                        <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
-                      ) : (
-                        <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
+                    <div className="absolute top-2 right-2 z-10 w-10 h-10">
+                      {!wishlistLoading && (
+                        <button
+                          onClick={() => toggleWishlist(product)}
+                          title={
+                            isInWishlist
+                              ? t("remove_from_wishlist")
+                              : t("add_to_wishlist")
+                          }
+                          className="w-full h-full bg-white p-2 rounded-full shadow-lg hover:bg-gray-100">
+                          {isInWishlist ? (
+                            <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
+                          ) : (
+                            <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
+                          )}
+                        </button>
                       )}
-                    </button>
-
+                    </div>
                     <div
                       onClick={() => handleProductClick(product)}
-                      className="cursor-pointer aspect-w-1 aspect-h-1 rounded-lg">
-                      <img
-                        src={product.images[0]}
-                        alt={product.name[i18n.language]}
-                        className="object-cover w-full h-56 sm:h-64 lg:h-72"
-                      />
+                      className="cursor-pointer">
+                      <ProductImage product={product} i18n={i18n} />
                     </div>
                   </article>
-
                   <div className="p-4 text-center">
-                    <h3 className="text-base text-xl text-gray-900">
+                    <h3 className="text-base text-xl text-gray-900 line-clamp-2 min-h-[3.6rem]">
                       {product.name[i18n.language]}
                     </h3>
-
                     {isOnSale ? (
                       <div className="mt-1 text-xl font-bold">
                         <div className="flex flex-col items-center sm:flex-row sm:justify-center sm:space-x-2 rtl:space-x-reverse">
@@ -339,7 +332,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                             ₪{product.price.toFixed(2)}
                           </span>
                           <span className="text-green-900 text-sm font-medium">
-                            {discountPercentage}%-
+                            {discountPercentage}%
                           </span>
                         </div>
                       </div>

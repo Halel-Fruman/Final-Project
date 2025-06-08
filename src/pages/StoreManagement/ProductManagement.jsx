@@ -1,5 +1,5 @@
 // קובץ: ProductManagement.jsx
-import React, { useState, useEffect } from "react";
+import  { useState, useEffect } from "react";
 import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";

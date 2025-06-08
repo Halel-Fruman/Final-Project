@@ -1,4 +1,3 @@
-import React from "react";
 import { useTranslation } from "react-i18next";
 
 // The Sidebar component is a functional component that takes the currentView and onViewChange as props.

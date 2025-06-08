@@ -1,4 +1,3 @@
-import React from "react";
 import { Dialog, DialogPanel } from "@headlessui/react";
 //  Modal component
 const Modal = ({ isOpen, onClose, children }) => {

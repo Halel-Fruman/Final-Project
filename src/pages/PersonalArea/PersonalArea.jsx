@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useLocation } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import Sidebar from "./PersonalFields/SideBar";
@@ -7,7 +7,7 @@ import PasswordManager from "./PersonalFields/PasswordManager";
 import AddressManager from "./PersonalFields/AddressManager";
 import WishlistComponent from "./PersonalFields/WishlistComponent";
 import OrderHistory from "./PersonalFields/OrdersHistory";
-import { fetchWithTokenRefresh, forceLogout } from "../../utils/authHelpers";
+import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
 const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
   const { t } = useTranslation();
