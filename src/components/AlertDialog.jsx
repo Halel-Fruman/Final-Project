@@ -47,7 +47,7 @@ export const AlertProvider = ({ children }) => {
           className="fixed inset-0 z-50">
           <DialogBackdrop className="fixed inset-0 bg-gray-500/75" />
           <div className="fixed inset-0 flex items-center justify-center">
-            <DialogPanel className="bg-white p-8 rounded-lg shadow-2xl max-w-md">
+            <DialogPanel className="bg-white p-8 rounded-xl shadow-2xl max-w-md">
               <DialogTitle className="text-lg font-semibold">
                 {alert.type === "success" && "✅ הצלחה"}
                 {alert.type === "error" && "❌ שגיאה"}
@@ -55,12 +55,12 @@ export const AlertProvider = ({ children }) => {
                 {alert.type === "info" && "ℹ️ מידע"}
               </DialogTitle>
               <p className="mt-2">{alert.message}</p>
-              <div className="mt-4 flex justify-end space-x-2">
+              <div className="mt-4 flex gap-2 justify-end ">
                 {alert.onConfirm || alert.onCancel ? (
                   <>
                     {alert.onCancel && (
                       <button
-                        className="bg-gray-300 px-4 py-2 rounded"
+                        className="bg-gray-300 px-4 py-2 rounded-full"
                         onClick={() => {
                           if (typeof alert.onCancel === "function") {
                             alert.onCancel(); //call the function only if it is a function
@@ -71,7 +71,7 @@ export const AlertProvider = ({ children }) => {
                       </button>
                     )}
                     <button
-                      className="bg-blue-600 text-white px-4 py-2 rounded"
+                      className="bg-blue-600 text-white px-4 py-2 rounded-full"
                       onClick={() => {
                         if (typeof alert.onConfirm === "function") {
                           alert.onConfirm(); // call the function only if it is a function
@@ -83,7 +83,7 @@ export const AlertProvider = ({ children }) => {
                   </>
                 ) : (
                   <button
-                    className="bg-blue-600 text-white px-4 py-2 rounded"
+                    className="bg-blue-600 text-white px-4 py-2 rounded-full"
                     onClick={closeAlert}>
                     סגור
                   </button>
