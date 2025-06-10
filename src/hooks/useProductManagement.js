@@ -5,6 +5,7 @@ import { useAlert } from "../components/AlertDialog";
 import exportToExcel from "../utils/exportToExcel";
 import e from "cors";
 
+
 const useProductManagement = (
   storeId,
   autoOpenAddForm = false,
@@ -21,13 +22,16 @@ const useProductManagement = (
   const [pendingAutofillPayload, setPendingAutofillPayload] = useState(null);
   const [pendingEditFields, setPendingEditFields] = useState(null);
 
+
   const isAddingProductRef = useRef(isAddingProduct);
   const { showAlert } = useAlert();
 
+  // Map the autofill payload to the expected product structure
   useEffect(() => {
     isAddingProductRef.current = isAddingProduct;
   }, [isAddingProduct]);
 
+  // Fetch products and categories when storeId changes or on mount
   useEffect(() => {
     if (!storeId) return;
 
@@ -42,6 +46,7 @@ const useProductManagement = (
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
   }, [storeId]);
 
+  // Handle auto-open add product form
   useEffect(() => {
     const handleOpenAdd = () => {
       setIsAddingProduct(true);
@@ -51,6 +56,7 @@ const useProductManagement = (
     return () => window.removeEventListener("openAddProduct", handleOpenAdd);
   }, []);
 
+  // Handle autofill payload from external sources
   useEffect(() => {
     const handler = (e) => {
       const data = e.detail;
@@ -63,6 +69,7 @@ const useProductManagement = (
     return () => window.removeEventListener("autofillProductForm", handler);
   }, []);
 
+  // Handle pending autofill payload when adding a product
   useEffect(() => {
     if (isAddingProduct && autofillPayload) {
       const mapped = mapPayloadToNewProduct(autofillPayload);
@@ -71,6 +78,7 @@ const useProductManagement = (
     }
   }, [isAddingProduct, autofillPayload]);
 
+  // Handle pending autofill payload when adding a product
   useEffect(() => {
     if (pendingAutofillPayload && isAddingProduct) {
       const mapped = mapPayloadToNewProduct(pendingAutofillPayload);
@@ -79,6 +87,7 @@ const useProductManagement = (
     }
   }, [isAddingProduct, pendingAutofillPayload]);
 
+  // Handle pending edit fields when editing a product
   useEffect(() => {
     const handleEditProductForm = (e) => {
       const { productId } = e.detail;
@@ -97,6 +106,9 @@ const useProductManagement = (
       window.removeEventListener("openEditProductForm", handleEditProductForm);
   }, [products]);
 
+  // Handle pending edit request from external sources
+  // This is used to open the edit form when a product name is provided
+  // and the product is found in the list of products
   useEffect(() => {
     if (pendingEditRequest && products.length > 0) {
       const { productName } = pendingEditRequest;
@@ -122,6 +134,8 @@ const useProductManagement = (
     }
   }, [pendingEditRequest, products]);
 
+  // Handle pending edit request from external sources
+  // This is used to open the edit form when a product name is provided
   useEffect(() => {
     const handleEditEvent = (e) => {
       setPendingEditRequest(e.detail);
@@ -130,11 +144,16 @@ const useProductManagement = (
     return () => window.removeEventListener("openEditProduct", handleEditEvent);
   }, []);
 
+  // Handle pending edit fields when editing a product
+
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true);
   };
 
+
+  // Handle delete product action
+  // This function shows a confirmation alert before deleting a product
   const handleDelete = (productId) => {
     if (
       showAlert(
@@ -158,6 +177,8 @@ const useProductManagement = (
     }
   };
 
+  // Handle cancel action when adding or editing a product
+  // This function shows a confirmation alert before canceling the action
   const handleCancel = () => {
     showAlert(
       "האם אתה בטוח שברצונך לבטל?",
@@ -170,6 +191,12 @@ const useProductManagement = (
     );
   };
 
+  // Handle save product action
+  // This function validates the product data and sends it to the server
+  // If the product is being edited, it updates the existing product
+  // If a new product is being added, it creates a new product
+  // It also handles discount validation and shows appropriate alerts
+  // If the product data is valid, it sends the data to the server
   const handleSaveProduct = (newProduct) => {
     newProduct = mapPayloadToNewProduct(newProduct);
     if (
@@ -244,6 +271,8 @@ const useProductManagement = (
       .catch(() => showAlert("אירעה שגיאה בשמירת המוצר", "error"));
   };
 
+  // Handle export products action
+  // This function exports the products to an Excel file
   const handleExportProducts = () => {
     exportToExcel(products);
     showAlert("המוצרים ייצאו לקובץ Excel", "success");
@@ -258,6 +287,7 @@ const useProductManagement = (
     );
   });
 
+  // Map the payload to the expected product structure
   const mapPayloadToNewProduct = (payload) => ({
     name: {
       en: payload.nameEn || "",
@@ -283,6 +313,7 @@ const useProductManagement = (
     discountStart: payload.discountStart || "",
     discountEnd: payload.discountEnd || "",
   });
+
 
   return {
     products,

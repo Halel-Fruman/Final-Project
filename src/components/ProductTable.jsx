@@ -1,6 +1,7 @@
 // File: src/components/ProductTable.jsx
 import { Icon } from "@iconify/react";
 
+// this component displays a table of products with options to edit and delete each product
 const ProductTable = ({ products, onEdit, onDelete }) => {
   return (
     <div className="hidden md:block">

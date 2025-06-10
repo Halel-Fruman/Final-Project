@@ -1,4 +1,5 @@
 // File: ProductManagement.jsx
+
 import React from "react";
 import ProductForm from "../../components/ProductForm";
 import ProductTable from "../../components/ProductTable";
@@ -24,6 +25,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {} }) 
     handleExportProducts,
     filteredProducts,
   } = useProductManagement(storeId, autoOpenAddForm, autofill);
+
 
   return (
     <div className="w-full">
