@@ -1,5 +1,5 @@
 // utils/chatBotHandlers.js
-
+import { useState } from "react";
 export const buildMessageHistory = (messages, role) => {
   const systemPrompt = `
 You are a smart and accessible chatbot integrated into ILAN’s e-commerce website.
@@ -59,11 +59,10 @@ When the user makes a general request like “I want to add a product” or "Edi
 
  For editing a product:
 1. First, confirm which product to edit (based on name, ID, etc.)
-2. Then trigger the navigation: 'goToProductList'
-3. After reaching the page, trigger 'openEditProduct' to open the editing UI for that specific product.
- 4. Ask the user which fields they want to update.
- 5. For each field the user requests to change, collect it step-by-step.
- 6. After each confirmed update, return:
+2. After reaching the page, trigger 'openEditProduct' to open the editing UI for that specific product.
+ 3. Ask the user which fields they want to update.
+ 4. For each field the user requests to change, collect it step-by-step.
+ 5. After each confirmed update, return:
 
  {
    "reply": "עדכנתי את המחיר ל-10 ש\"ח.",
@@ -111,7 +110,7 @@ Example of valid response to open the edit page:
   }
 }
 
-After the product form is open, ask the user what fields they want to edit.  
+After the product form is open, ask the user what fields they want to edit.
 Collect each field step-by-step and update them gradually.
 
 ⚠️ Always proceed step-by-step:
@@ -237,7 +236,18 @@ export const createActionHandlers = (
   navigate,
   speak,
   externalHandlers = {}
-) => ({
+) => {
+  let productName = "";
+  const setProductName = (name) => {
+    if (typeof name === "string") {
+      productName = name.trim();
+    } else if (name && typeof name === "object" && name.productName) {
+      productName = name.productName.trim();
+    } else {
+      productName = "";
+    }
+  };
+  return{
   goToProductList: () => {
     navigate("/store-management", {
       state: { tab: "products" },
@@ -283,7 +293,7 @@ export const createActionHandlers = (
   },
 
   openEditProduct: (payload) => {
-    const { productName } = payload || {};
+    setProductName(payload || {});
 
     if (!productName) {
       speak("לא צוין שם מוצר לעריכה.");
@@ -316,21 +326,27 @@ export const createActionHandlers = (
 
   editProduct: (payload) => {
     if (!payload || !payload.productName || !payload.newFields) {
+      console.warn("Invalid payload for editProduct:", payload);
       speak("חסר מידע לעדכון המוצר.");
       return;
     }
+    console.log("editProduct payload:", payload);
 
-    const isEditOpen = !!document.getElementById("edit-product-modal");
-
-    if (window.location.pathname === "/store-management" && isEditOpen) {
-      window.dispatchEvent(
-        new CustomEvent("autofillEditProductForm", {
-          detail: payload.newFields,
-        })
-      );
+    // const isEditOpen = document.getElementById("edit-product-modal");
+    // console.log("isEditOpen:", isEditOpen);
+    if (window.location.pathname === "/shop/store-management") {
+      console.log("here");
+       window.dispatchEvent(
+          new CustomEvent("autofillEditProductForm", {
+            detail: {
+              newFields: payload.newFields,
+              productName: payload.productName,
+            },
+          })
+        );
       speak("ממלא את פרטי המוצר המעודכנים.");
-    } else if (!isEditOpen) {
-      speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
+      // } else if (!isEditOpen) {
+      //   speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
     } else {
       speak("יש לפתוח את דף ניהול המוצרים תחילה.");
     }
@@ -354,7 +370,7 @@ export const createActionHandlers = (
   openCart: externalHandlers.onOpenCart,
   openWishlist: externalHandlers.onOpenWishlist,
   logout: externalHandlers.onLogout,
-});
+}};
 
 export const handleAction = (
   action,
