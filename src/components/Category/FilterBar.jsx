@@ -22,7 +22,7 @@ const FilterBar = ({
   setMaxPrice,
 }) => {
   const { i18n, t } = useTranslation();
-  const [isOpen, setIsOpen] = useState(false); // חדש
+  const [isOpen, setIsOpen] = useState(false); // State to control mobile filter visibility
 
   const clearAll = () => {
     setSelectedCategories([]);

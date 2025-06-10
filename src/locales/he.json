@@ -113,6 +113,11 @@
     "submit": "הרשם",
     "loading": "נרשם...",
     "success": "ההרשמה הצליחה!",
+    "terms": "אני מסכים לתנאי השימוש",
+    "viewTerms": "צפה בתנאי השימוש",
+    "close": "סגור",
+    "termsTitle": "תנאי השימוש",
+    "termsContent": "עליך להסכים לתנאי השימוש כדי להמשיך.",
     "errors": {
       "passwordMismatch": "הסיסמאות אינן תואמות!",
       "failed": "ההרשמה נכשלה.",
@@ -229,7 +234,10 @@
     "ratingError": "הייתה שגיאה בשליחת הדירוג.",
     "ratingSuccess": "תודה על הדירוג!",
     "about": "על החנות",
-    "outOfStock": "זמנית אזל מהמלאי"
+    "outOfStock": "זמנית אזל מהמלאי",
+    "not_found":"אופס...",
+    "not_found_title": "המוצר לא נמצא",
+    "not_found_message": "נראה שהמוצר לא קיים או שהוסר."
   },
 
   "sysadmin": {

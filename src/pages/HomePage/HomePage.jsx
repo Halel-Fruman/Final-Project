@@ -8,6 +8,7 @@ import backgroundImage from "../../backgroung.webp";
 import FilterBar from "../../components/Category/FilterBar";
 import { getActiveDiscount } from "../../utils/discountHelpers";
 
+// ProductImage component to handle image loading and fallback
 const ProductImage = ({ product, i18n }) => {
   const [useFallback, setUseFallback] = useState(false);
   const originalImage = product.images[0];
@@ -25,6 +26,9 @@ const ProductImage = ({ product, i18n }) => {
     </div>
   );
 };
+
+// HomePage component
+// This component fetches products, categories, and handles filtering
 
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
@@ -56,6 +60,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
 
+  // Save filter state to sessionStorage whenever it changes
+  // This allows the filters to persist across page reloads
   useEffect(() => {
     sessionStorage.setItem(
       "selectedCategories",
@@ -77,6 +83,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     inStockOnly,
   ]);
 
+  // Fetch products from the API
+  // This effect runs once when the component mounts
   useEffect(() => {
     const fetchProducts = async () => {
       try {
@@ -93,10 +101,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchProducts();
   }, []);
 
+  // Handle error by navigating to a 503 page if an error occurs
+  // This effect runs whenever the error state changes
   useEffect(() => {
     if (error) navigate("/503");
   }, [error, navigate]);
 
+  // Fetch categories from the API
+  // This effect runs once when the component mounts
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -110,6 +122,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     fetchCategories();
   }, []);
 
+  // Restore scroll position from sessionStorage when the component mounts
+  // This effect runs whenever the isLoading state changes
+  // This ensures that the scroll position is restored after the products are loaded
+  // This is useful for maintaining user experience when navigating back to the homepage
   useEffect(() => {
     const scrollPosition = sessionStorage.getItem("scrollPosition");
     if (scrollPosition) {
@@ -120,6 +136,9 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       sessionStorage.removeItem("scrollPosition");
     }
   }, [isLoading]);
+
+  // Generate store options for the filter bar
+  // This uses a Set to ensure unique store options based on storeId and name
 
   const storeOptions = useMemo(() => {
     return Array.from(
@@ -136,6 +155,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     ).map((str) => JSON.parse(str));
   }, [allProducts, i18n.language]);
 
+  // Filter products based on selected categories, stores, sale status, price range, search text, and stock status
   const productsToShow = allProducts.filter((product) => {
     const categoryMatch =
       selectedCategories.length === 0 ||
@@ -162,6 +182,9 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   });
 
+  // Sort products by ID in reverse order
+  // This uses a custom sorting function to reverse the string representation of the product ID
+
   const sortedProductsToShow = useMemo(() => {
     return [...productsToShow].sort((a, b) =>
       String(a._id)
@@ -172,6 +195,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   }, [productsToShow]);
 
+  // Toggle wishlist status for a product
+  // This checks if the product is already in the wishlist and calls addToWishlist accordingly
   const toggleWishlist = (product) => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -179,11 +204,17 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     addToWishlist(product, isInWishlist);
   };
 
+  // Handle product click to navigate to the product details page
+  // This saves the current scroll position to sessionStorage before navigating
+  // This is useful for maintaining user experience when navigating back to the homepage
+  // This allows the user to return to the same scroll position after viewing a product
   const handleProductClick = (product) => {
     sessionStorage.setItem("scrollPosition", window.scrollY);
     navigate(`/products/${product._id}`);
   };
 
+  // show loading state if isLoading is true
+  // This displays a skeleton loading state while the products are being fetched
   if (isLoading) {
     return (
       <div className="bg-primaryColor bg-opacity-10">
@@ -221,6 +252,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   }
 
+  // Render the homepage with products and filters
+  // This includes the header with a background image, a welcome message, and a button to view products
   return (
     <div className="bg-primaryColor bg-opacity-10">
       <header className="relative h-[700px] overflow-hidden">

@@ -113,6 +113,11 @@
     "submit": "Register",
     "loading": "Registering...",
     "success": "Registration successful!",
+    "terms": "I agree to the Terms and Conditions",
+    "termsLink": "Terms and Conditions",
+    "viewTerms": "View Terms and Conditions",
+    "termsTitle": "Terms and Conditions",
+    "termsContent": "By registering, you agree to our Terms and Conditions. Please read them carefully before proceeding.",
     "errors": {
       "passwordMismatch": "Passwords do not match!",
       "failed": "Registration failed.",
@@ -206,7 +211,10 @@
     "ratingSuccess": "Thank you for your rating!",
     "reviews": "Reviews",
     "about": "About the Store",
-    "outOfStock: ": "Temporarily Out of Stock"
+    "outOfStock: ": "Temporarily Out of Stock",
+    "not_found":"Oops...",
+    "not_found_title": "Product Not Found",
+    "not_found_message": "The product you are looking for does not exist or has been removed."
   },
 
   "sysadmin": {

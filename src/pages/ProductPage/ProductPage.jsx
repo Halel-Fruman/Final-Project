@@ -1,6 +1,6 @@
 // ProductPage.jsx – LCP Optimized Version without react-helmet
 import { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate,Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -8,6 +8,7 @@ import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+// ImageWithFallback component to handle WebP fallback
 const ImageWithFallback = ({ src, alt, className, ...props }) => {
   const [useFallback, setUseFallback] = useState(false);
   const webpSrc = src?.replace(/\.(jpg|jpeg|png)$/i, ".webp") || src;
@@ -23,13 +24,13 @@ const ImageWithFallback = ({ src, alt, className, ...props }) => {
   );
 };
 
+// ProductPage component to display product details and handle interactions
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
   const token = localStorage.getItem("accessToken");
   const isLoggedIn = !!token;
-
   const [product, setProduct] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -37,6 +38,11 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const [rating, setRating] = useState(0);
   const [about, setAbout] = useState("");
 
+  // Scroll to top on mount and fetch product details
+  // This ensures the page starts at the top when loaded
+  // and fetches product data from the API
+  // It also preloads the first product image in WebP format
+  // and handles errors by navigating to a 503 page if needed
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
     const fetchProduct = async () => {
@@ -53,7 +59,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
         setRating(data.averageRating || 0);
         setAbout(data.storeAbout?.[i18n.language] || data.storeAbout?.he || "");
 
-        // ✅ preload image dynamically
+        //  preload image dynamically
         const preload = document.createElement("link");
         preload.rel = "preload";
         preload.as = "image";
@@ -69,9 +75,13 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   }, [id, t, i18n.language]);
 
   useEffect(() => {
-    if (error) navigate("/503");
+    if (error==="Service Unavailable") navigate("/503");
   }, [error, navigate]);
 
+  // Function to toggle wishlist status for the product
+  // It checks if the product is already in the wishlist
+  // and calls addToWishlist with the product and its current status
+  // This allows users to add or remove products from their wishlist
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -79,6 +89,10 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     addToWishlist(product, isInWishlist);
   };
 
+  // Function to handle adding the product to the cart
+  // It checks if the user is logged in by looking for a userId in localStorage
+  // If not logged in, it shows an error message
+  // If logged in, it calls addToCart with the product ID and a quantity of 1
   const handleAddToCart = () => {
     const userId = localStorage.getItem("userId");
     if (!userId) return toast.error(t("cart.mustBeLoggedIn"));
@@ -88,6 +102,11 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
 
   const handleImageClick = (image) => setSelectedImage(image);
 
+  // Function to handle product rating
+  // It sends a POST request to the product's rate endpoint with the new rating
+  // If the rating is successful, it updates the product state and shows a success message
+  // If the user has already rated the product, it shows an error message
+  // If there's an error during the request, it shows a generic error message
   const handleRating = async (newRating) => {
     try {
       const response = await fetchWithTokenRefresh(`/api/products/${id}/rate`, {
@@ -112,6 +131,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     }
   };
 
+  // If the product is still loading, show a skeleton loader
   if (isLoading) {
     return (
       <main className="bg-gray-50">
@@ -169,7 +189,27 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     );
   }
 
-  if (!product) return <div>{t("product.notFound")}</div>;
+// If the product is not found, show a 404-like message
+  if (!product) return <div><div className="min-h-screen bg-gray-50 flex border-b flex-col items-center justify-center text-center px-4">
+      <h1 className="text-6xl font-bold text-primaryColor mb-4">{t("product.not_found", "אופס...")}</h1>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+        {t("product.not_found_title", "המוצר לא נמצא")}
+      </h2>
+      <p className="text-gray-600 mb-6 max-w-md">
+        {t(
+          "product.not_found_message",
+          "נראה שהמוצר לא קיים או שהוסר."
+        )}
+      </p>
+      <Link
+        to="/"
+        className="bg-primaryColor text-white px-6 py-2 rounded-lg shadow hover:bg-secondaryColor transition"
+      >
+        {t("not_found.back_to_home", "חזרה לדף הבית")}
+      </Link>
+    </div></div>;
+
+  // Extract product details and prepare data for rendering
 
   const language = i18n.language;
   const productName = product.name[language] || product.name["en"];
@@ -192,6 +232,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const discountedPrice = isOnSale
     ? productPrice - productPrice * (discountPercentage / 100)
     : productPrice;
+
 
   return (
     <main className="bg-gray-50">

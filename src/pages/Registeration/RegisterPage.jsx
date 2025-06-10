@@ -1,5 +1,5 @@
-import { DialogTitle } from "@headlessui/react";
-import  { useState } from "react";
+import { DialogTitle, Dialog, DialogPanel } from "@headlessui/react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 
@@ -12,6 +12,7 @@ export default function Register({ setToken, setUserId, onClose }) {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
   const [loading, setLoading] = useState(false);
+  const [showTermsModal, setShowTermsModal] = useState(false);
 
   // Handle form submission
   // This function is called when the user submits the registration form
@@ -40,9 +41,11 @@ export default function Register({ setToken, setUserId, onClose }) {
       });
       // Check if the response is successful
       if (!response.ok) {
-        if (response.status === 409) { // Conflict, email already exists
+        if (response.status === 409) {
+          // Conflict, email already exists
           toast.error(t("register.errors.emailExists"));
-        } else if (response.status === 503) { // Service unavailable
+        } else if (response.status === 503) {
+          // Service unavailable
           toast.error(t("register.errors.serverUnavailable"));
         } else {
           toast.error(t("register.errors.failed"));
@@ -68,7 +71,6 @@ export default function Register({ setToken, setUserId, onClose }) {
     }
   };
 
-
   return (
     <div className="relative p-6 bg-white rounded-md w-full max-w-md h-full overflow-auto mx-auto">
       {onClose && (
@@ -89,7 +91,9 @@ export default function Register({ setToken, setUserId, onClose }) {
       <form onSubmit={handleSubmit} className="mt-4 h-10/12 space-y-6">
         {/* First name */}
         <div>
-          <label htmlFor="firstName" className="block text-sm font-medium text-gray-900">
+          <label
+            htmlFor="firstName"
+            className="block text-sm font-medium text-gray-900">
             {t("register.first_name")}
           </label>
           <input
@@ -105,7 +109,9 @@ export default function Register({ setToken, setUserId, onClose }) {
 
         {/* Last name */}
         <div>
-          <label htmlFor="lastName" className="block text-sm font-medium text-gray-900">
+          <label
+            htmlFor="lastName"
+            className="block text-sm font-medium text-gray-900">
             {t("register.last_name")}
           </label>
           <input
@@ -121,7 +127,9 @@ export default function Register({ setToken, setUserId, onClose }) {
 
         {/* Phone */}
         <div>
-          <label htmlFor="phoneNumber" className="block text-sm font-medium text-gray-900">
+          <label
+            htmlFor="phoneNumber"
+            className="block text-sm font-medium text-gray-900">
             {t("register.phoneNumber")}
           </label>
           <input
@@ -137,7 +145,9 @@ export default function Register({ setToken, setUserId, onClose }) {
 
         {/* Email */}
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-900">
+          <label
+            htmlFor="email"
+            className="block text-sm font-medium text-gray-900">
             {t("register.email")}
           </label>
           <input
@@ -154,7 +164,9 @@ export default function Register({ setToken, setUserId, onClose }) {
 
         {/* Password */}
         <div>
-          <label htmlFor="password" className="block text-sm font-medium text-gray-900">
+          <label
+            htmlFor="password"
+            className="block text-sm font-medium text-gray-900">
             {t("register.password")}
           </label>
           <input
@@ -171,7 +183,9 @@ export default function Register({ setToken, setUserId, onClose }) {
 
         {/* Confirm Password */}
         <div>
-          <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-900">
+          <label
+            htmlFor="confirmPassword"
+            className="block text-sm font-medium text-gray-900">
             {t("register.confirmPassword")}
           </label>
           <input
@@ -195,7 +209,13 @@ export default function Register({ setToken, setUserId, onClose }) {
             className="mr-2"
           />
           <label htmlFor="terms" className="text-sm text-gray-600">
-            {t("register.terms")}
+            {t("register.terms")}{" "}
+            <button
+              type="button"
+              onClick={() => setShowTermsModal(true)}
+              className="underline text-primaryColor hover:text-secondaryColor">
+              {t("register.viewTerms")}
+            </button>
           </label>
         </div>
 
@@ -213,6 +233,30 @@ export default function Register({ setToken, setUserId, onClose }) {
           </button>
         </div>
       </form>
+      { /* Terms and Conditions Modal */}
+      <Dialog
+        open={showTermsModal}
+        onClose={() => setShowTermsModal(false)}
+        className="relative z-50">
+        <div className="fixed inset-0 bg-black/30" aria-hidden="true" />
+        <div className="fixed inset-0 flex items-center justify-center p-4">
+          <DialogPanel className="w-full max-w-2xl rounded bg-white p-6 shadow-lg overflow-y-auto max-h-[80vh]">
+            <DialogTitle className="text-xl font-semibold mb-4">
+              {t("register.termsTitle")}
+            </DialogTitle>
+            <div className="text-sm text-gray-700 space-y-4">
+              <p>{t("register.termsContent")}</p>
+            </div>
+            <div className="mt-6 text-right">
+              <button
+                onClick={() => setShowTermsModal(false)}
+                className="px-4 py-2 bg-primaryColor text-white rounded-full hover:bg-secondaryColor">
+                {t("register.close")}
+              </button>
+            </div>
+          </DialogPanel>
+        </div>
+      </Dialog>
     </div>
   );
 }

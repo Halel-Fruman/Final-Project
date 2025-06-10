@@ -50,6 +50,7 @@ const RegisterPage = lazy(() => import("./pages/Registeration/RegisterPage"));
 const NotFound = lazy(() => import("./pages/Errors/NotFound.jsx"));
 const ServiceUnavailablePage = lazy(() => import("./pages/Errors/Service.jsx"));
 
+
 const App = () => {
   const { t, i18n } = useTranslation();
   const [token, setToken] = useState(localStorage.getItem("accessToken"));
@@ -63,6 +64,7 @@ const App = () => {
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
+  // Function to handle logout and clear local storage
   const handleLogout = () => {
     localStorage.clear();
     setCartItems([]);
@@ -71,6 +73,7 @@ const App = () => {
     setRole(null);
   };
 
+  // Verify token on initial load
   useEffect(() => {
     const verifyToken = async () => {
       const storedUserId = localStorage.getItem("userId");
@@ -96,10 +99,12 @@ const App = () => {
     verifyToken();
   }, []);
 
+  // Set document direction based on language
   useEffect(() => {
     document.documentElement.dir = i18n.language === "he" ? "rtl" : "ltr";
   }, [i18n.language]);
 
+  // Load cart items when userId and token are available
   const loadCart = useCallback(async () => {
     if (userId && token) {
       const data = await fetchCart(userId, token);
@@ -120,6 +125,7 @@ const App = () => {
     }
   };
 
+  // Load wishlist items when userId and token are available
   const loadWishlist = useCallback(async () => {
     setWishlistLoading(true);
     if (!userId || !token) {
@@ -132,6 +138,7 @@ const App = () => {
     setWishlistLoading(false);
   }, [userId, token]);
 
+  // Load cart and wishlist on initial load or when token/userId changes
   useEffect(() => {
     if (token && userId) {
       loadCart();
@@ -139,6 +146,7 @@ const App = () => {
     }
   }, [token, userId, loadWishlist, loadCart]);
 
+  // Add or remove product from wishlist
   const addToWishlist = async (product, isInWishlist) => {
     const success = await updateWishlist(userId, token, product, isInWishlist);
     if (success) {
@@ -151,8 +159,12 @@ const App = () => {
     }
   };
 
+
   return (
+    // Wrap the entire app in AlertProvider for alert dialogs
     <AlertProvider>
+      {/* Use BrowserRouter with basename for deployment in subdirectory
+          Use Toaster for toast notifications*/}
       <Router basename="/shop">
         <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
         <div className="flex flex-col bg-gray-50 w-full max-w-[1920px] min-h-[100dvh] mx-auto">
