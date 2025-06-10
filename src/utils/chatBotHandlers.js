@@ -1,7 +1,7 @@
 // utils/chatBotHandlers.js
 
 export const buildMessageHistory = (messages, role) => {
- const systemPrompt = `
+  const systemPrompt = `
 You are a smart and accessible chatbot integrated into ILAN’s e-commerce website.
 Your purpose is to assist site users — private customers and store managers with disabilities — in performing useful actions in a simple, accessible, and conversational manner.
 
@@ -60,16 +60,21 @@ When the user makes a general request like “I want to add a product” or "Edi
  For editing a product:
 1. First, confirm which product to edit (based on name, ID, etc.)
 2. Then trigger the navigation: 'goToProductList'
-3. After reaching the page, trigger 'openEditProduct' to open the editing UI for that specific product
-4. Ask the user which fields they want to update
-5.If the user gives a direct and clear command (e.g., “Open the product management page”, “Show me the orders”), you are allowed to perform the action immediately by returning the appropriate 'action' field — without asking for confirmation.
-6. Collect new values step by step
-7. When all updates are collected — return:
+3. After reaching the page, trigger 'openEditProduct' to open the editing UI for that specific product.
+ 4. Ask the user which fields they want to update.
+ 5. For each field the user requests to change, collect it step-by-step.
+ 6. After each confirmed update, return:
 
-{
-  "reply": "פותח את דף ניהול המוצרים כעת.",
-  "action": "goToProductList"
-}
+ {
+   "reply": "עדכנתי את המחיר ל-10 ש\"ח.",
+   "action": "editProduct",
+   "payload": {
+     "productName": "עיפרון",
+     "newFields": {
+       "price": 10
+     }
+   }
+ }
 
 ---
 
@@ -86,6 +91,70 @@ When the user makes a general request like “I want to add a product” or "Edi
 - Is international shipping available?
 - Any product images? (provide image links)
 - Is there a discount? (percentage, start date, end date)
+
+---
+Example of editing a product:
+
+If the user says "שנה את המחיר של העיפרון ל-10 ש"ח":
+
+1. First, navigate to the product management page ('goToProductList').
+2. Then, open the specific product for editing using the 'openEditProduct' action.
+3. The 'payload' should include the product name to locate the product.
+
+Example of valid response to open the edit page:
+
+{
+  "reply": "פותח את דף עריכת המוצר.",
+  "action": "openEditProduct",
+  "payload": {
+    "productName": "עיפרון"
+  }
+}
+
+After the product form is open, ask the user what fields they want to edit.  
+Collect each field step-by-step and update them gradually.
+
+⚠️ Always proceed step-by-step:
+- Open page → Open product by name → Ask for updates → Apply updates.
+
+Example of a valid response to update product fields:
+
+{
+  "reply": "עדכנתי את שם המוצר ל-'קערה לחגים'.",
+  "action": "editProduct",
+  "payload": {
+    "productName": "קערה לחגי תשרי",
+    "newFields": {
+      "nameHe": "קערה לחגים"
+    }
+  }
+}
+
+Explanation:
+- 'productName': the current name of the product in the system.
+- 'newFields': object containing only the fields that should be updated.
+
+Allowed fields inside 'newFields':
+- nameHe (string)
+- nameEn (string)
+- price (number)
+- stock (number)
+- manufacturingCost (number)
+- descriptionHe (string)
+- descriptionEn (string)
+- highlightHe (array of strings)
+- highlightEn (array of strings)
+- selectedCategories (array of category IDs)
+- allowBackorder (boolean)
+- internationalShipping (boolean)
+- images (array of URLs)
+- discountPercentage (number)
+- discountStart (ISO date string)
+- discountEnd (ISO date string)
+
+⚠️ You must not invent field names. Use only the allowed fields.
+
+
 
 ---
 
@@ -106,7 +175,6 @@ When the user makes a general request like “I want to add a product” or "Edi
     "allowBackorder": false,
     "internationalShipping": true,
     "images": ["https://example.com/image1.jpg"],
-    "newImageUrl": "",
     "discountPercentage": 10,
     "discountStart": "2024-06-01",
     "discountEnd": "2024-06-10",
@@ -124,7 +192,7 @@ When the user makes a general request like “I want to add a product” or "Edi
 - 'openAddProduct' — Clicks the add button
 - 'openAddProductForm' — Fills the product form using payload
 - 'openEditProduct' — Opens a specific product for editing
-- 'editProduct' — Applies field updates
+- 'editProduct' — Applies specific field changes to a product currently open for editing. Requires 'productName' and 'newFields' keys in the payload This action may be used repeatedly, once per confirmed field update..
 - 'viewStoreOrders'
 - 'viewTransactions'
 - 'showStats'
@@ -196,74 +264,75 @@ export const createActionHandlers = (
   openAddProductForm: (payload) => {
     console.log(window.location.pathname);
     if (window.location.pathname === "/shop/store-management") {
+      console.log("true");
       window.dispatchEvent(
         new CustomEvent("autofillProductForm", { detail: payload })
       );
       speak("ממלא את פרטי המוצר בטופס.");
     } else {
+      console.log("false");
+
       navigate("/store-management", {
         state: { tab: "products", openAddProductForm: true, autofill: payload },
         replace: true,
       });
-    }
-  },
-
-  openEditProduct: (productId) => {
-    if (!productId) {
-      speak("לא צוין מזהה מוצר לעריכה.");
-      return;
-    }
-    if (window.location.pathname === "/shop/store-management") {
       window.dispatchEvent(
-        new CustomEvent("openEditProductForm", { detail: { productId } })
+        new CustomEvent("autofillProductForm", { detail: payload })
       );
-      speak("פותח את טופס עריכת המוצר.");
-    } else {
-      speak("יש לפתוח קודם את דף ניהול המוצרים.");
     }
   },
 
-  editProduct: async (payload) => {
-    if (
-      !payload ||
-      !payload.productId ||
-      !payload.updates ||
-      !payload.storeName
-    ) {
-      console.warn("editProduct: חסר מידע");
+  openEditProduct: (payload) => {
+    const { productName } = payload || {};
+
+    if (!productName) {
+      speak("לא צוין שם מוצר לעריכה.");
       return;
     }
 
-    try {
-      const res = await fetch(
-        `/api/Stores/by-name?name=${encodeURIComponent(payload.storeName)}`
-      );
-      const store = await res.json();
-
-      if (!store || !store._id) {
-        speak("לא הצלחתי למצוא את החנות לפי השם שציינת.");
-        return;
-      }
-
-      const storeId = store._id;
-
+    if (window.location.pathname !== "/store-management") {
+      // לא בדף הנכון — ננווט קודם
       navigate("/store-management", {
+        state: { tab: "products" }, // אם יש לך טאב מוצרים
         replace: true,
-        state: {
-          tab: "products",
-          openEditProductForm: true,
-          editProductData: {
-            productId: payload.productId,
-            updates: payload.updates,
-          },
-          storeId,
-        },
       });
 
-      speak("פותח את טופס עריכת המוצר.");
-    } catch (err) {
-      console.error("editProduct error:", err);
-      speak("אירעה שגיאה בעת ניסיון לאתר את החנות.");
+      // רגע! לא להמשיך מיד — נחכה שהניווט יקרה
+      setTimeout(() => {
+        window.dispatchEvent(
+          new CustomEvent("openEditProduct", { detail: { productName } })
+        );
+        speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
+      }, 500); // חצי שנייה שיהיה זמן לניווט
+      return;
+    }
+
+    // אם כבר בדף הנכון — שולח ישר
+    window.dispatchEvent(
+      new CustomEvent("openEditProduct", { detail: { productName } })
+    );
+    speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
+  },
+
+  editProduct: (payload) => {
+    if (!payload || !payload.productName || !payload.newFields) {
+      speak("חסר מידע לעדכון המוצר.");
+      return;
+    }
+
+    const isEditOpen = !!document.getElementById("edit-product-modal");
+
+    if (window.location.pathname === "/store-management" && isEditOpen) {
+      window.dispatchEvent(
+        new CustomEvent("autofillEditProductForm", {
+          detail: payload.newFields,
+        })
+      );
+      speak("ממלא את פרטי המוצר המעודכנים.");
+    } else if (!isEditOpen) {
+      speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
+    } else {
+      speak("יש לפתוח את דף ניהול המוצרים תחילה.");
     }
   },
 

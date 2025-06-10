@@ -25,7 +25,6 @@ import Sidebar from "./pages/SysAdmin/Sidebar.jsx";
 import Modal from "./components/Modal";
 import LoginPage from "./pages/PersonalArea/LoginPage";
 import RegisterPage from "./pages/Registeration/RegisterPage";
-import AddAddressPage from "./pages/Registeration/AddAddressPage.jsx";
 import StoreManagement from "./pages/StoreManagement/StoreManagement.jsx";
 import WishlistModal from "./components/WishlistModal";
 import CheckoutPage from "./pages/Checkout/Checkout";
@@ -34,7 +33,7 @@ import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx";
 import { useNavigate } from "react-router-dom";
 import NotFound from "./pages/Errors/NotFound.jsx";
 import ServiceUnavailablePage from "./pages/Errors/Service.jsx";
-import { fetchWithTokenRefresh } from "./utils/authHelpers";
+import { refreshAccessToken } from "./utils/authHelpers";
 
 const App = () => {
   const { t, i18n } = useTranslation();

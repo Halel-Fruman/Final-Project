@@ -35,6 +35,7 @@ const ChatBot = ({
   const [isHidden, setIsHidden] = useState(false);
   const [conversationContext, setConversationContext] = useState({});
   const bottomRef = React.useRef(null);
+  const [isListening, setIsListening] = useState(false);
 
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -97,20 +98,26 @@ const ChatBot = ({
   });
 
   const startListening = () => {
+    setIsListening(true);
     const recognition = new (window.SpeechRecognition ||
       window.webkitSpeechRecognition)();
     recognition.lang = "he-IL";
     recognition.interimResults = false;
+ recognition.onend = () => {
+      setIsListening(false); // מפסיק להאזין אוטומטית כשהמערכת מסיימת
+    };
 
+    recognition.onerror = (e) => {
+      console.error(e);
+      setIsListening(false); // שגיאה -> מפסיק להאזין
+    };
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
       setInput(transcript);
       sendMessage(transcript);
     };
 
-    recognition.onerror = (event) => {
-      console.error("Speech recognition error:", event.error);
-    };
+    
 
     recognition.start();
   };
@@ -218,7 +225,7 @@ const ChatBot = ({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 60, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="w-80 h-[30rem] bg-white rounded-xl shadow-2xl flex flex-col p-4 mt-2">
+                className="w-80 h-[30rem] bg-white rounded-3xl shadow-2xl flex flex-col p-4 mt-2">
                 <div className="mb-2">
                   <label className="text-xs text-gray-500 block mb-1">
                     בחר קול
@@ -257,7 +264,7 @@ const ChatBot = ({
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       transition={{ duration: 0.2 }}
-                      className={`p-2 rounded-lg max-w-[80%] whitespace-pre-wrap ${
+                      className={`p-2 rounded-2xl max-w-[80%] whitespace-pre-wrap ${
                         msg.role === "user"
                           ? "bg-blue-100 self-end"
                           : "bg-secondaryColor self-start"
@@ -274,7 +281,10 @@ const ChatBot = ({
                 <div className="flex items-center gap-2 mt-2">
                   <button
                     onClick={startListening}
-                    className="text-primaryColor text-xl"
+                    disabled={isListening}
+                    className={`text-xl transition-colors duration-300 ${
+          isListening ? "text-red-500" : "text-primaryColor"
+        }`}
                     aria-label="דבר">
                     <FaMicrophone />
                   </button>

@@ -1,12 +1,16 @@
 // קובץ: ProductManagement.jsx
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect,useRef  } from "react";
 import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { useLocation, useNavigate } from "react-router-dom";
+import VoiceInputButton from "../../components/VoiceInputButton"; // או הנתיב שמתאים לך
 
+
+
+  
 const ProductManagement = ({
   storeId,
   autoOpenAddForm = false,
@@ -17,13 +21,17 @@ const ProductManagement = ({
   const [isAddingProduct, setIsAddingProduct] = useState(
     autoOpenAddForm || false
   );
+const isAddingProductRef = useRef(isAddingProduct);
+
   const [searchQuery, setSearchQuery] = useState("");
   const { showAlert } = useAlert();
   const [editingProduct, setEditingProduct] = useState(null);
   const [isEditing, setIsEditing] = useState(false);
   const [editProductId, setEditProductId] = useState(null);
   const navigate = useNavigate();
-  const [autofillPayload, setAutofillPayload] = useState(null);
+const [pendingEditRequest, setPendingEditRequest] = useState(null);
+const [pendingAutofillPayload, setPendingAutofillPayload] = useState(null);
+const [pendingEditFields, setPendingEditFields] = useState(null);
 
   const handleEdit = (product) => {
     setEditingProduct(product);
@@ -52,8 +60,11 @@ const ProductManagement = ({
       highlightEn: safe.highlightEn || [],
     };
   });
+useEffect(() => {
+  isAddingProductRef.current = isAddingProduct;
+}, [isAddingProduct]);
 
-  useEffect(() => {
+ useEffect(() => {
     const handler = (e) => {
       const data = e.detail;
       if (data) {
@@ -65,12 +76,16 @@ const ProductManagement = ({
     window.addEventListener("autofillProductForm", handler);
     return () => window.removeEventListener("autofillProductForm", handler);
   }, []);
+  
   useEffect(() => {
-    if (isAddingProduct && autofillPayload) {
-      setNewProduct((prev) => ({ ...prev, ...autofillPayload }));
-      setAutofillPayload(null);
-    }
-  }, [isAddingProduct, autofillPayload]);
+  if (pendingAutofillPayload) {
+    console.log("✅ הטופס נפתח — ממלא את השדות עכשיו.");
+    const mapped = mapPayloadToNewProduct(pendingAutofillPayload);
+    setNewProduct((prev) => ({ ...prev, ...mapped }));
+    setPendingAutofillPayload(null);
+  }
+}, [isAddingProduct, pendingAutofillPayload]);
+
 
   useEffect(() => {
     const handleOpenAdd = () => {
@@ -83,6 +98,117 @@ const ProductManagement = ({
     return () => window.removeEventListener("openAddProduct", handleOpenAdd);
   }, []);
   const location = useLocation();
+  
+
+
+  useEffect(() => {
+  const handleFindProductByName = (e) => {
+    const { productName } = e.detail;
+    if (productName) {
+      const productId = findProductIdByName(productName);
+      if (productId) {
+        window.dispatchEvent(
+          new CustomEvent("openEditProductForm", { detail: { productId } })
+        );
+      } else {
+        console.warn("לא נמצא מוצר עם השם:", productName);
+        showAlert("לא נמצא מוצר עם השם שסיפקת.", "error");
+      }
+    }
+  };
+
+  window.addEventListener("findProductByName", handleFindProductByName);
+  return () => window.removeEventListener("findProductByName", handleFindProductByName);
+}, [products]);
+
+
+  useEffect(() => {
+  const handleEditProductForm = (e) => {
+    const { productId } = e.detail;
+    if (productId) {
+      const productToEdit = products.find((p) => p._id === productId);
+      if (productToEdit) {
+        setEditingProduct(productToEdit);
+        setIsAddingProduct(true); // יפתח את הטופס
+      } else {
+        console.error("⚠️ לא נמצא מוצר עם המזהה:", productId);
+      }
+    }
+  };
+
+  window.addEventListener("openEditProductForm", handleEditProductForm);
+  return () => window.removeEventListener("openEditProductForm", handleEditProductForm);
+}, [products]);
+
+useEffect(() => {
+  const handleAutofillEdit = (e) => {
+    const updates = e.detail;
+    if (!updates) return;
+
+    if (isAddingProductRef.current) {
+      // טופס פתוח — נעדכן מיידית
+      setNewProduct((prev) => ({
+        ...prev,
+        ...mapUpdatesToNewProduct(updates),
+      }));
+    } else {
+      // טופס עדיין לא פתוח — נשמור להמשך
+      setPendingEditFields(updates);
+
+    }
+  };
+
+  window.addEventListener("autofillEditProductForm", handleAutofillEdit);
+  return () =>
+    window.removeEventListener("autofillEditProductForm", handleAutofillEdit);
+}, []);
+
+useEffect(() => {
+  if (pendingEditFields && isAddingProduct) {
+    // מילוי ברגע שהטופס נפתח
+    setNewProduct((prev) => ({
+      ...prev,
+      ...mapUpdatesToNewProduct(pendingEditFields),
+    }));
+    setPendingEditFields(null);
+  }
+}, [isAddingProduct, pendingEditFields]);
+
+
+
+
+
+useEffect(() => {
+  const handler = (e) => {
+    console.log("📥 קיבלתי בקשה לפתוח מוצר לעריכה:", e.detail);
+    setPendingEditRequest(e.detail);
+  };
+
+  window.addEventListener("openEditProduct", handler);
+  return () => window.removeEventListener("openEditProduct", handler);
+}, []);
+
+useEffect(() => {
+  if (pendingEditRequest && products.length > 0) {
+    const { productName } = pendingEditRequest;
+
+    console.log("🔍 מוצא ID למוצר:", productName);
+    const productId = findProductIdByName(productName);
+
+    if (productId) {
+      console.log("✅ נמצא מוצר, שולח פתיחה:", productId);
+      window.dispatchEvent(
+        new CustomEvent("openEditProductForm", { detail: { productId } })
+      );
+      setPendingEditRequest(null);
+    } else {
+      console.warn("❌ לא נמצא מוצר עם השם:", productName);
+      showAlert("לא נמצא מוצר עם השם שסיפקת.", "error");
+      setPendingEditRequest(null);
+    }
+  }
+}, [pendingEditRequest, products]);
+
 
   useEffect(() => {
     if (location.state?.openAddProductForm) {
@@ -140,6 +266,73 @@ const ProductManagement = ({
       highlightEn: [],
     });
   };
+   
+const mapPayloadToNewProduct = (payload) => {
+  return {
+    name: {
+      en: payload.nameEn || "",
+      he: payload.nameHe || "",
+    },
+    description: {
+      en: payload.descriptionEn || "",
+      he: payload.descriptionHe || "",
+    },
+    price: payload.price ?? "", // אין צורך להמיר ל-String, מחיר הוא מספר
+    stock: payload.stock ?? "",
+    manufacturingCost: payload.manufacturingCost ?? "",
+    highlight: {
+      en: payload.highlightEn || [],
+      he: payload.highlightHe || [],
+    },
+    selectedCategories: payload.selectedCategories || [],
+    allowBackorder: payload.allowBackorder || false,
+    internationalShipping: payload.internationalShipping || false,
+    images: payload.images || [],
+    newImageUrl: "",
+    discountPercentage: payload.discountPercentage ?? "",
+    discountStart: payload.discountStart || "",
+    discountEnd: payload.discountEnd || "",
+  };
+};
+
+
+
+  const findProductIdByName = (productName) => {
+  if (!productName) return null;
+  
+  const normalized = productName.trim().toLowerCase();
+
+  const found = products.find((product) => {
+    const nameHe = product.name?.he?.toLowerCase() || "";
+    const nameEn = product.name?.en?.toLowerCase() || "";
+    return nameHe.includes(normalized) || nameEn.includes(normalized);
+  });
+
+  return found?._id || null;
+};
+
+
+  const mapUpdatesToNewProduct = (updates) => {
+  const mapped = {};
+  if (updates.nameHe) mapped.nameHe = updates.nameHe;
+  if (updates.nameEn) mapped.nameEn = updates.nameEn;
+  if (updates.price) mapped.price = updates.price;
+  if (updates.stock) mapped.stock = updates.stock;
+  if (updates.descriptionHe) mapped.descriptionHe = updates.descriptionHe;
+  if (updates.descriptionEn) mapped.descriptionEn = updates.descriptionEn;
+  if (updates.highlightHe) mapped.highlightHe = updates.highlightHe;
+  if (updates.highlightEn) mapped.highlightEn = updates.highlightEn;
+  if (updates.manufacturingCost) mapped.manufacturingCost = updates.manufacturingCost;
+  if (updates.allowBackorder !== undefined) mapped.allowBackorder = updates.allowBackorder;
+  if (updates.internationalShipping !== undefined) mapped.internationalShipping = updates.internationalShipping;
+  if (updates.images) mapped.images = updates.images;
+  if (updates.discountPercentage) mapped.discountPercentage = updates.discountPercentage;
+  if (updates.discountStart) mapped.discountStart = updates.discountStart;
+  if (updates.discountEnd) mapped.discountEnd = updates.discountEnd;
+  if (updates.selectedCategories) mapped.selectedCategories = updates.selectedCategories;
+  return mapped;
+};
+
 
   const handleSaveProduct = () => {
     if (
@@ -352,112 +545,179 @@ const ProductManagement = ({
           <Icon icon="mdi:export" width="20" />
         </button>
       </div>
+
+
+      {/*---page--*/}
+
       {isAddingProduct && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
           <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-2xl font-bold mb-4 text-center">
               {editingProduct ? "עריכת מוצר" : "הוסף מוצר"}
             </h2>
+{/* שם מוצר */}
+<div className="mb-4 grid grid-cols-2 gap-4">
+  <div>
+    <label className="block mb-1 font-bold">שם בעברית</label>
+    <div className="relative w-full">
+      
+      <input
+        aria-label="Product Name in Hebrew"
+        type="text"
+        className="w-full border    pr-14 pl-3 py-2 py-2 rounded-full shadow-sm" // יותר padding בשביל המיקרופון
+        value={newProduct.nameHe}
+        onChange={(e) =>
+          setNewProduct({ ...newProduct, nameHe: e.target.value })
+        }
+        
+      />
+      <VoiceInputButton
+        lang="he-IL"
+        onResult={(text) => setNewProduct((prev) => ({ ...prev, nameHe: text }))}
+      />
+    </div>
+  </div>
+  <div>
+    <label className="block mb-1 font-bold">שם באנגלית</label>
+    <div className="relative">
+      <input
+        aria-label="Product Name in English"
+        type="text"
+        className="w-full border px-12 py-2 rounded-full shadow-sm"
+        value={newProduct.nameEn}
+        onChange={(e) =>
+          setNewProduct({ ...newProduct, nameEn: e.target.value })
+        }
+      />
+      <VoiceInputButton
+        lang="en-US"
+        onResult={(text) => setNewProduct((prev) => ({ ...prev, nameEn: text }))}
+      />
+    </div>
+  </div>
+</div>
 
-            {/* שם מוצר */}
+{/* תיאור */}
+<div className="mb-4">
+  <label className="block mb-1 font-bold">תיאור בעברית</label>
+  <div className="relative">
+    <textarea
+      aria-label="Product Description in Hebrew"
+      className="w-full border px-12 py-2 rounded-full shadow-sm"
+      value={newProduct.descriptionHe}
+      onChange={(e) =>
+        setNewProduct({
+          ...newProduct,
+          descriptionHe: e.target.value,
+        })
+      }
+    />
+    <VoiceInputButton
+      lang="he-IL"
+      onResult={(text) => setNewProduct((prev) => ({ ...prev, descriptionHe: text }))}
+    />
+  </div>
+</div>
+
+<div className="mb-4">
+  <label className="block mb-1 font-bold">תיאור באנגלית</label>
+  <div className="relative">
+    <textarea
+      aria-label="Product Description in English"
+      className="w-full border px-12 py-2 rounded-full shadow-sm"
+      value={newProduct.descriptionEn}
+      onChange={(e) =>
+        setNewProduct({
+          ...newProduct,
+          descriptionEn: e.target.value,
+        })
+      }
+    />
+    <VoiceInputButton
+      lang="en-US"
+      onResult={(text) => setNewProduct((prev) => ({ ...prev, descriptionEn: text }))}
+    />
+  </div>
+</div>
+<div className="mb-4">
+  <label className="block font-bold mb-1 font-bold">מאפיינים בעברית (שורה לכל מאפיין)</label>
+  <div className="relative">
+    <textarea
+      aria-label="Product Highlights in Hebrew"
+      className="w-full border px-10 py-2 rounded-full shadow-sm"
+      value={newProduct.highlightHe.join("\n")}
+      onChange={(e) =>
+        setNewProduct({
+          ...newProduct,
+          highlightHe: e.target.value.split("\n"),
+        })
+      }
+    />
+    <VoiceInputButton
+      lang="he-IL"
+      onResult={(text) => {
+        const features = text
+          .split(/סיים|פסיק|נקודה|,|\.|;/g)
+          .map((item) => item.trim())
+          .filter((item) => item);
+
+        setNewProduct((prev) => ({
+          ...prev,
+          highlightHe: features,
+        }));
+      }}
+    />
+        </div>
+
+    {/* טקסט עזר בפנים */}
+    <div className=" text-gray-400 text-xs mt-0 bg-opacity-80 px-1 rounded">
+      בעת תמלול אמור "סיים", "פסיק" או "נקודה" כדי להפריד בין מאפיינים.
+  </div>
+</div>
+
+
+<div className="mb-4">
+  <label className="block font-bold mb-1">מאפיינים באנגלית (שורה לכל מאפיין)</label>
+  <div className="relative">
+    <textarea
+      aria-label="Product Highlights in English"
+      className="w-full h- border px-10 py-2 rounded-full shadow-sm"
+      value={newProduct.highlightEn.join("\n")}
+      onChange={(e) =>
+        setNewProduct({
+          ...newProduct,
+          highlightEn: e.target.value.split("\n"),
+        })
+      }
+    />
+    <VoiceInputButton
+      lang="en-US"
+      onResult={(text) => {
+        const features = text
+          .split(/comma|dot|semicolon|end/gi)
+          .map((item) => item.trim())
+          .filter((item) => item);
+
+        setNewProduct((prev) => ({
+          ...prev,
+          highlightEn: features,
+        }));
+      }}
+    />
+  </div>
+   <div className=" text-gray-400 text-xs mt-0 bg-opacity-80 px-1 rounded">
+   .While dictating, say "comma", "dot", or "end" to separate features
+  </div>
+</div>
+
+
             <div className="mb-4 grid grid-cols-2 gap-4">
               <div>
-                <label className="block mb-1">שם בעברית</label>
-                <input
-                  aria-label="Product Name in Hebrew"
-                  type="text"
-                  className="w-full border px-3 py-2 rounded-md shadow-sm"
-                  value={newProduct.nameHe}
-                  onChange={(e) =>
-                    setNewProduct({ ...newProduct, nameHe: e.target.value })
-                  }
-                />
-              </div>
-              <div>
-                <label className="block mb-1">שם באנגלית</label>
-                <input
-                  aria-label="Product Name in English"
-                  type="text"
-                  className="w-full border px-3 py-2 rounded-md shadow-sm"
-                  value={newProduct.nameEn}
-                  onChange={(e) =>
-                    setNewProduct({ ...newProduct, nameEn: e.target.value })
-                  }
-                />
-              </div>
-            </div>
-
-            {/* תיאור */}
-            <div className="mb-4">
-              <label className="block mb-1">תיאור בעברית</label>
-              <textarea
-                aria-label="Product Description in Hebrew"
-                className="w-full border px-3 py-2 rounded-md shadow-sm"
-                value={newProduct.descriptionHe}
-                onChange={(e) =>
-                  setNewProduct({
-                    ...newProduct,
-                    descriptionHe: e.target.value,
-                  })
-                }
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block mb-1">תיאור באנגלית</label>
-              <textarea
-                aria-label="Product Description in English"
-                className="w-full border px-3 py-2 rounded-md shadow-sm"
-                value={newProduct.descriptionEn}
-                onChange={(e) =>
-                  setNewProduct({
-                    ...newProduct,
-                    descriptionEn: e.target.value,
-                  })
-                }
-              />
-            </div>
-            <div className="mb-4">
-              <label className="block font-bold mb-1">
-                מאפיינים בעברית (שורה לכל מאפיין)
-              </label>
-              <textarea
-                aria-label="Product Highlights in Hebrew"
-                className="w-full border px-3 py-2 rounded-md shadow-sm"
-                value={newProduct.highlightHe.join("\n")}
-                onChange={(e) =>
-                  setNewProduct({
-                    ...newProduct,
-                    highlightHe: e.target.value.split("\n"),
-                  })
-                }
-              />
-            </div>
-
-            <div className="mb-4">
-              <label className="block font-bold mb-1">
-                מאפיינים באנגלית (שורה לכל מאפיין)
-              </label>
-              <textarea
-                aria-label="Product Highlights in English"
-                className="w-full border px-3 py-2 rounded-md shadow-sm"
-                value={newProduct.highlightEn.join("\n")}
-                onChange={(e) =>
-                  setNewProduct({
-                    ...newProduct,
-                    highlightEn: e.target.value.split("\n"),
-                  })
-                }
-              />
-            </div>
-
-            <div className="mb-4 grid grid-cols-2 gap-4">
-              <div>
-                <label className="block mb-1">מחיר</label>
+                <label className="block mb-1 font-bold">מחיר</label>
                 <input
                   aria-label="Product Price"
                   type="number"
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border px-3 py-2 rounded-full"
                   value={newProduct.price}
                   onChange={(e) =>
                     setNewProduct({
@@ -468,11 +728,11 @@ const ProductManagement = ({
                 />
               </div>
               <div>
-                <label className="block mb-1">עלות ייצור</label>
+                <label className="block mb-1 font-bold font-bold">עלות ייצור</label>
                 <input
                   aria-label="Manufacturing Cost"
                   type="number"
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border px-3 py-2 rounded-full"
                   value={newProduct.manufacturingCost || ""}
                   onChange={(e) =>
                     setNewProduct({
@@ -486,11 +746,11 @@ const ProductManagement = ({
 
             <div className="mb-4 grid grid-cols-3 gap-4">
               <div>
-                <label className="block mb-1">אחוז מבצע</label>
+                <label className="block mb-1 font-bold">אחוז מבצע</label>
                 <input
                   aria-label="Discount Percentage"
                   type="number"
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border px-3 py-2 rounded-full"
                   value={newProduct.discountPercentage}
                   onChange={(e) =>
                     setNewProduct({
@@ -501,11 +761,11 @@ const ProductManagement = ({
                 />
               </div>
               <div>
-                <label className="block mb-1">תאריך התחלה</label>
+                <label className="block mb-1 font-bold">תאריך התחלה</label>
                 <input
                   aria-label="Discount Start Date"
                   type="date"
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border px-3 py-2 rounded-full"
                   value={newProduct.discountStart}
                   onChange={(e) =>
                     setNewProduct({
@@ -516,11 +776,11 @@ const ProductManagement = ({
                 />
               </div>
               <div>
-                <label className="block mb-1">תאריך סיום</label>
+                <label className="block mb-1 font-bold">תאריך סיום</label>
                 <input
                   aria-label="Discount End Date"
                   type="date"
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border px-3 py-2 rounded-full"
                   value={newProduct.discountEnd}
                   onChange={(e) =>
                     setNewProduct({
@@ -534,11 +794,11 @@ const ProductManagement = ({
 
             <div className="mb-4 grid grid-cols-3 gap-4">
               <div>
-                <label className="block mb-1">מלאי</label>
+                <label className="block mb-1 font-bold">מלאי</label>
                 <input
                   aria-label="Product Stock"
                   type="number"
-                  className="w-full border px-3 py-2 rounded-md"
+                  className="w-full border px-3 py-2 rounded-full"
                   value={newProduct.stock}
                   onChange={(e) =>
                     setNewProduct({
@@ -609,7 +869,7 @@ const ProductManagement = ({
                   aria-label="Image URL"
                   type="text"
                   placeholder="הדבק קישור לתמונה"
-                  className="flex-grow border px-3 py-2 rounded-md"
+                  className="flex-grow border px-3 py-2 rounded-full"
                   value={newProduct.newImageUrl || ""}
                   onChange={(e) =>
                     setNewProduct({
@@ -620,7 +880,8 @@ const ProductManagement = ({
                 />
                 <button
                   type="button"
-                  className="bg-blue-700 font-bold text-xl text-white px-3 py-2 rounded-md"
+className="bg-white text-green-600 font-semibold text-base px-4 py-2 rounded-full border-2 border-green-500 shadow-sm hover:bg-green-50 hover:shadow-md hover:scale-105 transform transition duration-300 ease-in-out"
+
                   onClick={() => {
                     if (newProduct.newImageUrl) {
                       setNewProduct({
@@ -706,12 +967,12 @@ const ProductManagement = ({
 
             <div className="flex justify-between mt-6">
               <button
-                className="bg-gray-200 px-4 py-2 rounded hover:bg-gray-300"
+                className="bg-gray-200 px-4 py-2 rounded-full hover:bg-gray-300"
                 onClick={handleCancel}>
                 ביטול
               </button>
               <button
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700"
                 onClick={handleSaveProduct}
                 data-chat-approve="true">
                 {editingProduct ? "שמור שינויים" : "הוסף מוצר"}
@@ -720,6 +981,7 @@ const ProductManagement = ({
           </div>
         </div>
       )}
+{/*---page--*/}
 
       <div className="border rounded-lg shadow overflow-hidden">
         {/* Desktop View */}
