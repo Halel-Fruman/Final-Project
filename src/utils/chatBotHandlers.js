@@ -238,6 +238,8 @@ export const createActionHandlers = (
   externalHandlers = {}
 ) => {
   let productName = "";
+  let lastEditedProductId = null; // נשמור את מזהה המוצר שנערך לאחרונה
+
   const setProductName = (name) => {
     if (typeof name === "string") {
       productName = name.trim();
@@ -247,130 +249,141 @@ export const createActionHandlers = (
       productName = "";
     }
   };
-  return{
-  goToProductList: () => {
-    navigate("/store-management", {
-      state: { tab: "products" },
-      replace: true,
-    });
-    speak("מעביר אותך לעמוד ניהול המוצרים.");
-  },
 
-  openAddProduct: () => {
-    if (window.location.pathname === "/store-management") {
-      const event = new Event("openAddProductForm");
-      window.dispatchEvent(event);
-      speak("פותח את טופס הוספת המוצר.");
-    } else {
+  // נעדכן את lastEditedProductId כאשר מתקבל אירוע פתיחת טופס עריכה
+  window.addEventListener("openEditProductForm", (e) => {
+    if (e.detail?.productId) {
+      lastEditedProductId = e.detail.productId;
+    }
+  });
+
+  return {
+    goToProductList: () => {
       navigate("/store-management", {
-        state: { tab: "products", openAddProductForm: true },
+        state: { tab: "products" },
         replace: true,
       });
-      const event = new Event("openAddProductForm");
-      window.dispatchEvent(event);
-    }
-  },
+      speak("מעביר אותך לעמוד ניהול המוצרים.");
+    },
 
-  openAddProductForm: (payload) => {
-    console.log(window.location.pathname);
-    if (window.location.pathname === "/shop/store-management") {
-      console.log("true");
-      window.dispatchEvent(
-        new CustomEvent("autofillProductForm", { detail: payload })
-      );
-      speak("ממלא את פרטי המוצר בטופס.");
-    } else {
-      console.log("false");
+    openAddProduct: () => {
+      if (window.location.pathname === "/store-management") {
+        const event = new Event("openAddProductForm");
+        window.dispatchEvent(event);
+        speak("פותח את טופס הוספת המוצר.");
+      } else {
+        navigate("/store-management", {
+          state: { tab: "products", openAddProductForm: true },
+          replace: true,
+        });
+        const event = new Event("openAddProductForm");
+        window.dispatchEvent(event);
+      }
+    },
 
-      navigate("/store-management", {
-        state: { tab: "products", openAddProductForm: true, autofill: payload },
-        replace: true,
-      });
-      window.dispatchEvent(
-        new CustomEvent("autofillProductForm", { detail: payload })
-      );
-    }
-  },
-
-  openEditProduct: (payload) => {
-    setProductName(payload || {});
-
-    if (!productName) {
-      speak("לא צוין שם מוצר לעריכה.");
-      return;
-    }
-
-    if (window.location.pathname !== "/store-management") {
-      // לא בדף הנכון — ננווט קודם
-      navigate("/store-management", {
-        state: { tab: "products" }, // אם יש לך טאב מוצרים
-        replace: true,
-      });
-
-      // רגע! לא להמשיך מיד — נחכה שהניווט יקרה
-      setTimeout(() => {
+    openAddProductForm: (payload) => {
+      if (window.location.pathname === "/shop/store-management") {
         window.dispatchEvent(
-          new CustomEvent("openEditProduct", { detail: { productName } })
+          new CustomEvent("autofillProductForm", { detail: payload })
         );
-        speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-      }, 500); // חצי שנייה שיהיה זמן לניווט
-      return;
-    }
-
-    // אם כבר בדף הנכון — שולח ישר
-    window.dispatchEvent(
-      new CustomEvent("openEditProduct", { detail: { productName } })
-    );
-    speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-  },
-
-  editProduct: (payload) => {
-    if (!payload || !payload.productName || !payload.newFields) {
-      console.warn("Invalid payload for editProduct:", payload);
-      speak("חסר מידע לעדכון המוצר.");
-      return;
-    }
-    console.log("editProduct payload:", payload);
-
-    // const isEditOpen = document.getElementById("edit-product-modal");
-    // console.log("isEditOpen:", isEditOpen);
-    if (window.location.pathname === "/shop/store-management") {
-      console.log("here");
-       window.dispatchEvent(
-          new CustomEvent("autofillEditProductForm", {
-            detail: {
-              newFields: payload.newFields,
-              productName: payload.productName,
-            },
-          })
+        speak("ממלא את פרטי המוצר בטופס.");
+      } else {
+        navigate("/store-management", {
+          state: {
+            tab: "products",
+            openAddProductForm: true,
+            autofill: payload,
+          },
+          replace: true,
+        });
+        window.dispatchEvent(
+          new CustomEvent("autofillProductForm", { detail: payload })
         );
-      speak("ממלא את פרטי המוצר המעודכנים.");
-      // } else if (!isEditOpen) {
-      //   speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
-    } else {
-      speak("יש לפתוח את דף ניהול המוצרים תחילה.");
-    }
-  },
+      }
+    },
 
-  viewStoreOrders: () => navigate("/store/orders"),
-  showStats: () => navigate("/store/analytics"),
-  openSettings: () => navigate("/store/settings"),
-  goToHome: () => navigate("/"),
-  openHelpCenter: () => navigate("/help"),
-  trackOrder: () => navigate("/track-order"),
-  contactSupport: () => navigate("/contact"),
-  goToFavorites: () => navigate("/favorites"),
-  openSearchPage: () => navigate("/search"),
-  openCategories: () => navigate("/categories"),
-  goToPersonalArea: () => navigate("/personal-area"),
-  goToPersonalOrders: () =>
-    navigate("/personal-area", { state: { selectedTab: "orders" } }),
-  viewTransactions: () => navigate("/store/transactions"),
+    openEditProduct: (payload) => {
+      setProductName(payload || {});
 
-  openCart: externalHandlers.onOpenCart,
-  openWishlist: externalHandlers.onOpenWishlist,
-  logout: externalHandlers.onLogout,
-}};
+      if (!productName) {
+        speak("לא צוין שם מוצר לעריכה.");
+        return;
+      }
+
+      lastEditedProductId = null; // ננקה מזהה קודם
+
+      if (window.location.pathname !== "/store-management") {
+        navigate("/store-management", {
+          state: { tab: "products" },
+          replace: true,
+        });
+
+        setTimeout(() => {
+          window.dispatchEvent(
+            new CustomEvent("openEditProduct", { detail: { productName } })
+          );
+          speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
+        }, 500);
+        return;
+      }
+
+      window.dispatchEvent(
+        new CustomEvent("openEditProduct", { detail: { productName } })
+      );
+      speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
+    },
+
+    editProduct: (payload) => {
+  if (!payload || !payload.newFields) {
+    speak("חסר מידע לעדכון המוצר.");
+    return;
+  }
+
+  // ננסה לקבל את ה־productId ישירות מה־window או DOM או משתנה גלובלי
+  let productId = null;
+
+  try {
+    // אם אתה שומר את editingProduct ב־window (לבדיקה בלבד)
+    productId = window.__editingProductId;
+  } catch (e) {}
+
+  if (!productId) {
+    productId = localStorage.getItem("lastEditedProductId");
+  }
+
+  window.dispatchEvent(
+    new CustomEvent("autofillEditProductForm", {
+      detail: {
+        productId: productId || undefined,
+        productName: payload.productName || productName,
+        newFields: payload.newFields,
+      },
+    })
+  );
+
+  speak("מעדכן את פרטי המוצר.");
+},
+
+    viewStoreOrders: () => navigate("/store/orders"),
+    showStats: () => navigate("/store/analytics"),
+    openSettings: () => navigate("/store/settings"),
+    goToHome: () => navigate("/"),
+    openHelpCenter: () => navigate("/help"),
+    trackOrder: () => navigate("/track-order"),
+    contactSupport: () => navigate("/contact"),
+    goToFavorites: () => navigate("/favorites"),
+    openSearchPage: () => navigate("/search"),
+    openCategories: () => navigate("/categories"),
+    goToPersonalArea: () => navigate("/personal-area"),
+    goToPersonalOrders: () =>
+      navigate("/personal-area", { state: { selectedTab: "orders" } }),
+    viewTransactions: () => navigate("/store/transactions"),
+
+    openCart: externalHandlers.onOpenCart,
+    openWishlist: externalHandlers.onOpenWishlist,
+    logout: externalHandlers.onLogout,
+  };
+};
 
 export const handleAction = (
   action,

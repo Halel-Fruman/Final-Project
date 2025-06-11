@@ -5,7 +5,6 @@ import { useAlert } from "../components/AlertDialog";
 import exportToExcel from "../utils/exportToExcel";
 import e from "cors";
 
-
 const useProductManagement = (
   storeId,
   autoOpenAddForm = false,
@@ -92,6 +91,7 @@ const useProductManagement = (
       if (productId) {
         const productToEdit = products.find((p) => p._id === productId);
         if (productToEdit) {
+          window.localStorage.setItem("lastEditedProductId", productId); // שמירת מזהה
           setEditingProduct(productToEdit);
           setIsAddingProduct(true);
         } else {
@@ -142,13 +142,69 @@ const useProductManagement = (
     return () => window.removeEventListener("openEditProduct", handleEditEvent);
   }, []);
 
+  // Handle autofill for existing product during edit
+  useEffect(() => {
+    const handler = (e) => {
+      const { productName, newFields, productId } = e.detail;
+
+      let found = null;
+
+      if (productId) {
+        found = products.find((product) => product._id === productId);
+      }
+
+      if (!found && productName) {
+        const normalized = productName.trim().toLowerCase();
+        found = products.find((product) => {
+          const nameHe = product.name?.he?.toLowerCase() || "";
+          const nameEn = product.name?.en?.toLowerCase() || "";
+          return nameHe.includes(normalized) || nameEn.includes(normalized);
+        });
+      }
+
+      if (found) {
+        const updated = {
+          ...found,
+          ...newFields,
+          name: {
+            en: newFields.nameEn ?? found.name?.en ?? "",
+            he: newFields.nameHe ?? found.name?.he ?? "",
+          },
+          description: {
+            en: newFields.descriptionEn ?? found.description?.en ?? "",
+            he: newFields.descriptionHe ?? found.description?.he ?? "",
+          },
+          highlight: {
+            en: newFields.highlightEn ?? found.highlight?.en ?? [],
+            he: newFields.highlightHe ?? found.highlight?.he ?? [],
+          },
+        };
+
+        setEditingProduct(updated);
+        setIsAddingProduct(true);
+      } else {
+        showAlert("❌ לא נמצא מוצר מתאים לעדכון", "error");
+      }
+    };
+
+    window.addEventListener("autofillEditProductForm", handler);
+    return () => window.removeEventListener("autofillEditProductForm", handler);
+  }, [products]);
+
+  useEffect(() => {
+  if (editingProduct?._id) {
+    window.__editingProductId = editingProduct._id;
+    localStorage.setItem("lastEditedProductId", editingProduct._id);
+  }
+}, [editingProduct]);
+
+
   // Handle pending edit fields when editing a product
 
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true);
   };
-
 
   // Handle delete product action
   // This function shows a confirmation alert before deleting a product
@@ -311,7 +367,6 @@ const useProductManagement = (
     discountStart: payload.discountStart || "",
     discountEnd: payload.discountEnd || "",
   });
-
 
   return {
     products,
