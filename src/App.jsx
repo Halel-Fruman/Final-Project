@@ -16,6 +16,8 @@ import {
 import { fetchWishlist, updateWishlist } from "./utils/Wishlist";
 import { AlertProvider } from "./components/AlertDialog.jsx";
 import { fetchWithTokenRefresh } from "./utils/authHelpers";
+import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx";
+import { useNavigate } from "react-router-dom";
 
 // Lazy-loaded components and pages
 const Header = lazy(() => import("./components/Header/Header"));
@@ -49,7 +51,6 @@ const LoginPage = lazy(() => import("./pages/PersonalArea/LoginPage"));
 const RegisterPage = lazy(() => import("./pages/Registeration/RegisterPage"));
 const NotFound = lazy(() => import("./pages/Errors/NotFound.jsx"));
 const ServiceUnavailablePage = lazy(() => import("./pages/Errors/Service.jsx"));
-
 
 const App = () => {
   const { t, i18n } = useTranslation();
@@ -99,6 +100,19 @@ const App = () => {
     };
     verifyToken();
   }, []);
+  const handleOpenCart = () => setIsCartOpen(true);
+  const handleCloseCart = () => setIsCartOpen(false);
+  const handleOpenWishlist = () => setIsWishlistOpen(true);
+  const handleCloseWishlist = () => setIsWishlistOpen(false);
+
+  const handleOpenAddProductForm = () =>
+    window.dispatchEvent(new CustomEvent("openAddProductForm"));
+
+  const handleCreateDiscount = () =>
+    window.dispatchEvent(new CustomEvent("createDiscount"));
+
+  const handleSendNewsletter = () =>
+    window.dispatchEvent(new CustomEvent("sendNewsletter"));
 
   // Set document direction based on language
   useEffect(() => {
@@ -159,7 +173,6 @@ const App = () => {
       loadWishlist();
     }
   };
-
 
   return (
     // Wrap the entire app in AlertProvider for alert dialogs
@@ -234,10 +247,7 @@ const App = () => {
           </Suspense>
 
           <div className="app-content">
-            <Suspense
-              fallback={
-                null
-              }>
+            <Suspense fallback={null}>
               <Routes>
                 <Route
                   path="/"
@@ -335,6 +345,16 @@ const App = () => {
               </Routes>
             </Suspense>
           </div>
+          <ChatBot
+            token={token}
+            userId={userId}
+            onOpenCart={handleOpenCart}
+            onOpenWishlist={handleOpenWishlist}
+            onLogout={handleLogout}
+            onOpenAddProductForm={handleOpenAddProductForm}
+            onCreateDiscount={handleCreateDiscount}
+            onSendNewsletter={handleSendNewsletter}
+          />
 
           <Suspense fallback={null}>
             <Footer />

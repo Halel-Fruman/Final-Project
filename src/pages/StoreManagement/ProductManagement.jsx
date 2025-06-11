@@ -1,9 +1,9 @@
 // File: ProductManagement.jsx
 
 import React from "react";
-import ProductForm from "../../components/ProductForm";
-import ProductTable from "../../components/ProductTable";
-import ProductTableMobile from "../../components/ProductTableMobile";
+import ProductForm from "../../components/Product/ProductForm";
+import ProductTable from "../../components/Product/ProductTable";
+import ProductTableMobile from "../../components/Product/ProductTableMobile";
 import useProductManagement from "../../hooks/useProductManagement";
 import exportToExcel from "../../utils/exportToExcel";
 import { Icon } from "@iconify/react";

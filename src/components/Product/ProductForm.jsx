@@ -1,7 +1,7 @@
 // File: src/components/ProductForm.jsx
 import React, { useState } from "react";
-import VoiceInputButton from "./VoiceInputButton";
-import useProductForm from "../hooks/useProductForm";
+import VoiceInputButton from "../VoiceInputButton";
+import useProductForm from "../../hooks/useProductForm";
 
 const ProductForm = ({ editingProduct, categories, onCancel, onSave }) => {
   const {
