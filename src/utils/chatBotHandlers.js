@@ -238,8 +238,6 @@ export const createActionHandlers = (
   externalHandlers = {}
 ) => {
   let productName = "";
-  let lastEditedProductId = null; // נשמור את מזהה המוצר שנערך לאחרונה
-
   const setProductName = (name) => {
     if (typeof name === "string") {
       productName = name.trim();
@@ -249,14 +247,6 @@ export const createActionHandlers = (
       productName = "";
     }
   };
-
-  // נעדכן את lastEditedProductId כאשר מתקבל אירוע פתיחת טופס עריכה
-  window.addEventListener("openEditProductForm", (e) => {
-    if (e.detail?.productId) {
-      lastEditedProductId = e.detail.productId;
-    }
-  });
-
   return {
     goToProductList: () => {
       navigate("/store-management", {
@@ -282,12 +272,16 @@ export const createActionHandlers = (
     },
 
     openAddProductForm: (payload) => {
+      console.log(window.location.pathname);
       if (window.location.pathname === "/shop/store-management") {
+        console.log("true");
         window.dispatchEvent(
           new CustomEvent("autofillProductForm", { detail: payload })
         );
         speak("ממלא את פרטי המוצר בטופס.");
       } else {
+        console.log("false");
+
         navigate("/store-management", {
           state: {
             tab: "products",
@@ -310,8 +304,6 @@ export const createActionHandlers = (
         return;
       }
 
-      lastEditedProductId = null; // ננקה מזהה קודם
-
       if (window.location.pathname !== "/store-management") {
         navigate("/store-management", {
           state: { tab: "products" },
@@ -323,8 +315,7 @@ export const createActionHandlers = (
             new CustomEvent("openEditProduct", { detail: { productName } })
           );
           speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-        }, 500);
-        return;
+        }, 1000);
       }
 
       window.dispatchEvent(
@@ -334,35 +325,43 @@ export const createActionHandlers = (
     },
 
     editProduct: (payload) => {
-  if (!payload || !payload.newFields) {
-    speak("חסר מידע לעדכון המוצר.");
-    return;
-  }
+      if (!payload || !payload.productName || !payload.newFields) {
+        console.warn("Invalid payload for editProduct:", payload);
+        speak("חסר מידע לעדכון המוצר.");
+        return;
+      }
 
-  // ננסה לקבל את ה־productId ישירות מה־window או DOM או משתנה גלובלי
-  let productId = null;
+      console.log("editProduct payload:", payload);
+      setProductName(payload.productName);
 
-  try {
-    // אם אתה שומר את editingProduct ב־window (לבדיקה בלבד)
-    productId = window.__editingProductId;
-  } catch (e) {}
+      // נוודא ש-productId נשמר גם אם כבר קיים
+      if (!window.__editingProductId) {
+        const lastId = localStorage.getItem("lastEditedProductId");
+        if (lastId) {
+          window.__editingProductId = lastId;
+        }
+      }
 
-  if (!productId) {
-    productId = localStorage.getItem("lastEditedProductId");
-  }
+      const productId =
+        window.__editingProductId ||
+        localStorage.getItem("lastEditedProductId");
 
-  window.dispatchEvent(
-    new CustomEvent("autofillEditProductForm", {
-      detail: {
-        productId: productId || undefined,
-        productName: payload.productName || productName,
-        newFields: payload.newFields,
-      },
-    })
-  );
-
-  speak("מעדכן את פרטי המוצר.");
-},
+      if (window.location.pathname === "/shop/store-management") {
+        // נשלח בכל מקרה את האירוע, גם אם כבר ערכנו מוצר
+        window.dispatchEvent(
+          new CustomEvent("autofillEditProductForm", {
+            detail: {
+              productId,
+              newFields: payload.newFields,
+              productName: payload.productName,
+            },
+          })
+        );
+        speak("ממלא את פרטי המוצר המעודכנים.");
+      } else {
+        speak("יש לפתוח את דף ניהול המוצרים תחילה.");
+      }
+    },
 
     viewStoreOrders: () => navigate("/store/orders"),
     showStats: () => navigate("/store/analytics"),

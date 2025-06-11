@@ -142,57 +142,73 @@ const useProductManagement = (
     return () => window.removeEventListener("openEditProduct", handleEditEvent);
   }, []);
 
-  // Handle autofill for existing product during edit
   useEffect(() => {
-    const handler = (e) => {
-      const { productName, newFields, productId } = e.detail;
+  const handler = (e) => {
+    const { productName, newFields, productId } = e.detail;
 
-      let found = null;
+    let found = null;
 
-      if (productId) {
-        found = products.find((product) => product._id === productId);
-      }
+    if (productId) {
+      found = products.find((product) => product._id === productId);
+    }
 
-      if (!found && productName) {
-        const normalized = productName.trim().toLowerCase();
-        found = products.find((product) => {
-          const nameHe = product.name?.he?.toLowerCase() || "";
-          const nameEn = product.name?.en?.toLowerCase() || "";
-          return nameHe.includes(normalized) || nameEn.includes(normalized);
-        });
-      }
+    if (!found && productName) {
+      const normalized = productName.trim().toLowerCase();
+      found = products.find((product) => {
+        const nameHe = product.name?.he?.toLowerCase() || "";
+        const nameEn = product.name?.en?.toLowerCase() || "";
+        return nameHe.includes(normalized) || nameEn.includes(normalized);
+      });
+    }
 
-      if (found) {
-        const updated = {
-          ...found,
-          ...newFields,
-          name: {
-            en: newFields.nameEn ?? found.name?.en ?? "",
-            he: newFields.nameHe ?? found.name?.he ?? "",
-          },
-          description: {
-            en: newFields.descriptionEn ?? found.description?.en ?? "",
-            he: newFields.descriptionHe ?? found.description?.he ?? "",
-          },
-          highlight: {
-            en: newFields.highlightEn ?? found.highlight?.en ?? [],
-            he: newFields.highlightHe ?? found.highlight?.he ?? [],
-          },
-        };
+    if (found) {
+      // נשמור את מזהה המוצר באופן גלובלי
+      window.__editingProductId = found._id;
+      localStorage.setItem("lastEditedProductId", found._id);
 
-        setEditingProduct(updated);
-        setIsAddingProduct(true);
-      } else {
-        showAlert("❌ לא נמצא מוצר מתאים לעדכון", "error");
-      }
-    };
+      const updated = {
+        ...editingProduct ?? found,
+        ...newFields,
+        name: {
+          en: newFields.nameEn ?? editingProduct?.name?.en ?? found.name?.en ?? "",
+          he: newFields.nameHe ?? editingProduct?.name?.he ?? found.name?.he ?? "",
+        },
+        description: {
+          en: newFields.descriptionEn ?? editingProduct?.description?.en ?? found.description?.en ?? "",
+          he: newFields.descriptionHe ?? editingProduct?.description?.he ?? found.description?.he ?? "",
+        },
+        highlight: {
+          en: newFields.highlightEn ?? editingProduct?.highlight?.en ?? found.highlight?.en ?? [],
+          he: newFields.highlightHe ?? editingProduct?.highlight?.he ?? found.highlight?.he ?? [],
+        },
+        price: newFields.price ?? editingProduct?.price ?? found.price ?? "",
+        stock: newFields.stock ?? editingProduct?.stock ?? found.stock ?? "",
+        manufacturingCost: newFields.manufacturingCost ?? editingProduct?.manufacturingCost ?? found.manufacturingCost ?? "",
+        allowBackorder: newFields.allowBackorder ?? editingProduct?.allowBackorder ?? found.allowBackorder ?? false,
+      };
 
-    window.addEventListener("autofillEditProductForm", handler);
-    return () => window.removeEventListener("autofillEditProductForm", handler);
-  }, [products]);
+      setEditingProduct(updated);
+      setIsAddingProduct(true);
+    } else {
+      showAlert("❌ לא נמצא מוצר מתאים לעדכון", "error");
+    }
+  };
+
+  window.addEventListener("autofillEditProductForm", handler);
+  return () => window.removeEventListener("autofillEditProductForm", handler);
+}, [products, editingProduct]);
+
 
   useEffect(() => {
   if (editingProduct?._id) {
+    window.__editingProductId = editingProduct._id;
+    localStorage.setItem("lastEditedProductId", editingProduct._id);
+  }
+}, [editingProduct]);
+
+useEffect(() => {
+  if (editingProduct?._id) {
+    console.log("🟢 Saving editingProduct._id:", editingProduct._id);
     window.__editingProductId = editingProduct._id;
     localStorage.setItem("lastEditedProductId", editingProduct._id);
   }

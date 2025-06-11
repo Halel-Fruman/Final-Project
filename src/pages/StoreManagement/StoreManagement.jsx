@@ -16,7 +16,6 @@ const StoreManagement = () => {
   const { storeId: paramStoreId } = useParams();
   const location = useLocation();
   const { tab, openAddProductForm ,autofill } = location.state || {};
-  console.log("Location state:", location.state);
 
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
@@ -32,7 +31,7 @@ const StoreManagement = () => {
   useEffect(() => {
     if (tab) setActiveTab(tab);
   }, [tab]);
-  
+
 
 
   const navigate = useNavigate();
@@ -137,9 +136,9 @@ const StoreManagement = () => {
         return <StoreDashboard key="dashboard" storeId={storeId} />;
       case "products":
         return <ProductManagement
-         key="products" 
-         storeId={storeId}  
-         autoOpenAddForm={openAddProductForm}       
+         key="products"
+         storeId={storeId}
+         autoOpenAddForm={openAddProductForm}
          autofill={autofill}
 />;
       case "orders":

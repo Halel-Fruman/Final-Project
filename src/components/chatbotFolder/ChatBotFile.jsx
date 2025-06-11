@@ -117,7 +117,7 @@ const ChatBot = ({
       sendMessage(transcript);
     };
 
-    
+
 
     recognition.start();
   };
