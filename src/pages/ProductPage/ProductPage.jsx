@@ -1,6 +1,6 @@
-// File: src/pages/ProductPage.jsx
-import React, { useEffect, useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+// ProductPage.jsx – LCP Optimized Version without react-helmet
+import { useEffect, useState } from "react";
+import { useParams, useNavigate,Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -8,6 +8,23 @@ import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+// ImageWithFallback component to handle WebP fallback
+const ImageWithFallback = ({ src, alt, className, ...props }) => {
+  const [useFallback, setUseFallback] = useState(false);
+  const webpSrc = src?.replace(/\.(jpg|jpeg|png)$/i, ".webp") || src;
+
+  return (
+    <img
+      src={useFallback ? src : webpSrc}
+      onError={() => setUseFallback(true)}
+      alt={alt}
+      className={className}
+      {...props}
+    />
+  );
+};
+
+// ProductPage component to display product details and handle interactions
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
@@ -20,30 +37,34 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [rating, setRating] = useState(0);
   const [about, setAbout] = useState("");
-  const [userAlreadyRated, setUserAlreadyRated] = useState(false);
 
-  // Fetch product details when the component mounts
+  // Scroll to top on mount and fetch product details
+  // This ensures the page starts at the top when loaded
+  // and fetches product data from the API
+  // It also preloads the first product image in WebP format
+  // and handles errors by navigating to a 503 page if needed
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: "instant" });
-
     const fetchProduct = async () => {
       try {
-        const token = localStorage.getItem("accessToken");
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
-
         const response = await fetch(`/api/Products/${id}`, {
           method: "GET",
           headers,
         });
-
         if (!response.ok) throw new Error(t("error.fetchProduct"));
         const data = await response.json();
-        console.log("Product data:", data);
         setProduct(data);
         setSelectedImage(data.images[0]);
         setRating(data.averageRating || 0);
         setAbout(data.storeAbout?.[i18n.language] || data.storeAbout?.he || "");
-        setUserAlreadyRated(data.userHasRated || false);
+
+        //  preload image dynamically
+        const preload = document.createElement("link");
+        preload.rel = "preload";
+        preload.as = "image";
+        preload.href = data.images[0]?.replace(/\.(jpg|jpeg|png)$/i, ".webp");
+        document.head.appendChild(preload);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -51,16 +72,16 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
       }
     };
     fetchProduct();
-  }, [id, t]);
+  }, [id, t, i18n.language]);
 
-  // Redirect to error page if there's an error
   useEffect(() => {
-    if (error) {
-      navigate("/503");
-    }
+    if (error==="Service Unavailable") navigate("/503");
   }, [error, navigate]);
 
-  // Handle adding/removing from wishlist
+  // Function to toggle wishlist status for the product
+  // It checks if the product is already in the wishlist
+  // and calls addToWishlist with the product and its current status
+  // This allows users to add or remove products from their wishlist
   const toggleWishlist = () => {
     const isInWishlist = wishlist?.some(
       (item) => String(item.productId) === String(product._id)
@@ -68,39 +89,32 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     addToWishlist(product, isInWishlist);
   };
 
-  // Handle adding to cart
-  // Check if user is logged in before adding to cart
+  // Function to handle adding the product to the cart
+  // It checks if the user is logged in by looking for a userId in localStorage
+  // If not logged in, it shows an error message
+  // If logged in, it calls addToCart with the product ID and a quantity of 1
   const handleAddToCart = () => {
     const userId = localStorage.getItem("userId");
-    if (!userId) {
-      toast.error(t("cart.mustBeLoggedIn"));
-      return;
-    }
-
+    if (!userId) return toast.error(t("cart.mustBeLoggedIn"));
     addToCart({ productId: product._id, quantity: 1 });
     toast.success(t("wishlist.addToCart") + " ✅");
   };
 
-  // Handle image click to set selected image
-  // This function is used to set the selected image when a thumbnail is clicked
-  const handleImageClick = (image) => {
-    setSelectedImage(image);
-  };
+  const handleImageClick = (image) => setSelectedImage(image);
 
-  // Handle rating the product
-  // This function is used to send the rating to the server
+  // Function to handle product rating
+  // It sends a POST request to the product's rate endpoint with the new rating
+  // If the rating is successful, it updates the product state and shows a success message
+  // If the user has already rated the product, it shows an error message
+  // If there's an error during the request, it shows a generic error message
   const handleRating = async (newRating) => {
     try {
       const response = await fetchWithTokenRefresh(`/api/products/${id}/rate`, {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ rating: newRating }),
       });
-
       const data = await response.json();
-
       if (!response.ok) {
         if (data.message === "You have already rated this product.") {
           toast.error(t("product.alreadyRated"));
@@ -109,61 +123,64 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
         }
         return;
       }
-
       setProduct(data.product);
       setRating(newRating);
       toast.success(t("product.ratingSuccess"));
     } catch (err) {
-      console.error("Error updating rating:", err.message);
       toast.error(t("product.ratingError"));
     }
   };
 
-  // skeleton loading state
-  // This is used to show a loading state while the product data is being fetched
+  // If the product is still loading, show a skeleton loader
   if (isLoading) {
     return (
       <main className="bg-gray-50">
         <div className="container mx-auto py-12 animate-pulse">
           <div className="flex flex-col lg:flex-row gap-12 items-start">
-            <div className="w-full lg:w-1/2 flex justify-center">
-              <div className="h-[400px] w-[350px] bg-gray-200 rounded-lg" />
-            </div>
-            <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow w-full lg:min-h-128">
-              <div className="h-8 bg-gray-200 rounded mb-4 w-2/3" />
-              <div className="flex items-center gap-4 mb-4">
-                <div className="h-6 w-20 bg-gray-200 rounded" />
-                <div className="h-6 w-16 bg-gray-300 rounded" />
-                <div className="h-5 w-10 bg-gray-100 rounded" />
-              </div>
-              <div className="flex items-center gap-2 mb-6">
-                {[...Array(5)].map((_, i) => (
-                  <div key={i} className="h-5 w-5 bg-gray-200 rounded-full" />
+            {/* Skeleton for image + thumbnails */}
+            <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
+              <div className="w-full max-w-lg aspect-[4/3] bg-gray-200 rounded-md mb-4" />
+              <div className="flex flex-wrap gap-2 min-h-[88px]">
+                {Array.from({ length: 4 }).map((_, i) => (
+                  <div key={i} className="w-20 h-20 bg-gray-300 rounded-md" />
                 ))}
-                <div className="h-4 w-16 bg-gray-200 rounded" />
               </div>
-              <div className="grid lg:grid-cols-2 gap-6 mb-6">
-                <div>
-                  <div className="h-5 bg-gray-200 w-32 mb-2 rounded" />
-                  <div className="space-y-2">
-                    {[...Array(3)].map((_, i) => (
-                      <div key={i} className="h-3 bg-gray-100 rounded w-3/4" />
-                    ))}
-                  </div>
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {[...Array(4)].map((_, i) => (
-                    <div key={i} className="w-20 h-20 bg-gray-200 rounded-md" />
+            </div>
+
+            {/* Skeleton for content */}
+            <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow w-full lg:min-h-128">
+              <div className="h-9 bg-gray-300 w-3/4 mb-4 rounded" />{" "}
+              {/* Title */}
+              <div className="flex items-center gap-4 mb-4 min-h-[2.5rem]">
+                <div className="w-24 h-6 bg-gray-200 rounded" /> {/* Price */}
+                <div className="w-16 h-5 bg-gray-300 rounded" />
+                <div className="w-12 h-5 bg-gray-200 rounded" />
+              </div>
+              <div className="flex items-center mb-4 min-h-[2rem] gap-2">
+                {Array.from({ length: 5 }).map((_, i) => (
+                  <div key={i} className="w-6 h-6 bg-gray-200 rounded-full" />
+                ))}
+                <div className="h-4 w-20 bg-gray-200 rounded" />
+              </div>
+              <div className="mb-6">
+                <div className="h-5 w-32 bg-gray-200 rounded mb-2" />
+                <div className="space-y-2">
+                  {[...Array(3)].map((_, i) => (
+                    <div key={i} className="h-3 bg-gray-100 rounded w-3/4" />
                   ))}
                 </div>
               </div>
               <div className="mb-6">
-                <div className="h-5 bg-gray-200 w-40 mb-2 rounded" />
-                <div className="h-20 bg-gray-100 rounded" />
+                <div className="h-5 w-40 bg-gray-200 rounded mb-2" />
+                <div className="h-16 bg-gray-100 rounded" />
               </div>
               <div className="flex gap-4 mt-6">
-                <div className="h-12 w-1/2 bg-gray-300 rounded-lg" />
+                <div className="h-12 w-1/2 bg-gray-300 rounded-full" />
                 <div className="h-12 w-12 bg-gray-200 rounded-full" />
+              </div>
+              <div className="my-6">
+                <div className="h-5 w-40 bg-gray-200 rounded mb-2" />
+                <div className="h-20 bg-gray-100 rounded" />
               </div>
             </div>
           </div>
@@ -172,10 +189,28 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     );
   }
 
-  // Error handling
-  if (!product) return <div>{t("product.notFound")}</div>;
+// If the product is not found, show a 404-like message
+  if (!product) return <div><div className="min-h-screen bg-gray-50 flex border-b flex-col items-center justify-center text-center px-4">
+      <h1 className="text-6xl font-bold text-primaryColor mb-4">{t("product.not_found", "אופס...")}</h1>
+      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+        {t("product.not_found_title", "המוצר לא נמצא")}
+      </h2>
+      <p className="text-gray-600 mb-6 max-w-md">
+        {t(
+          "product.not_found_message",
+          "נראה שהמוצר לא קיים או שהוסר."
+        )}
+      </p>
+      <Link
+        to="/"
+        className="bg-primaryColor text-white px-6 py-2 rounded-lg shadow hover:bg-secondaryColor transition"
+      >
+        {t("not_found.back_to_home", "חזרה לדף הבית")}
+      </Link>
+    </div></div>;
 
-  // Main product page content
+  // Extract product details and prepare data for rendering
+
   const language = i18n.language;
   const productName = product.name[language] || product.name["en"];
   const productDetails =
@@ -187,34 +222,33 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     (item) => String(item.productId) === String(product._id)
   );
   const currentDate = new Date();
-
   const activeDiscount = product.discounts?.find((discount) => {
     const start = new Date(discount.startDate);
     const end = new Date(discount.endDate);
     return start <= currentDate && currentDate <= end;
   });
-
-  // Check if the product is on sale
-  // This is used to check if the product has an active discount
   const isOnSale = !!activeDiscount;
   const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
   const discountedPrice = isOnSale
     ? productPrice - productPrice * (discountPercentage / 100)
     : productPrice;
 
+
   return (
     <main className="bg-gray-50">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
-            <img
-              src={selectedImage || "https://placehold.co/300"}
-              alt={productName}
-              className="object-contain max-h-128 max-w-full rounded-md border"
-            />
-            <div className="flex  m-4 flex-wrap gap-2 ">
+            <div className="w-full max-w-lg aspect-[4/3]">
+              <ImageWithFallback
+                src={selectedImage || "https://placehold.co/300"}
+                alt={productName}
+                className="object-cover w-full h-full rounded-md border"
+              />
+            </div>
+            <div className="flex m-4 flex-wrap gap-2 min-h-[88px]">
               {product.images.map((image, index) => (
-                <img
+                <ImageWithFallback
                   key={index}
                   src={image}
                   alt={`Thumbnail ${index + 1}`}
@@ -228,12 +262,19 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               ))}
             </div>
           </div>
+
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
-            <h1 className="text-3xl font-bold text-gray-900 mb-4">
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 min-h-[3.6rem] line-clamp-2">
               {productName}
             </h1>
 
-            <div className="mb-2 flex items-center gap-4">
+            {product.stock <= 0 && !product.allowBackorder && (
+              <span className=" right-6 bg-red-600 text-white  px-4 py-1 rounded-full text-sm font-semibold shadow">
+                {t("product.outOfStock")}
+              </span>
+            )}
+
+            <div className="mb-2 flex items-center gap-4 min-h-[2.5rem]">
               {isOnSale ? (
                 <>
                   <span className="text-2xl text-red-600 font-bold">
@@ -253,20 +294,18 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               )}
             </div>
 
-            <div className="flex items-center mb-4">
+            <div className="flex items-center mb-4 min-h-[2rem]">
               {[...Array(5)].map((_, i) => (
                 <StarIcon
                   key={i}
                   className={`h-6 w-6 cursor-pointer ${
                     i < Math.round(rating) ? "text-yellow-400" : "text-gray-300"
                   } ${!isLoggedIn ? "cursor-not-allowed opacity-50" : ""}`}
-                  onClick={() => {
-                    if (isLoggedIn) {
-                      handleRating(i + 1);
-                    } else {
-                      toast.error(t("login.requiredToRate"));
-                    }
-                  }}
+                  onClick={() =>
+                    isLoggedIn
+                      ? handleRating(i + 1)
+                      : toast.error(t("login.requiredToRate"))
+                  }
                 />
               ))}
               <span className="ml-2 text-gray-600">
@@ -274,17 +313,15 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
               </span>
             </div>
 
-            <div className="flex flex-col lg:flex-row gap-12 ">
-              <div className="mb-6">
-                <h2 className="text-lg font-semibold text-gray-900 mb-2">
-                  {t("product.highlights")}
-                </h2>
-                <ul className="list-disc pl-5 text-gray-700">
-                  {productHighlights.map((highlight, index) => (
-                    <li key={index}>{highlight}</li>
-                  ))}
-                </ul>
-              </div>
+            <div className="mb-6">
+              <h2 className="text-lg font-semibold text-gray-900 mb-2">
+                {t("product.highlights")}
+              </h2>
+              <ul className="list-disc pl-5 text-gray-700">
+                {productHighlights.map((highlight, index) => (
+                  <li key={index}>{highlight}</li>
+                ))}
+              </ul>
             </div>
 
             <div className="mb-6">
@@ -297,22 +334,33 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
             <div className="flex gap-4 mt-6">
               <button
                 onClick={handleAddToCart}
-                className="lg:w-1/2 bg-primaryColor text-white py-2 px-4 rounded-full text-xl font-bold hover:bg-primaryColor transition">
-                {t("product.addToCart")}
+                disabled={product.stock <= 0}
+                className={`lg:w-1/2 py-2 px-4 rounded-full text-xl font-bold transition ${
+                  product.stock <= 0 && !product.allowBackorder
+                    ? "bg-gray-400 text-white cursor-not-allowed"
+                    : "bg-primaryColor text-white hover:bg-primaryColor"
+                }`}>
+                {product.stock <= 0 && !product.allowBackorder
+                  ? t("product.outOfStock")
+                  : t("product.addToCart")}
               </button>
-              <button
-                onClick={toggleWishlist}
-                className="self-center bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition"
-                aria-label={
-                  isInWishlist ? "Remove from wishlist" : "Add to wishlist"
-                }>
-                {isInWishlist ? (
-                  <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
-                ) : (
-                  <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
-                )}
-              </button>
+
+              <div className="w-12 h-12">
+                <button
+                  onClick={toggleWishlist}
+                  className="w-full h-full bg-white p-3 rounded-full ring-1 ring-secondaryColor shadow-lg hover:bg-gray-100 transition"
+                  aria-label={
+                    isInWishlist ? "Remove from wishlist" : "Add to wishlist"
+                  }>
+                  {isInWishlist ? (
+                    <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
+                  ) : (
+                    <OutlineHeartIcon className="h-6 w-6 text-secondaryColor hover:text-primaryColor" />
+                  )}
+                </button>
+              </div>
             </div>
+
             <div className="my-6">
               <h3 className="text-lg font-semibold text-gray-900 mb-2">
                 {t("product.about")}

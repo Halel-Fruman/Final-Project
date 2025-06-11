@@ -17,6 +17,8 @@ const storage = multer.diskStorage({
 const upload = multer({ storage });
 const mongoose = require("mongoose");
 const StoreProducts = require("../models/Products");
+const Store = require("../models/Stores");
+
 
 router.get("/", async (req, res) => {
   try {
@@ -151,32 +153,37 @@ router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate ObjectId
+    // Validate if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid Product ID" });
     }
 
-    // Find the store that contains the product
-    const store = await StoreProducts.findOne({ "products._id": id });
-    if (!store) {
+    // Step 1: Find the StoreProducts document that contains the product
+    const storeProducts = await StoreProducts.findOne({ "products._id": id });
+    if (!storeProducts) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Find the product inside the store
-    const product = store.products.find(
-      (product) => String(product._id) === id
+    // Step 2: Extract the product from the matched StoreProducts document
+    const product = storeProducts.products.find(
+      (p) => String(p._id) === id
     );
-
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Return the product with store details
+    // Step 3: Fetch the actual Store document to get the 'about' field
+    const store = await Store.findById(storeProducts.storeId);
+    if (!store) {
+      return res.status(404).json({ message: "Store not found" });
+    }
+
+    // Step 4: Return the product info along with store details and multilingual 'about'
     res.json({
       ...product.toObject(),
-      storeId: store.storeId,
-      storeName: store.storeName,
-      about: store.about,
+      storeId: store._id,
+      storeName: store.name,
+      storeAbout: store.about, // renamed to avoid collision with product.about
       averageRating:
         product.reviews?.length > 0
           ? product.reviews.reduce((sum, r) => sum + r.rating, 0) /

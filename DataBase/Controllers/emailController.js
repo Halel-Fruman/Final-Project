@@ -1,12 +1,12 @@
 
 
-const { sendTestEmail } = require("../sendMail");
+const { sendEmail } = require("../sendEmail");
 
 const sendConfirmationEmail = async (req, res) => {
   const { userEmail, userName } = req.body;
 
   try {
-    await sendTestEmail({
+    await sendEmail({
       to: userEmail,
       subject: "אישור הזמנה",
       html: `<h1>שלום ${userName},</h1><p>הזמנתך התקבלה בהצלחה!</p>`,

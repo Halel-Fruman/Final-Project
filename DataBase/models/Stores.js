@@ -14,6 +14,10 @@ const storeSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+about: {
+    he: { type: String, required: false },
+    en: { type: String, required: false },
+  },
     manager: [
       {
         name: {
@@ -32,11 +36,7 @@ const storeSchema = new mongoose.Schema(
         company: { type: String, required: false },
         price: { type: Number, required: false, default: 0 },
       },
-      pickupPoint: {
-        company: { type: String, required: false },
-        price: { type: Number, required: false, default: 0 },
-      },
-    },
+          },
   },
   { timestamps: true }
 );

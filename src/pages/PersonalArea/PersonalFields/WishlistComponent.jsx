@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
@@ -114,7 +114,7 @@ const WishlistComponent = ({
                   <img
                     src={product.images?.[0] || "https://placehold.co/50"}
                     alt={
-                      product.name[i18n.language] +"image" ||
+                      product.name[i18n.language] + "image" ||
                       t("product.nameUnavailable")
                     }
                     className="w-12 h-12 rounded-full ml-2"
@@ -138,8 +138,7 @@ const WishlistComponent = ({
                       toast.success(t("wishlist.addToCart") + " ✅");
                     }}
                     className="bg-secondaryColor text-white p-2 rounded-full shadow-lg hover:bg-primaryColor"
-                    aria-label="Add to cart"
-                    >
+                    aria-label="Add to cart">
                     <Icon
                       icon="material-symbols:add-shopping-cart-rounded"
                       width="24"
@@ -149,8 +148,7 @@ const WishlistComponent = ({
                   <button
                     onClick={() => handleRemoveFromWishlist(product)}
                     className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white"
-                    aria-label="Remove from wishlist"
-                    >
+                    aria-label="Remove from wishlist">
                     <Icon
                       icon="material-symbols:delete-outline"
                       width="24"
@@ -198,8 +196,7 @@ const WishlistComponent = ({
                     toast.success(t("wishlist.addToCart") + " ✅");
                   }}
                   className="bg-secondaryColor text-white p-2  rounded-full shadow-lg hover:bg-primaryColor"
-                  aria-label="Add to cart"
-                  >
+                  aria-label="Add to cart">
                   <Icon
                     icon="material-symbols:add-shopping-cart-rounded"
                     width="20"
@@ -209,8 +206,7 @@ const WishlistComponent = ({
                 <button
                   onClick={() => handleRemoveFromWishlist(product)}
                   className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white"
-                  aria-label="Remove from wishlist"
-                  >
+                  aria-label="Remove from wishlist">
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="20"

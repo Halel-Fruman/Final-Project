@@ -17,6 +17,7 @@
   "search": "חיפוש",
   "max_price": "מחיר מקסימלי",
   "min_price": "מחיר מינימלי",
+  "in_stock_only": "זמין במלאי",
 
   "view_products": "צפה במוצרים",
   "header": {
@@ -112,12 +113,49 @@
     "submit": "הרשם",
     "loading": "נרשם...",
     "success": "ההרשמה הצליחה!",
+    "terms": "אני מסכים לתנאי השימוש",
+    "viewTerms": "צפה בתנאי השימוש",
+    "close": "סגור",
+    "termsTitle": "תנאי השימוש",
+    "termsContent": "עליך להסכים לתנאי השימוש כדי להמשיך.",
     "errors": {
       "passwordMismatch": "הסיסמאות אינן תואמות!",
       "failed": "ההרשמה נכשלה.",
       "network": "שגיאת רשת. בדוק את החיבור שלך",
       "emailExists": "כתובת האימייל כבר רשומה",
       "serverUnavailable": "השרת אינו זמין כרגע. נסה שוב מאוחר יותר"
+    }
+  },
+  "verify_email": {
+    "loading": "מאמת את כתובת המייל שלך...",
+    "success_title": "המייל אומת בהצלחה!",
+    "success_message": "כתובת המייל שלך אומתה בהצלחה. תוכל כעת להתחבר.",
+    "error_title": "האימות נכשל",
+    "error_message": "הקישור שגוי או שפג תוקפו.",
+    "redirecting":"מעביר אותך לדף הבית..."
+  },
+  "forgotPassword": {
+    "title": "שכחת סיסמה?",
+    "email": "כתובת מייל",
+    "submit": "שלח קישור לאיפוס",
+    "loading": "שולח...",
+    "success": "נשלח קישור לאיפוס סיסמה למייל",
+    "errors": {
+      "failed": "שליחה נכשלה",
+      "network": "שגיאת רשת"
+    }
+  },
+  "resetPassword": {
+    "title": "איפוס סיסמה",
+    "newPassword": "סיסמה חדשה",
+    "confirmPassword": "אימות סיסמה",
+    "submit": "אפס סיסמה",
+    "loading": "מאפס...",
+    "success": "הסיסמה אופסה בהצלחה. אפשר להתחבר.",
+    "errors": {
+      "passwordMismatch": "הסיסמאות אינן תואמות",
+      "failed": "האיפוס נכשל",
+      "network": "שגיאת רשת"
     }
   },
   "login": {
@@ -127,7 +165,7 @@
     "submit": "התחבר",
     "emailRequired": "כתובת אימייל נדרשת",
     "passwordRequired": "סיסמה נדרשת",
-    "notMember": "אין לך חשבון? הרשם כאן",
+    "notMember": "אין לך חשבון? הרשם כאן  ",
     "registerLink": "להרשמה",
     "emailPlaceholder": "הכנס את כתובת האימייל שלך",
     "passwordPlaceholder": "הכנס את הסיסמה שלך",
@@ -139,7 +177,13 @@
     "networkError": "אין חיבור לשרת. נסה שוב מאוחר יותר",
     "serverUnavailable": "השרת אינו זמין כעת. אנא נסה מאוחר יותר",
     "requiredToRate": "יש להתחבר כדי לדרג מוצרים",
-    "userNotFound": "משתמש לא נמצא. אנא בדוק את הפרטים שלך"
+    "userNotFound": "משתמש לא נמצא. אנא בדוק את הפרטים שלך",
+    "forgotPassword": "שכחת סיסמה?",
+    "emailNotVerified": "יש לאמת את כתובת המייל לפני התחברות",
+    "resendVerificationText": "לא קיבלת את מייל האימות?",
+    "resendVerificationButton": "שלח שוב מייל אימות",
+    "verificationEmailSent": "מייל אימות נשלח בהצלחה",
+    "verificationEmailError": "שליחת מייל האימות נכשלה"
   },
   "addAddress": {
     "title": "הוספת כתובת",
@@ -189,7 +233,11 @@
     "alreadyRated": "כבר דירגת מוצר זה.",
     "ratingError": "הייתה שגיאה בשליחת הדירוג.",
     "ratingSuccess": "תודה על הדירוג!",
-    "about": "על החנות"
+    "about": "על החנות",
+    "outOfStock": "זמנית אזל מהמלאי",
+    "not_found":"אופס...",
+    "not_found_title": "המוצר לא נמצא",
+    "not_found_message": "נראה שהמוצר לא קיים או שהוסר."
   },
 
   "sysadmin": {

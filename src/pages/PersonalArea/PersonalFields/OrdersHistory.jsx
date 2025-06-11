@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import  { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
@@ -75,103 +75,110 @@ const OrderHistory = ({ user, addToCart }) => {
         {t("orders.subtitle")}
       </h2>
 
-      {Object.entries(transactionGroups).map(([transactionId, orders], idx) => (
-        <div key={idx} className="mb-12 bg-blue-50 border rounded-md shadow-md">
-          <div className="bg-primaryColor bg-opacity-10 text-primaryColor rounded-md px-6 py-3 font-bold text-xl border-b">
-            {t("orders.orderGroup")}:{" "}
-            <span className="font-mono">{transactionId}</span>
-          </div>
-
-          {orders.map((order, i) => (
-            <div key={i} className="bg-white border-b">
-              <div className="flex flex-col md:flex-row justify-between items-center bg-gray-100 px-6 py-3 text-lg text-gray-900 border-b">
-                <span>
-                  {t("orders.store")}:{" "}
-                  <strong>{order.storeName[i18n.language]}</strong>
-                </span>
-                <span>
-                  {t("orders.date")}:{" "}
-                  {new Date(order.createdAt).toLocaleDateString()}
-                </span>
-                <span>
-                  {t("orders.orderId")}:{" "}
-                  <strong className="font-mono">{order.orderId}</strong>
-                </span>
-              </div>
-
-              <div className="divide-y px-6">
-                {order.products.map((item, j) => {
-                  const fullProduct = productDetails[item.productId];
-                  const image =
-                    fullProduct?.images?.[0] || "https://placehold.co/100";
-                  const highlights =
-                    fullProduct?.highlight?.[i18n.language] || [];
-                  const name = fullProduct?.name?.[i18n.language] || item.name;
-
-                  return (
-                    <div
-                      key={j}
-                      className="flex flex-col md:flex-row items-start gap-6 py-6">
-                      <img
-                        src={image}
-                        alt={name}
-                        className="w-28 h-28 object-cover rounded-md border"
-                      />
-                      <div className="flex-1">
-                        <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                          {name}
-                        </h3>
-                        <div className="flex flex-wrap gap-2 text-sm text-gray-700 mb-2">
-                          {highlights.map((h, idx) => (
-                            <span
-                              key={idx}
-                              className="bg-gray-100 px-3 py-1 rounded-full">
-                              {h}
-                            </span>
-                          ))}
-                        </div>
-                        <p className="text-sm text-gray-700 mb-1">
-                          {t("orders.quantity")}: {item.quantity}
-                        </p>
-                        <p className="text-lg font-medium text-gray-900">
-                          ₪{item.price}
-                        </p>
-                      </div>
-                      <div className="flex flex-col gap-2 justify-start">
-                        <button
-                          onClick={() => {
-                            addToCart({
-                              productId: item.productId,
-                              quantity: 1,
-                            });
-                            toast.success(t("wishlist.addToCart") + " ✅");
-                          }}
-                          className="bg-primaryColor text-white text-xl font-bold px-4 py-2 rounded-full hover:bg-secondaryColor">
-                          {t("orders.buyAgain")}
-                        </button>
-                        <button className="border border-gray-300 text-md px-4 py-2 rounded text-gray-700 hover:bg-gray-100">
-                          {t("orders.shopSimilar")}
-                        </button>
-                      </div>
-                    </div>
-                  );
-                })}
-              </div>
-
-              <div className="text-right text-primaryColor font-bold text-xl pr-6 pt-2 pb-4">
-                {t("orders.subtotal")}: ₪{order.totalAmount?.toFixed(2)}
-              </div>
+      {Object.entries(transactionGroups)
+        .sort(([, aOrders], [, bOrders]) => {
+          const aDate = new Date(aOrders[0]?.createdAt || 0);
+          const bDate = new Date(bOrders[0]?.createdAt || 0);
+          return bDate - aDate; // חדש קודם
+        })
+        .map(([transactionId, orders], idx) => (
+          <div
+            key={idx}
+            className="mb-12 bg-blue-50 border rounded-md shadow-md">
+            <div className="bg-primaryColor bg-opacity-10 text-primaryColor rounded-md px-6 py-3 font-bold text-xl border-b">
+              {t("orders.orderGroup")}:{" "}
+              <span className="font-mono">{transactionId}</span>
             </div>
-          ))}
 
-          <div className="text-right text-xl font-bold text-primaryColor px-6 py-4 border-t rounded-md bg-secondaryColor bg-opacity-10">
-            {t("orders.totalForTransaction")}: ₪
-            {orders
-              .reduce((sum, order) => sum + (order.totalAmount || 0), 0)
-              .toFixed(2)}
+            {orders.map((order, i) => (
+              <div key={i} className="bg-white border-b">
+                <div className="flex flex-col md:flex-row justify-between items-center bg-gray-100 px-6 py-3 text-lg text-gray-900 border-b">
+                  <span>
+                    {t("orders.store")}:{" "}
+                    <strong>{order.storeName[i18n.language]}</strong>
+                  </span>
+                  <span>
+                    {t("orders.date")}:{" "}
+                    {new Date(order.createdAt).toLocaleDateString()}
+                  </span>
+                  <span>
+                    {t("orders.orderId")}:{" "}
+                    <strong className="font-mono">{order.orderId}</strong>
+                  </span>
+                </div>
+
+                <div className="divide-y px-6">
+                  {order.products.map((item, j) => {
+                    const fullProduct = productDetails[item.productId];
+                    const image =
+                      fullProduct?.images?.[0] || "https://placehold.co/100";
+                    const highlights =
+                      fullProduct?.highlight?.[i18n.language] || [];
+                    const name =
+                      fullProduct?.name?.[i18n.language] || item.name;
+
+                    return (
+                      <div
+                        key={j}
+                        className="flex flex-col md:flex-row items-start gap-6 py-6">
+                        <img
+                          src={image}
+                          alt={name}
+                          className="w-28 h-28 object-cover rounded-md border"
+                        />
+                        <div className="flex-1">
+                          <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                            {name}
+                          </h3>
+                          <div className="flex flex-wrap gap-2 text-sm text-gray-700 mb-2">
+                            {highlights.map((h, idx) => (
+                              <span
+                                key={idx}
+                                className="bg-gray-100 px-3 py-1 rounded-full">
+                                {h}
+                              </span>
+                            ))}
+                          </div>
+                          <p className="text-sm text-gray-700 mb-1">
+                            {t("orders.quantity")}: {item.quantity}
+                          </p>
+                          <p className="text-lg font-medium text-gray-900">
+                            ₪{item.price}
+                          </p>
+                        </div>
+                        <div className="flex flex-col gap-2 justify-start">
+                          <button
+                            onClick={() => {
+                              addToCart({
+                                productId: item.productId,
+                                quantity: 1,
+                              });
+                              toast.success(t("wishlist.addToCart") + " ✅");
+                            }}
+                            className="bg-primaryColor text-white text-xl font-bold px-4 py-2 rounded-full hover:bg-secondaryColor">
+                            {t("orders.buyAgain")}
+                          </button>
+
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                <div className="text-right text-primaryColor font-bold text-xl pr-6 pt-2 pb-4">
+                  {t("orders.subtotal")}: ₪{order.totalAmount?.toFixed(2)}
+                </div>
+              </div>
+            ))}
+
+            <div className="text-right text-xl font-bold text-primaryColor px-6 py-4 border-t rounded-md bg-secondaryColor bg-opacity-10">
+              {t("orders.totalForTransaction")}: ₪
+              {orders
+                .reduce((sum, order) => sum + (order.totalAmount || 0), 0)
+                .toFixed(2)}
+            </div>
           </div>
-        </div>
-      ))}
+        ))}
 
       {isLoadingTransactions ? (
         <div className="text-center py-10">

@@ -1,4 +1,3 @@
-import React from "react";
 import { Popover, PopoverButton, PopoverPanel } from "@headlessui/react";
 import { Icon } from "@iconify/react";
 

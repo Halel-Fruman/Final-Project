@@ -1,8 +1,7 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DialogTitle } from "@headlessui/react";
 import toast from "react-hot-toast";
-import { el } from "date-fns/locale";
 
 const Login = ({
   setToken,
@@ -15,6 +14,8 @@ const Login = ({
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState(null);
+
 
   // Handle form submission
   // This function is called when the user submits the login form
@@ -35,6 +36,11 @@ const Login = ({
         if (response.status === 401) {
           // Unauthorized - invalid credentials
           toast.error(t("login.invalidCredentials"));
+          return;
+        } else if (response.status === 403) {
+          // Forbidden - email not verified
+          toast.error(t("login.emailNotVerified"));
+          setUnverifiedEmail(email);
           return;
         } else if (response.status === 503) {
           // Service unavailable - server down
@@ -131,7 +137,48 @@ const Login = ({
           }`}>
           {loading ? t("login.loading") : t("login.submit")}
         </button>
+        {unverifiedEmail && (
+  <div className="mt-4 text-center">
+    <p className="text-sm text-gray-600">
+      {t("login.resendVerificationText")}
+    </p>
+    <button
+      onClick={async () => {
+        try {
+          const res = await fetch("/api/User/resend-verification", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: unverifiedEmail }),
+          });
+          if (res.ok) {
+            toast.success(t("login.verificationEmailSent"));
+          } else {
+            toast.error(t("login.verificationEmailError"));
+          }
+        } catch (err) {
+          console.error(err);
+          toast.error(t("login.networkError"));
+        }
+      }}
+      className="mt-1 text-blue-600 font-medium hover:underline"
+    >
+      {t("login.resendVerificationButton")}
+    </button>
+  </div>
+)}
+
       </form>
+      <p className="text-sm text-center mt-2">
+        <button
+          type="button"
+          className="text-blue-600 hover:underline"
+          onClick={() => {
+            onClose(); // סגור את המודל הנוכחי
+            window.location.href = "/shop/forgot-password"; // ניווט לדף איפוס
+          }}>
+          {t("login.forgotPassword")}
+        </button>
+      </p>
 
       <p className="mt-6 text-center text-m font-bold text-black">
         {t("login.notMember")}{" "}
