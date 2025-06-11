@@ -1,45 +1,48 @@
 const StoreTransactions = require("../models/Transactions");
 // const StoreTransactions = require("../models/StoreTransactions");
 
+// Get all transactions for a specific store
 const getStoreTransaction = async (req, res) => {
+  // Check if storeId is provided
   try {
     const store = await StoreTransactions.findOne({
       storeId: req.params.storeId,
     });
     if (!store) return res.status(404).json({ message: "חנות לא נמצאה" });
 
+    // If store exists, return its transactions
     res.json(store.transactions);
   } catch (error) {
+    // If an error occurs, return a 500 status with the error message
     res.status(500).json({ message: error.message });
   }
 };
 
-
-// editing transactions
+// Update a specific transaction by transactionId
+// This function updates a transaction within a store's transactions array
 const updateTransaction = async (req, res) => {
+  // Check if transactionId is provided in the request parameters
   try {
     const { transactionId } = req.params;
     const updatedData = req.body;
-    console.log(transactionId);
     const updatedTransaction = await StoreTransactions.findOneAndUpdate(
-  { "transactions.transactionId": transactionId },
-  { $set: { "transactions.$": updatedData } },
-  { new: true }
-);
-
+      { "transactions.transactionId": transactionId },
+      { $set: { "transactions.$": updatedData } },
+      { new: true }
+    );
+    // If no transaction is found, return a 404 status
     if (!updatedTransaction) {
-      return res.status(404).json({ message: 'Transaction not found' });
+      return res.status(404).json({ message: "Transaction not found" });
     }
-
+    // If the transaction is successfully updated, return the updated transaction
     res.json(updatedTransaction);
   } catch (error) {
-    console.error('Error updating transaction:', error);
-    res.status(500).json({ message: 'Server error' });
+    console.error("Error updating transaction:", error);
+    res.status(500).json({ message: "Server error" });
   }
 };
 
-
-// Get all transactions
+// Get all transactions from the StoreTransactions collection
 const getTransactions = async (req, res) => {
   try {
     const transactions = await StoreTransactions.find();
@@ -49,13 +52,12 @@ const getTransactions = async (req, res) => {
   }
 };
 
-// Get all transactions
-
+// Get a specific transaction by its ID
 const getTransactionsByID = async (req, res) => {
   try {
     const { transactionId } = req.params;
 
-    // חיפוש במסמך שיש בו את העסקה עם transactionId תואם
+    // Check if transactionId is provided
     const storeTransaction = await StoreTransactions.findOne({
       "transactions.transactionId": transactionId,
     });
@@ -63,8 +65,7 @@ const getTransactionsByID = async (req, res) => {
     if (!storeTransaction) {
       return res.status(404).json({ message: "העסקה לא נמצאה" });
     }
-
-    // שליפת העסקה הספציפית מתוך המערך
+    // Find the specific transaction within the store's transactions
     const transaction = storeTransaction.transactions.find(
       (t) => t.transactionId === transactionId
     );
@@ -73,7 +74,7 @@ const getTransactionsByID = async (req, res) => {
       return res.status(404).json({ message: "העסקה לא נמצאה בתוך המסמך" });
     }
 
-    // הוספת שם החנות למידע (כדי שיהיה זמין ב-frontend)
+    // Return the transaction details along with the store name
     res.status(200).json({
       ...(transaction.toObject?.() || transaction),
       storeName: storeTransaction.storeName,
@@ -83,6 +84,9 @@ const getTransactionsByID = async (req, res) => {
     res.status(500).json({ message: "שגיאה בקבלת העסקאות", error });
   }
 };
+
+// Get orders by transactionId
+// This function retrieves all orders associated with a specific transactionId across all stores
 const getOrdersByTransactionId = async (req, res) => {
   const { transactionId } = req.params;
 
@@ -101,6 +105,10 @@ const getOrdersByTransactionId = async (req, res) => {
         .json({ message: "No transactions found for this transactionId" });
     }
 
+    // Flatten the transactions from all stores that match the transactionId
+    // and include storeId and storeName in the result
+    // This will return an array of orders with their respective store details
+    // Use flatMap to iterate over each store document and filter transactions
     const matchingOrders = storeDocs.flatMap((storeDoc) =>
       storeDoc.transactions
         .filter((tx) => tx.transactionId === transactionId)
@@ -177,19 +185,20 @@ const addTransaction = async (req, res) => {
   const { storeId, storeName, transaction } = req.body;
 
   if (!storeId || !storeName || !transaction || !transaction.transactionId) {
-	console.log("storeId",storeId );
-	console.log (transaction.transactionId);
+    console.log("storeId", storeId);
+    console.log(transaction.transactionId);
     return res.status(400).json({ message: "Missing required fields" });
   }
 
   try {
     let storeDoc = await StoreTransactions.findOne({ storeId });
     let newTransaction;
-	
+
     if (!storeDoc) {
       const orderCounter = 1;
       const orderId = `${storeName.en
-        .trim().replace(/\s+/g, '')
+        .trim()
+        .replace(/\s+/g, "")
         .toUpperCase()}-${orderCounter}`;
       newTransaction = { ...transaction, orderId };
 
@@ -197,7 +206,7 @@ const addTransaction = async (req, res) => {
         storeId,
         storeName,
         orderCounter,
-        ordersStart: storeName.en.trim().replace(/\s+/g, '').toUpperCase(),
+        ordersStart: storeName.en.trim().replace(/\s+/g, "").toUpperCase(),
         transactions: [newTransaction],
       });
     } else {

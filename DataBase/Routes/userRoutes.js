@@ -9,7 +9,10 @@ router.post("/refresh-token", UserController.refreshTokenHandler);
 router.post("/login", UserController.login);
 
 router.post("/logout", UserController.logoutHandler);
+router.get("/verify-email/:token", UserController.verifyEmail);
 
+
+router.post("/resend-verification", UserController.resendVerification);
 
 //clear cart
 router.put('/:id/clear-cart', authenticateToken, UserController.clearUserCart);

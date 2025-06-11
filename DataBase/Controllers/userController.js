@@ -3,7 +3,7 @@ const User = require("../models/User");
 const StoreProducts = require("../models/Products");
 const jwt = require("jsonwebtoken"); // import jwt
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key"; // set the secret key
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET; 
 const sendEmail = require("../sendEmail"); // כמו באיפוס סיסמה
 const crypto = require("crypto");
 
@@ -42,7 +42,7 @@ refreshTokenHandler: async (req, res) => {
       const newAccessToken = jwt.sign(
         { userId: user._id, role: user.role },
         SECRET_KEY,
-        { expiresIn: "15m" }
+        { expiresIn: "120m" }
       );
       res.status(200).json({ token: newAccessToken });
     } catch (err) {
@@ -147,11 +147,11 @@ refreshTokenHandler: async (req, res) => {
 
       const isMatch = await bcrypt.compare(password, user.password);
       if (!isMatch) return res.status(401).send("Invalid credentials");
-
+      if (!user.emailVerified) return res.status(403).send("email not Verified");
       const accessToken = jwt.sign(
         { userId: user._id, role: user.role },
         SECRET_KEY,
-        { expiresIn: "15m" }
+        { expiresIn: "120m" }
       );
 
       const refreshToken = jwt.sign(
@@ -349,7 +349,7 @@ deleteUser: async (req, res) => {
       res.status(500).send("Error deleting address: " + error.message);
     }
   },
-
+ 
 
 register: async (req, res) => {
   const { email, password, phoneNumber, first_name, last_name } = req.body;
@@ -709,7 +709,34 @@ clearUserCart: async (req, res) => {
     console.error(error);
     res.status(500).json({ message: "Server error" });
   }
+},
+// userController.js
+resendVerification:async (req, res) => {
+  const { email } = req.body;
+  try {
+    const user = await User.findOne({ email });
+    if (!user) return res.status(404).json({ message: "User not found" });
+    if (user.verified) return res.status(400).json({ message: "Already verified" });
+
+    const token = crypto.randomBytes(32).toString("hex");
+    user.emailVerificationToken = token;
+    user.emailVerificationExpires = Date.now() + 1000 * 60 * 60; // שעה
+    await user.save();
+
+    const verifyLink = `${BASE_URL}/verify-email/${token}`;
+    await sendEmail({
+      to: user.email,
+      subject: "אימות כתובת מייל",
+      html: `<p>נא לחץ על הקישור הבא כדי לאמת את כתובת המייל:</p><a href="${verifyLink}">${verifyLink}</a>`
+    });
+
+    res.json({ message: "Verification email sent" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: "Server error" });
+  }
 }
+
 
 };
 

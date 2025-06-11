@@ -21,8 +21,6 @@ const useProductManagement = (
   const [pendingEditRequest, setPendingEditRequest] = useState(null);
   const [pendingAutofillPayload, setPendingAutofillPayload] = useState(null);
   const [pendingEditFields, setPendingEditFields] = useState(null);
-
-
   const isAddingProductRef = useRef(isAddingProduct);
   const { showAlert } = useAlert();
 

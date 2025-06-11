@@ -30,6 +30,10 @@ const userSchema = new mongoose.Schema({
     refreshToken: { type: String },
   resetPasswordToken: String,
   resetPasswordExpires: Date,
+emailVerified: { type: Boolean, default: false },
+emailVerificationToken: String,
+emailVerificationExpires: Date,
+
 
 
 });

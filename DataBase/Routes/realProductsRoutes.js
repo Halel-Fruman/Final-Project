@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
+const sharp = require("sharp");
 const authenticateToken = require("../Middleware/authenticateToken");
 
 // storage setting
@@ -36,13 +38,27 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/upload-image", upload.single("image"), (req, res) => {
+router.post("/upload-image", upload.single("image"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-  const imageUrl = `/uploads/${req.file.filename}`;
-  res.json({ imageUrl });
-});
+  const inputPath = req.file.path;
+  const outputFilename = path.parse(req.file.filename).name + ".webp";
+  const outputPath = path.join(path.dirname(inputPath), outputFilename);
 
+  try {
+    await sharp(inputPath)
+      .webp({ quality: 80 })
+      .toFile(outputPath);
+
+    fs.unlinkSync(inputPath);
+
+    const imageUrl = `/uploads/${outputFilename}`;
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error("Image conversion error:", error);
+    res.status(500).json({ error: "Failed to convert image" });
+  }
+});
 router.get("/by-store", async (req, res) => {
   const storeId = req.query.store;
 
@@ -281,6 +297,34 @@ router.get("/filter-by-categories", async (req, res) => {
   } catch (err) {
     console.error("Error filtering products by categories:", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch("/:productId/decrease-stock", authenticateToken, async (req, res) => {
+  const { productId } = req.params;
+  const { quantity } = req.body;
+  if (!quantity || quantity <= 0) {
+    return res.status(400).json({ error: "Invalid quantity" });
+  }
+
+  try {
+    const store = await StoreProducts.findOne({ "products._id": productId });
+    if (!store) return res.status(404).json({ error: "Product not found" });
+
+    const product = store.products.id(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    if (product.stock < quantity) {
+      return res.status(400).json({ error: "Not enough stock available" });
+    }
+
+    product.stock -= quantity;
+    await store.save();
+
+    res.json({ message: "Stock updated", product });
+  } catch (error) {
+    console.error("Error updating stock:", error.message);
+    res.status(500).json({ error: "Failed to update stock" });
   }
 });
 

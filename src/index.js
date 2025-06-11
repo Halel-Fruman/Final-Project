@@ -6,6 +6,7 @@ import "@fontsource/rubik"; // משקל ברירת מחדל 400
 import "@fontsource/rubik/500.css"; // משקל 500
 import "@fontsource/rubik/700.css"; // משקל 700
 import "./index.css";
+import "@fortawesome/fontawesome-svg-core"
 
 
 const lang = localStorage.getItem("i18nextLng") || "he";
