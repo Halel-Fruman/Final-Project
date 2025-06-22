@@ -1,6 +1,5 @@
 // utils/chatBotHandlers.js
-import { useState } from "react";
-export const buildMessageHistory = (messages, role) => {
+export const buildMessageHistory = (messages, role, imageUrl)  => {
   const systemPrompt = `
 You are a smart and accessible chatbot integrated into ILAN’s e-commerce website.
 Your purpose is to assist site users — private customers and store managers with disabilities — in performing useful actions in a simple, accessible, and conversational manner.
@@ -12,6 +11,14 @@ The site serves as a social commerce platform, where users can purchase products
  You must act carefully, respecting the user’s permission level, and never trigger any automatic action without explicit confirmation in the conversation. Your goal is to assist — not to initiate critical actions unless the user asks.
 
 If the user explicitly confirms a previous suggestion (e.g., says "כן", "תפתח", "יאללה", etc.), you **must** return a valid 'action'. Never return 'action: null' in this case.
+ 
+
+---
+
+📷 If the user uploads an image, assume it is of a product they want to add or edit.
+Based **only on the visual content**, return as many fields as you can confidently identify — such as name, description, price (if visible), etc.
+Never guess fields that cannot be visually identified.
+Always respond in **Hebrew**, using the fixed JSON format as shown below.
 
 ---
 
@@ -224,10 +231,72 @@ Allowed fields inside 'newFields':
 
   const lastMessages = messages.slice(-20);
 
-  const formattedMessages = lastMessages.map((msg) => ({
-    role: msg.role,
-    content: msg.text,
-  }));
+ const formattedMessages = lastMessages.map((msg) => {
+  if (typeof msg.content === "object" && Array.isArray(msg.content)) {
+    // כבר פורמט vision
+    return {
+      role: msg.role,
+      content: msg.content,
+    };
+  } else {
+    return {
+      role: msg.role,
+      content: msg.text || msg.content || "",
+    };
+  }
+});
+  
+const hasVision = formattedMessages.some(
+  (msg) =>
+    msg.content &&
+    Array.isArray(msg.content) &&
+    msg.content.some((c) => c.type === "image_url")
+);
+
+  // ✅ אם יש תמונה — נוסיף vision message עם instruction באנגלית
+  if (imageUrl && !hasVision) {
+    formattedMessages.push({
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text:
+            `The user uploaded an image of a new product they wish to add to the store.
+
+Based solely on the visual content of the image, return as many product details as you can confidently identify. If you're not sure about a detail — skip it.
+
+Return your response as a valid JSON object in the following format:
+{
+  "reply": "תגובה ברורה בעברית, למשל 'זה נראה כמו עט. מילאתי את פרטי המוצר בטופס.'",
+  "action": "openAddProductForm",
+  "payload": {
+    "nameHe": "...",
+    "descriptionHe": "...",
+    "price": ...,
+    "manufacturingCost": ...,
+    "highlightHe": ["..."],
+    "images": ["..."],
+    "selectedCategories": ["..."],
+    "allowBackorder": true,
+    "internationalShipping": false,
+    "discountPercentage": 10,
+    "discountStart": "YYYY-MM-DD",
+    "discountEnd": "YYYY-MM-DD"
+  }
+}
+
+Only include fields you can recognize or extract visually. Do NOT guess or fill in random values.
+`,
+        },
+        {
+          type: "image_url",
+          image_url: {
+            url: imageUrl,
+          },
+        },
+      ],
+    });
+  }
 
   return [{ role: "system", content: systemPrompt }, ...formattedMessages];
 };
@@ -247,96 +316,100 @@ export const createActionHandlers = (
       productName = "";
     }
   };
-  return{
-  goToProductList: () => {
-    navigate("/store-management", {
-      state: { tab: "products" },
-      replace: true,
-    });
-    speak("מעביר אותך לעמוד ניהול המוצרים.");
-  },
-
-  openAddProduct: () => {
-    if (window.location.pathname === "/store-management") {
-      const event = new Event("openAddProductForm");
-      window.dispatchEvent(event);
-      speak("פותח את טופס הוספת המוצר.");
-    } else {
+  return {
+    goToProductList: () => {
       navigate("/store-management", {
-        state: { tab: "products", openAddProductForm: true },
+        state: { tab: "products" },
         replace: true,
       });
-      const event = new Event("openAddProductForm");
-      window.dispatchEvent(event);
-    }
-  },
+      speak("מעביר אותך לעמוד ניהול המוצרים.");
+    },
 
-  openAddProductForm: (payload) => {
-    console.log(window.location.pathname);
-    if (window.location.pathname === "/shop/store-management") {
-      console.log("true");
-      window.dispatchEvent(
-        new CustomEvent("autofillProductForm", { detail: payload })
-      );
-      speak("ממלא את פרטי המוצר בטופס.");
-    } else {
-      console.log("false");
+    openAddProduct: () => {
+      if (window.location.pathname === "/store-management") {
+        const event = new Event("openAddProductForm");
+        window.dispatchEvent(event);
+        speak("פותח את טופס הוספת המוצר.");
+      } else {
+        navigate("/store-management", {
+          state: { tab: "products", openAddProductForm: true },
+          replace: true,
+        });
+        const event = new Event("openAddProductForm");
+        window.dispatchEvent(event);
+      }
+    },
 
-      navigate("/store-management", {
-        state: { tab: "products", openAddProductForm: true, autofill: payload },
-        replace: true,
-      });
-      window.dispatchEvent(
-        new CustomEvent("autofillProductForm", { detail: payload })
-      );
-    }
-  },
-
-  openEditProduct: (payload) => {
-    setProductName(payload || {});
-
-    if (!productName) {
-      speak("לא צוין שם מוצר לעריכה.");
-      return;
-    }
-
-    if (window.location.pathname !== "/store-management") {
-      // לא בדף הנכון — ננווט קודם
-      navigate("/store-management", {
-        state: { tab: "products" }, // אם יש לך טאב מוצרים
-        replace: true,
-      });
-
-      // רגע! לא להמשיך מיד — נחכה שהניווט יקרה
-      setTimeout(() => {
+    openAddProductForm: (payload) => {
+      console.log(window.location.pathname);
+      if (window.location.pathname === "/shop/store-management") {
+        console.log("true");
         window.dispatchEvent(
-          new CustomEvent("openEditProduct", { detail: { productName } })
+          new CustomEvent("autofillProductForm", { detail: payload })
         );
-        speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-      }, 500); // חצי שנייה שיהיה זמן לניווט
-      return;
-    }
+        speak("ממלא את פרטי המוצר בטופס.");
+      } else {
+        console.log("false");
 
-    // אם כבר בדף הנכון — שולח ישר
-    window.dispatchEvent(
-      new CustomEvent("openEditProduct", { detail: { productName } })
-    );
-    speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-  },
+        navigate("/store-management", {
+          state: {
+            tab: "products",
+            openAddProductForm: true,
+            autofill: payload,
+          },
+          replace: true,
+        });
+        window.dispatchEvent(
+          new CustomEvent("autofillProductForm", { detail: payload })
+        );
+      }
+    },
 
-  editProduct: (payload) => {
-    if (!payload || !payload.productName || !payload.newFields) {
-      console.warn("Invalid payload for editProduct:", payload);
-      speak("חסר מידע לעדכון המוצר.");
-      return;
-    }
-    console.log("editProduct payload:", payload);
+    openEditProduct: (payload) => {
+      setProductName(payload || {});
 
-    // const isEditOpen = document.getElementById("edit-product-modal");
-    // console.log("isEditOpen:", isEditOpen);
-    if (window.location.pathname === "/shop/store-management") {
-      console.log("here");
-       window.dispatchEvent(
+      if (!productName) {
+        speak("לא צוין שם מוצר לעריכה.");
+        return;
+      }
+
+      if (window.location.pathname !== "/store-management") {
+        // לא בדף הנכון — ננווט קודם
+        navigate("/store-management", {
+          state: { tab: "products" }, // אם יש לך טאב מוצרים
+          replace: true,
+        });
+
+        // רגע! לא להמשיך מיד — נחכה שהניווט יקרה
+        setTimeout(() => {
+          window.dispatchEvent(
+            new CustomEvent("openEditProduct", { detail: { productName } })
+          );
+          speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
+        }, 500); // חצי שנייה שיהיה זמן לניווט
+        return;
+      }
+
+      // אם כבר בדף הנכון — שולח ישר
+      window.dispatchEvent(
+        new CustomEvent("openEditProduct", { detail: { productName } })
+      );
+      speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
+    },
+
+    editProduct: (payload) => {
+      if (!payload || !payload.productName || !payload.newFields) {
+        console.warn("Invalid payload for editProduct:", payload);
+        speak("חסר מידע לעדכון המוצר.");
+        return;
+      }
+      console.log("editProduct payload:", payload);
+
+      // const isEditOpen = document.getElementById("edit-product-modal");
+      // console.log("isEditOpen:", isEditOpen);
+      if (window.location.pathname === "/shop/store-management") {
+        console.log("here");
+        window.dispatchEvent(
           new CustomEvent("autofillEditProductForm", {
             detail: {
               newFields: payload.newFields,
@@ -344,33 +417,34 @@ export const createActionHandlers = (
             },
           })
         );
-      speak("ממלא את פרטי המוצר המעודכנים.");
-      // } else if (!isEditOpen) {
-      //   speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
-    } else {
-      speak("יש לפתוח את דף ניהול המוצרים תחילה.");
-    }
-  },
+        speak("ממלא את פרטי המוצר המעודכנים.");
+        // } else if (!isEditOpen) {
+        //   speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
+      } else {
+        speak("יש לפתוח את דף ניהול המוצרים תחילה.");
+      }
+    },
 
-  viewStoreOrders: () => navigate("/store/orders"),
-  showStats: () => navigate("/store/analytics"),
-  openSettings: () => navigate("/store/settings"),
-  goToHome: () => navigate("/"),
-  openHelpCenter: () => navigate("/help"),
-  trackOrder: () => navigate("/track-order"),
-  contactSupport: () => navigate("/contact"),
-  goToFavorites: () => navigate("/favorites"),
-  openSearchPage: () => navigate("/search"),
-  openCategories: () => navigate("/categories"),
-  goToPersonalArea: () => navigate("/personal-area"),
-  goToPersonalOrders: () =>
-    navigate("/personal-area", { state: { selectedTab: "orders" } }),
-  viewTransactions: () => navigate("/store/transactions"),
+    viewStoreOrders: () => navigate("/store/orders"),
+    showStats: () => navigate("/store/analytics"),
+    openSettings: () => navigate("/store/settings"),
+    goToHome: () => navigate("/"),
+    openHelpCenter: () => navigate("/help"),
+    trackOrder: () => navigate("/track-order"),
+    contactSupport: () => navigate("/contact"),
+    goToFavorites: () => navigate("/favorites"),
+    openSearchPage: () => navigate("/search"),
+    openCategories: () => navigate("/categories"),
+    goToPersonalArea: () => navigate("/personal-area"),
+    goToPersonalOrders: () =>
+      navigate("/personal-area", { state: { selectedTab: "orders" } }),
+    viewTransactions: () => navigate("/store/transactions"),
 
-  openCart: externalHandlers.onOpenCart,
-  openWishlist: externalHandlers.onOpenWishlist,
-  logout: externalHandlers.onLogout,
-}};
+    openCart: externalHandlers.onOpenCart,
+    openWishlist: externalHandlers.onOpenWishlist,
+    logout: externalHandlers.onLogout,
+  };
+};
 
 export const handleAction = (
   action,

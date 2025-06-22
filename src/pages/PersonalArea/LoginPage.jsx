@@ -130,10 +130,10 @@ const Login = ({
         <button
           type="submit"
           disabled={loading}
-          className={`w-full py-2 px-4 text-white font-bold text-xl rounded-full shadow-sm ${
+          className={`w-full py-2 px-4 text-white font-bold text-xl rounded-full transition-transform duration-200 transform hover:scale-105 shadow-sm ${
             loading
               ? "bg-gray-400 cursor-not-allowed"
-              : "bg-primaryColor hover:bg-secondaryColor"
+              : "bg-primaryColor hover:bg-primaryColor"
           }`}>
           {loading ? t("login.loading") : t("login.submit")}
         </button>
@@ -160,7 +160,7 @@ const Login = ({
           toast.error(t("login.networkError"));
         }
       }}
-      className="mt-1 text-blue-600 font-medium hover:underline"
+      className="mt-1 text-blue-600 font-medium hover:underline transition-transform duration-200 transform hover:scale-110"
     >
       {t("login.resendVerificationButton")}
     </button>

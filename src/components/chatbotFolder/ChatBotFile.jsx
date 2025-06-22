@@ -1,9 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { FaPaperPlane, FaMicrophone } from "react-icons/fa";
+import { FaPaperPlane, FaMicrophone, FaCamera } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 import { jwtDecode } from "jwt-decode";
 import chatImage from "./chatImage2.png";
 import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
 import {
   buildMessageHistory,
@@ -103,7 +104,7 @@ const ChatBot = ({
       window.webkitSpeechRecognition)();
     recognition.lang = "he-IL";
     recognition.interimResults = false;
- recognition.onend = () => {
+    recognition.onend = () => {
       setIsListening(false); // מפסיק להאזין אוטומטית כשהמערכת מסיימת
     };
 
@@ -116,8 +117,6 @@ const ChatBot = ({
       setInput(transcript);
       sendMessage(transcript);
     };
-
-    
 
     recognition.start();
   };
@@ -183,12 +182,123 @@ const ChatBot = ({
     setLoading(false);
   };
 
+  const handleImageUpload = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+
+  const formData = new FormData();
+  formData.append("image", file);
+
+  try {
+    // 1. העלאת התמונה לשרת
+    const uploadRes = await fetch("/api/products/upload-image", {
+      method: "POST",
+      body: formData,
+    });
+
+    const uploadData = await uploadRes.json();
+    if (!uploadRes.ok || !uploadData.imageUrl) {
+      alert("שגיאה בהעלאת התמונה");
+      return;
+    }
+
+    const fullImageUrl = `https://ilan-israel.co.il/api${uploadData.imageUrl}`;
+
+    // 2. יצירת הודעה ויזואלית לצ'אט (להצגה בלבד)
+    const imagePreviewMessage = {
+      role: "user",
+      image: fullImageUrl,
+    };
+
+    // 3. יצירת הודעת vision ל־GPT
+    const visionMessage = {
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text:
+            "The user uploaded an image of a new product they wish to add to the store.\n\n" +
+            "Based solely on the visual content of the image, return as many product details as you can confidently identify. " +
+            "Only include fields you can visually recognize. Do NOT guess or fabricate information.",
+        },
+        {
+          type: "image_url",
+          image_url: {
+            url: fullImageUrl,
+          },
+        },
+      ],
+    };
+
+    // 4. עידכון היסטוריית ההודעות והצגת התמונה
+    const newMessages = [...messages, imagePreviewMessage, visionMessage];
+    setMessages(newMessages);
+    setLoading(true);
+
+    // 5. בניית ההיסטוריה לתקשורת עם GPT
+    const formattedMessages = buildMessageHistory(newMessages, role);
+
+    const res = await fetch("/api/chat", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        messages: formattedMessages,
+        userId,
+        role,
+        imageUrl: fullImageUrl,
+      }),
+    });
+
+    const data = await res.json();
+    const botMessage = {
+      role: "assistant",
+      text: data.reply || "לא הצלחתי להבין מהתמונה.",
+    };
+
+    setMessages((prev) => [...prev, botMessage]);
+    speak(botMessage.text);
+
+    if (data.action) {
+      handleAction(
+        data.action,
+        data.payload || null,
+        token,
+        userId,
+        role,
+        [
+          "openAddProductForm",
+          "goToProductList",
+          "openAddProduct",
+          "editProduct",
+          "openEditProduct",
+          "viewOrders",
+          "showStats",
+          "openSettings",
+          "createDiscount",
+          "sendNewsletter",
+          "viewTransactions",
+        ],
+        speak,
+        setMessages,
+        actionHandlers
+      );
+    }
+
+    setLoading(false);
+  } catch (err) {
+    console.error("שגיאה בניתוח תמונה:", err);
+    alert("אירעה שגיאה בניתוח התמונה.");
+    setLoading(false);
+  }
+};
+
   return (
     <div className="fixed bottom-4 left-4 z-50">
       {isHidden ? (
         <button
           className="fixed bottom-4 left-4 z-50 bg-primaryColor text-white px-3 py-1 rounded-full text-sm shadow"
-          onClick={() => setIsHidden(false)}>
+          onClick={() => setIsHidden(false)}
+        >
           פתח את הבוט
         </button>
       ) : (
@@ -200,8 +310,9 @@ const ChatBot = ({
               </div>
             )}
             <button
-              className="w-24 h-24 shadow-lg rounded-full overflow-hidden border-2 border-primaryColor bg-transparent p-0"
-              onClick={toggleChat}>
+              className="w-24 h-24 shadow-lg rounded-full overflow-hidden border-2 border-primaryColor bg-transparent p-0 transition-transform duration-200 transform hover:scale-110"
+              onClick={toggleChat}
+            >
               <img
                 src={chatImage}
                 alt=""
@@ -213,7 +324,8 @@ const ChatBot = ({
                 setIsHidden(true);
                 setIsOpen(false);
               }}
-              className="text-xs text-gray-500 hover:text-red-600 mt-2 underline">
+              className="text-xs text-gray-500 hover:text-red-600 mt-2 underline"
+            >
               הסתר בוט
             </button>
           </div>
@@ -225,7 +337,8 @@ const ChatBot = ({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 60, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="w-80 h-[30rem] bg-white rounded-3xl shadow-2xl flex flex-col p-4 mt-2">
+                className="w-80 h-[30rem] bg-white rounded-3xl shadow-2xl flex flex-col p-4 mt-2"
+              >
                 <div className="mb-2">
                   <label className="text-xs text-gray-500 block mb-1">
                     בחר קול
@@ -238,7 +351,8 @@ const ChatBot = ({
                       );
                       setSelectedVoice(selected);
                     }}
-                    value={selectedVoice?.name || ""}>
+                    value={selectedVoice?.name || ""}
+                  >
                     <option value="">ברירת מחדל</option>
                     {voices.map((v) => (
                       <option key={v.name} value={v.name}>
@@ -268,8 +382,17 @@ const ChatBot = ({
                         msg.role === "user"
                           ? "bg-blue-100 self-end"
                           : "bg-secondaryColor self-start"
-                      }`}>
-                      {msg.text}
+                      }`}
+                    >
+                      {msg.image ? (
+                        <img
+                          src={msg.image}
+                          alt="תמונה"
+                          className="max-w-[60%] rounded-lg"
+                        />
+                      ) : (
+                        msg.text
+                      )}
                     </motion.div>
                   ))}
                   {loading && (
@@ -279,15 +402,32 @@ const ChatBot = ({
                 </div>
 
                 <div className="flex items-center gap-2 mt-2">
+                  {role === "storeManager" && (
+                    <label
+                      className="cursor-pointer text-primaryColor  transition-transform duration-200 transform hover:scale-110
+"
+                    >
+                      <FaCamera className="text-lg" />
+                      <input
+                        type="file"
+                        accept="image/*"
+                        capture="environment"
+                        onChange={handleImageUpload}
+                        className="hidden"
+                      />
+                    </label>
+                  )}
                   <button
                     onClick={startListening}
                     disabled={isListening}
-                    className={`text-xl transition-colors duration-300 ${
-          isListening ? "text-red-500" : "text-primaryColor"
-        }`}
-                    aria-label="דבר">
+                    className={`text-xl transition-colors duration-300transition-transform duration-200 transform hover:scale-110 ${
+                      isListening ? "text-red-500" : "text-primaryColor"
+                    }`}
+                    aria-label="דבר"
+                  >
                     <FaMicrophone />
                   </button>
+
                   <input
                     type="text"
                     className="flex-grow border rounded-full px-4 py-1 text-sm focus:outline-none"
@@ -296,10 +436,12 @@ const ChatBot = ({
                     onChange={(e) => setInput(e.target.value)}
                     onKeyDown={(e) => e.key === "Enter" && sendMessage()}
                   />
+
                   <button
                     onClick={() => sendMessage()}
-                    className="text-primaryColor text-xl"
-                    aria-label="שלח">
+                    className="text-primaryColor text-xl transition-transform duration-200 transform hover:scale-110"
+                    aria-label="שלח"
+                  >
                     <FaPaperPlane />
                   </button>
                 </div>
