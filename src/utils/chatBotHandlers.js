@@ -334,7 +334,6 @@ export const createActionHandlers = (
       console.log("editProduct payload:", payload);
       setProductName(payload.productName);
 
-      // נוודא ש-productId נשמר גם אם כבר קיים
       if (!window.__editingProductId) {
         const lastId = localStorage.getItem("lastEditedProductId");
         if (lastId) {
