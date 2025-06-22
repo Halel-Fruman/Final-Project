@@ -22,7 +22,7 @@ const useProductManagement = (
   const [pendingEditFields, setPendingEditFields] = useState(null);
   const isAddingProductRef = useRef(isAddingProduct);
   const { showAlert } = useAlert();
-  const [formMode, setFormMode] = useState("add"); // מצב: "add" או "edit"
+  const [formMode, setFormMode] = useState("add");
 
   // Map the autofill payload to the expected product structure
   useEffect(() => {
@@ -94,7 +94,7 @@ const useProductManagement = (
       if (productId) {
         const productToEdit = products.find((p) => p._id === productId);
         if (productToEdit) {
-          window.localStorage.setItem("lastEditedProductId", productId); // שמירת מזהה
+          window.localStorage.setItem("lastEditedProductId", productId);
           setEditingProduct(productToEdit);
           setIsAddingProduct(true);
           setFormMode("edit");
@@ -168,7 +168,6 @@ const useProductManagement = (
     }
 
     if (found) {
-      // נשמור את מזהה המוצר באופן גלובלי
       window.__editingProductId = found._id;
       localStorage.setItem("lastEditedProductId", found._id);
 
@@ -264,7 +263,7 @@ useEffect(() => {
       () => {
         setIsAddingProduct(false);
         setEditingProduct(null);
-        setFormMode("add"); // איפוס למצב הוספה
+        setFormMode("add");
       },
       () => {}
     );

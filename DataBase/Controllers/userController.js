@@ -3,8 +3,8 @@ const User = require("../models/User");
 const StoreProducts = require("../models/Products");
 const jwt = require("jsonwebtoken"); // import jwt
 const SECRET_KEY = process.env.JWT_SECRET || "your-secret-key"; // set the secret key
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET; 
-const sendEmail = require("../sendEmail"); // כמו באיפוס סיסמה
+const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET;
+const sendEmail = require("../sendEmail");
 const crypto = require("crypto");
 
 const BASE_URL = process.env.REACT_APP_BASE_URL || "https://yourdomain.com";
@@ -220,9 +220,8 @@ refreshTokenHandler: async (req, res) => {
     }
   },
 
-// מחיקת משתמש – רק למשתמשים עם role === 'admin'
 deleteUser: async (req, res) => {
-  const requesterRole = req.user.role; // נשלף מהמידלוור
+  const requesterRole = req.user.role;
   const userIdToDelete = req.params.userId;
 
   if (requesterRole !== "admin") {
@@ -349,7 +348,7 @@ deleteUser: async (req, res) => {
       res.status(500).send("Error deleting address: " + error.message);
     }
   },
- 
+
 
 register: async (req, res) => {
   const { email, password, phoneNumber, first_name, last_name } = req.body;
@@ -372,7 +371,7 @@ register: async (req, res) => {
       addresses: [],
       emailVerified: false,
       emailVerificationToken: verificationToken,
-      emailVerificationExpires: Date.now() + 1000 * 60 * 60, // שעה
+      emailVerificationExpires: Date.now() + 1000 * 60 * 60, // 1 hour
     });
 
     await newUser.save();
@@ -720,7 +719,7 @@ resendVerification:async (req, res) => {
 
     const token = crypto.randomBytes(32).toString("hex");
     user.emailVerificationToken = token;
-    user.emailVerificationExpires = Date.now() + 1000 * 60 * 60; // שעה
+    user.emailVerificationExpires = Date.now() + 1000 * 60 * 60; // 1 hour
     await user.save();
 
     const verifyLink = `${BASE_URL}/verify-email/${token}`;

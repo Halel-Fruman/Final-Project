@@ -173,8 +173,8 @@ const Login = ({
           type="button"
           className="text-blue-600 hover:underline"
           onClick={() => {
-            onClose(); // סגור את המודל הנוכחי
-            window.location.href = "/shop/forgot-password"; // ניווט לדף איפוס
+            onClose();
+            window.location.href = "/shop/forgot-password";
           }}>
           {t("login.forgotPassword")}
         </button>

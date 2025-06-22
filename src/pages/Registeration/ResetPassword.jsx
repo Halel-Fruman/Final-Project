@@ -4,7 +4,7 @@ import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
 export default function ResetPassword() {
-  const { token } = useParams(); // טוקן מה-URL
+  const { token } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
 

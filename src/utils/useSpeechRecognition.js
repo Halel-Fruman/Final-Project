@@ -19,7 +19,7 @@ const useSpeechRecognition = ({ onResult, lang = "he-IL" } = {}) => {
 
     recognition.lang = lang;
     recognition.interimResults = false;
-    recognition.continuous = false; // חשוב! יזהה סיום לבד
+    recognition.continuous = false;
 
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;

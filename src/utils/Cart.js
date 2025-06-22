@@ -1,6 +1,5 @@
 import { fetchWithTokenRefresh } from "../utils/authHelpers";
 
-// קריאת עגלה
 export const fetchCart = async (userId, token) => {
   try {
     const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
@@ -21,7 +20,6 @@ export const fetchCart = async (userId, token) => {
   }
 };
 
-// שמירת עגלה
 export const saveCart = async (userId, token, cartItems) => {
   try {
     if (cartItems.length === 0) {
@@ -48,7 +46,6 @@ export const saveCart = async (userId, token, cartItems) => {
   }
 };
 
-// הוספה לעגלה
 export const addToCart = async (userId, token, product) => {
   try {
     const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
@@ -74,7 +71,7 @@ export const addToCart = async (userId, token, product) => {
   }
 };
 
-// הסרה מהעגלה
+
 export const removeFromCart = async (userId, token, productId) => {
   try {
     const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
@@ -97,7 +94,6 @@ export const removeFromCart = async (userId, token, productId) => {
   }
 };
 
-// עדכון כמות
 export const updateCartItemQuantity = async (
   userId,
   productId,
@@ -128,7 +124,6 @@ export const updateCartItemQuantity = async (
   }
 };
 
-// חישוב סה״כ
 export const calculateCartTotal = (cartItems) => {
   return cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -136,7 +131,6 @@ export const calculateCartTotal = (cartItems) => {
   );
 };
 
-// שליפת פרטי מוצר (ציבורי - לא צריך refresh)
 export const fetchProductDetails = async (productId) => {
   if (!productId) {
     console.error("fetchProductDetails called with undefined productId");

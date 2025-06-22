@@ -59,7 +59,7 @@ const StoreManagement = () => {
         );
       } catch (error) {
         console.error("Failed to load store by ID", error.message);
-        navigate("/"); // fallback גם בשגיאה כללית
+        navigate("/");
       } finally {
         setIsFetchingStore(false);
       }

@@ -1,9 +1,9 @@
 import toast from "react-hot-toast";
 
-let logoutTriggered = false; // מונע הפעלה כפולה
+let logoutTriggered = false;
 
 export function forceLogout() {
-  if (logoutTriggered) return; // מניעת קריאות כפולות
+  if (logoutTriggered) return;
   logoutTriggered = true;
 
   toast.error("פג תוקף ההתחברות, נא התחבר מחדש");
@@ -14,7 +14,7 @@ export function forceLogout() {
   localStorage.removeItem("role");
 
   setTimeout(() => {
-    window.location.href = "/shop"; // הפניה לדף הבית
+    window.location.href = "/shop";
   }, 1500);
 }
 

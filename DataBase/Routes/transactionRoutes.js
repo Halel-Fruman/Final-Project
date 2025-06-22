@@ -1,7 +1,7 @@
 const express = require("express");
 const {
   getTransactions,
-  updateTransaction, 
+  updateTransaction,
   updateProductStatus,
   getStoreTransaction,
   getTransactionsByID,
@@ -15,10 +15,8 @@ const router = express.Router();
 router.post("/add", addTransaction);
 router.put("/:transactionId/updateTransactionStatus", updateTransactionStatus);
 
-// קבלת כל העסקאות של חנות מסוימת
 router.get("/transactions/:storeId", getStoreTransaction);
 
-// קבלת כל העסקאות
 router.get("/", getTransactions);
 
 router.put('/:transactionId/updateTransaction', updateTransaction);
@@ -28,10 +26,8 @@ router.put('/:transactionId/updateTransaction', updateTransaction);
 router.get("/by-id/:transactionId", getTransactionsByID);
 router.get("/by-transactionId/:transactionId", getOrdersByTransactionId);
 
-// עדכון סטטוס של מוצר בתוך עסקה
 router.put("/:transactionId/updateProductStatus", updateProductStatus);
 
-// עדכון סטטוס משלוח
 router.put("/:transactionId/updateDeliveryStatus", async (req, res) => {
   try {
     const { deliveryStatus, trackingNumber, estimatedDelivery } = req.body;

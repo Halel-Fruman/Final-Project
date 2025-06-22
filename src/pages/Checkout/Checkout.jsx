@@ -55,7 +55,7 @@ const CheckoutPage = ({
       if (event?.data?.type === "TRZILA_PAYMENT_SUCCESS") {
         (async () => {
           try {
-            setIsFinalizing(true); // ⬅️ התחלת טעינה
+            setIsFinalizing(true);
 
             const res = await fetch(`/api/tranzila/notify/${userId}`);
             if (!res.ok) throw new Error("Failed to fetch notify info");
@@ -78,7 +78,7 @@ const CheckoutPage = ({
             console.error("❌ Error during post-payment processing:", err);
             alert("שגיאה בעת השלמת ההזמנה");
           } finally {
-            setIsFinalizing(false); // ⬅️ סיום טעינה
+            setIsFinalizing(false);
           }
         })();
       }

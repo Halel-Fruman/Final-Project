@@ -248,7 +248,6 @@ const OrderDetailsModal = ({ order, onClose, showAlert }) => {
                       onChange={(e) =>
                         handleChange("delivery", key, e.target.value)
                       }
-                      // 👇 מבטל הגבלת תאריך עתידי בלבד
                       max=""
                       min=""
                     />

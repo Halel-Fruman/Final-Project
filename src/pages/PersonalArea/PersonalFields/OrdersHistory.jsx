@@ -79,7 +79,7 @@ const OrderHistory = ({ user, addToCart }) => {
         .sort(([, aOrders], [, bOrders]) => {
           const aDate = new Date(aOrders[0]?.createdAt || 0);
           const bDate = new Date(bOrders[0]?.createdAt || 0);
-          return bDate - aDate; // חדש קודם
+          return bDate - aDate;
         })
         .map(([transactionId, orders], idx) => (
           <div

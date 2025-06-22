@@ -251,7 +251,6 @@ Allowed fields inside 'newFields':
 
   const formattedMessages = lastMessages.map((msg) => {
     if (typeof msg.content === "object" && Array.isArray(msg.content)) {
-      // כבר פורמט vision
       return {
         role: msg.role,
         content: msg.content,
@@ -271,7 +270,6 @@ Allowed fields inside 'newFields':
       msg.content.some((c) => c.type === "image_url")
   );
 
-  // ✅ אם יש תמונה — נוסיף vision message עם instruction באנגלית
   if (imageUrl && !hasVision) {
     formattedMessages.push({
       role: "user",
@@ -391,23 +389,20 @@ export const createActionHandlers = (
       }
 
       if (window.location.pathname !== "/store-management") {
-        // לא בדף הנכון — ננווט קודם
         navigate("/store-management", {
-          state: { tab: "products" }, // אם יש לך טאב מוצרים
+          state: { tab: "products" },
           replace: true,
         });
 
-        // רגע! לא להמשיך מיד — נחכה שהניווט יקרה
         setTimeout(() => {
           window.dispatchEvent(
             new CustomEvent("openEditProduct", { detail: { productName } })
           );
           speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-        }, 500); // חצי שנייה שיהיה זמן לניווט
+        }, 500);
         return;
       }
 
-      // אם כבר בדף הנכון — שולח ישר
       window.dispatchEvent(
         new CustomEvent("openEditProduct", { detail: { productName } })
       );
@@ -422,22 +417,19 @@ export const createActionHandlers = (
       }
       console.log("editProduct payload:", payload);
 
-      // const isEditOpen = document.getElementById("edit-product-modal");
-      // console.log("isEditOpen:", isEditOpen);
+
       if (window.location.pathname === "/shop/store-management") {
         console.log("here");
         window.dispatchEvent(
           new CustomEvent("autofillEditProductForm", {
             detail: {
-              productId,
               newFields: payload.newFields,
               productName: payload.productName,
             },
           })
         );
         speak("ממלא את פרטי המוצר המעודכנים.");
-        // } else if (!isEditOpen) {
-        //   speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
+
       } else {
         speak("יש לפתוח את דף ניהול המוצרים תחילה.");
       }

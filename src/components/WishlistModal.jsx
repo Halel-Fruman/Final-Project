@@ -19,7 +19,7 @@ const WishlistModal = ({
 
   useEffect(() => {
     const loadProducts = async () => {
-      setIsLoading(true); // ← התחלת טעינה
+      setIsLoading(true);
       if (!wishlist || wishlist.length === 0) {
         setProducts([]);
         setIsLoading(false);
@@ -34,7 +34,7 @@ const WishlistModal = ({
         (p) => p !== null && p !== undefined
       );
       setProducts(validProducts);
-      setIsLoading(false); // ← סיום טעינה
+      setIsLoading(false);
     };
 
     if (isOpen) loadProducts();

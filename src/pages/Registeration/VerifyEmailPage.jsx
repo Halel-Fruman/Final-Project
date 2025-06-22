@@ -17,14 +17,14 @@ export default function VerifyEmailPage() {
         const response = await fetch(`/api/User/verify-email/${token}`);
         if (response.ok) {
           setStatus("success");
-          setTimeout(() => navigate("/"), 5000); // ניווט אוטומטי הביתה לאחר 3 שניות
+          setTimeout(() => navigate("/"), 5000);
         } else {
           setStatus("error");
         }
       } catch (err) {
         setStatus("error");
       } finally {
-        setHasFetched(true); // מונע שליחה כפולה
+        setHasFetched(true);
 
       }
     };

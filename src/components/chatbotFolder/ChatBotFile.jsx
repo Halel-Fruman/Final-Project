@@ -48,7 +48,7 @@ const ChatBot = ({
         setMessages([
           { role: "assistant", text: "שלום! איך אפשר לעזור לך היום?" },
         ]);
-      }, 800); // או 1000ms
+      }, 800);
 
       return () => clearTimeout(timeout);
     }
@@ -105,12 +105,11 @@ const ChatBot = ({
     recognition.lang = "he-IL";
     recognition.interimResults = false;
     recognition.onend = () => {
-      setIsListening(false); // מפסיק להאזין אוטומטית כשהמערכת מסיימת
-    };
+      setIsListening(false);     };
 
     recognition.onerror = (e) => {
       console.error(e);
-      setIsListening(false); // שגיאה -> מפסיק להאזין
+      setIsListening(false);
     };
     recognition.onresult = (event) => {
       const transcript = event.results[0][0].transcript;
@@ -205,12 +204,10 @@ const ChatBot = ({
 
       const fullImageUrl = `https://ilan-israel.co.il/api${uploadData.imageUrl}`;
 
-      // ⏳ פותחים את טופס הוספת מוצר לפני שליחת ההודעות ל־GPT
       if (actionHandlers.openAddProduct) {
-        actionHandlers.openAddProduct(); // פותח את הטופס UI
+        actionHandlers.openAddProduct();
       }
 
-      // ⏱️ מחכים רגע שייפתח
       setTimeout(async () => {
         const instructionMessage = {
           role: "user",
@@ -284,7 +281,7 @@ const ChatBot = ({
         }
 
         setLoading(false);
-      }, 500); // זמן המתנה לפתיחת הטופס
+      }, 500);
     } catch (err) {
       console.error("שגיאה בניתוח תמונה:", err);
       alert("אירעה שגיאה בניתוח התמונה.");
