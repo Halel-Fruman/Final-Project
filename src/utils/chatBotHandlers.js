@@ -1,6 +1,5 @@
 // utils/chatBotHandlers.js
-import { useState } from "react";
-export const buildMessageHistory = (messages, role) => {
+export const buildMessageHistory = (messages, role, imageUrl) => {
   const systemPrompt = `
 You are a smart and accessible chatbot integrated into ILAN’s e-commerce website.
 Your purpose is to assist site users — private customers and store managers with disabilities — in performing useful actions in a simple, accessible, and conversational manner.
@@ -12,6 +11,32 @@ The site serves as a social commerce platform, where users can purchase products
  You must act carefully, respecting the user’s permission level, and never trigger any automatic action without explicit confirmation in the conversation. Your goal is to assist — not to initiate critical actions unless the user asks.
 
 If the user explicitly confirms a previous suggestion (e.g., says "כן", "תפתח", "יאללה", etc.), you **must** return a valid 'action'. Never return 'action: null' in this case.
+
+
+---
+
+📷 If the user uploads an image, assume it is of a product they want to add to the store.
+
+1. First, return this action:
+{
+  "reply": "פותח את טופס הוספת מוצר.",
+  "action": "openAddProduct",
+  "payload": null
+}
+
+3. Then return:
+{
+  "reply": "מילאתי את פרטי המוצר לפי התמונה. תוכל לעבור עליהם לפני אישור.",
+  "action": "openAddProductForm",
+  "payload": {
+    // Fields based ONLY on visual content, such as nameHe, nameEn,(translate the name and the description) descriptionHe,descriptionEn, price, images,(use on the image URL thet you get) etc.
+  }
+}
+
+⚠️ You must NOT fabricate data.
+Only include fields you can confidently extract visually from the image (e.g., product name, visual description, price if visible).
+All responses must be in Hebrew and in the standard JSON format.
+
 
 ---
 
@@ -224,10 +249,71 @@ Allowed fields inside 'newFields':
 
   const lastMessages = messages.slice(-20);
 
-  const formattedMessages = lastMessages.map((msg) => ({
-    role: msg.role,
-    content: msg.text,
-  }));
+  const formattedMessages = lastMessages.map((msg) => {
+    if (typeof msg.content === "object" && Array.isArray(msg.content)) {
+      // כבר פורמט vision
+      return {
+        role: msg.role,
+        content: msg.content,
+      };
+    } else {
+      return {
+        role: msg.role,
+        content: msg.text || msg.content || "",
+      };
+    }
+  });
+
+  const hasVision = formattedMessages.some(
+    (msg) =>
+      msg.content &&
+      Array.isArray(msg.content) &&
+      msg.content.some((c) => c.type === "image_url")
+  );
+
+  // ✅ אם יש תמונה — נוסיף vision message עם instruction באנגלית
+  if (imageUrl && !hasVision) {
+    formattedMessages.push({
+      role: "user",
+      content: [
+        {
+          type: "text",
+          text: `The user uploaded an image of a new product they wish to add to the store.
+
+Based solely on the visual content of the image, return as many product details as you can confidently identify. If you're not sure about a detail — skip it.
+
+Return your response as a valid JSON object in the following format:
+{
+  "reply": "תגובה ברורה בעברית, למשל 'זה נראה כמו עט. מילאתי את פרטי המוצר בטופס.'",
+  "action": "openAddProductForm",
+  "payload": {
+    "nameHe": "...",
+    "descriptionHe": "...",
+    "price": ...,
+    "manufacturingCost": ...,
+    "highlightHe": ["..."],
+    "images": ["..."],
+    "selectedCategories": ["..."],
+    "allowBackorder": true,
+    "internationalShipping": false,
+    "discountPercentage": 10,
+    "discountStart": "YYYY-MM-DD",
+    "discountEnd": "YYYY-MM-DD"
+  }
+}
+
+Only include fields you can recognize or extract visually. Do NOT guess or fill in random values.
+`,
+        },
+        {
+          type: "image_url",
+          image_url: {
+            url: imageUrl,
+          },
+        },
+      ],
+    });
+  }
 
   return [{ role: "system", content: systemPrompt }, ...formattedMessages];
 };
@@ -305,19 +391,23 @@ export const createActionHandlers = (
       }
 
       if (window.location.pathname !== "/store-management") {
+        // לא בדף הנכון — ננווט קודם
         navigate("/store-management", {
-          state: { tab: "products" },
+          state: { tab: "products" }, // אם יש לך טאב מוצרים
           replace: true,
         });
 
+        // רגע! לא להמשיך מיד — נחכה שהניווט יקרה
         setTimeout(() => {
           window.dispatchEvent(
             new CustomEvent("openEditProduct", { detail: { productName } })
           );
           speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-        }, 1000);
+        }, 500); // חצי שנייה שיהיה זמן לניווט
+        return;
       }
 
+      // אם כבר בדף הנכון — שולח ישר
       window.dispatchEvent(
         new CustomEvent("openEditProduct", { detail: { productName } })
       );
@@ -330,23 +420,12 @@ export const createActionHandlers = (
         speak("חסר מידע לעדכון המוצר.");
         return;
       }
-
       console.log("editProduct payload:", payload);
-      setProductName(payload.productName);
 
-      if (!window.__editingProductId) {
-        const lastId = localStorage.getItem("lastEditedProductId");
-        if (lastId) {
-          window.__editingProductId = lastId;
-        }
-      }
-
-      const productId =
-        window.__editingProductId ||
-        localStorage.getItem("lastEditedProductId");
-
+      // const isEditOpen = document.getElementById("edit-product-modal");
+      // console.log("isEditOpen:", isEditOpen);
       if (window.location.pathname === "/shop/store-management") {
-        // נשלח בכל מקרה את האירוע, גם אם כבר ערכנו מוצר
+        console.log("here");
         window.dispatchEvent(
           new CustomEvent("autofillEditProductForm", {
             detail: {
@@ -357,6 +436,8 @@ export const createActionHandlers = (
           })
         );
         speak("ממלא את פרטי המוצר המעודכנים.");
+        // } else if (!isEditOpen) {
+        //   speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
       } else {
         speak("יש לפתוח את דף ניהול המוצרים תחילה.");
       }
@@ -370,7 +451,6 @@ export const createActionHandlers = (
     trackOrder: () => navigate("/track-order"),
     contactSupport: () => navigate("/contact"),
     goToFavorites: () => navigate("/favorites"),
-    openSearchPage: () => navigate("/search"),
     openCategories: () => navigate("/categories"),
     goToPersonalArea: () => navigate("/personal-area"),
     goToPersonalOrders: () =>

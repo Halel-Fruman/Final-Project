@@ -22,6 +22,7 @@ const useProductManagement = (
   const [pendingEditFields, setPendingEditFields] = useState(null);
   const isAddingProductRef = useRef(isAddingProduct);
   const { showAlert } = useAlert();
+  const [formMode, setFormMode] = useState("add"); // מצב: "add" או "edit"
 
   // Map the autofill payload to the expected product structure
   useEffect(() => {
@@ -48,6 +49,8 @@ const useProductManagement = (
     const handleOpenAdd = () => {
       setIsAddingProduct(true);
       setEditingProduct(null);
+      setEditProductId(null); //
+      setFormMode("add");
     };
     window.addEventListener("openAddProduct", handleOpenAdd);
     return () => window.removeEventListener("openAddProduct", handleOpenAdd);
@@ -94,6 +97,7 @@ const useProductManagement = (
           window.localStorage.setItem("lastEditedProductId", productId); // שמירת מזהה
           setEditingProduct(productToEdit);
           setIsAddingProduct(true);
+          setFormMode("edit");
         } else {
           showAlert("⚠️ לא נמצא מוצר עם המזהה המבוקש", "error");
         }
@@ -119,6 +123,8 @@ const useProductManagement = (
       if (found) {
         setEditProductId(found._id);
         setEditingProduct(found);
+        setFormMode("edit");
+
         window.dispatchEvent(
           new CustomEvent("openEditProductForm", {
             detail: { productId: found._id },
@@ -220,6 +226,8 @@ useEffect(() => {
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true);
+      setFormMode("edit");
+
   };
 
   // Handle delete product action
@@ -256,6 +264,7 @@ useEffect(() => {
       () => {
         setIsAddingProduct(false);
         setEditingProduct(null);
+        setFormMode("add"); // איפוס למצב הוספה
       },
       () => {}
     );
@@ -316,15 +325,15 @@ useEffect(() => {
       ];
     }
 
-    const url = editingProduct
-      ? `/api/products/${storeId}/${editingProduct._id}`
-      : `/api/products/${storeId}`;
-
-    const method = editingProduct ? axios.put : axios.post;
+    const url =
+      formMode === "edit"
+        ? `/api/products/${storeId}/${editingProduct._id}`
+        : `/api/products/${storeId}`;
+    const method = formMode === "edit" ? axios.put : axios.post;
 
     method(url, payload)
       .then((res) => {
-        if (editingProduct) {
+        if ( formMode === "edit" ) {
           setProducts((prev) =>
             prev.map((p) => (p._id === editingProduct._id ? res.data : p))
           );
@@ -356,6 +365,11 @@ useEffect(() => {
       nameEn.includes(searchQuery.toLowerCase())
     );
   });
+  const handleAdd = () => {
+  setEditingProduct(null);
+  setFormMode("add");
+  setIsAddingProduct(true);
+};
 
   // Map the payload to the expected product structure
   const mapPayloadToNewProduct = (payload) => ({
@@ -400,7 +414,10 @@ useEffect(() => {
     handleCancel,
     handleSaveProduct,
     handleExportProducts,
+    handleAdd,
     filteredProducts,
+    formMode,
+    setFormMode,
   };
 };
 

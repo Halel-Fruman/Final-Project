@@ -1,4 +1,4 @@
-import  { useState } from "react";
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogPanel } from "@headlessui/react";
@@ -39,10 +39,11 @@ const Header = ({
     <header
       id="general"
       className="bg-gray-50 shadow border-b-2 border-gray-200"
-      aria-label="Navigation Header">
+      aria-label="Navigation Header"
+    >
       <nav className="w-full px-6 flex items-center justify-between py-4">
         {/* Logo */}
-        <Link to="/" className="flex items-center">
+        <Link to="/" className="flex items-center transition-transform duration-200 transform hover:scale-110">
           <img src={logo} alt="Logo" className="h-12 w-12" />
         </Link>
 
@@ -51,21 +52,24 @@ const Header = ({
           {isLoggedIn && role === "admin" && (
             <Link
               to="/SysAdmin"
-              className="text-sm text-gray-700 hover:text-primaryColor font-medium">
+              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110"
+            >
               {t("header.admin_area")}
             </Link>
           )}
           {isLoggedIn && role === "storeManager" && (
             <Link
               to="/store-management"
-              className="text-sm text-gray-700 hover:text-primaryColor font-medium">
+              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110" 
+            >
               {t("header.store_area")}
             </Link>
           )}
           {isLoggedIn && (
             <Link
               to="/personal-area"
-              className="text-sm text-gray-700 hover:text-primaryColor font-medium">
+              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110"
+            >
               {t("header.personal_area")}
             </Link>
           )}
@@ -74,20 +78,23 @@ const Header = ({
             <button
               onClick={onLogout}
               title={t("header.logout")}
-              className="text-gray-700 hover:text-red-600">
+              className="text-gray-700 hover:text-red-600 transition-transform duration-200 transform hover:scale-110"
+            >
               <Icon icon="mdi-light:logout" width="24" height="24" />
             </button>
           ) : (
             <>
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="text-sm text-gray-700 hover:text-primaryColor">
+                className="text-sm text-gray-700 hover:text-primaryColor transition-transform duration-200 transform hover:scale-110"
+              >
                 {t("login.title")}
               </button>
-              <div className="h-6 border-r border-gray-300"></div>
+              <div className="h-6 border-r border-gray-300 transition-transform duration-200 transform hover:scale-110"></div>
               <button
                 onClick={() => setIsRegisterModalOpen(true)}
-                className="text-sm text-gray-700 hover:text-primaryColor">
+                className="text-sm text-gray-700 hover:text-primaryColor transition-transform duration-200 transform hover:scale-110"
+              >
                 {t("register.title")}
               </button>
             </>
@@ -101,9 +108,10 @@ const Header = ({
           {/* Cart */}
           <button
             onClick={onCartClick}
-            className="relative"
-            aria-label="Shopping Cart">
-            <ShoppingCartIcon className="h-6 w-6 text-gray-700" />
+            className="relative transition-transform duration-200 transform hover:scale-110"
+            aria-label="Shopping Cart"
+          >
+            <ShoppingCartIcon className="h-6 w-6 text-gray-700 " />
             <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
               {cartItems?.length || 0}
             </span>
@@ -112,18 +120,20 @@ const Header = ({
           {/* Wishlist */}
           <button
             onClick={onWishlistClick}
-            className="relative"
-            aria-label="Wishlist">
+            className="relative transition-transform duration-200 transform hover:scale-110"
+            aria-label="Wishlist"
+          >
             <HeartIconSolid className="h-6 w-6 text-primaryColor" />
           </button>
         </div>
 
         {/* Mobile menu toggle */}
-        <div className="lg:hidden">
+        <div className="lg:hidden transition-transform duration-200 transform hover:scale-110">
           <button
             onClick={() => setMobileMenuOpen(true)}
             className="-m-2.5 p-2.5 text-gray-700"
-            aria-label="Open Mobile Menu">
+            aria-label="Open Mobile Menu"
+          >
             <Bars3Icon className="h-6 w-6" />
           </button>
         </div>
@@ -134,7 +144,8 @@ const Header = ({
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
         className="lg:hidden"
-        aria-label="Mobile Menu">
+        aria-label="Mobile Menu"
+      >
         <div className="fixed inset-0 z-10 bg-black bg-opacity-50" />
         <DialogPanel className="fixed inset-y-0 right-0 z-20 w-80 bg-white shadow-lg border-l border-gray-200">
           <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -144,7 +155,8 @@ const Header = ({
             <button
               onClick={() => setMobileMenuOpen(false)}
               className="text-gray-500 hover:text-gray-700"
-              aria-label="Close Mobile Menu">
+              aria-label="Close Mobile Menu"
+            >
               <XMarkIcon className="h-6 w-6" />
             </button>
           </div>
@@ -172,7 +184,8 @@ const Header = ({
               <Link
                 to="/SysAdmin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-gray-700 hover:text-primaryColor font-medium">
+                className="block text-gray-700 hover:text-primaryColor font-medium"
+              >
                 {t("header.admin_area")}
               </Link>
             )}
@@ -180,7 +193,8 @@ const Header = ({
               <Link
                 to="/store-management"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-gray-700 hover:text-primaryColor  font-medium">
+                className="block text-gray-700 hover:text-primaryColor  font-medium"
+              >
                 {t("header.store_area")}
               </Link>
             )}
@@ -188,7 +202,8 @@ const Header = ({
               <Link
                 to="/personal-area"
                 onClick={() => setMobileMenuOpen(false)}
-                className="block text-gray-700 hover:text-primaryColor font-medium">
+                className="block text-gray-700 hover:text-primaryColor font-medium"
+              >
                 {t("header.personal_area")}
               </Link>
             )}
@@ -196,7 +211,8 @@ const Header = ({
             {isLoggedIn ? (
               <button
                 onClick={onLogout}
-                className="w-full text-center text-xl font-bold text-red-600 hover:text-red-700 ">
+                className="w-full text-center text-xl font-bold text-red-600 hover:text-red-700 "
+              >
                 {t("header.logout")}
               </button>
             ) : (
@@ -206,7 +222,8 @@ const Header = ({
                     setIsLoginModalOpen(true);
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full bg-primaryColor text-xl font-bold text-white py-2 rounded hover:bg-secondaryColor">
+                  className="w-full bg-primaryColor text-xl font-bold text-white py-2 rounded hover:bg-secondaryColor"
+                >
                   {t("login.title")}
                 </button>
                 <button
@@ -214,7 +231,8 @@ const Header = ({
                     setIsRegisterModalOpen(true);
                     setMobileMenuOpen(false);
                   }}
-                  className="w-full bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300">
+                  className="w-full bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300"
+                >
                   {t("register.title")}
                 </button>
               </>
@@ -227,13 +245,15 @@ const Header = ({
       <Dialog
         open={isLoginModalOpen}
         onClose={() => setIsLoginModalOpen(false)}
-        className="fixed inset-0 z-50 flex items-center justify-center">
+        className="fixed inset-0 z-50 flex items-center justify-center"
+      >
         <div className="fixed inset-0 bg-black bg-opacity-50" />
         <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6">
           <button
             onClick={() => setIsLoginModalOpen(false)}
             className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-            aria-label="Close Login Modal">
+            aria-label="Close Login Modal"
+          >
             <XMarkIcon className="h-6 w-6" />
           </button>
           <Login
@@ -253,11 +273,11 @@ const Header = ({
       <Dialog
         open={isRegisterModalOpen}
         onClose={() => setIsRegisterModalOpen(false)}
-        className="fixed inset-0 z-50 flex p-4 items-center justify-center max-h-screen overflow-y-scroll">
+        className="fixed inset-0 z-50 flex p-4 items-center justify-center max-h-screen overflow-y-scroll"
+      >
         <div className="fixed inset-0 bg-black bg-opacity-50 max-h-screen" />
         <DialogPanel className="relative bg-white rounded-lg shadow-lg  max-w-md w-full h-max max-h-screen p-6 overflow-y-auto">
-
-        <Register
+          <Register
             setToken={setToken}
             setUserId={setUserId}
             onClose={() => setIsRegisterModalOpen(false)}
@@ -269,4 +289,3 @@ const Header = ({
 };
 
 export default Header;
-

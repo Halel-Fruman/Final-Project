@@ -3,7 +3,13 @@ import React, { useState } from "react";
 import VoiceInputButton from "../VoiceInputButton";
 import useProductForm from "../../hooks/useProductForm";
 
-const ProductForm = ({ editingProduct, categories, onCancel, onSave }) => {
+const ProductForm = ({
+  mode,
+  editingProduct,
+  categories,
+  onCancel,
+  onSave,
+}) => {
   const {
     newProduct,
     setNewProduct,
@@ -21,9 +27,15 @@ const ProductForm = ({ editingProduct, categories, onCancel, onSave }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center z-50">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         <h2 className="text-2xl font-bold mb-4 text-center">
-          {editingProduct ? "עריכת מוצר" : "הוסף מוצר"}
+          {mode === "edit" ? "עריכת מוצר" : "הוסף מוצר"}
         </h2>
 
+        {mode === "edit" && newProduct?.nameHe && (
+          <div className="text-sm text-gray-600 mb-4 text-center">
+            עריכת המוצר:{" "}
+            <span className="font-semibold">{newProduct.nameHe}</span>
+          </div>
+        )}
         <div className="mb-4 grid grid-cols-2 gap-4">
           <div>
             <label className="block mb-1 font-bold">שם בעברית</label>
@@ -244,7 +256,8 @@ const ProductForm = ({ editingProduct, categories, onCancel, onSave }) => {
             <button
               type="button"
               className="bg-white text-green-600 font-semibold text-base px-4 py-2 rounded-full border-2 border-green-500 shadow-sm hover:bg-green-50 hover:shadow-md hover:scale-105 transform transition duration-300 ease-in-out"
-              onClick={handleImageUrlAdd}>
+              onClick={handleImageUrlAdd}
+            >
               הוסף קישור
             </button>
           </div>
@@ -264,7 +277,8 @@ const ProductForm = ({ editingProduct, categories, onCancel, onSave }) => {
             />
             <label
               htmlFor="file-upload"
-              className="inline-block bg-white text-green-600 font-semibold text-base px-4 py-2 rounded-full border-2 border-green-500 shadow-sm hover:bg-green-50 hover:shadow-md hover:scale-105 transform transition duration-300 ease-in-out">
+              className="inline-block bg-white text-green-600 font-semibold text-base px-4 py-2 rounded-full border-2 border-green-500 shadow-sm hover:bg-green-50 hover:shadow-md hover:scale-105 transform transition duration-300 ease-in-out"
+            >
               בחר תמונה מהמחשב
             </label>
             {selectedFileName && (
@@ -284,7 +298,8 @@ const ProductForm = ({ editingProduct, categories, onCancel, onSave }) => {
                 />
                 <button
                   className="absolute top-0 left-0 bg-red-600 text-white text-xs px-2 py-1 rounded-tr rounded-bl"
-                  onClick={() => handleImageRemove(index)}>
+                  onClick={() => handleImageRemove(index)}
+                >
                   ✕
                 </button>
               </div>
@@ -295,13 +310,15 @@ const ProductForm = ({ editingProduct, categories, onCancel, onSave }) => {
         <div className="flex justify-between mt-6">
           <button
             className="bg-gray-200 px-4 py-2 rounded-full hover:bg-gray-300"
-            onClick={onCancel}>
+            onClick={onCancel}
+          >
             ביטול
           </button>
           <button
             className="bg-green-600 text-white px-4 py-2 rounded-full hover:bg-green-700"
-            onClick={() => onSave(newProduct)}>
-            {editingProduct ? "שמור שינויים" : "הוסף מוצר"}
+            onClick={() => onSave(newProduct)}
+          >
+            {mode === "edit" ? "שמור שינויים" : "הוסף מוצר"}
           </button>
         </div>
       </div>

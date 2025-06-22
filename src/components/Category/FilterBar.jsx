@@ -60,7 +60,7 @@ const FilterBar = ({
           aria-expanded="true">
           {label}
           {selected.length > 0 && (
-            <span className="ml-2 mr-2 rounded-full bg-secondaryColor bg-opacity-20 px-1 text-sm">
+            <span className="ml-2 mr-2 rounded-full bg-secondaryColor bg-opacity-20 px-1 text-sm ">
               {selected.length}
             </span>
           )}
@@ -112,7 +112,7 @@ const FilterBar = ({
       <div className="sm:hidden flex justify-start mb-2">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
-          className="flex items-center gap-2 bg-primaryColor text-white px-4 py-2 rounded-full shadow-md">
+          className="flex items-center gap-2 bg-primaryColor text-white px-4 py-2 rounded-full shadow-md ">
           {t("filters")}
           {hasFilters && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-red-600 text-white rounded-full">
@@ -132,8 +132,8 @@ const FilterBar = ({
 
       {/* Filters section: hidden on mobile unless isOpen is true */}
       <div className={`${isOpen ? "block" : "hidden"} sm:block`}>
-        <div className="flex flex-col  gap-y-4 sm:flex-wrap sm:flex-row sm:items-center sm:gap-4 mb-4">
-          <div className="flex gap-2 mt-2">
+        <div className="flex flex-col  gap-y-4 sm:flex-wrap sm:flex-row sm:items-center sm:gap-4 mb-4 ">
+          <div className="flex gap-2 mt-2 ">
             <FilterDropdown
               label={t("category")}
               options={categories.map((c) => ({

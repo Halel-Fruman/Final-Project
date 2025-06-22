@@ -20,10 +20,12 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {} }) 
     handleCancel,
     handleSaveProduct,
     setIsAddingProduct,
+    handleAdd,
     searchQuery,
     setSearchQuery,
     handleExportProducts,
     filteredProducts,
+      formMode,
   } = useProductManagement(storeId, autoOpenAddForm, autofill);
 
 
@@ -34,7 +36,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {} }) 
       <div className="mb-4 mr-4 flex justify">
         <button
           className="bg-blue-700 font-bold text-xl ml-4 text-white px-4 py-2 rounded-full"
-          onClick={() => setIsAddingProduct(true)}>
+          onClick={handleAdd}>
           <h2>הוסף מוצר</h2>
         </button>
 
@@ -58,6 +60,7 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {} }) 
 
       {isAddingProduct && (
         <ProductForm
+          mode={formMode}
           editingProduct={editingProduct}
           categories={categories}
           onCancel={handleCancel}

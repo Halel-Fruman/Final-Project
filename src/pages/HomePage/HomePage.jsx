@@ -11,21 +11,27 @@ import { getActiveDiscount } from "../../utils/discountHelpers";
 // ProductImage component to handle image loading and fallback
 const ProductImage = ({ product, i18n }) => {
   const [useFallback, setUseFallback] = useState(false);
-  const originalImage = product.images[0];
-  const webpImage = originalImage.replace(/\.(jpg|jpeg|png)$/i, ".webp");
+  const originalImage = product.images?.[0];
+
+  const webpImage = originalImage
+    ? originalImage.replace(/\.(jpg|jpeg|png)$/i, ".webp")
+    : null;
+
+  const imageToShow = useFallback || !webpImage ? originalImage : webpImage;
 
   return (
     <div className="aspect-[83/96] w-full overflow-hidden">
       <img
-        src={useFallback ? originalImage : webpImage}
+        src={imageToShow || "https://placehold.co/300x400?text=No+Image"}
         onError={() => setUseFallback(true)}
-        alt={product.name[i18n.language]}
+        alt={product.name?.[i18n.language] || "Product"}
         className="object-cover w-full h-full"
         loading="lazy"
       />
     </div>
   );
 };
+
 
 // HomePage component
 // This component fetches products, categories, and handles filtering
@@ -272,7 +278,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             className="mt-4 text-xl sm:text-2xl md:text-5xl text-secondaryColor"
             dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}></p>
           <button
-            className="mt-6 bg-white text-black py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-gray-200 transition"
+            className="mt-6 bg-white text-black py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-gray-200 transition transition-transform duration-200 transform hover:scale-110"
             onClick={() =>
               document
                 .getElementById("products-section")
@@ -326,8 +332,8 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                 : product.price;
               return (
                 <div key={product._id} className="flex flex-col">
-                  <article className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition">
-                    <div className="absolute top-2 right-2 z-10 w-10 h-10">
+                  <article className="relative bg-white rounded-lg overflow-hidden hover:shadow-lg transition transition-transform duration-200 transform hover:scale-105">
+                    <div className="absolute top-2 right-2 z-10 w-10 h-10 ">
                       {!wishlistLoading && (
                         <button
                           onClick={() => toggleWishlist(product)}
@@ -336,7 +342,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
                               ? t("remove_from_wishlist")
                               : t("add_to_wishlist")
                           }
-                          className="w-full h-full bg-white p-2 rounded-full shadow-lg hover:bg-gray-100">
+                          className="w-full h-full bg-white p-2 rounded-full shadow-lg hover:bg-gray-100 transition-transform duration-200 transform hover:scale-110">
                           {isInWishlist ? (
                             <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
                           ) : (
