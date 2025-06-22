@@ -11,21 +11,27 @@ import { getActiveDiscount } from "../../utils/discountHelpers";
 // ProductImage component to handle image loading and fallback
 const ProductImage = ({ product, i18n }) => {
   const [useFallback, setUseFallback] = useState(false);
-  const originalImage = product.images[0];
-  const webpImage = originalImage.replace(/\.(jpg|jpeg|png)$/i, ".webp");
+  const originalImage = product.images?.[0];
+
+  const webpImage = originalImage
+    ? originalImage.replace(/\.(jpg|jpeg|png)$/i, ".webp")
+    : null;
+
+  const imageToShow = useFallback || !webpImage ? originalImage : webpImage;
 
   return (
     <div className="aspect-[83/96] w-full overflow-hidden">
       <img
-        src={useFallback ? originalImage : webpImage}
+        src={imageToShow || "https://placehold.co/300x400?text=No+Image"}
         onError={() => setUseFallback(true)}
-        alt={product.name[i18n.language]}
+        alt={product.name?.[i18n.language] || "Product"}
         className="object-cover w-full h-full"
         loading="lazy"
       />
     </div>
   );
 };
+
 
 // HomePage component
 // This component fetches products, categories, and handles filtering

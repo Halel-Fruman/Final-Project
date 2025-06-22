@@ -5,7 +5,6 @@ import { useAlert } from "../components/AlertDialog";
 import exportToExcel from "../utils/exportToExcel";
 import e from "cors";
 
-
 const useProductManagement = (
   storeId,
   autoOpenAddForm = false,
@@ -23,6 +22,7 @@ const useProductManagement = (
   const [pendingEditFields, setPendingEditFields] = useState(null);
   const isAddingProductRef = useRef(isAddingProduct);
   const { showAlert } = useAlert();
+  const [formMode, setFormMode] = useState("add"); // מצב: "add" או "edit"
 
   // Map the autofill payload to the expected product structure
   useEffect(() => {
@@ -49,6 +49,8 @@ const useProductManagement = (
     const handleOpenAdd = () => {
       setIsAddingProduct(true);
       setEditingProduct(null);
+      setEditProductId(null); //
+      setFormMode("add");
     };
     window.addEventListener("openAddProduct", handleOpenAdd);
     return () => window.removeEventListener("openAddProduct", handleOpenAdd);
@@ -94,6 +96,7 @@ const useProductManagement = (
         if (productToEdit) {
           setEditingProduct(productToEdit);
           setIsAddingProduct(true);
+          setFormMode("edit");
         } else {
           showAlert("⚠️ לא נמצא מוצר עם המזהה המבוקש", "error");
         }
@@ -119,6 +122,8 @@ const useProductManagement = (
       if (found) {
         setEditProductId(found._id);
         setEditingProduct(found);
+        setFormMode("edit");
+
         window.dispatchEvent(
           new CustomEvent("openEditProductForm", {
             detail: { productId: found._id },
@@ -147,8 +152,9 @@ const useProductManagement = (
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true);
-  };
+      setFormMode("edit");
 
+  };
 
   // Handle delete product action
   // This function shows a confirmation alert before deleting a product
@@ -184,6 +190,7 @@ const useProductManagement = (
       () => {
         setIsAddingProduct(false);
         setEditingProduct(null);
+        setFormMode("add"); // איפוס למצב הוספה
       },
       () => {}
     );
@@ -244,15 +251,15 @@ const useProductManagement = (
       ];
     }
 
-    const url = editingProduct
-      ? `/api/products/${storeId}/${editingProduct._id}`
-      : `/api/products/${storeId}`;
-
-    const method = editingProduct ? axios.put : axios.post;
+    const url =
+      formMode === "edit"
+        ? `/api/products/${storeId}/${editingProduct._id}`
+        : `/api/products/${storeId}`;
+    const method = formMode === "edit" ? axios.put : axios.post;
 
     method(url, payload)
       .then((res) => {
-        if (editingProduct) {
+        if ( formMode === "edit" ) {
           setProducts((prev) =>
             prev.map((p) => (p._id === editingProduct._id ? res.data : p))
           );
@@ -284,6 +291,11 @@ const useProductManagement = (
       nameEn.includes(searchQuery.toLowerCase())
     );
   });
+  const handleAdd = () => {
+  setEditingProduct(null);
+  setFormMode("add");
+  setIsAddingProduct(true);
+};
 
   // Map the payload to the expected product structure
   const mapPayloadToNewProduct = (payload) => ({
@@ -312,7 +324,6 @@ const useProductManagement = (
     discountEnd: payload.discountEnd || "",
   });
 
-
   return {
     products,
     categories,
@@ -329,7 +340,10 @@ const useProductManagement = (
     handleCancel,
     handleSaveProduct,
     handleExportProducts,
+    handleAdd,
     filteredProducts,
+    formMode,
+    setFormMode,
   };
 };
 

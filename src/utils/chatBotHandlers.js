@@ -1,5 +1,5 @@
 // utils/chatBotHandlers.js
-export const buildMessageHistory = (messages, role, imageUrl)  => {
+export const buildMessageHistory = (messages, role, imageUrl) => {
   const systemPrompt = `
 You are a smart and accessible chatbot integrated into ILAN’s e-commerce website.
 Your purpose is to assist site users — private customers and store managers with disabilities — in performing useful actions in a simple, accessible, and conversational manner.
@@ -15,10 +15,28 @@ If the user explicitly confirms a previous suggestion (e.g., says "כן", "תפ�
 
 ---
 
-📷 If the user uploads an image, assume it is of a product they want to add or edit.
-Based **only on the visual content**, return as many fields as you can confidently identify — such as name, description, price (if visible), etc.
-Never guess fields that cannot be visually identified.
-Always respond in **Hebrew**, using the fixed JSON format as shown below.
+📷 If the user uploads an image, assume it is of a product they want to add to the store.
+
+1. First, return this action:
+{
+  "reply": "פותח את טופס הוספת מוצר.",
+  "action": "openAddProduct",
+  "payload": null
+}
+
+3. Then return:
+{
+  "reply": "מילאתי את פרטי המוצר לפי התמונה. תוכל לעבור עליהם לפני אישור.",
+  "action": "openAddProductForm",
+  "payload": {
+    // Fields based ONLY on visual content, such as nameHe, nameEn,(translate the name and the description) descriptionHe,descriptionEn, price, images,(use on the image URL thet you get) etc.
+  }
+}
+
+⚠️ You must NOT fabricate data.
+Only include fields you can confidently extract visually from the image (e.g., product name, visual description, price if visible).
+All responses must be in Hebrew and in the standard JSON format.
+
 
 ---
 
@@ -231,27 +249,27 @@ Allowed fields inside 'newFields':
 
   const lastMessages = messages.slice(-20);
 
- const formattedMessages = lastMessages.map((msg) => {
-  if (typeof msg.content === "object" && Array.isArray(msg.content)) {
-    // כבר פורמט vision
-    return {
-      role: msg.role,
-      content: msg.content,
-    };
-  } else {
-    return {
-      role: msg.role,
-      content: msg.text || msg.content || "",
-    };
-  }
-});
-  
-const hasVision = formattedMessages.some(
-  (msg) =>
-    msg.content &&
-    Array.isArray(msg.content) &&
-    msg.content.some((c) => c.type === "image_url")
-);
+  const formattedMessages = lastMessages.map((msg) => {
+    if (typeof msg.content === "object" && Array.isArray(msg.content)) {
+      // כבר פורמט vision
+      return {
+        role: msg.role,
+        content: msg.content,
+      };
+    } else {
+      return {
+        role: msg.role,
+        content: msg.text || msg.content || "",
+      };
+    }
+  });
+
+  const hasVision = formattedMessages.some(
+    (msg) =>
+      msg.content &&
+      Array.isArray(msg.content) &&
+      msg.content.some((c) => c.type === "image_url")
+  );
 
   // ✅ אם יש תמונה — נוסיף vision message עם instruction באנגלית
   if (imageUrl && !hasVision) {
@@ -260,8 +278,7 @@ const hasVision = formattedMessages.some(
       content: [
         {
           type: "text",
-          text:
-            `The user uploaded an image of a new product they wish to add to the store.
+          text: `The user uploaded an image of a new product they wish to add to the store.
 
 Based solely on the visual content of the image, return as many product details as you can confidently identify. If you're not sure about a detail — skip it.
 
@@ -323,7 +340,7 @@ export const createActionHandlers = (
         replace: true,
       });
       speak("מעביר אותך לעמוד ניהול המוצרים.");
-    },
+    },  
 
     openAddProduct: () => {
       if (window.location.pathname === "/store-management") {
@@ -433,7 +450,6 @@ export const createActionHandlers = (
     trackOrder: () => navigate("/track-order"),
     contactSupport: () => navigate("/contact"),
     goToFavorites: () => navigate("/favorites"),
-    openSearchPage: () => navigate("/search"),
     openCategories: () => navigate("/categories"),
     goToPersonalArea: () => navigate("/personal-area"),
     goToPersonalOrders: () =>

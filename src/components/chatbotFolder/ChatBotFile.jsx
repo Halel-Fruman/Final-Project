@@ -183,114 +183,112 @@ const ChatBot = ({
   };
 
   const handleImageUpload = async (e) => {
-  const file = e.target.files[0];
-  if (!file) return;
+    const file = e.target.files[0];
+    if (!file) return;
 
-  const formData = new FormData();
-  formData.append("image", file);
+    const formData = new FormData();
+    formData.append("image", file);
 
-  try {
-    // 1. העלאת התמונה לשרת
-    const uploadRes = await fetch("/api/products/upload-image", {
-      method: "POST",
-      body: formData,
-    });
+    try {
+      const uploadRes = await fetch("/api/products/upload-image", {
+        method: "POST",
+        body: formData,
+      });
 
-    const uploadData = await uploadRes.json();
-    if (!uploadRes.ok || !uploadData.imageUrl) {
-      alert("שגיאה בהעלאת התמונה");
-      return;
-    }
+      const uploadData = await uploadRes.json();
+      if (!uploadRes.ok || !uploadData.imageUrl) {
+        alert("שגיאה בהעלאת התמונה");
+        return;
+      }
 
-    const fullImageUrl = `https://ilan-israel.co.il/api${uploadData.imageUrl}`;
+      const fullImageUrl = `https://ilan-israel.co.il/api${uploadData.imageUrl}`;
 
-    // 2. יצירת הודעה ויזואלית לצ'אט (להצגה בלבד)
-    const imagePreviewMessage = {
-      role: "user",
-      image: fullImageUrl,
-    };
+      // ⏳ פותחים את טופס הוספת מוצר לפני שליחת ההודעות ל־GPT
+      if (actionHandlers.openAddProduct) {
+        actionHandlers.openAddProduct(); // פותח את הטופס UI
+      }
 
-    // 3. יצירת הודעת vision ל־GPT
-    const visionMessage = {
-      role: "user",
-      content: [
-        {
-          type: "text",
+      // ⏱️ מחכים רגע שייפתח
+      setTimeout(async () => {
+        const instructionMessage = {
+          role: "user",
           text:
-            "The user uploaded an image of a new product they wish to add to the store.\n\n" +
-            "Based solely on the visual content of the image, return as many product details as you can confidently identify. " +
-            "Only include fields you can visually recognize. Do NOT guess or fabricate information.",
-        },
-        {
-          type: "image_url",
-          image_url: {
-            url: fullImageUrl,
-          },
-        },
-      ],
-    };
+            "פתחתי טופס הוספת מוצר.\n" +
+            "תסתכל בתמונה שנשלחת אליך בהודעה הבאה היא מכילה מוצר להוספה ונסה למלא את מה שאתה מצליח לזהות באופן ברור בלבד:\n\n" +
+            "- שם בעברית ואנגלית\n" +
+            "- תיאור בעברית ואנגלית\n" +
+            "- מאפיינים (highlights) בעברית ואנגלית\n" +
+            " -שים את קישור לתמונה" +
+            `https://ilan-israel.co.il/api${uploadData.imageUrl} \n\n` +
+            " תבצע בשלב הראשון מילוי של הפרטים אחר כך תשאל אם להמשיך לעזור למלא את שאר השדות." +
+            "שים לב לשמור על הפורמט האחיד של הורעת הJSON",
+        };
 
-    // 4. עידכון היסטוריית ההודעות והצגת התמונה
-    const newMessages = [...messages, imagePreviewMessage, visionMessage];
-    setMessages(newMessages);
-    setLoading(true);
+        const imageMessage = {
+          role: "user",
+          image: fullImageUrl,
+        };
 
-    // 5. בניית ההיסטוריה לתקשורת עם GPT
-    const formattedMessages = buildMessageHistory(newMessages, role);
+        const newMessages = [...messages, instructionMessage, imageMessage];
+        setMessages([...messages, imageMessage]);
+        setLoading(true);
 
-    const res = await fetch("/api/chat", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({
-        messages: formattedMessages,
-        userId,
-        role,
-        imageUrl: fullImageUrl,
-      }),
-    });
+        const formattedMessages = buildMessageHistory(newMessages, role);
 
-    const data = await res.json();
-    const botMessage = {
-      role: "assistant",
-      text: data.reply || "לא הצלחתי להבין מהתמונה.",
-    };
+        const res = await fetch("/api/chat", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            messages: formattedMessages,
+            userId,
+            role,
+            imageUrl: fullImageUrl,
+          }),
+        });
 
-    setMessages((prev) => [...prev, botMessage]);
-    speak(botMessage.text);
+        const data = await res.json();
+        const botMessage = {
+          role: "assistant",
+          text: data.reply || "לא הצלחתי להבין מהתמונה.",
+        };
 
-    if (data.action) {
-      handleAction(
-        data.action,
-        data.payload || null,
-        token,
-        userId,
-        role,
-        [
-          "openAddProductForm",
-          "goToProductList",
-          "openAddProduct",
-          "editProduct",
-          "openEditProduct",
-          "viewOrders",
-          "showStats",
-          "openSettings",
-          "createDiscount",
-          "sendNewsletter",
-          "viewTransactions",
-        ],
-        speak,
-        setMessages,
-        actionHandlers
-      );
+        setMessages((prev) => [...prev, botMessage]);
+        speak(botMessage.text);
+
+        if (data.action) {
+          handleAction(
+            data.action,
+            data.payload || null,
+            token,
+            userId,
+            role,
+            [
+              "openAddProductForm",
+              "goToProductList",
+              "openAddProduct",
+              "editProduct",
+              "openEditProduct",
+              "viewOrders",
+              "showStats",
+              "openSettings",
+              "createDiscount",
+              "sendNewsletter",
+              "viewTransactions",
+            ],
+            speak,
+            setMessages,
+            actionHandlers
+          );
+        }
+
+        setLoading(false);
+      }, 500); // זמן המתנה לפתיחת הטופס
+    } catch (err) {
+      console.error("שגיאה בניתוח תמונה:", err);
+      alert("אירעה שגיאה בניתוח התמונה.");
+      setLoading(false);
     }
-
-    setLoading(false);
-  } catch (err) {
-    console.error("שגיאה בניתוח תמונה:", err);
-    alert("אירעה שגיאה בניתוח התמונה.");
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="fixed bottom-4 left-4 z-50">
@@ -323,10 +321,11 @@ const ChatBot = ({
               onClick={() => {
                 setIsHidden(true);
                 setIsOpen(false);
+                setMessages([]);
               }}
               className="text-xs text-gray-500 hover:text-red-600 mt-2 underline"
             >
-              הסתר בוט
+              סגור בוט
             </button>
           </div>
 
