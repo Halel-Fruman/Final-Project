@@ -1,4 +1,13 @@
-import  { useState, useEffect } from "react";
+/**
+ * @file StoreManagement.jsx
+ * @description This file contains the StoreManagement component which allows users to manage their store,
+ * including products, orders, transactions, and store settings.
+ * It uses React hooks for state management and side effects, and integrates with the backend API for data fetching.
+ * The component also handles user authentication and authorization,
+ * ensuring that only authorized users can access store management features.
+ * It includes a responsive sidebar for navigation and dynamically renders content based on the selected tab.
+ */
+import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import ProductManagement from "./ProductManagement.jsx";
@@ -7,16 +16,21 @@ import { useTranslation } from "react-i18next";
 import StoreDashboard from "./StoreDashboard.jsx";
 import StoreAnalytics from "./StoreAnalytics.jsx";
 import { useLocation } from "react-router-dom";
-
 import StoreSettings from "./StoreSettings.jsx";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 import { useNavigate } from "react-router-dom";
 
+/**
+ * @function StoreManagement
+ * @description Main component for managing a store, including navigation and content rendering.
+ * It fetches store data, user email, and handles tab navigation.
+ * It also manages the sidebar menu state and renders different components based on the active tab.
+ * @returns {JSX.Element} The rendered StoreManagement component.
+ */
 const StoreManagement = () => {
   const { storeId: paramStoreId } = useParams();
   const location = useLocation();
-  const { tab, openAddProductForm ,autofill } = location.state || {};
-
+  const { tab, openAddProductForm, autofill } = location.state || {};
   const [activeTab, setActiveTab] = useState("dashboard");
   const [menuOpen, setMenuOpen] = useState(false);
   const [storeId, setStoreId] = useState(null);
@@ -27,15 +41,16 @@ const StoreManagement = () => {
   const userId = localStorage.getItem("userId");
   const token = localStorage.getItem("token");
 
-
   useEffect(() => {
     if (tab) setActiveTab(tab);
   }, [tab]);
 
-
-
   const navigate = useNavigate();
 
+  // Fetch store by ID if provided in the URL
+  // This function retrieves the store details and sets the storeId and storeName state variables.
+  // It also handles unauthorized access by redirecting to the home page.
+  // If the store is not found, it navigates to the home page.
   useEffect(() => {
     const fetchStoreById = async () => {
       try {
@@ -70,6 +85,9 @@ const StoreManagement = () => {
     }
   }, [paramStoreId, i18n.language]);
 
+  // Fetch user email based on userId
+  // This function retrieves the user's email from the backend API using the userId stored in localStorage.
+  // It handles errors by logging them and returning null if the email cannot be fetched.
   const fetchUserEmail = async (userId) => {
     try {
       const response = await fetchWithTokenRefresh(`/api/user/${userId}`);
@@ -91,6 +109,9 @@ const StoreManagement = () => {
     fetchEmail();
   }, [userId]);
 
+  // Fetch store ID based on user email
+  // This function retrieves the store ID by checking if the user's email matches any store manager's email.
+  // It sets the storeId and storeName state variables if a matching store is found.
   useEffect(() => {
     const fetchStoreId = async () => {
       try {
@@ -130,17 +151,22 @@ const StoreManagement = () => {
     }
   }, [userEmail, i18n.language, paramStoreId]);
 
+  // Render content based on the active tab
+  // This function returns the appropriate component based on the active tab state.
+  // It handles different tabs like dashboard, products, orders, transactions, store stats, and settings.
   const renderContent = () => {
     switch (activeTab) {
       case "dashboard":
         return <StoreDashboard key="dashboard" storeId={storeId} />;
       case "products":
-        return <ProductManagement
-         key="products"
-         storeId={storeId}
-         autoOpenAddForm={openAddProductForm}
-         autofill={autofill}
-/>;
+        return (
+          <ProductManagement
+            key="products"
+            storeId={storeId}
+            autoOpenAddForm={openAddProductForm}
+            autofill={autofill}
+          />
+        );
       case "orders":
         return (
           <OrderManagement

@@ -1,7 +1,18 @@
-import  { useState } from "react";
+/**
+ * @file ForgotPassword.jsx
+ * @description This component allows users to request a password reset by entering their email.
+ * It sends a request to the server and handles the response accordingly.
+ */
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 
+/**
+ * @function ForgotPassword
+ * @description Component for handling password reset requests.
+ * @param {Object} props - Component properties.
+ * @param {Function} props.onClose - Function to call when the form is successfully submitted.
+ */
 export default function ForgotPassword({ onClose }) {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
@@ -35,11 +46,12 @@ export default function ForgotPassword({ onClose }) {
 
   return (
     <main className="max-w-md mx-auto my-10 p-6 bg-white rounded-lg border">
-      <h1 className="text-xl font-bold mb-4 text-center">{t("forgotPassword.title")}</h1>
+      <h1 className="text-xl font-bold mb-4 text-center">
+        {t("forgotPassword.title")}
+      </h1>
       <form onSubmit={handleForgotPassword}>
         <h2>
-        <label className="block mb-2">{t("forgotPassword.email")}</label>
-
+          <label className="block mb-2">{t("forgotPassword.email")}</label>
         </h2>
         <input
           type="email"
@@ -53,7 +65,9 @@ export default function ForgotPassword({ onClose }) {
           type="submit"
           disabled={loading}
           className={`w-full py-2  text-white font-bold text-xl rounded-full ${
-            loading ? "bg-gray-400 cursor-not-allowed" : "bg-primaryColor hover:bg-secondaryColor"
+            loading
+              ? "bg-gray-400 cursor-not-allowed"
+              : "bg-primaryColor hover:bg-secondaryColor"
           }`}>
           {loading ? t("forgotPassword.loading") : t("forgotPassword.submit")}
         </button>

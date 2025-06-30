@@ -1,8 +1,23 @@
+/**
+ * @file LoginPage.jsx
+ * @description This component handles user login functionality,
+ * allowing users to authenticate with their email and password.
+ */
+
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { DialogTitle } from "@headlessui/react";
 import toast from "react-hot-toast";
 
+/**
+ * @function Login
+ * @description Component for user login, allowing users to enter their email and password.
+ * @param {Object} props - Component properties.
+ * @param {Function} props.setToken - Function to set the authentication token.
+ * @param {Function} props.setUserId - Function to set the user ID.
+ * @param {Function} props.setUserRole - Function to set the user role.
+ * @param {Function} props.onClose - Function to close the login modal.
+ */
 const Login = ({
   setToken,
   setUserId,
@@ -15,7 +30,6 @@ const Login = ({
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [unverifiedEmail, setUnverifiedEmail] = useState(null);
-
 
   // Handle form submission
   // This function is called when the user submits the login form
@@ -138,35 +152,33 @@ const Login = ({
           {loading ? t("login.loading") : t("login.submit")}
         </button>
         {unverifiedEmail && (
-  <div className="mt-4 text-center">
-    <p className="text-sm text-gray-600">
-      {t("login.resendVerificationText")}
-    </p>
-    <button
-      onClick={async () => {
-        try {
-          const res = await fetch("/api/User/resend-verification", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: unverifiedEmail }),
-          });
-          if (res.ok) {
-            toast.success(t("login.verificationEmailSent"));
-          } else {
-            toast.error(t("login.verificationEmailError"));
-          }
-        } catch (err) {
-          console.error(err);
-          toast.error(t("login.networkError"));
-        }
-      }}
-      className="mt-1 text-blue-600 font-medium hover:underline transition-transform duration-200 transform hover:scale-110"
-    >
-      {t("login.resendVerificationButton")}
-    </button>
-  </div>
-)}
-
+          <div className="mt-4 text-center">
+            <p className="text-sm text-gray-600">
+              {t("login.resendVerificationText")}
+            </p>
+            <button
+              onClick={async () => {
+                try {
+                  const res = await fetch("/api/User/resend-verification", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: unverifiedEmail }),
+                  });
+                  if (res.ok) {
+                    toast.success(t("login.verificationEmailSent"));
+                  } else {
+                    toast.error(t("login.verificationEmailError"));
+                  }
+                } catch (err) {
+                  console.error(err);
+                  toast.error(t("login.networkError"));
+                }
+              }}
+              className="mt-1 text-blue-600 font-medium hover:underline transition-transform duration-200 transform hover:scale-110">
+              {t("login.resendVerificationButton")}
+            </button>
+          </div>
+        )}
       </form>
       <p className="text-sm text-center mt-2">
         <button

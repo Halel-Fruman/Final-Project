@@ -1,8 +1,19 @@
-import  { useState } from "react";
+/** * @file PersonalAreaEditor.jsx
+ * @description This component allows users to view and edit their personal area details,
+ * including first name, last name, email, and phone number.
+ */
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
-// The PersonalAreaEditor component is a functional component that takes the user, setUser, and onSave as props.
+/**
+ * @function PersonalAreaEditor
+ * @description Component for viewing and editing user personal area details.
+ * @param {Object} props - Component properties.
+ * @param {Object} props.user - The user object containing personal details.
+ * @param {Function} props.setUser - Function to update the user state.
+ * @param {Function} props.onSave - Function to handle saving the updated user details.
+ */
 const PersonalAreaEditor = ({ user, setUser, onSave }) => {
   const { t } = useTranslation(); // useTranslation hook to access the i18n instance and the translation function t
   const [isEditing, setIsEditing] = useState(false); // useState hook to store the editing state

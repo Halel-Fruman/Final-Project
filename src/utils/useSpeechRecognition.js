@@ -1,12 +1,21 @@
 // utils/useSpeechRecognition.js
 import { useState, useCallback } from "react";
 
+/**
+ * @function useSpeechRecognition
+ * @description Custom hook for speech recognition.
+ * @param {Object} params - The parameters for the hook.
+ * @param {Function} params.onResult - Callback function to handle the recognized speech result.
+ * @param {string} params.lang - The language for speech recognition.
+ * @returns {Object} The speech recognition state and functions.
+ */
 const useSpeechRecognition = ({ onResult, lang = "he-IL" } = {}) => {
   const [isListening, setIsListening] = useState(false);
   const [error, setError] = useState(null);
 
   const recognitionRef = useCallback(() => {
-    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+    const SpeechRecognition =
+      window.SpeechRecognition || window.webkitSpeechRecognition;
     return SpeechRecognition ? new SpeechRecognition() : null;
   }, []);
 

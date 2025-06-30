@@ -1,4 +1,11 @@
-// File: src/utils/exportToExcel.js
+/**
+ * @function exportToExcel
+ * @description Exports product data to an Excel file.
+ * This function formats product details into a structured Excel sheet,
+ * including product names, descriptions, prices, stock levels, and discount information.
+ * It uses the XLSX library to create the Excel file and the file-saver library to save it.
+ * @param {Array} products - An array of product objects to be exported.
+ */
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 

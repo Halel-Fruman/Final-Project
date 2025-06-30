@@ -1,13 +1,21 @@
-import  { useState } from "react";
+/**
+ * @file ResetPassword.jsx
+ * @description This component allows users to reset their password using a token received via email.
+ */
+
+import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 
+/**
+ * @function ResetPassword
+ * @description Component for resetting the user's password.
+ */
 export default function ResetPassword() {
   const { token } = useParams();
   const navigate = useNavigate();
   const { t } = useTranslation();
-
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -77,9 +85,9 @@ export default function ResetPassword() {
               ? "bg-gray-400 cursor-not-allowed"
               : "bg-primaryColor hover:bg-secondaryColor"
           }`}>
-            <h2>
-              {loading ? t("resetPassword.loading") : t("resetPassword.submit")}
-            </h2>
+          <h2>
+            {loading ? t("resetPassword.loading") : t("resetPassword.submit")}
+          </h2>
         </button>
       </form>
     </main>

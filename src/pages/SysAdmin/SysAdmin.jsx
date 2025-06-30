@@ -1,5 +1,10 @@
-// File: SysAdmin.jsx
-import  { useState, useEffect } from "react";
+/**
+ * @file SysAdmin.jsx
+ * @description This file contains the SysAdmin component which allows administrators to manage stores,
+ * add new stores, edit existing ones, and manage store managers.
+ * It also includes functionality for exporting store data to Excel.
+ */
+import { useState, useEffect } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import { useAlert } from "../../components/AlertDialog.jsx";
@@ -7,6 +12,12 @@ import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+/**
+ * @function SysAdmin
+ * @description This component renders the system administration interface for managing stores.
+ * It allows adding, editing, and deleting stores, as well as managing store managers.
+ * It also provides functionality to export stores data to an Excel file.
+ */
 const SysAdmin = () => {
   const { t, i18n } = useTranslation();
   const [stores, setStores] = useState([]);
@@ -15,6 +26,7 @@ const SysAdmin = () => {
   const [newStoreMode, setNewStoreMode] = useState(false);
   const { showAlert } = useAlert();
   const [isLoading, setIsLoading] = useState(true);
+
   const handleCloseModal = () => {
     setIsModalOpen(false);
     setSelectedStore(null);
@@ -76,6 +88,8 @@ const SysAdmin = () => {
       .finally(() => setIsLoading(false));
   }, []);
 
+  // Function to open the modal for adding or editing a store
+  // It initializes the selectedStore state with default values if no store is provided
   const handleOpenModal = (store = null) => {
     setSelectedStore(
       store
@@ -96,6 +110,12 @@ const SysAdmin = () => {
     setIsModalOpen(true);
   };
 
+  // Function to handle saving the store data
+  // It validates the input fields and sends a POST or PUT request to the server
+  // based on whether it's a new store or an existing one
+  // If the request is successful, it updates the stores state and shows a success alert
+  // If there's an error, it shows an error alert
+  // It also checks for unique store names and valid email addresses
   const handleSave = async () => {
     if (!isStoreNameValid(selectedStore.name)) {
       showAlert("יש למלא שם חנות בעברית ובאנגלית.", "error");
@@ -157,6 +177,10 @@ const SysAdmin = () => {
     }
   };
 
+  // Function to handle deleting a store
+  // It shows a confirmation alert before proceeding with the deletion
+  // If the deletion is successful, it updates the stores state and shows a success alert
+  // If there's an error, it shows an error alert
   const handleDeleteStore = () => {
     showAlert("האם אתה בטוח שברצונך למחוק את החנות?", "warning", async () => {
       try {
@@ -175,7 +199,8 @@ const SysAdmin = () => {
       }
     });
   };
-
+  // Function to handle removing a manager from the store
+  // It checks if there is more than one manager before allowing deletion
   const handleRemoveManager = (index) => {
     if (selectedStore.manager.length === 1) {
       showAlert("לא ניתן למחוק את המנהל האחרון.", "error");
@@ -186,6 +211,8 @@ const SysAdmin = () => {
       setSelectedStore({ ...selectedStore, manager: updated });
     });
   };
+  // Function to export stores data to an Excel file
+  // It formats the store data and uses the XLSX library to create an Excel file
   const handleExportStores = () => {
     const data = stores.map((store) => ({
       שם_חנות: store.name?.he || "",
@@ -402,10 +429,6 @@ const SysAdmin = () => {
                   }
                 />
               </div>
-
-
-
-
             </div>
             <div className="mb-4">
               <label className="block mb-1">

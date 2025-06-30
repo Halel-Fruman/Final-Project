@@ -1,7 +1,16 @@
+/**
+ * @file VerifyEmailPage.jsx
+ * @description This component handles the email verification process for users.
+ */
 import { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 
+/**
+ * @function VerifyEmailPage
+ * @description Component for verifying the user's email address.
+ * It fetches the verification status based on the token from the URL.
+ */
 export default function VerifyEmailPage() {
   const { token } = useParams();
   const navigate = useNavigate();
@@ -25,7 +34,6 @@ export default function VerifyEmailPage() {
         setStatus("error");
       } finally {
         setHasFetched(true);
-
       }
     };
 
@@ -42,9 +50,7 @@ export default function VerifyEmailPage() {
           <h1 className="text-2xl font-bold text-green-600">
             {t("verify_email.success_title")}
           </h1>
-          <p className="text-md mt-2">
-            {t("verify_email.success_message")}
-          </p>
+          <p className="text-md mt-2">{t("verify_email.success_message")}</p>
           <p className="text-sm text-gray-500 mt-4">
             {t("verify_email.redirecting")}
           </p>
@@ -55,9 +61,7 @@ export default function VerifyEmailPage() {
           <h1 className="text-2xl font-bold text-red-600">
             {t("verify_email.error_title")}
           </h1>
-          <p className="text-md mt-2">
-            {t("verify_email.error_message")}
-          </p>
+          <p className="text-md mt-2">{t("verify_email.error_message")}</p>
         </div>
       )}
     </div>

@@ -1,4 +1,11 @@
-import  { useState } from "react";
+/**
+ * @file Sidebar.jsx
+ * @description This file contains the Sidebar component for the SysAdmin page.
+ * It provides navigation options for different admin functionalities such as
+ * dashboard, category management, user management, and system administration.
+ * It also includes responsive design for mobile and desktop views.
+ */
+import { useState } from "react";
 import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 import { useAlert } from "../../components/AlertDialog.jsx";
@@ -7,10 +14,17 @@ import SysAdmin from "./SysAdmin.jsx";
 import UserManagement from "./UserManagement.jsx";
 import AdminDashboard from "./AdminDashboard.jsx";
 
+/**
+ * @function Sidebar
+ * @description This component renders the sidebar for the SysAdmin page.
+ * It includes navigation tabs for different admin functionalities and handles
+ * responsive design for mobile and desktop views.
+ * @param {string} token - The authentication token for API requests.
+ */
 const Sidebar = ({ token }) => {
   const { t } = useTranslation();
   const [activeTab, setActiveTab] = useState("dashboard");
-  const [menuOpen, setMenuOpen] = useState(false); // תפריט מובייל
+  const [menuOpen, setMenuOpen] = useState(false);
   const { showAlert } = useAlert();
 
   const tabs = [
@@ -65,10 +79,11 @@ const Sidebar = ({ token }) => {
 
       {/* Sidebar for desktop */}
       <aside className="hidden lg:block w-64 bg-white border-r shadow-md p-4">
-        <div className="text-lg font-bold mb-2">{t("sysadmin.admin_management")}</div>
+        <div className="text-lg font-bold mb-2">
+          {t("sysadmin.admin_management")}
+        </div>
         <nav className="flex flex-col gap-1">
           {tabs.map((tab) => (
-
             <button
               key={tab.id}
               className={`flex items-center text-right w-full p-3 rounded hover:bg-gray-200 ${
@@ -107,8 +122,7 @@ const Sidebar = ({ token }) => {
       {/* Main content */}
       {/* <main className="flex-1 p-4 bg-white  overflow-y-auto h-fit"> */}
       <main className="flex-1 p-4 pl-6 bg-white shadow-md m-6 rounded-lg h-fit overflow-y-auto">
-
-          {renderContent()}
+        {renderContent()}
       </main>
     </div>
   );

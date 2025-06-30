@@ -1,3 +1,9 @@
+/**
+ * @file ChatBot.jsx
+ * @description This file contains the ChatBot component which provides a chat interface for users to interact
+ * with a virtual assistant. It supports text input, voice input, and image upload for product recognition.
+ * It also handles various user roles and actions based on the conversation context.
+ */
 import React, { useState, useEffect } from "react";
 import { FaPaperPlane, FaMicrophone, FaCamera } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
@@ -12,6 +18,18 @@ import {
   handleAction,
 } from "../../utils/chatBotHandlers";
 
+/**
+ * @component ChatBot
+ * @description A chat interface that allows users to interact with a virtual assistant.
+ * It supports text input, voice input, and image upload for product recognition.
+ * @param {Object} props - The properties passed to the component.
+ * @param {string} props.token - The authentication token for the user.
+ * @param {string} props.userId - The ID of the user.
+ * @param {function} props.onOpenCart - Callback to open the shopping cart.
+ * @param {function} props.onOpenWishlist - Callback to open the wishlist.
+ * @param {function} props.onLogout - Callback to log out the user.
+ * @param {function} props.onOpenAddProductForm - Callback to open the add product form.
+ */
 const ChatBot = ({
   token,
   userId,
@@ -38,10 +56,15 @@ const ChatBot = ({
   const bottomRef = React.useRef(null);
   const [isListening, setIsListening] = useState(false);
 
+  // Scroll to the bottom of the chat when messages change
+  // This effect ensures that the chat view scrolls to the latest message
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
-
+  // Initialize the chat with a welcome message if it's open and no messages exist
+  // This effect runs when the chat is opened and sets a default message
+  // to help users get started with the chat
+  // It uses a timeout to simulate a delay in the assistant's response
   useEffect(() => {
     if (isOpen && messages.length === 0) {
       const timeout = setTimeout(() => {
@@ -54,6 +77,8 @@ const ChatBot = ({
     }
   }, [isOpen]);
 
+  // Decode the JWT token to determine the user's role
+  // This effect runs when the token changes and sets the role based on the decoded token
   useEffect(() => {
     if (token) {
       try {
@@ -65,6 +90,8 @@ const ChatBot = ({
     }
   }, [token]);
 
+  // Fetch available Hebrew voices for speech synthesis
+  // This effect runs once when the component mounts and whenever the selected voice changes
   useEffect(() => {
     const updateVoices = () => {
       const allVoices = window.speechSynthesis.getVoices();
@@ -84,7 +111,7 @@ const ChatBot = ({
   }, [selectedVoice]);
 
   const toggleChat = () => setIsOpen(!isOpen);
-
+  //
   const speak = (text) => {
     if (!isSpeakingEnabled) return;
     const utterance = new SpeechSynthesisUtterance(text);
@@ -92,12 +119,16 @@ const ChatBot = ({
     if (selectedVoice) utterance.voice = selectedVoice;
     window.speechSynthesis.speak(utterance);
   };
+  // Create action handlers for various actions like opening cart, wishlist, etc.
+  // This function creates a set of handlers that can be used to perform actions based on the
   const actionHandlers = createActionHandlers(navigate, speak, {
     onOpenCart,
     onOpenWishlist,
     onLogout,
   });
 
+  // This function starts listening for voice input using the Web Speech API
+  // It sets the isListening state to true, initializes the SpeechRecognition object,
   const startListening = () => {
     setIsListening(true);
     const recognition = new (window.SpeechRecognition ||
@@ -105,7 +136,8 @@ const ChatBot = ({
     recognition.lang = "he-IL";
     recognition.interimResults = false;
     recognition.onend = () => {
-      setIsListening(false);     };
+      setIsListening(false);
+    };
 
     recognition.onerror = (e) => {
       console.error(e);
@@ -117,11 +149,12 @@ const ChatBot = ({
       sendMessage(transcript);
     };
 
-
-
     recognition.start();
   };
 
+  // This function sends a message to the chat API
+  // It checks if the user is logged in, formats the message history, and sends the request
+  // If the response contains an action, it handles that action accordingly
   const sendMessage = async (customInput = null) => {
     const userMessage = customInput !== null ? customInput : input;
     if (!userMessage.trim()) return;
@@ -183,6 +216,10 @@ const ChatBot = ({
     setLoading(false);
   };
 
+  // This function handles image uploads for product recognition
+  // It sends the image to the server, receives the analysis result, and updates the chat
+  // If the action to open the add product form is available, it opens that form
+  // It also sends a message to the assistant with instructions for filling out the product details
   const handleImageUpload = async (e) => {
     const file = e.target.files[0];
     if (!file) return;
@@ -294,8 +331,7 @@ const ChatBot = ({
       {isHidden ? (
         <button
           className="fixed bottom-4 left-4 z-50 bg-primaryColor text-white px-3 py-1 rounded-full text-sm shadow"
-          onClick={() => setIsHidden(false)}
-        >
+          onClick={() => setIsHidden(false)}>
           פתח את הבוט
         </button>
       ) : (
@@ -308,8 +344,7 @@ const ChatBot = ({
             )}
             <button
               className="w-24 h-24 shadow-lg rounded-full overflow-hidden border-2 border-primaryColor bg-transparent p-0 transition-transform duration-200 transform hover:scale-110"
-              onClick={toggleChat}
-            >
+              onClick={toggleChat}>
               <img
                 src={chatImage}
                 alt=""
@@ -322,8 +357,7 @@ const ChatBot = ({
                 setIsOpen(false);
                 setMessages([]);
               }}
-              className="text-xs text-gray-500 hover:text-red-600 mt-2 underline"
-            >
+              className="text-xs text-gray-500 hover:text-red-600 mt-2 underline">
               סגור בוט
             </button>
           </div>
@@ -335,8 +369,7 @@ const ChatBot = ({
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: 60, scale: 0.95 }}
                 transition={{ type: "spring", stiffness: 300, damping: 25 }}
-                className="w-80 h-[30rem] bg-white rounded-3xl shadow-2xl flex flex-col p-4 mt-2"
-              >
+                className="w-80 h-[30rem] bg-white rounded-3xl shadow-2xl flex flex-col p-4 mt-2">
                 <div className="mb-2">
                   <label className="text-xs text-gray-500 block mb-1">
                     בחר קול
@@ -349,8 +382,7 @@ const ChatBot = ({
                       );
                       setSelectedVoice(selected);
                     }}
-                    value={selectedVoice?.name || ""}
-                  >
+                    value={selectedVoice?.name || ""}>
                     <option value="">ברירת מחדל</option>
                     {voices.map((v) => (
                       <option key={v.name} value={v.name}>
@@ -380,8 +412,7 @@ const ChatBot = ({
                         msg.role === "user"
                           ? "bg-blue-100 self-end"
                           : "bg-secondaryColor self-start"
-                      }`}
-                    >
+                      }`}>
                       {msg.image ? (
                         <img
                           src={msg.image}
@@ -403,8 +434,7 @@ const ChatBot = ({
                   {role === "storeManager" && (
                     <label
                       className="cursor-pointer text-primaryColor  transition-transform duration-200 transform hover:scale-110
-"
-                    >
+">
                       <FaCamera className="text-lg" />
                       <input
                         type="file"
@@ -421,8 +451,7 @@ const ChatBot = ({
                     className={`text-xl transition-colors duration-300transition-transform duration-200 transform hover:scale-110 ${
                       isListening ? "text-red-500" : "text-primaryColor"
                     }`}
-                    aria-label="דבר"
-                  >
+                    aria-label="דבר">
                     <FaMicrophone />
                   </button>
 
@@ -438,8 +467,7 @@ const ChatBot = ({
                   <button
                     onClick={() => sendMessage()}
                     className="text-primaryColor text-xl transition-transform duration-200 transform hover:scale-110"
-                    aria-label="שלח"
-                  >
+                    aria-label="שלח">
                     <FaPaperPlane />
                   </button>
                 </div>

@@ -1,11 +1,17 @@
-import  { useState } from "react";
+/**
+ * @file OrderDetailsModal.jsx
+ * @description This file contains the OrderDetailsModal component which
+ * displays detailed information about an order.
+ */
+import { useState } from "react";
 import { FaTimes, FaEdit, FaSave, FaUndo } from "react-icons/fa";
 import { ImSpinner2 } from "react-icons/im";
 import { motion } from "framer-motion";
-
 import { toast } from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+// array of order statuses and their translations
+// This array contains the possible statuses for an order and their corresponding translations in Hebrew.
 const statusOptions = ["pending", "packed", "shipped", "completed", "canceled"];
 const statusTranslations = {
   pending: "ממתין",
@@ -14,7 +20,8 @@ const statusTranslations = {
   completed: "נמסר",
   canceled: "בוטל",
 };
-
+// array of fields related to delivery information
+// This array contains the fields related to delivery information that can be edited in the order details modal
 const deliveryFields = [
   "deliveryMethod",
   "trackingNumber",
@@ -22,6 +29,8 @@ const deliveryFields = [
   "deliveryDate",
 ];
 
+// function to format date to ISO string
+// This function takes a date string as input and returns it in ISO format (YYYY-MM-DD).
 const formatDate = (date) => {
   if (!date) return "";
   const parsedDate = new Date(date);
@@ -30,6 +39,8 @@ const formatDate = (date) => {
     : parsedDate.toISOString().split("T")[0];
 };
 
+// function to format date for display in Hebrew
+// This function takes a date string as input and returns it formatted for display in Hebrew.
 const formatDisplayDate = (date) => {
   if (!date) return "לא זמין";
   const parsedDate = new Date(date);
@@ -38,6 +49,9 @@ const formatDisplayDate = (date) => {
     : parsedDate.toLocaleDateString("he-IL");
 };
 
+// function to clean input values
+// This function takes a value and a boolean indicating if it's a date, and returns a cleaned version of the value.
+// If it's a date, it returns the ISO string format; otherwise, it trims whitespace from the value.
 const cleanInput = (value, isDate) => {
   if (isDate) {
     const parsedDate = new Date(value);
@@ -46,6 +60,12 @@ const cleanInput = (value, isDate) => {
   return value.trim();
 };
 
+/**
+ * @function OrderDetailsModal
+ * @description This component displays detailed information about an order and allows editing of certain fields.
+ * @param {Object} props - The component props.
+ * @param {Object} props.order - The order object containing details about the order.
+ */
 const OrderDetailsModal = ({ order, onClose, showAlert }) => {
   const [isEditing, setIsEditing] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
@@ -281,6 +301,8 @@ const OrderDetailsModal = ({ order, onClose, showAlert }) => {
   );
 };
 
+// Function to get the label for buyer details based on the key
+// This function takes a key and returns the corresponding label in Hebrew.
 const getBuyerLabel = (key) => {
   switch (key) {
     case "fullName":
@@ -295,7 +317,8 @@ const getBuyerLabel = (key) => {
       return key;
   }
 };
-
+// Function to get the label for delivery details based on the key
+// This function takes a key and returns the corresponding label in Hebrew.
 const getDeliveryLabel = (key) => {
   switch (key) {
     case "deliveryMethod":

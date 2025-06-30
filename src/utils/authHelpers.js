@@ -1,7 +1,10 @@
 import toast from "react-hot-toast";
 
 let logoutTriggered = false;
-
+/** * @function forceLogout
+ * @description Forces the user to log out by clearing local storage and redirecting to the shop page.
+ * It shows an error message indicating that the session has expired.
+ */
 export function forceLogout() {
   if (logoutTriggered) return;
   logoutTriggered = true;
@@ -17,7 +20,10 @@ export function forceLogout() {
     window.location.href = "/shop";
   }, 1500);
 }
-
+/** * @function refreshAccessToken
+ * @description Refreshes the access token using the refresh token stored in local storage.
+ * If the refresh token is not available or the refresh fails, it forces a logout.
+ */
 export async function refreshAccessToken() {
   const refreshToken = localStorage.getItem("refreshToken");
   if (!refreshToken) {
@@ -47,6 +53,12 @@ export async function refreshAccessToken() {
   }
 }
 
+/** * @function fetchWithTokenRefresh
+ * @description Fetches data from a given URL with the current access token.
+ * @param {string} url - The URL to fetch data from.
+ * @param {Object} options - The options for the fetch request.
+ * @returns {Promise<Response>} The response from the fetch request.
+ */
 export async function fetchWithTokenRefresh(url, options = {}) {
   const token = localStorage.getItem("accessToken");
 

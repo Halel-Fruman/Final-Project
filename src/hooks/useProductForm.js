@@ -1,6 +1,12 @@
-// File: src/hooks/useProductForm.js
+/**
+ * @file useProductForm.js
+ * @description Custom hook for managing product form state and handling input changes.
+ * This hook is designed to be used in a product management interface,
+ * allowing users to create or edit product details efficiently.
+ */
 import { useState, useEffect } from "react";
 
+/// Initial state for the product form
 const initialFormState = {
   nameEn: "",
   nameHe: "",
@@ -20,11 +26,15 @@ const initialFormState = {
   highlightHe: [],
   highlightEn: [],
 };
-
+/** * Custom hook to manage product form state and handle input changes.
+ * @param {Object} editingProduct - The product being edited, if any.
+ * @returns {Object} - An object containing the product state and functions to handle input changes.
+ */
 const useProductForm = (editingProduct) => {
   const [newProduct, setNewProduct] = useState(initialFormState);
 
   useEffect(() => {
+    //if editingProduct is provided, populate the form with its data
     if (editingProduct) {
       const discount = editingProduct.discounts?.[0];
       setNewProduct({
@@ -56,10 +66,12 @@ const useProductForm = (editingProduct) => {
       setNewProduct((prev) => ({ ...prev, [field]: value }));
     };
 
+  // Handle voice input for text fields
   const handleVoiceInput = (field) => (value) => {
     setNewProduct((prev) => ({ ...prev, [field]: value }));
   };
-
+  // Handle voice input for feature fields
+  // Splits the input text by common delimiters and updates the respective feature field
   const handleFeatureVoiceInput = (field) => (text) => {
     const split = field.includes("En")
       ? text.split(/comma|dot|semicolon|end/gi)
