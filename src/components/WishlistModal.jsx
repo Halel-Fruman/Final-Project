@@ -1,3 +1,9 @@
+/**
+ * @file WishlistModal.jsx
+ * @description A modal component that displays the user's wishlist with options to add items to the cart,
+ * remove items from the wishlist, and view product details. It fetches product details for each item in the wishlist
+ * and allows users to manage their wishlist items effectively.
+ */
 import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -5,6 +11,18 @@ import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
 
+/** * @component WishlistModal
+ * @description A modal component that displays the user's wishlist with options to add items to the cart,
+ * remove items from the wishlist, and view product details. It fetches product details for each item in the wishlist
+ * and allows users to manage their wishlist items effectively.
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.isOpen - Whether the modal is open or not.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Array} props.wishlist - Array of items in the user's wishlist.
+ * @param {Function} props.fetchProductDetails - Function to fetch product details by ID
+ * @param {Function} props.onAddToCart - Function to add an item to the cart
+ * @param {Function} props.onRemoveFromWishlist - Function to remove an item from the wishlist
+ */
 const WishlistModal = ({
   isOpen,
   onClose,
@@ -19,7 +37,7 @@ const WishlistModal = ({
 
   useEffect(() => {
     const loadProducts = async () => {
-      setIsLoading(true); // ← התחלת טעינה
+      setIsLoading(true);
       if (!wishlist || wishlist.length === 0) {
         setProducts([]);
         setIsLoading(false);
@@ -34,7 +52,7 @@ const WishlistModal = ({
         (p) => p !== null && p !== undefined
       );
       setProducts(validProducts);
-      setIsLoading(false); // ← סיום טעינה
+      setIsLoading(false);
     };
 
     if (isOpen) loadProducts();

@@ -1,6 +1,11 @@
 import { fetchWithTokenRefresh } from "../utils/authHelpers";
-
-// fetch wishlist from server
+/**
+ * @function fetchWishlist
+ * @description Fetches the user's wishlist from the server.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @returns {Promise<Array>} The user's wishlist items.
+ */
 export const fetchWishlist = async (userId, token) => {
   try {
     const response = await fetchWithTokenRefresh(
@@ -22,7 +27,15 @@ export const fetchWishlist = async (userId, token) => {
   }
 };
 
-// update wishlist
+/**
+ * @function updateWishlist
+ * @description Adds or removes a product from the user's wishlist.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {Object} product - The product to be added or removed, containing productId.
+ * @param {boolean} isInWishlist - Indicates whether the product is currently in the wishlist.
+ * @returns {Promise<boolean>} True if the operation was successful, false otherwise.
+ */
 export const updateWishlist = async (userId, token, product, isInWishlist) => {
   try {
     const method = isInWishlist ? "DELETE" : "POST";

@@ -1,3 +1,9 @@
+/**
+ * @file Header.jsx
+ * @description This file contains the Header component,
+ * which includes the navigation bar, logo, and user account controls.
+ * It also handles mobile responsiveness and user authentication modals.
+ */
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
@@ -14,6 +20,22 @@ import LanguageSelector from "../LanguageSelector";
 import Login from "../../pages/PersonalArea/LoginPage";
 import Register from "../../pages/Registeration/RegisterPage";
 
+/**
+ * @component Header
+ * @description The Header component renders the navigation bar with links to different sections,
+ * handles user authentication, and provides a responsive design for mobile devices.
+ * It includes a logo, language selector, shopping cart, and wishlist icons.
+ * @param {Object} props - The properties passed to the component.
+ * @param {Function} props.onLogout - Function to handle user logout.
+ * @param {boolean} props.isLoggedIn - Indicates if the user is logged in.
+ * @param {Function} props.onCartClick - Function to open the cart modal.
+ * @param {Array} props.cartItems - Array of items in the shopping cart.
+ * @param {string} props.role - User's role (e.g., admin, storeManager).
+ * @param {Function} props.setToken - Function to set the authentication token.
+ * @param {Function} props.setUserId - Function to set the user ID.
+ * @param {Array} props.wishlist - Array of items in the user's wishlist.
+ * @param {Function} props.onWishlistClick - Function to open the wishlist modal.
+ */
 const Header = ({
   onLogout,
   isLoggedIn,
@@ -31,6 +53,8 @@ const Header = ({
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
+  // Function to change the language
+  // This function updates the language in the i18n instance
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
   };
@@ -60,7 +84,7 @@ const Header = ({
           {isLoggedIn && role === "storeManager" && (
             <Link
               to="/store-management"
-              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110" 
+              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110"
             >
               {t("header.store_area")}
             </Link>

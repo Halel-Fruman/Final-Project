@@ -1,10 +1,21 @@
-// File: src/hooks/useProductManagement.js
+/**
+ * @file useProductManagement.js
+ * @description Custom hook for managing product-related operations such as
+ * adding, editing, deleting, and fetching products.
+ */
 import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useAlert } from "../components/AlertDialog";
 import exportToExcel from "../utils/exportToExcel";
 import e from "cors";
 
+/**
+ * @function useProductManagement
+ * @description Custom hook for managing product-related operations such as
+ * adding, editing, deleting, and fetching products.
+ * @param {string} storeId - The ID of the store for which products are managed.
+ * @returns {Object} - An object containing product management functions and state.
+ */
 const useProductManagement = (
   storeId,
   autoOpenAddForm = false,
@@ -22,7 +33,7 @@ const useProductManagement = (
   const [pendingEditFields, setPendingEditFields] = useState(null);
   const isAddingProductRef = useRef(isAddingProduct);
   const { showAlert } = useAlert();
-  const [formMode, setFormMode] = useState("add"); // מצב: "add" או "edit"
+  const [formMode, setFormMode] = useState("add");
 
   // Map the autofill payload to the expected product structure
   useEffect(() => {
@@ -94,6 +105,7 @@ const useProductManagement = (
       if (productId) {
         const productToEdit = products.find((p) => p._id === productId);
         if (productToEdit) {
+          window.localStorage.setItem("lastEditedProductId", productId);
           setEditingProduct(productToEdit);
           setIsAddingProduct(true);
           setFormMode("edit");
@@ -147,13 +159,114 @@ const useProductManagement = (
     return () => window.removeEventListener("openEditProduct", handleEditEvent);
   }, []);
 
+  useEffect(() => {
+    const handler = (e) => {
+      const { productName, newFields, productId } = e.detail;
+
+      let found = null;
+
+      if (productId) {
+        found = products.find((product) => product._id === productId);
+      }
+
+      if (!found && productName) {
+        const normalized = productName.trim().toLowerCase();
+        found = products.find((product) => {
+          const nameHe = product.name?.he?.toLowerCase() || "";
+          const nameEn = product.name?.en?.toLowerCase() || "";
+          return nameHe.includes(normalized) || nameEn.includes(normalized);
+        });
+      }
+
+      if (found) {
+        window.__editingProductId = found._id;
+        localStorage.setItem("lastEditedProductId", found._id);
+
+        const updated = {
+          ...(editingProduct ?? found),
+          ...newFields,
+          name: {
+            en:
+              newFields.nameEn ??
+              editingProduct?.name?.en ??
+              found.name?.en ??
+              "",
+            he:
+              newFields.nameHe ??
+              editingProduct?.name?.he ??
+              found.name?.he ??
+              "",
+          },
+          description: {
+            en:
+              newFields.descriptionEn ??
+              editingProduct?.description?.en ??
+              found.description?.en ??
+              "",
+            he:
+              newFields.descriptionHe ??
+              editingProduct?.description?.he ??
+              found.description?.he ??
+              "",
+          },
+          highlight: {
+            en:
+              newFields.highlightEn ??
+              editingProduct?.highlight?.en ??
+              found.highlight?.en ??
+              [],
+            he:
+              newFields.highlightHe ??
+              editingProduct?.highlight?.he ??
+              found.highlight?.he ??
+              [],
+          },
+          price: newFields.price ?? editingProduct?.price ?? found.price ?? "",
+          stock: newFields.stock ?? editingProduct?.stock ?? found.stock ?? "",
+          manufacturingCost:
+            newFields.manufacturingCost ??
+            editingProduct?.manufacturingCost ??
+            found.manufacturingCost ??
+            "",
+          allowBackorder:
+            newFields.allowBackorder ??
+            editingProduct?.allowBackorder ??
+            found.allowBackorder ??
+            false,
+        };
+
+        setEditingProduct(updated);
+        setIsAddingProduct(true);
+      } else {
+        showAlert("❌ לא נמצא מוצר מתאים לעדכון", "error");
+      }
+    };
+
+    window.addEventListener("autofillEditProductForm", handler);
+    return () => window.removeEventListener("autofillEditProductForm", handler);
+  }, [products, editingProduct]);
+
+  useEffect(() => {
+    if (editingProduct?._id) {
+      window.__editingProductId = editingProduct._id;
+      localStorage.setItem("lastEditedProductId", editingProduct._id);
+    }
+  }, [editingProduct]);
+
+  useEffect(() => {
+    if (editingProduct?._id) {
+      console.log("🟢 Saving editingProduct._id:", editingProduct._id);
+      window.__editingProductId = editingProduct._id;
+      localStorage.setItem("lastEditedProductId", editingProduct._id);
+    }
+  }, [editingProduct]);
+
   // Handle pending edit fields when editing a product
 
   const handleEdit = (product) => {
     setEditingProduct(product);
     setIsAddingProduct(true);
-      setFormMode("edit");
-
+    setFormMode("edit");
   };
 
   // Handle delete product action
@@ -190,7 +303,7 @@ const useProductManagement = (
       () => {
         setIsAddingProduct(false);
         setEditingProduct(null);
-        setFormMode("add"); // איפוס למצב הוספה
+        setFormMode("add");
       },
       () => {}
     );
@@ -259,7 +372,7 @@ const useProductManagement = (
 
     method(url, payload)
       .then((res) => {
-        if ( formMode === "edit" ) {
+        if (formMode === "edit") {
           setProducts((prev) =>
             prev.map((p) => (p._id === editingProduct._id ? res.data : p))
           );
@@ -292,10 +405,10 @@ const useProductManagement = (
     );
   });
   const handleAdd = () => {
-  setEditingProduct(null);
-  setFormMode("add");
-  setIsAddingProduct(true);
-};
+    setEditingProduct(null);
+    setFormMode("add");
+    setIsAddingProduct(true);
+  };
 
   // Map the payload to the expected product structure
   const mapPayloadToNewProduct = (payload) => ({

@@ -1,14 +1,14 @@
 // File: ProductManagement.jsx
 
-import React from "react";
 import ProductForm from "../../components/Product/ProductForm";
 import ProductTable from "../../components/Product/ProductTable";
 import ProductTableMobile from "../../components/Product/ProductTableMobile";
 import useProductManagement from "../../hooks/useProductManagement";
-import exportToExcel from "../../utils/exportToExcel";
 import { Icon } from "@iconify/react";
 import { fi } from "date-fns/locale";
 
+// This component manages the product management functionality for a store
+// It includes adding, editing, deleting products, searching, and exporting to Excel
 const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {} }) => {
   const {
     isAddingProduct,

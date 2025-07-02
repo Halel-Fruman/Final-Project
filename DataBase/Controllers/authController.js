@@ -1,31 +1,44 @@
 const crypto = require("crypto");
 const User = require("../models/User");
-const sendEmail = require("../sendEmail");
+const sendEmail = require("../sendEmail"); 
 const bcrypt = require("bcrypt");
-const BASE_URL = process.env.REACT_APP_BASE_URL || "https://yourdomain.com";
 
-// forgot Password function, creates a reset token and sends an email with the reset link
+
+const BASE_URL = process.env.REACT_APP_BASE_URL || "https://yourdomain.com"; 
+
 exports.forgotPassword = async (req, res) => {
   const { email } = req.body;
   try {
     const user = await User.findOne({ email });
-    if (!user) return res.status(404).json({ message: "User not found" });
+    if (!user)
+      return res.status(404).json({ message: "User not found" });
 
-    // Generate a reset token by hashing a random string
-    // and store it in the user's document
     const token = crypto.randomBytes(32).toString("hex");
     user.resetPasswordToken = token;
-    user.resetPasswordExpires = Date.now() + 1000 * 60 * 60; // Token valid for 1 hour
+    user.resetPasswordExpires = Date.now() + 1000 * 60 * 60; // שעה
     await user.save();
 
-    // Create a reset link using the token
-    // and the base URL of your application
     const resetLink = `${BASE_URL}/reset-password/${token}`;
-    await sendEmail(
-      email,
-      "Password Reset Request",
-      `Click the link to reset your password: ${resetLink}`
-    );
+
+    await sendEmail({
+  to: email,
+  subject: "בקשה לאיפוס סיסמה",
+  html: `
+     <div style="font-family: Arial, sans-serif; direction: rtl; max-width: 600px; margin: auto;">
+    <h2 style="margin-bottom: 12px; font-size: 22px; color: #333;">איפוס סיסמה</h2>
+    <div style="margin: 0 0 12px 0; font-size: 15px;">קיבלנו את הבקשה שלך לאיפוס הסיסמה .
+     <br/>
+     כדי להגדיר סיסמה חדשה, לחץ על הקישור הבא:</div>
+    <p style="margin: 0 0 18px 0;">
+      <a href="${resetLink}" style="font-size: 15px; color: #1a73e8; text-decoration: none; font-weight: bold;">
+        לחץ כאן לאיפוס הסיסמה
+      </a>
+    </p>
+    <p style="margin: 0; font-size: 13px; color: #555;">
+      אם לא אתה ביצעת את הבקשה – פשוט התעלם מההודעה.
+    </p>
+  </div>
+`});
 
     res.json({ message: "Reset link sent." });
   } catch (err) {
@@ -34,29 +47,27 @@ exports.forgotPassword = async (req, res) => {
   }
 };
 
-// reset Password function, verifies the token and updates the user's password
 exports.resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
-  // Validate the token and update the password
   try {
     const user = await User.findOne({
       resetPasswordToken: token,
-      resetPasswordExpires: { $gt: Date.now() },
+      resetPasswordExpires: { $gt: Date.now() }, // הטוקן עדיין בתוקף
     });
 
-    // Check if user exists and token is valid
     if (!user) {
       return res.status(400).json({ message: "Invalid or expired token" });
     }
 
-    //encrypt the new password
+    // הצפנת סיסמה חדשה
     const hashedPassword = await bcrypt.hash(password, 10);
-    // Update the user's password and clear the reset token and expiration
+
     user.password = hashedPassword;
     user.resetPasswordToken = undefined;
     user.resetPasswordExpires = undefined;
+
     await user.save();
 
     res.json({ message: "Password reset successful" });
@@ -65,3 +76,5 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+

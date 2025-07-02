@@ -1,7 +1,21 @@
-import  { useEffect, useState } from "react";
+/**
+ * @file OrderHistory.jsx
+ * @description This component displays the user's order history, grouped by transaction ID.
+ * It fetches transaction data and product details, allowing users to view their past orders and re-purchase items.
+ */
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
+
+/**
+ * @function OrderHistory
+ * @description Component for displaying the user's order history.
+ * @param {Object} props - Component properties.
+ * @param {Object} props.user - The user object containing user information.
+ * @param {function} props.addToCart - Function to add a product to the cart.
+ * @return {JSX.Element} The rendered component.
+ */
 
 const OrderHistory = ({ user, addToCart }) => {
   const { t, i18n } = useTranslation();
@@ -9,16 +23,21 @@ const OrderHistory = ({ user, addToCart }) => {
   const [productDetails, setProductDetails] = useState({});
   const [isLoadingTransactions, setIsLoadingTransactions] = useState(false);
 
+  // Fetches grouped transactions based on the user's transaction IDs
+  // It retrieves each transaction's details and groups them by transaction ID.
   useEffect(() => {
     const fetchGroupedTransactions = async () => {
       setIsLoadingTransactions(true);
       try {
+        // Initialize an empty object to hold grouped transactions
+        // Each key will be a transaction ID, and the value will be an array of transactions
         const groups = {};
         for (const txId of user.transactions) {
           const res = await fetchWithTokenRefresh(
             `/api/Transactions/by-transactionId/${txId}`
           );
-
+          // If the response is OK, parse the JSON and add it to the groups object
+          // If there are transactions for this ID, they will be stored in the groups object
           if (res.ok) {
             const txs = await res.json();
             if (txs?.length) {
@@ -26,19 +45,26 @@ const OrderHistory = ({ user, addToCart }) => {
             }
           }
         }
+        // Set the grouped transactions to state
+        // This will trigger a re-render of the component with the new data
         setTransactionGroups(groups);
       } catch (err) {
         console.error("Failed to fetch grouped transactions:", err);
       } finally {
+        // Regardless of success or failure, we set the loading state to false
+        // This ensures that the loading spinner is removed once the fetch operation is complete
         setIsLoadingTransactions(false);
       }
     };
-
+    // If the user has transactions, fetch the grouped transactions
+    // This will only run if the user.transactions array is not empty
     if (user.transactions?.length) {
       fetchGroupedTransactions();
     }
   }, [user.transactions]);
 
+  // Fetches product details for each product in the grouped transactions
+  // It creates a map of product IDs to their details, which is then used to display
   useEffect(() => {
     const fetchProductDetails = async () => {
       const allProducts = {};
@@ -60,7 +86,8 @@ const OrderHistory = ({ user, addToCart }) => {
       }
       setProductDetails(detailsMap);
     };
-
+    // If there are transaction groups, fetch the product details for each product
+    // This will only run if the transactionGroups object is not empty
     if (Object.keys(transactionGroups).length) {
       fetchProductDetails();
     }
@@ -79,7 +106,7 @@ const OrderHistory = ({ user, addToCart }) => {
         .sort(([, aOrders], [, bOrders]) => {
           const aDate = new Date(aOrders[0]?.createdAt || 0);
           const bDate = new Date(bOrders[0]?.createdAt || 0);
-          return bDate - aDate; // חדש קודם
+          return bDate - aDate;
         })
         .map(([transactionId, orders], idx) => (
           <div
@@ -89,7 +116,7 @@ const OrderHistory = ({ user, addToCart }) => {
               {t("orders.orderGroup")}:{" "}
               <span className="font-mono">{transactionId}</span>
             </div>
-
+            {/* Display each order within the transaction group */}
             {orders.map((order, i) => (
               <div key={i} className="bg-white border-b">
                 <div className="flex flex-col md:flex-row justify-between items-center bg-gray-100 px-6 py-3 text-lg text-gray-900 border-b">
@@ -158,7 +185,6 @@ const OrderHistory = ({ user, addToCart }) => {
                             className="bg-primaryColor text-white text-xl font-bold px-4 py-2 rounded-full hover:bg-secondaryColor">
                             {t("orders.buyAgain")}
                           </button>
-
                         </div>
                       </div>
                     );

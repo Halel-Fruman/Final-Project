@@ -1,9 +1,20 @@
-import  { useEffect, useState } from "react";
+/**
+ * @file StoreSettings.jsx
+ * @description This file contains the StoreSettings component which allows store managers to manage their store settings
+ */
+import { useEffect, useState } from "react";
 import axios from "axios";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
 import { useTranslation } from "react-i18next";
 
+/**
+ * @function StoreSettings
+ * @description This function component renders the settings page for a specific store.
+ * It allows the store manager to update various settings related to the store.
+ * @param {string} props.storeId - The ID of the store to fetch settings for
+ * @param {string} props.token - The authentication token for API requests
+ */
 const StoreSettings = ({ storeId, token }) => {
   const [store, setStore] = useState(null);
   const [loading, setLoading] = useState(true);

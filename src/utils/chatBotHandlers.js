@@ -1,4 +1,11 @@
-// utils/chatBotHandlers.js
+/**
+ * @function buildMessageHistory
+ * @description Builds the message history for the chatbot, including system prompts and user messages.
+ * @param {Array} messages - The array of messages to include in the history.
+ * @param {string} role - The role of the user (e.g., 'user', 'storeManager').
+ * @param {string} imageUrl - The URL of an image uploaded by the user, if any.
+ * @returns {Array} The formatted message history, including the system prompt and user messages.
+ */
 export const buildMessageHistory = (messages, role, imageUrl) => {
   const systemPrompt = `
 You are a smart and accessible chatbot integrated into ILAN’s e-commerce website.
@@ -11,7 +18,7 @@ The site serves as a social commerce platform, where users can purchase products
  You must act carefully, respecting the user’s permission level, and never trigger any automatic action without explicit confirmation in the conversation. Your goal is to assist — not to initiate critical actions unless the user asks.
 
 If the user explicitly confirms a previous suggestion (e.g., says "כן", "תפתח", "יאללה", etc.), you **must** return a valid 'action'. Never return 'action: null' in this case.
- 
+
 
 ---
 
@@ -251,7 +258,6 @@ Allowed fields inside 'newFields':
 
   const formattedMessages = lastMessages.map((msg) => {
     if (typeof msg.content === "object" && Array.isArray(msg.content)) {
-      // כבר פורמט vision
       return {
         role: msg.role,
         content: msg.content,
@@ -271,7 +277,6 @@ Allowed fields inside 'newFields':
       msg.content.some((c) => c.type === "image_url")
   );
 
-  // ✅ אם יש תמונה — נוסיף vision message עם instruction באנגלית
   if (imageUrl && !hasVision) {
     formattedMessages.push({
       role: "user",
@@ -318,6 +323,14 @@ Only include fields you can recognize or extract visually. Do NOT guess or fill 
   return [{ role: "system", content: systemPrompt }, ...formattedMessages];
 };
 
+/**
+ * @function createActionHandlers
+ * @description Creates action handlers for navigating and performing actions in the store management system.
+ * @param {Function} navigate - Function to navigate to different pages.
+ * @param {Function} speak - Function to provide voice feedback.
+ * @param {Object} externalHandlers - Optional external handlers for additional actions.
+ * @returns {Object} An object containing action handler functions.
+ */
 export const createActionHandlers = (
   navigate,
   speak,
@@ -334,15 +347,19 @@ export const createActionHandlers = (
     }
   };
   return {
+    //
     goToProductList: () => {
       navigate("/store-management", {
         state: { tab: "products" },
         replace: true,
       });
       speak("מעביר אותך לעמוד ניהול המוצרים.");
-    },  
+    },
 
     openAddProduct: () => {
+      // Check if we are already on the store management page
+      // If so, dispatch the event directly
+      // Otherwise, navigate to the store management page and then dispatch the event
       if (window.location.pathname === "/store-management") {
         const event = new Event("openAddProductForm");
         window.dispatchEvent(event);
@@ -358,6 +375,9 @@ export const createActionHandlers = (
     },
 
     openAddProductForm: (payload) => {
+      // Check if we are already on the store management page
+      // If so, dispatch the event directly
+      // Otherwise, navigate to the store management page and then dispatch the event
       console.log(window.location.pathname);
       if (window.location.pathname === "/shop/store-management") {
         console.log("true");
@@ -366,8 +386,6 @@ export const createActionHandlers = (
         );
         speak("ממלא את פרטי המוצר בטופס.");
       } else {
-        console.log("false");
-
         navigate("/store-management", {
           state: {
             tab: "products",
@@ -391,23 +409,20 @@ export const createActionHandlers = (
       }
 
       if (window.location.pathname !== "/store-management") {
-        // לא בדף הנכון — ננווט קודם
         navigate("/store-management", {
-          state: { tab: "products" }, // אם יש לך טאב מוצרים
+          state: { tab: "products" },
           replace: true,
         });
 
-        // רגע! לא להמשיך מיד — נחכה שהניווט יקרה
         setTimeout(() => {
           window.dispatchEvent(
             new CustomEvent("openEditProduct", { detail: { productName } })
           );
           speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-        }, 500); // חצי שנייה שיהיה זמן לניווט
+        }, 500);
         return;
       }
 
-      // אם כבר בדף הנכון — שולח ישר
       window.dispatchEvent(
         new CustomEvent("openEditProduct", { detail: { productName } })
       );
@@ -422,8 +437,6 @@ export const createActionHandlers = (
       }
       console.log("editProduct payload:", payload);
 
-      // const isEditOpen = document.getElementById("edit-product-modal");
-      // console.log("isEditOpen:", isEditOpen);
       if (window.location.pathname === "/shop/store-management") {
         console.log("here");
         window.dispatchEvent(
@@ -435,8 +448,6 @@ export const createActionHandlers = (
           })
         );
         speak("ממלא את פרטי המוצר המעודכנים.");
-        // } else if (!isEditOpen) {
-        //   speak("יש לפתוח את טופס עריכת המוצר לפני מילוי שדות.");
       } else {
         speak("יש לפתוח את דף ניהול המוצרים תחילה.");
       }
@@ -463,6 +474,19 @@ viewStoreOrders: () =>
   };
 };
 
+/**
+ * @function handleAction
+ * @description Handles user actions based on their role and permissions.
+ * @param {string} action - The action to perform.
+ * @param {Object} payload - The data required for the action.
+ * @param {string} token - The user's authentication token.
+ * @param {string} userId - The ID of the user.
+ * @param {string} role - The role of the user (e.g., 'user', 'storeManager').
+ * @param {Array} restrictedActions - Actions restricted to certain roles.
+ * @param {Function} speak - Function to provide voice feedback.
+ * @param {Function} setMessages - Function to update chat messages.
+ * @param {Object} actionHandlers - Object containing action handler functions.
+ */
 export const handleAction = (
   action,
   payload,

@@ -1,6 +1,9 @@
-// קובץ: StoreAnalytics.jsx
-import  { useEffect, useState } from "react";
-import axios from "axios";
+/**
+ * @file StoreAnalytics.jsx
+ * @description This file contains the StoreAnalytics component which displays analytics for a store
+ * including monthly revenue and product category breakdowns.
+ */
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -26,6 +29,12 @@ const COLORS = [
   "#00BCD4",
 ];
 
+/**
+ * @function StoreAnalytics
+ * @description This component fetches and displays analytics data for a store
+ * including monthly revenue and product category breakdowns.
+ * @param {string} props.storeId - The ID of the store to fetch analytics for
+ */
 const StoreAnalytics = ({ storeId }) => {
   const [monthlyData, setMonthlyData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);

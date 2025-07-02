@@ -1,4 +1,9 @@
-import  { useEffect, useState } from "react";
+/**
+ * @file AdminDashboard.jsx
+ * @description This file contains the AdminDashboard component which displays
+ * various analytics and statistics for the admin panel.
+ */
+import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import {
   BarChart,
@@ -13,6 +18,11 @@ import {
 import { FaStar } from "react-icons/fa";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+/**
+ * @function AdminDashboard
+ * @description This component renders the admin dashboard with store sales statistics,
+ * top products, and various filters for date ranges.
+ */
 const AdminDashboard = () => {
   const { t, i18n } = useTranslation();
   const [storeStats, setStoreStats] = useState([]);
@@ -22,6 +32,8 @@ const AdminDashboard = () => {
   const [toDate, setToDate] = useState("");
   const [isLoading, setIsLoading] = useState(true);
 
+  // Function to fetch statistics from the API
+  // It handles both store sales and top products data
   const fetchStats = async () => {
     try {
       setIsLoading(true);
@@ -39,7 +51,8 @@ const AdminDashboard = () => {
 
       const storeData = await storeRes.json();
       const productData = await productRes.json();
-
+      // Map store data to include localized names based on the current language
+      // This ensures that the store names are displayed correctly in the selected language
       setStoreStats(
         storeData.map((store) => ({
           ...store,
@@ -49,19 +62,26 @@ const AdminDashboard = () => {
             "Unnamed",
         }))
       );
+      // Set the top products data directly from the API response
+      // This includes product names, store names, prices, and total sold quantities
       setTopProducts(productData);
     } catch (err) {
       console.error("Failed to load statistics:", err);
       setError(t("sysadmin.errors.fetchFailed"));
     } finally {
+      // Reset loading state after fetching data
+      // This ensures that the loading indicator is removed once the data is fetched
       setIsLoading(false);
     }
   };
-
+  // Fetch statistics when the component mounts or when the language changes
+  // This ensures that the dashboard updates with the latest data and translations
   useEffect(() => {
     fetchStats();
   }, [i18n.language]);
 
+  // Custom tick component for the X-axis
+  // This component formats the tick labels to handle long names by splitting them into multiple lines
   const CustomTick = ({ x, y, payload }) => {
     const lines = payload.value.split(" ");
     return (

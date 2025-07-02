@@ -1,7 +1,19 @@
-// File: src/components/ProductTable.jsx
+/**
+ * @file ProductTable.jsx
+ * @description A component that displays a table of products with options to edit and delete each product.
+ * this component is designed to be used in an store manager interface for desktop.
+ */
 import { Icon } from "@iconify/react";
 
-// this component displays a table of products with options to edit and delete each product
+/**
+ * @component ProductTable
+ * @description Renders a table of products with options to edit and delete each product.
+ * @param {Object} props - Component properties.
+ * @param {Array} props.products - Array of product objects to display in the table.
+ * @param {Function} props.onEdit - Callback function to handle editing a product.
+ * @param {Function} props.onDelete - Callback function to handle deleting a product.
+ * @returns {JSX.Element} A table displaying product details and action buttons.
+ */
 const ProductTable = ({ products, onEdit, onDelete }) => {
   return (
     <div className="hidden md:block">

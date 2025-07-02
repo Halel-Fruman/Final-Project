@@ -1,13 +1,32 @@
-// File: CheckoutPage.jsx
-import  { useEffect, useState, useMemo } from "react";
+/**
+ * @file Checkout.jsx
+ * @description This component handles the checkout process, including displaying the cart items,
+ * managing user addresses, and processing payments.
+ */
+
+import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { addAddress } from "../../utils/Address";
 import { processCheckout } from "../../utils/checkoutHandler";
 import { useNavigate } from "react-router-dom";
-
 import { Icon } from "@iconify/react";
 import { updateCartItemQuantity } from "../../utils/Cart";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
+
+/**
+ * @component CheckoutPage
+ * @description This component renders the checkout page where users can review their cart items,
+ * select shipping addresses, and proceed to payment.
+ * @param {Object} props - The component props.
+ * @param {Array} props.cartItems - The items in the user's cart.
+ * @param {Function} props.fetchProductDetails - Function to fetch product details by ID.
+ * @param {string} props.userId - The ID of the user.
+ * @param {string} props.token - The authentication token for the user.
+ * @param {Function} props.addToCart - Function to add items to the cart.
+ * @param {Function} props.setCartItems - Function to update the cart items state.
+ * @param {Function} props.removeFromCart - Function to remove items from the cart.
+ * @returns {JSX.Element} The rendered checkout page component.
+ */
 const CheckoutPage = ({
   cartItems = [],
   fetchProductDetails,
@@ -28,6 +47,8 @@ const CheckoutPage = ({
   const [storeShippingInfo, setStoreShippingInfo] = useState({});
   const [isFinalizing, setIsFinalizing] = useState(false);
 
+  // Navigate hook from react-router-dom to handle navigation
+  // after successful payment processing
   const navigate = useNavigate();
 
   const selectedAddress = userData?.addresses?.[selectedAddressIndex];
@@ -52,15 +73,19 @@ const CheckoutPage = ({
   // and process the checkout
   useEffect(() => {
     const handleMessage = (event) => {
+      // Check if the message is from Tranzila and contains the payment success type
       if (event?.data?.type === "TRZILA_PAYMENT_SUCCESS") {
         (async () => {
           try {
-            setIsFinalizing(true); // ⬅️ התחלת טעינה
-
+            //set the finalizing state to true to show a loading spinner
+            setIsFinalizing(true);
+            // Fetch the notify info from the server using the userId
             const res = await fetch(`/api/tranzila/notify/${userId}`);
+            // Check if the response is ok, if not throw an error
             if (!res.ok) throw new Error("Failed to fetch notify info");
             const notifyData = await res.json();
 
+            //create new transaction with the notify data
             const transactions = await processCheckout({
               cartItems: detailedCart,
               userData,
@@ -78,12 +103,16 @@ const CheckoutPage = ({
             console.error("❌ Error during post-payment processing:", err);
             alert("שגיאה בעת השלמת ההזמנה");
           } finally {
-            setIsFinalizing(false); // ⬅️ סיום טעינה
+            // Reset the finalizing state to false after processing
+            // This will hide the loading spinner
+            setIsFinalizing(false);
           }
         })();
       }
     };
 
+    // Add an event listener for messages from the window
+    // This will listen for messages from the Tranzila iframe
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, [
@@ -121,7 +150,7 @@ const CheckoutPage = ({
       const createPaymentSession = async () => {
         try {
           const cartDetails = [];
-
+          // Iterate through each store and its products
           Object.entries(groupedByStore).forEach(([storeId, products]) => {
             products.forEach((item) => {
               cartDetails.push({
@@ -158,6 +187,10 @@ const CheckoutPage = ({
             });
           });
 
+          // Create a payment session with Tranzila
+          // This will send the payment details to the server
+          // and receive the HTML for the payment iframe
+          // The server will handle the Tranzila API calls
           const res = await fetch("/api/tranzila/create-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -182,7 +215,16 @@ const CheckoutPage = ({
       };
 
       createPaymentSession();
-    }, [sum, userId, cartItems, selectedAddress, userData, deliveryMethods, storeShippingInfo, groupedByStore]);
+    }, [
+      sum,
+      userId,
+      cartItems,
+      selectedAddress,
+      userData,
+      deliveryMethods,
+      storeShippingInfo,
+      groupedByStore,
+    ]);
 
     // Render the Tranzila iframe
     // If formHtml is not available, show a loading spinner
@@ -304,6 +346,10 @@ const CheckoutPage = ({
     return sum;
   }, [groupedByStore, deliveryMethods, storeShippingInfo]);
 
+  // Handle adding a new address
+  // This function will call the addAddress utility function
+  // and update the userData state with the new address
+  // It will also reset the newAddress state and hide the form
   const handleAddNewAddress = async () => {
     try {
       const updatedAddresses = await addAddress({
@@ -437,7 +483,7 @@ const CheckoutPage = ({
                 ? t("checkout.cancelNewAddress")
                 : t("checkout.addNewAddress")}
             </button>
-
+            {/* button to open tranzila payment iframe with the correct amount to pay */}
             <button
               className="w-full bg-primaryColor text-xl text-white py-2 rounded-full font-bold hover:bg-secondaryColor"
               onClick={() => setStartPayment(true)}>

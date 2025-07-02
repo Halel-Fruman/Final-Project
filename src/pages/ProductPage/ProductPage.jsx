@@ -1,6 +1,10 @@
-// ProductPage.jsx – LCP Optimized Version without react-helmet
+/**
+ * @file ProductPage.jsx
+ * @description This component displays product details, allows users to add products to their cart,
+ * and manage their wishlist.
+ */
 import { useEffect, useState } from "react";
-import { useParams, useNavigate,Link } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
@@ -8,7 +12,17 @@ import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
-// ImageWithFallback component to handle WebP fallback
+/**
+ * @function ImageWithFallback
+ * @description Component for rendering an image with a fallback to WebP format.
+ * It attempts to load the WebP version of the image first,
+ * and if it fails, it falls back to the original image format.
+ * @param {Object} props - Component properties.
+ * @param {string} props.src - The source URL of the image.
+ * @param {string} props.alt - The alt text for the image.
+ * @param {string} props.className - Additional CSS classes for styling the image.
+ * @param {Object} props.props - Additional properties to pass to the img element.
+ */
 const ImageWithFallback = ({ src, alt, className, ...props }) => {
   const [useFallback, setUseFallback] = useState(false);
   const webpSrc = src?.replace(/\.(jpg|jpeg|png)$/i, ".webp") || src;
@@ -24,7 +38,15 @@ const ImageWithFallback = ({ src, alt, className, ...props }) => {
   );
 };
 
-// ProductPage component to display product details and handle interactions
+/**
+ * @function ProductPage
+ * @description Component for displaying product details, allowing users to add products to their cart,
+ * and manage their wishlist.
+ * @param {Object} props - Component properties.
+ * @param {Function} props.addToWishlist - Function to add or remove a product from the wishlist.
+ * @param {Array} props.wishlist - Array of products in the user's wishlist.
+ * @param {Function} props.addToCart - Function to add a product to the user's cart.
+ */
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
@@ -75,7 +97,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   }, [id, t, i18n.language]);
 
   useEffect(() => {
-    if (error==="Service Unavailable") navigate("/503");
+    if (error === "Service Unavailable") navigate("/503");
   }, [error, navigate]);
 
   // Function to toggle wishlist status for the product
@@ -189,25 +211,28 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     );
   }
 
-// If the product is not found, show a 404-like message
-  if (!product) return <div><div className="min-h-screen bg-gray-50 flex border-b flex-col items-center justify-center text-center px-4">
-      <h1 className="text-6xl font-bold text-primaryColor mb-4">{t("product.not_found", "אופס...")}</h1>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-        {t("product.not_found_title", "המוצר לא נמצא")}
-      </h2>
-      <p className="text-gray-600 mb-6 max-w-md">
-        {t(
-          "product.not_found_message",
-          "נראה שהמוצר לא קיים או שהוסר."
-        )}
-      </p>
-      <Link
-        to="/"
-        className="bg-primaryColor text-white px-6 py-2 rounded-lg shadow hover:bg-secondaryColor transition"
-      >
-        {t("not_found.back_to_home", "חזרה לדף הבית")}
-      </Link>
-    </div></div>;
+  // If the product is not found, show a 404-like message
+  if (!product)
+    return (
+      <div>
+        <div className="min-h-screen bg-gray-50 flex border-b flex-col items-center justify-center text-center px-4">
+          <h1 className="text-6xl font-bold text-primaryColor mb-4">
+            {t("product.not_found", "אופס...")}
+          </h1>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+            {t("product.not_found_title", "המוצר לא נמצא")}
+          </h2>
+          <p className="text-gray-600 mb-6 max-w-md">
+            {t("product.not_found_message", "נראה שהמוצר לא קיים או שהוסר.")}
+          </p>
+          <Link
+            to="/"
+            className="bg-primaryColor text-white px-6 py-2 rounded-lg shadow hover:bg-secondaryColor transition">
+            {t("not_found.back_to_home", "חזרה לדף הבית")}
+          </Link>
+        </div>
+      </div>
+    );
 
   // Extract product details and prepare data for rendering
 
@@ -232,7 +257,6 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const discountedPrice = isOnSale
     ? productPrice - productPrice * (discountPercentage / 100)
     : productPrice;
-
 
   return (
     <main className="bg-gray-50">

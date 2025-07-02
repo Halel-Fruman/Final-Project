@@ -1,8 +1,19 @@
-// File: src/components/ProductForm.jsx
+/**
+ * @file ProductForm.jsx
+ * @description A form component for adding or editing products with voice input support.
+ */
 import React, { useState } from "react";
 import VoiceInputButton from "../VoiceInputButton";
 import useProductForm from "../../hooks/useProductForm";
 
+/**
+ * @component ProductForm
+ * @description A form for adding or editing products with voice input support.
+ * @param {Object} props - Component properties.
+ * @param {string} props.mode - The mode of the form, either "add" or "edit".
+ * @param {Object} props.editingProduct - The product being edited (if in edit mode).
+ * @param {Array} props.categories - List of categories to select from.
+ */
 const ProductForm = ({
   mode,
   editingProduct,

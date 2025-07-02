@@ -1,8 +1,20 @@
+/**
+ * @file RegisterPage.jsx
+ * @description This component handles user registration, allowing users to create an account.
+ */
 import { DialogTitle, Dialog, DialogPanel } from "@headlessui/react";
 import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import toast from "react-hot-toast";
 
+/**
+ * @function Register
+ * @description Component for user registration, allowing users to enter their details and create an account.
+ * @param {Object} props - Component properties.
+ * @param {Function} props.setToken - Function to set the authentication token.
+ * @param {Function} props.setUserId - Function to set the user ID.
+ * @param {Function} props.onClose - Function to call when the registration is successful.
+ */
 export default function Register({ setToken, setUserId, onClose }) {
   const { t } = useTranslation();
   const [email, setEmail] = useState("");
@@ -233,7 +245,7 @@ export default function Register({ setToken, setUserId, onClose }) {
           </button>
         </div>
       </form>
-      { /* Terms and Conditions Modal */}
+      {/* Terms and Conditions Modal */}
       <Dialog
         open={showTermsModal}
         onClose={() => setShowTermsModal(false)}

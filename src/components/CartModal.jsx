@@ -1,3 +1,9 @@
+/**
+ * @file CartModal.jsx
+ * @description A modal component that displays the user's shopping cart with options to update quantities,
+ * remove items, and proceed to checkout. It fetches product details for each item in the cart
+ * and allows users to manage their cart items effectively.
+ */
 import { useEffect, useState } from "react";
 import { Dialog } from "@headlessui/react";
 import { XMarkIcon } from "@heroicons/react/24/outline";
@@ -8,6 +14,19 @@ import toast from "react-hot-toast";
 import { updateCartItemQuantity } from "../utils/Cart";
 import { Icon } from "@iconify/react";
 
+/**
+ * @component CartModal
+ * @description A modal component that displays the user's shopping cart with options to update quantities,
+ * remove items, and proceed to checkout.
+ * @param {Object} props - Component properties.
+ * @param {boolean} props.isOpen - Whether the modal is open or not.
+ * @param {Function} props.onClose - Function to close the modal.
+ * @param {Array} props.cartItems - Array of items in the user's cart.
+ * @param {Function} props.onRemoveFromCart - Function to remove an item from the cart.
+ * @param {Function} props.fetchProductDetails - Function to fetch product details by ID.
+ * @param {string} props.userId - The ID of the user whose cart is being managed.
+ * @returns {JSX.Element} The rendered modal component.
+ */
 const CartModal = ({
   isOpen,
   onClose,
@@ -21,6 +40,10 @@ const CartModal = ({
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
+  // Load cart details when the modal opens
+  // This effect fetches product details for each item in the cart
+  // and updates the state with detailed cart items.
+  // It also handles loading state and error handling.
   useEffect(() => {
     const loadCartDetails = async () => {
       setIsLoading(true);
@@ -49,13 +72,19 @@ const CartModal = ({
     if (isOpen) loadCartDetails();
   }, [isOpen, cartItems, fetchProductDetails]);
 
+  // Calculate the total price of items in the cart
+  // This function iterates over the detailed cart items and sums up the price multiplied by the quantity
+  // It returns the total price as a number.
   const calculateTotal = () => {
     return detailedCartItems.reduce(
       (total, item) => total + item.price * item.quantity,
       0
     );
   };
-
+  // Handle quantity change for a specific product
+  // This function updates the quantity of a specific product in the cart
+  // It calls the updateCartItemQuantity function with the userId, productId, and new quantity.
+  // If successful, it updates the state with the new quantity and shows a success toast.
   const handleQuantityChange = async (productId, newQuantity) => {
     try {
       await updateCartItemQuantity(userId, productId, newQuantity);

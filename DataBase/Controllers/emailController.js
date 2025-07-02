@@ -2,12 +2,6 @@
 
 const sendEmail = require("../sendEmail");
 
-// This function sends a confirmation email to the store when a new order is placed
-// It includes details about the order and the customer
-// The email is sent in Hebrew and includes a link to the store management page
-// It uses a delivery method map to translate delivery methods into Hebrew
-// The function handles errors and returns appropriate responses
-// It expects the request body to contain storeEmail, storeName, transaction, and userName
 const sendConfirmationEmail = async (req, res) => {
   const { storeEmail, storeName, transaction, userName } = req.body;
   const deliveryMethodMap = {
@@ -52,6 +46,7 @@ const sendConfirmationEmail = async (req, res) => {
 
     await sendEmail({
       to: storeEmail,
+      bcc: ["IlanS@ilan-israel.co.il"],
       subject: "התקבלה הזמנה חדשה באתר",
       html,
     });

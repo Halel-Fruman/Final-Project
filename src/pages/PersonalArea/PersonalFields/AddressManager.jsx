@@ -1,9 +1,24 @@
-import  { useState } from "react";
+/**
+ * @file AddressManager.jsx
+ * @description This component manages the user's addresses, allowing them to add, edit, and delete addresses.
+ * It uses hooks for state management and translation, and provides feedback through toast notifications.
+ */
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
 import { addAddress, editAddress, deleteAddress } from "../../../utils/Address";
 
+/**
+ * @function AddressManager
+ * @description Component for managing user addresses.
+ * @param {Object} props - Component properties.
+ * @param {Array} props.addresses - List of addresses associated with the user.
+ * @param {string} props.userId - The ID of the user.
+ * @param {function} props.onUpdate - Callback function to update the addresses after an operation.
+ * @param {string} props.token - The authentication token for API requests.
+ * @return {JSX.Element} The rendered component.
+ */
 const AddressManager = ({ addresses, userId, onUpdate, token }) => {
   const { t } = useTranslation();
   const [newCity, setNewCity] = useState("");
