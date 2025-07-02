@@ -442,7 +442,8 @@ export const createActionHandlers = (
       }
     },
 
-    viewStoreOrders: () => navigate("/store/orders"),
+viewStoreOrders: () =>
+  navigate(`/store-management/`, { state: { tab: "orders" } }),
     showStats: () => navigate("/store/analytics"),
     openSettings: () => navigate("/store/settings"),
     goToHome: () => navigate("/"),
