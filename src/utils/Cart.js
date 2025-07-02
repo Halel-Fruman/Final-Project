@@ -27,7 +27,8 @@ export const fetchCart = async (userId, token) => {
   }
 };
 
-/** * @function saveCart
+/**
+ * @function saveCart
  * @description Saves the user's cart to the server.
  * @param {string} userId - The ID of the user.
  * @param {string} token - The authentication token.
@@ -58,7 +59,8 @@ export const saveCart = async (userId, token, cartItems) => {
     console.error("Error saving cart:", error.message);
   }
 };
-/** * @function addToCart
+/**
+ * @function addToCart
  * @description Adds a product to the user's cart.
  * @param {string} userId - The ID of the user.
  * @param {string} token - The authentication token.
@@ -90,7 +92,8 @@ export const addToCart = async (userId, token, product) => {
   }
 };
 
-/** * @function removeFromCart
+/**
+ * @function removeFromCart
  * @description Removes a product from the user's cart.
  * @param {string} userId - The ID of the user.
  * @param {string} token - The authentication token.
