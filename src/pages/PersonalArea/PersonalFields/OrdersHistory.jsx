@@ -7,6 +7,12 @@ import { useEffect, useState } from "react";
 import { useTranslation } from "react-i18next";
 import { toast } from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
+import {
+  FaExclamationCircle,
+  FaBoxOpen,
+  FaShippingFast,
+  FaCheckCircle,
+} from "react-icons/fa";
 
 /**
  * @function OrderHistory
@@ -92,6 +98,22 @@ const OrderHistory = ({ user, addToCart }) => {
       fetchProductDetails();
     }
   }, [transactionGroups]);
+  const badgeColor = (s) => {
+    switch (s) {
+      case "pending":
+        return <FaExclamationCircle className="text-yellow-600 text-lg" />;
+      case "packed":
+        return <FaBoxOpen className="text-blue-600 text-lg" />;
+      case "shipped":
+        return <FaShippingFast className="text-green-600 text-lg" />;
+      case "completed":
+        return <FaCheckCircle className="text-green-600 text-lg" />;
+      case "canceled":
+        return <FaExclamationCircle className="text-red-600 text-lg" />;
+      default:
+        return <FaCheckCircle className="text-gray-500 text-lg" />;
+    }
+  };
 
   return (
     <div className="lg:w-10/12 mx-auto py-10 px-4 sm:px-6 lg:px-8">
@@ -131,6 +153,10 @@ const OrderHistory = ({ user, addToCart }) => {
                   <span>
                     {t("orders.orderId")}:{" "}
                     <strong className="font-mono">{order.orderId}</strong>
+                  </span>
+                  <span className="flex items-center gap-1">
+                    {badgeColor(order.status)}
+                    <span className="text-sm font-bold">{t(`status.${order.status}`)}</span>
                   </span>
                 </div>
 
@@ -173,7 +199,7 @@ const OrderHistory = ({ user, addToCart }) => {
                             ₪{item.price}
                           </p>
                         </div>
-                        <div className="flex flex-col gap-2 justify-start">
+                        <div className="flex flex-col mt-6 gap-2 justify-start">
                           <button
                             onClick={() => {
                               addToCart({

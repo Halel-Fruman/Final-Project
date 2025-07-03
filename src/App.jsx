@@ -195,6 +195,11 @@ const App = () => {
   // This function is called when the user clicks the add to wishlist button in the product page
   // It updates the wishlist on the server and shows a toast notification
   const addToWishlist = async (product, isInWishlist) => {
+    if (!userId || !token) {
+      toast.error(t("wishlist.loginRequired"));
+      return;
+    }
+
     const success = await updateWishlist(userId, token, product, isInWishlist);
     if (success) {
       toast.success(

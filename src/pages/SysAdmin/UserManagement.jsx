@@ -278,7 +278,7 @@ const UserManagement = () => {
 
         <tbody>
           {isLoading
-            ? Array.from({ length: 6 }).map((_, rowIdx) => (
+            ? Array.from({ length: 12 }).map((_, rowIdx) => (
                 <tr key={rowIdx} className="animate-pulse">
                   {Array.from({ length: 7 }).map((__, colIdx) => (
                     <td key={colIdx} className="px-4 py-3">
