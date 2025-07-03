@@ -455,10 +455,16 @@ export const createActionHandlers = (
 
 viewStoreOrders: () =>
   navigate(`/store-management/`, { state: { tab: "orders" } }),
-    showStats: () => navigate("/store/analytics"),
-    openSettings: () => navigate("/store/settings"),
+showStats: () =>
+      navigate(`/store-management/`, {
+        state: { tab: "store-stats" },
+      }),    openSettings: () => navigate("/store/settings"),
     goToHome: () => navigate("/"),
-    openHelpCenter: () => navigate("/help"),
+ openShopSettings: () =>
+      navigate(`/store-management/`, {
+        state: { tab: "settings" },
+      }),
+
     trackOrder: () => navigate("/track-order"),
     contactSupport: () => navigate("/contact"),
     goToFavorites: () => navigate("/favorites"),

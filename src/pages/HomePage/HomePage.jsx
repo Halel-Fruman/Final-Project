@@ -289,7 +289,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   return (
     <div className="bg-primaryColor bg-opacity-10">
       {/* Hero Section */}
-      <header className="relative h-[700px] overflow-hidden">
+      <header className="relative h-[0px] overflow-hidden">
         <img
           src={backgroundImage}
           alt=""
