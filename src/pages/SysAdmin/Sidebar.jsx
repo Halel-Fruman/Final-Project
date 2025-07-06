@@ -13,6 +13,7 @@ import CategoryManagement from "./CategoryManagement.jsx";
 import SysAdmin from "./SysAdmin.jsx";
 import UserManagement from "./UserManagement.jsx";
 import AdminDashboard from "./AdminDashboard.jsx";
+import GlobalPromoPage from "./GlobalPromoPage.jsx";
 
 /**
  * @function Sidebar
@@ -48,6 +49,11 @@ const Sidebar = ({ token }) => {
       label: "ניהול משתמשים",
       icon: "material-symbols:bar-chart-outline",
     },
+    {
+      id: "promo",
+      label: "מבצע אתר",
+      icon: "material-symbols:local-offer-outline",
+    },
   ];
 
   const renderContent = () => {
@@ -60,6 +66,8 @@ const Sidebar = ({ token }) => {
         return <CategoryManagement />;
       case "users":
         return <UserManagement token={token} />;
+      case "promo":
+        return <GlobalPromoPage token={token} />;
       default:
         return <div className="p-6">בחר קטגוריה מהתפריט</div>;
     }

@@ -74,14 +74,19 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = (userId) => {
-    showAlert("האם אתה בטוח שברצונך למחוק את המשתמש?", "warning", () => {
-      fetchWithTokenRefresh(`/api/User/${userId}`, { method: "DELETE" })
-        .then(() => {
-          setUsers(users.filter((u) => u._id !== userId));
-          showAlert("המשתמש נמחק.", "success");
-        })
-        .catch(() => showAlert("שגיאה במחיקה", "error"));
-    });
+    showAlert(
+      "האם אתה בטוח שברצונך למחוק את המשתמש?",
+      "warning",
+      () => {
+        fetchWithTokenRefresh(`/api/User/${userId}`, { method: "DELETE" })
+          .then(() => {
+            setUsers(users.filter((u) => u._id !== userId));
+            showAlert("המשתמש נמחק.", "success");
+          })
+          .catch(() => showAlert("שגיאה במחיקה", "error"));
+      },
+      () => {}
+    );
   };
 
   const handleFieldChange = (field, value) => {

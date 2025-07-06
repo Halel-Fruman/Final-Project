@@ -25,6 +25,8 @@ import { AlertProvider } from "./components/AlertDialog.jsx";
 import { fetchWithTokenRefresh } from "./utils/authHelpers";
 import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx";
 import { useNavigate } from "react-router-dom";
+import ScrollTopButton from "./components/ScrollTopButton";
+import useGlobalPromo from "./hooks/useGlobalPromo";
 
 // Lazy load components to improve initial load time
 const Header = lazy(() => import("./components/Header/Header"));
@@ -78,6 +80,7 @@ const App = () => {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const promo = useGlobalPromo();
 
   // Function to handle logout and clear local storage
   const handleLogout = () => {
@@ -236,6 +239,12 @@ const App = () => {
             />
           </Suspense>
 
+          {promo && (
+            <div className="w-full bg-primaryColor text-white text-center py-2 px-4">
+              {promo.bannerText[i18n.language]}
+            </div>
+          )}
+
           <Suspense fallback={null}>
             <CartModal
               isOpen={isCartOpen}
@@ -286,6 +295,8 @@ const App = () => {
           This is where the main content of the app will be displayed based on the current route */}
           <div className="app-content">
             <Suspense fallback={null}>
+              <ScrollTopButton />
+
               <Routes>
                 <Route
                   path="/"

@@ -6,7 +6,8 @@
  */
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
+import { getActiveDiscount } from "../../utils/discountHelpers";
+import useGlobalPromo from "../../hooks/useGlobalPromo";
 /**
  * @function ConfirmationPage
  * @description This component renders the order confirmation page.
@@ -18,6 +19,7 @@ const ConfirmationPage = () => {
   const { state } = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const promo = useGlobalPromo(); // Fetch the global promotion if any
 
   const transactions = state?.transactions || [];
   const detailedCart = state?.detailedCart || [];
@@ -110,6 +112,15 @@ const ConfirmationPage = () => {
                         isSameId(item._id, product.productId) &&
                         isSameId(item.storeId?._id || item.storeId, storeId)
                     );
+                    const active = getActiveDiscount(
+                      matchedProduct.discounts,
+                      promo
+                    );
+                    const finalPrice = active
+                      ? active.type === "percent"
+                        ? matchedProduct.price * (1 - active.value / 100)
+                        : matchedProduct.price - active.value
+                      : matchedProduct.price;
 
                     return (
                       <div
@@ -129,7 +140,19 @@ const ConfirmationPage = () => {
                             {t("checkout.quantity")}: {product.quantity}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {t("price")}: ₪{product.price}
+                            {t("price")}:{" "}
+                            {active ? (
+                              <>
+                                <span className="text-red-600 font-semibold">
+                                  ₪{finalPrice.toFixed(2)}
+                                </span>
+                                <span className="line-through mx-1 text-gray-500">
+                                  ₪{matchedProduct.price.toFixed(2)}
+                                </span>
+                              </>
+                            ) : (
+                              `₪${matchedProduct.price.toFixed(2)}`
+                            )}
                           </p>
                         </div>
                       </div>

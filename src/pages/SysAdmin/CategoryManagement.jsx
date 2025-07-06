@@ -84,7 +84,8 @@ const CategoryManagement = () => {
         } catch {
           showAlert("אירעה שגיאה בעת מחיקת הקטגוריה", "error");
         }
-      }
+      },
+      () => {}
     );
   };
 

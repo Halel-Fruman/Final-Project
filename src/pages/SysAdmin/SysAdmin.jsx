@@ -182,22 +182,27 @@ const SysAdmin = () => {
   // If the deletion is successful, it updates the stores state and shows a success alert
   // If there's an error, it shows an error alert
   const handleDeleteStore = () => {
-    showAlert("האם אתה בטוח שברצונך למחוק את החנות?", "warning", async () => {
-      try {
-        const res = await fetchWithTokenRefresh(
-          `/api/Stores/${selectedStore._id}`,
-          {
-            method: "DELETE",
-          }
-        );
-        if (!res.ok) throw new Error();
-        setStores(stores.filter((s) => s._id !== selectedStore._id));
-        handleCloseModal();
-        showAlert("החנות נמחקה בהצלחה!", "success");
-      } catch {
-        showAlert("אירעה שגיאה בעת מחיקת החנות.", "error");
-      }
-    });
+    showAlert(
+      "האם אתה בטוח שברצונך למחוק את החנות?",
+      "warning",
+      async () => {
+        try {
+          const res = await fetchWithTokenRefresh(
+            `/api/Stores/${selectedStore._id}`,
+            {
+              method: "DELETE",
+            }
+          );
+          if (!res.ok) throw new Error();
+          setStores(stores.filter((s) => s._id !== selectedStore._id));
+          handleCloseModal();
+          showAlert("החנות נמחקה בהצלחה!", "success");
+        } catch {
+          showAlert("אירעה שגיאה בעת מחיקת החנות.", "error");
+        }
+      },
+      () => {}
+    );
   };
   // Function to handle removing a manager from the store
   // It checks if there is more than one manager before allowing deletion
@@ -206,10 +211,15 @@ const SysAdmin = () => {
       showAlert("לא ניתן למחוק את המנהל האחרון.", "error");
       return;
     }
-    showAlert("האם אתה בטוח שברצונך למחוק את המנהל?", "warning", () => {
-      const updated = selectedStore.manager.filter((_, i) => i !== index);
-      setSelectedStore({ ...selectedStore, manager: updated });
-    });
+    showAlert(
+      "האם אתה בטוח שברצונך למחוק את המנהל?",
+      "warning",
+      () => {
+        const updated = selectedStore.manager.filter((_, i) => i !== index);
+        setSelectedStore({ ...selectedStore, manager: updated });
+      },
+      () => {}
+    );
   };
   // Function to export stores data to an Excel file
   // It formats the store data and uses the XLSX library to create an Excel file

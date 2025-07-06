@@ -11,6 +11,8 @@ import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
+import useGlobalPromo from "../../hooks/useGlobalPromo";
+import { getActiveDiscount } from "../../utils/discountHelpers";
 
 /**
  * @function ImageWithFallback
@@ -51,6 +53,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const promo = useGlobalPromo();
   const token = localStorage.getItem("accessToken");
   const isLoggedIn = !!token;
   const [product, setProduct] = useState(null);
@@ -246,17 +249,20 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const isInWishlist = wishlist?.find(
     (item) => String(item.productId) === String(product._id)
   );
-  const currentDate = new Date();
-  const activeDiscount = product.discounts?.find((discount) => {
-    const start = new Date(discount.startDate);
-    const end = new Date(discount.endDate);
-    return start <= currentDate && currentDate <= end;
-  });
+  const activeDiscount = getActiveDiscount(product.discounts, promo);
   const isOnSale = !!activeDiscount;
-  const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
+
   const discountedPrice = isOnSale
-    ? productPrice - productPrice * (discountPercentage / 100)
+    ? activeDiscount.type === "percent"
+      ? productPrice * (1 - activeDiscount.value / 100)
+      : productPrice - activeDiscount.value
     : productPrice;
+
+  const discountPercentage = isOnSale
+    ? activeDiscount.type === "percent"
+      ? activeDiscount.value
+      : Math.round((activeDiscount.value / productPrice) * 100)
+    : 0;
 
   return (
     <main className="bg-gray-50">

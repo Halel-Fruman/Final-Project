@@ -13,6 +13,7 @@ import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import backgroundImage from "../../backgroung.webp";
 import FilterBar from "../../components/Category/FilterBar";
 import { getActiveDiscount } from "../../utils/discountHelpers";
+import useGlobalPromo from "../../hooks/useGlobalPromo";
 
 /**
  * @component ProductImage
@@ -55,6 +56,8 @@ const ProductImage = ({ product, i18n }) => {
 const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const promo = useGlobalPromo();
+
   // State management for products, categories, filters, and loading states
   // Using useState to manage local state for products, categories, and filters
   const [allProducts, setAllProducts] = useState([]);
@@ -90,7 +93,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [currentPage, setCurrentPage] = useState(() =>
     parseInt(sessionStorage.getItem("currentPage") || "1", 10)
   );
-  const productsPerPage = 20;
+  const productsPerPage = 15;
 
   // Persist filters to session storage
   useEffect(() => {
@@ -191,7 +194,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       product.categories?.some((catId) => selectedCategories.includes(catId));
     const storeMatch =
       selectedStores.length === 0 || selectedStores.includes(product.storeId);
-    const activeDiscount = getActiveDiscount(product.discounts);
+    const activeDiscount = getActiveDiscount(product.discounts, promo);
     const onSaleMatch = !isOnSaleOnly || !!activeDiscount;
     const price = product.price;
     const priceMatch =
@@ -359,14 +362,23 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
             const isInWishlist = wishlist?.some(
               (item) => String(item.productId) === String(product._id)
             );
-            const activeDiscount = getActiveDiscount(product.discounts);
+            // get active discount (product first, else global)
+            const activeDiscount = getActiveDiscount(product.discounts, promo);
             const isOnSale = !!activeDiscount;
-            const discountPercentage = isOnSale
-              ? activeDiscount.percentage || 0
-              : 0;
+
+            // price after discount
             const discountedPrice = isOnSale
-              ? product.price - product.price * (discountPercentage / 100)
+              ? activeDiscount.type === "percent"
+                ? product.price * (1 - activeDiscount.value / 100)
+                : product.price - activeDiscount.value
               : product.price;
+
+            // percentage helper for badge
+            const discountPercentage = isOnSale
+              ? activeDiscount.type === "percent"
+                ? activeDiscount.value
+                : Math.round((activeDiscount.value / product.price) * 100)
+              : 0;
 
             return (
               <div key={product._id} className="flex flex-col">

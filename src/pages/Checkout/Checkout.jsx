@@ -12,6 +12,8 @@ import { useNavigate } from "react-router-dom";
 import { Icon } from "@iconify/react";
 import { updateCartItemQuantity } from "../../utils/Cart";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
+import useGlobalPromo from "../../hooks/useGlobalPromo";
+import { getActiveDiscount } from "../../utils/discountHelpers";
 
 /**
  * @component CheckoutPage
@@ -50,6 +52,7 @@ const CheckoutPage = ({
   // Navigate hook from react-router-dom to handle navigation
   // after successful payment processing
   const navigate = useNavigate();
+  const promo = useGlobalPromo();
 
   const selectedAddress = userData?.addresses?.[selectedAddressIndex];
 
@@ -330,7 +333,15 @@ const CheckoutPage = ({
   const total = useMemo(() => {
     let sum = 0;
     for (const [storeId, items] of Object.entries(groupedByStore)) {
-      const itemsSum = items.reduce((s, i) => s + i.price * i.quantity, 0);
+      const itemsSum = items.reduce((s, i) => {
+        const active = getActiveDiscount(i.discounts, promo);
+        const price = active
+          ? active.type === "percent"
+            ? i.price * (1 - active.value / 100)
+            : i.price - active.value
+          : i.price;
+        return s + price * i.quantity;
+      }, 0);
       const method = deliveryMethods[storeId];
       const shipping = storeShippingInfo[storeId];
 
@@ -515,86 +526,122 @@ const CheckoutPage = ({
                   <h3 className="text-xl font-semibold text-right">
                     {products[0].storeName?.[i18n.language] || "Store"}
                   </h3>
+                  {products.map((item) => {
+                    const active = getActiveDiscount(item.discounts, promo);
+                    const price = active
+                      ? active.type === "percent"
+                        ? item.price * (1 - active.value / 100)
+                        : item.price - active.value
+                      : item.price;
 
-                  {products.map((item) => (
-                    <div
-                      key={item._id}
-                      className="flex items-center justify-between text-right border rounded p-2">
-                      <img
-                        src={item.images?.[0]}
-                        alt={item.name?.[i18n.language]}
-                        className="h-14 w-14 object-cover rounded ml-2"
-                      />
-                      <div className="text-sm text-gray-600 flex-1">
-                        <div className="font-medium">
-                          {item.name?.[i18n.language]}
-                        </div>
-                        <div className="flex items-center mt-1 space-x-2 rtl:space-x-reverse">
-                          <span className="text-xs">
-                            {t("checkout.quantity")}:
-                          </span>
-                          <button
-                            onClick={async () => {
-                              if (item.quantity > 1) {
+                    return (
+                      <div
+                        key={item._id}
+                        className="flex items-center justify-between text-right border rounded p-2">
+                        <img
+                          src={item.images?.[0]}
+                          alt={item.name?.[i18n.language]}
+                          className="h-14 w-14 object-cover rounded ml-2"
+                        />
+
+                        <div className="text-sm text-gray-600 flex-1">
+                          <div className="font-medium">
+                            {item.name?.[i18n.language]}
+                          </div>
+
+                          <div className="flex items-center mt-1 space-x-2 rtl:space-x-reverse">
+                            <span className="text-xs">
+                              {t("checkout.quantity")}:
+                            </span>
+
+                            <button
+                              onClick={async () => {
+                                if (item.quantity > 1) {
+                                  await updateCartItemQuantity(
+                                    userId,
+                                    item.productId?._id || item.productId,
+                                    item.quantity - 1,
+                                    token
+                                  );
+                                  setDetailedCart((prev) =>
+                                    prev.map((p) =>
+                                      p._id === item._id
+                                        ? { ...p, quantity: item.quantity - 1 }
+                                        : p
+                                    )
+                                  );
+                                }
+                              }}
+                              disabled={item.quantity <= 1}
+                              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
+                              -
+                            </button>
+
+                            <span className="px-2">{item.quantity}</span>
+
+                            <button
+                              onClick={async () => {
                                 await updateCartItemQuantity(
                                   userId,
                                   item.productId?._id || item.productId,
-                                  item.quantity - 1,
+                                  item.quantity + 1,
                                   token
                                 );
                                 setDetailedCart((prev) =>
                                   prev.map((p) =>
                                     p._id === item._id
-                                      ? { ...p, quantity: item.quantity - 1 }
+                                      ? { ...p, quantity: item.quantity + 1 }
                                       : p
                                   )
                                 );
-                              }
-                            }}
-                            disabled={item.quantity <= 1}
-                            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
-                            -
-                          </button>
-                          <span className="px-2">{item.quantity}</span>
-                          <button
-                            onClick={async () => {
-                              await updateCartItemQuantity(
-                                userId,
-                                item.productId?._id || item.productId,
-                                item.quantity + 1,
-                                token
-                              );
-                              setDetailedCart((prev) =>
-                                prev.map((p) =>
-                                  p._id === item._id
-                                    ? { ...p, quantity: item.quantity + 1 }
-                                    : p
-                                )
-                              );
-                            }}
-                            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
-                            +
-                          </button>
-                          <button
-                            onClick={async () => {
-                              removeFromCart(
-                                item.productId?._id || item.productId
-                              );
-                              setDetailedCart((prev) =>
-                                prev.filter((p) => p._id !== item._id)
-                              );
-                            }}
-                            className="ml-2 text-red-600 hover:text-red-800"
-                            title={t("checkout.remove")}>
-                            {t("checkout.remove")}
-                          </button>
+                              }}
+                              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                              +
+                            </button>
+
+                            <button
+                              onClick={async () => {
+                                removeFromCart(
+                                  item.productId?._id || item.productId
+                                );
+                                setDetailedCart((prev) =>
+                                  prev.filter((p) => p._id !== item._id)
+                                );
+                              }}
+                              className="ml-2 text-red-600 hover:text-red-800"
+                              title={t("checkout.remove")}>
+                              {t("checkout.remove")}
+                            </button>
+                          </div>
                         </div>
+
+                        {/* price – with or without discount */}
+                        {active ? (
+                          <div className="flex flex-col items-end text-sm">
+                            <span className="font-bold text-red-600">
+                              ₪{price.toFixed(2)}
+                            </span>
+                            <span className="line-through text-xs text-gray-500">
+                              ₪{item.price.toFixed(2)}
+                            </span>
+                            {active.type === "percent" ? (
+                              <span className="text-green-700 text-xs">
+                                -{active.value}%
+                              </span>
+                            ) : (
+                              <span className="text-green-700 text-xs">
+                                -₪{active.value.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-md font-bold text-primaryColor">
+                            ₪{item.price.toFixed(2)}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-md font-bold text-primaryColor ml-auto">
-                        ₪{item.price}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   <div className="mt-3 text-right">
                     <label className="block font-semibold mb-1">

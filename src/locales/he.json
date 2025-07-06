@@ -20,8 +20,30 @@
   "in_stock_only": "זמין במלאי",
   "page": "עמוד",
   "of": "מתוך",
+  "globalPromo": {
+  "title": "מבצע אתר",
+  "saved": "השינויים נשמרו!",
+  "deleteConfirm": "האם אתה בטוח שברצונך למחוק את המבצע ?",
+  "deleted": "המבצע נמחק בהצלחה!",
+  "form": {
+    "promoTitle": "כותרת המבצע",
+    "typeLabel": "סוג ההנחה",
+    "percent": "אחוז (%)",
+    "fixed": "סכום קבוע (₪)",
+    "value": "ערך ההנחה",
+    "start": "תאריך התחלה",
+    "end": "תאריך סיום",
+    "bannerHe": "טקסט באנר (עברית)",
+    "bannerEn": "טקסט באנר (English)"
+  }
+},
+"buttons": {
+  "save": "שמור",
+  "delete": "מחק"
+},
 
-  "view_products": "צפה במוצרים",
+
+  "view_products": "לצפייה במוצרים",
   "header": {
     "home": "בית",
     "products": "מוצרים",
