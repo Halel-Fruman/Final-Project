@@ -86,7 +86,10 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const [error, setError] = useState(null);
 
   // State for pagination
-  const [currentPage, setCurrentPage] = useState(1);
+  // load current page from session, default to 1
+  const [currentPage, setCurrentPage] = useState(() =>
+    parseInt(sessionStorage.getItem("currentPage") || "1", 10)
+  );
   const productsPerPage = 20;
 
   // Persist filters to session storage
@@ -208,11 +211,14 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
     );
   });
 
-  // Sort products by ID using useMemo to optimize performance
-  // This ensures that the products are always sorted consistently
+  // Sort products by ID in reverse-string order
   const sortedProductsToShow = useMemo(() => {
     return [...productsToShow].sort((a, b) =>
-      String(a._id).localeCompare(String(b._id))
+      String(a._id)
+        .split("")
+        .reverse()
+        .join("")
+        .localeCompare(String(b._id).split("").reverse().join(""))
     );
   }, [productsToShow]);
 
@@ -228,13 +234,15 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   // Handle page change and scroll to top
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    sessionStorage.setItem("currentPage", newPage);
+    window.scrollTo({ top: 781.25, behavior: "smooth" });
   };
 
   // Handle product click to navigate to product details page
   // This function saves the current scroll position to session storage
   const handleProductClick = (product) => {
     sessionStorage.setItem("scrollPosition", window.scrollY);
+    sessionStorage.setItem("currentPage", currentPage);
     navigate(`/products/${product._id}`);
   };
   // Toggle wishlist status for a product
