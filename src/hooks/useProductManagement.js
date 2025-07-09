@@ -60,7 +60,7 @@ const useProductManagement = (
     const handleOpenAdd = () => {
       setIsAddingProduct(true);
       setEditingProduct(null);
-      setEditProductId(null); //
+      setEditProductId(null);
       setFormMode("add");
     };
     window.addEventListener("openAddProduct", handleOpenAdd);

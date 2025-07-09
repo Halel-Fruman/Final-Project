@@ -394,7 +394,7 @@ const App = () => {
               </Routes>
             </Suspense>
           </div>
-          {/* <ChatBot
+          <ChatBot
             token={token}
             userId={userId}
             onOpenCart={handleOpenCart}
@@ -403,7 +403,7 @@ const App = () => {
             onOpenAddProductForm={handleOpenAddProductForm}
             onCreateDiscount={handleCreateDiscount}
             onSendNewsletter={handleSendNewsletter}
-          /> */}
+          />
 
           <Suspense fallback={null}>
             <Footer />

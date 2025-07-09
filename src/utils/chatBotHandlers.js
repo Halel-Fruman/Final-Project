@@ -16,7 +16,6 @@ The site serves as a social commerce platform, where users can purchase products
 ---
 
 You must act carefully, respecting the user’s permission level, and never trigger any automatic action without explicit confirmation in the conversation. Your goal is to assist — not to initiate critical actions unless the user asks.
-
 If the user explicitly confirms a previous suggestion (e.g., says "כן", "תפתח", "יאללה", etc.), you **must** return a valid 'action'. Never return 'action: null' in this case.
 
 
@@ -80,7 +79,6 @@ When the user makes a general request like “I want to add a product” or "Edi
    - Ask: "Would you like help filling out the form?"
    - If confirmed, ask the user for product details step by step
    - When all data is collected — return:
-
 {
   "reply": "מילאתי את פרטי המוצר, תוכל לאשר בטופס.",
   "action": "openAddProductForm",
@@ -90,7 +88,7 @@ When the user makes a general request like “I want to add a product” or "Edi
 }
 
  For editing a product:
-1. First, confirm which product to edit (based on name, ID, etc.)
+1. First, confirm which product to edit (based on name)
 2. After reaching the page, trigger 'openEditProduct' to open the editing UI for that specific product.
  3. Ask the user which fields they want to update.
  4. For each field the user requests to change, collect it step-by-step.
@@ -117,7 +115,7 @@ When the user makes a general request like “I want to add a product” or "Edi
 - How would you describe the product in Hebrew?
 - And in English?
 - What are the product’s key highlights (in Hebrew / English)?
-- What are the categories? (mention category IDs if possible)
+- What are the categories?
 - Can the product be ordered when out of stock?
 - Is international shipping available?
 - Any product images? (provide image links)
@@ -360,27 +358,34 @@ export const createActionHandlers = (
       // Check if we are already on the store management page
       // If so, dispatch the event directly
       // Otherwise, navigate to the store management page and then dispatch the event
-      if (window.location.pathname === "/store-management") {
-        const event = new Event("openAddProductForm");
-        window.dispatchEvent(event);
+      const ask = "תרצה עזרה במילוי הטופס?";
+
+      if (window.location.pathname === "/shop/store-management") {
+        const event = new Event("openAddProduct");
         speak("פותח את טופס הוספת המוצר.");
+        window.dispatchEvent(event);
       } else {
         navigate("/store-management", {
           state: { tab: "products", openAddProductForm: true },
           replace: true,
         });
-        const event = new Event("openAddProductForm");
-        window.dispatchEvent(event);
+        speak("פותח את טופס הוספת המוצר.");
+        const event = new Event("openAddProduct");
+        setTimeout(() => {
+          window.dispatchEvent(event);
+        }, 1000);
       }
+      setTimeout(() => {
+        speak(ask);
+        externalHandlers.addBotMessage?.(ask);
+      }, 1000);
     },
 
     openAddProductForm: (payload) => {
       // Check if we are already on the store management page
       // If so, dispatch the event directly
       // Otherwise, navigate to the store management page and then dispatch the event
-      console.log(window.location.pathname);
       if (window.location.pathname === "/shop/store-management") {
-        console.log("true");
         window.dispatchEvent(
           new CustomEvent("autofillProductForm", { detail: payload })
         );
@@ -401,6 +406,7 @@ export const createActionHandlers = (
     },
 
     openEditProduct: (payload) => {
+      const ask = "האם תרצה עזרה בעריכה?";
       setProductName(payload || {});
 
       if (!productName) {
@@ -419,7 +425,12 @@ export const createActionHandlers = (
             new CustomEvent("openEditProduct", { detail: { productName } })
           );
           speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
-        }, 500);
+        }, 2000);
+        setTimeout(() => {
+          speak(ask);
+          externalHandlers.addBotMessage?.(ask);
+        }, 1000);
+
         return;
       }
 
@@ -427,6 +438,10 @@ export const createActionHandlers = (
         new CustomEvent("openEditProduct", { detail: { productName } })
       );
       speak(`מחפש את המוצר "${productName}" ופותח עריכה.`);
+      setTimeout(() => {
+        speak(ask);
+        externalHandlers.addBotMessage?.(ask);
+      }, 1000);
     },
 
     editProduct: (payload) => {

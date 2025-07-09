@@ -17,6 +17,7 @@ import {
   createActionHandlers,
   handleAction,
 } from "../../utils/chatBotHandlers";
+import { add } from "date-fns";
 
 /**
  * @component ChatBot
@@ -121,11 +122,15 @@ const ChatBot = ({
   };
   // Create action handlers for various actions like opening cart, wishlist, etc.
   // This function creates a set of handlers that can be used to perform actions based on the
+  const addBotMessage = (txt) =>
+  setMessages((prev) => [...prev, { role: "assistant", text: txt }]);
   const actionHandlers = createActionHandlers(navigate, speak, {
     onOpenCart,
     onOpenWishlist,
     onLogout,
+    addBotMessage,
   });
+
 
   // This function starts listening for voice input using the Web Speech API
   // It sets the isListening state to true, initializes the SpeechRecognition object,
