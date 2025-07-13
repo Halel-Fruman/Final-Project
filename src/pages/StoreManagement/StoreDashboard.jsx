@@ -1,5 +1,10 @@
-// קובץ: StoreDashboard.jsx - מציג סטטיסטיקות לחנות
-import React, { useEffect, useState } from "react";
+/**
+ * @file StoreDashboard.jsx
+ * @description This file contains the StoreDashboard component which displays
+ * various statistics and alerts related to a store's transactions.
+ * It includes revenue calculations, order statuses, and overdue alerts.
+ */
+import { useEffect, useState } from "react";
 import axios from "axios";
 import {
   FaChartBar,
@@ -18,6 +23,12 @@ import {
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+/**
+ * @function StoreDashboard
+ * @description This function component fetches and displays the dashboard statistics for a specific store.
+ * It includes revenue, order, and product statistics, as well as alerts for overdue deliveries.
+ * @param {string} props.storeId - The ID of the store to fetch statistics for
+ */
 const StoreDashboard = ({ storeId }) => {
   const [transactions, setTransactions] = useState([]);
   const { showAlert } = useAlert();
@@ -271,7 +282,7 @@ const StoreDashboard = ({ storeId }) => {
         </div>
       </div>
       <div className="mt-8 flex flex-col lg:flex-row gap-8 items-start">
-        {/* טבלת סטטוסים */}
+        {/* Table for transaction statuses */}
         <div className="w-full lg:w-1/2">
           <h2 className="text-xl font-bold mb-2">סטטוסים של עסקאות:</h2>
           <table className="w-fit text-sm border border-gray-300 bg-white rounded shadow">
@@ -294,7 +305,7 @@ const StoreDashboard = ({ storeId }) => {
           </table>
         </div>
 
-        {/* טווח תאריכים */}
+        {/* Revenue by Date Range */}
         <div className="w-full lg:w-1/2">
           <h2 className="text-xl font-bold mb-4">הכנסות לפי טווח תאריכים</h2>
           <div className="flex items-center gap-4 mb-4 flex-wrap">
@@ -331,6 +342,8 @@ const StoreDashboard = ({ storeId }) => {
   );
 };
 
+// Component to display individual statistics cards
+// Each card shows an icon, title, and value
 const StatCard = ({ icon, title, value }) => (
   <div className="bg-white rounded shadow p-4 flex items-center gap-4">
     <div className="text-primaryColor text-2xl">{icon}</div>

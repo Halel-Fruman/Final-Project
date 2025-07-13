@@ -1,4 +1,8 @@
-import React, { useState, useEffect } from "react";
+/**
+ * @file OrderManagement.jsx
+ * @description This file contains the OrderManagement component which allows store managers to manage orders.
+ */
+import { useState, useEffect } from "react";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import {
   FaExclamationCircle,
@@ -12,6 +16,15 @@ import { saveAs } from "file-saver";
 import { Icon } from "@iconify/react";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+/**
+ * @function OrderManagement
+ * @description This component allows store managers to manage orders.
+ * It includes functionalities to view, sort, filter, and update order statuses.
+ * @param {Object} props - The component props.
+ * @param {string} props.storeId - The ID of the store for which orders are being managed.
+ * @param {Array} [props.statusFilter=[]] - An array of order statuses to filter by.
+ * @param {string} [props.title] - The title of the component.
+ */
 const OrderManagement = ({ storeId, statusFilter = [], title }) => {
   const [orders, setOrders] = useState([]);
   const [sortOrder, setSortOrder] = useState("desc");
@@ -21,6 +34,8 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
   const [expandedOrderId, setExpandedOrderId] = useState(null);
   const [pagetitle, setpagetitle] = useState(title);
 
+  // fetch orders when the component mounts or when storeId changes
+  // This function fetches the orders for the specified store and updates the state
   useEffect(() => {
     fetchWithTokenRefresh(`/api/Transactions?store=${storeId}`)
       .then((res) => res.json())
@@ -136,6 +151,8 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
     return diffInDays >= 3;
   };
 
+  // Function to handle exporting orders to Excel
+  // This function formats the orders data and generates an Excel file for download
   const handleExportOrders = () => {
     const data = orders.map((order) => {
       const productsList = order.products

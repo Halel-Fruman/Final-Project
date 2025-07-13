@@ -1,13 +1,34 @@
-// File: CheckoutPage.jsx
-import React, { useEffect, useState, useMemo } from "react";
+/**
+ * @file Checkout.jsx
+ * @description This component handles the checkout process, including displaying the cart items,
+ * managing user addresses, and processing payments.
+ */
+
+import { useEffect, useState, useMemo } from "react";
 import { useTranslation } from "react-i18next";
 import { addAddress } from "../../utils/Address";
 import { processCheckout } from "../../utils/checkoutHandler";
 import { useNavigate } from "react-router-dom";
-import { set } from "mongoose";
 import { Icon } from "@iconify/react";
 import { updateCartItemQuantity } from "../../utils/Cart";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
+import useGlobalPromo from "../../hooks/useGlobalPromo";
+import { getActiveDiscount } from "../../utils/discountHelpers";
+
+/**
+ * @component CheckoutPage
+ * @description This component renders the checkout page where users can review their cart items,
+ * select shipping addresses, and proceed to payment.
+ * @param {Object} props - The component props.
+ * @param {Array} props.cartItems - The items in the user's cart.
+ * @param {Function} props.fetchProductDetails - Function to fetch product details by ID.
+ * @param {string} props.userId - The ID of the user.
+ * @param {string} props.token - The authentication token for the user.
+ * @param {Function} props.addToCart - Function to add items to the cart.
+ * @param {Function} props.setCartItems - Function to update the cart items state.
+ * @param {Function} props.removeFromCart - Function to remove items from the cart.
+ * @returns {JSX.Element} The rendered checkout page component.
+ */
 const CheckoutPage = ({
   cartItems = [],
   fetchProductDetails,
@@ -28,7 +49,10 @@ const CheckoutPage = ({
   const [storeShippingInfo, setStoreShippingInfo] = useState({});
   const [isFinalizing, setIsFinalizing] = useState(false);
 
+  // Navigate hook from react-router-dom to handle navigation
+  // after successful payment processing
   const navigate = useNavigate();
+  const promo = useGlobalPromo();
 
   const selectedAddress = userData?.addresses?.[selectedAddressIndex];
 
@@ -52,15 +76,19 @@ const CheckoutPage = ({
   // and process the checkout
   useEffect(() => {
     const handleMessage = (event) => {
+      // Check if the message is from Tranzila and contains the payment success type
       if (event?.data?.type === "TRZILA_PAYMENT_SUCCESS") {
         (async () => {
           try {
-            setIsFinalizing(true); // ⬅️ התחלת טעינה
-
+            //set the finalizing state to true to show a loading spinner
+            setIsFinalizing(true);
+            // Fetch the notify info from the server using the userId
             const res = await fetch(`/api/tranzila/notify/${userId}`);
+            // Check if the response is ok, if not throw an error
             if (!res.ok) throw new Error("Failed to fetch notify info");
             const notifyData = await res.json();
 
+            //create new transaction with the notify data
             const transactions = await processCheckout({
               cartItems: detailedCart,
               userData,
@@ -78,12 +106,16 @@ const CheckoutPage = ({
             console.error("❌ Error during post-payment processing:", err);
             alert("שגיאה בעת השלמת ההזמנה");
           } finally {
-            setIsFinalizing(false); // ⬅️ סיום טעינה
+            // Reset the finalizing state to false after processing
+            // This will hide the loading spinner
+            setIsFinalizing(false);
           }
         })();
       }
     };
 
+    // Add an event listener for messages from the window
+    // This will listen for messages from the Tranzila iframe
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
   }, [
@@ -94,6 +126,7 @@ const CheckoutPage = ({
     token,
     userId,
     navigate,
+    setCartItems,
   ]);
 
   // Tranzila Iframe component
@@ -120,7 +153,7 @@ const CheckoutPage = ({
       const createPaymentSession = async () => {
         try {
           const cartDetails = [];
-
+          // Iterate through each store and its products
           Object.entries(groupedByStore).forEach(([storeId, products]) => {
             products.forEach((item) => {
               cartDetails.push({
@@ -157,6 +190,10 @@ const CheckoutPage = ({
             });
           });
 
+          // Create a payment session with Tranzila
+          // This will send the payment details to the server
+          // and receive the HTML for the payment iframe
+          // The server will handle the Tranzila API calls
           const res = await fetch("/api/tranzila/create-payment", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -181,7 +218,16 @@ const CheckoutPage = ({
       };
 
       createPaymentSession();
-    }, [sum, userId, cartItems, selectedAddress, userData]);
+    }, [
+      sum,
+      userId,
+      cartItems,
+      selectedAddress,
+      userData,
+      deliveryMethods,
+      storeShippingInfo,
+      groupedByStore,
+    ]);
 
     // Render the Tranzila iframe
     // If formHtml is not available, show a loading spinner
@@ -270,7 +316,7 @@ const CheckoutPage = ({
     if (Object.keys(initialMethods).length > 0) {
       setDeliveryMethods((prev) => ({ ...prev, ...initialMethods }));
     }
-  }, [detailedCart]);
+  }, [detailedCart, deliveryMethods]);
 
   // Group the detailed cart items by storeId
   // This is used to display the items in the summary section
@@ -287,7 +333,15 @@ const CheckoutPage = ({
   const total = useMemo(() => {
     let sum = 0;
     for (const [storeId, items] of Object.entries(groupedByStore)) {
-      const itemsSum = items.reduce((s, i) => s + i.price * i.quantity, 0);
+      const itemsSum = items.reduce((s, i) => {
+        const active = getActiveDiscount(i.discounts, promo);
+        const price = active
+          ? active.type === "percent"
+            ? i.price * (1 - active.value / 100)
+            : i.price - active.value
+          : i.price;
+        return s + price * i.quantity;
+      }, 0);
       const method = deliveryMethods[storeId];
       const shipping = storeShippingInfo[storeId];
 
@@ -303,6 +357,10 @@ const CheckoutPage = ({
     return sum;
   }, [groupedByStore, deliveryMethods, storeShippingInfo]);
 
+  // Handle adding a new address
+  // This function will call the addAddress utility function
+  // and update the userData state with the new address
+  // It will also reset the newAddress state and hide the form
   const handleAddNewAddress = async () => {
     try {
       const updatedAddresses = await addAddress({
@@ -436,7 +494,7 @@ const CheckoutPage = ({
                 ? t("checkout.cancelNewAddress")
                 : t("checkout.addNewAddress")}
             </button>
-
+            {/* button to open tranzila payment iframe with the correct amount to pay */}
             <button
               className="w-full bg-primaryColor text-xl text-white py-2 rounded-full font-bold hover:bg-secondaryColor"
               onClick={() => setStartPayment(true)}>
@@ -468,86 +526,122 @@ const CheckoutPage = ({
                   <h3 className="text-xl font-semibold text-right">
                     {products[0].storeName?.[i18n.language] || "Store"}
                   </h3>
+                  {products.map((item) => {
+                    const active = getActiveDiscount(item.discounts, promo);
+                    const price = active
+                      ? active.type === "percent"
+                        ? item.price * (1 - active.value / 100)
+                        : item.price - active.value
+                      : item.price;
 
-                  {products.map((item) => (
-                    <div
-                      key={item._id}
-                      className="flex items-center justify-between text-right border rounded p-2">
-                      <img
-                        src={item.images?.[0]}
-                        alt={item.name?.[i18n.language]}
-                        className="h-14 w-14 object-cover rounded ml-2"
-                      />
-                      <div className="text-sm text-gray-600 flex-1">
-                        <div className="font-medium">
-                          {item.name?.[i18n.language]}
-                        </div>
-                        <div className="flex items-center mt-1 space-x-2 rtl:space-x-reverse">
-                          <span className="text-xs">
-                            {t("checkout.quantity")}:
-                          </span>
-                          <button
-                            onClick={async () => {
-                              if (item.quantity > 1) {
+                    return (
+                      <div
+                        key={item._id}
+                        className="flex items-center justify-between text-right border rounded p-2">
+                        <img
+                          src={item.images?.[0]}
+                          alt={item.name?.[i18n.language]}
+                          className="h-14 w-14 object-cover rounded ml-2"
+                        />
+
+                        <div className="text-sm text-gray-600 flex-1">
+                          <div className="font-medium">
+                            {item.name?.[i18n.language]}
+                          </div>
+
+                          <div className="flex items-center mt-1 space-x-2 rtl:space-x-reverse">
+                            <span className="text-xs">
+                              {t("checkout.quantity")}:
+                            </span>
+
+                            <button
+                              onClick={async () => {
+                                if (item.quantity > 1) {
+                                  await updateCartItemQuantity(
+                                    userId,
+                                    item.productId?._id || item.productId,
+                                    item.quantity - 1,
+                                    token
+                                  );
+                                  setDetailedCart((prev) =>
+                                    prev.map((p) =>
+                                      p._id === item._id
+                                        ? { ...p, quantity: item.quantity - 1 }
+                                        : p
+                                    )
+                                  );
+                                }
+                              }}
+                              disabled={item.quantity <= 1}
+                              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
+                              -
+                            </button>
+
+                            <span className="px-2">{item.quantity}</span>
+
+                            <button
+                              onClick={async () => {
                                 await updateCartItemQuantity(
                                   userId,
                                   item.productId?._id || item.productId,
-                                  item.quantity - 1,
+                                  item.quantity + 1,
                                   token
                                 );
                                 setDetailedCart((prev) =>
                                   prev.map((p) =>
                                     p._id === item._id
-                                      ? { ...p, quantity: item.quantity - 1 }
+                                      ? { ...p, quantity: item.quantity + 1 }
                                       : p
                                   )
                                 );
-                              }
-                            }}
-                            disabled={item.quantity <= 1}
-                            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300 disabled:opacity-50">
-                            -
-                          </button>
-                          <span className="px-2">{item.quantity}</span>
-                          <button
-                            onClick={async () => {
-                              await updateCartItemQuantity(
-                                userId,
-                                item.productId?._id || item.productId,
-                                item.quantity + 1,
-                                token
-                              );
-                              setDetailedCart((prev) =>
-                                prev.map((p) =>
-                                  p._id === item._id
-                                    ? { ...p, quantity: item.quantity + 1 }
-                                    : p
-                                )
-                              );
-                            }}
-                            className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
-                            +
-                          </button>
-                          <button
-                            onClick={async () => {
-                              removeFromCart(
-                                item.productId?._id || item.productId
-                              );
-                              setDetailedCart((prev) =>
-                                prev.filter((p) => p._id !== item._id)
-                              );
-                            }}
-                            className="ml-2 text-red-600 hover:text-red-800"
-                            title={t("checkout.remove")}>
-                            {t("checkout.remove")}
-                          </button>
+                              }}
+                              className="px-2 py-1 bg-gray-200 rounded hover:bg-gray-300">
+                              +
+                            </button>
+
+                            <button
+                              onClick={async () => {
+                                removeFromCart(
+                                  item.productId?._id || item.productId
+                                );
+                                setDetailedCart((prev) =>
+                                  prev.filter((p) => p._id !== item._id)
+                                );
+                              }}
+                              className="ml-2 text-red-600 hover:text-red-800"
+                              title={t("checkout.remove")}>
+                              {t("checkout.remove")}
+                            </button>
+                          </div>
                         </div>
+
+                        {/* price – with or without discount */}
+                        {active ? (
+                          <div className="flex flex-col items-end text-sm">
+                            <span className="font-bold text-red-600">
+                              ₪{price.toFixed(2)}
+                            </span>
+                            <span className="line-through text-xs text-gray-500">
+                              ₪{item.price.toFixed(2)}
+                            </span>
+                            {active.type === "percent" ? (
+                              <span className="text-green-700 text-xs">
+                                -{active.value}%
+                              </span>
+                            ) : (
+                              <span className="text-green-700 text-xs">
+                                -₪{active.value.toFixed(2)}
+                              </span>
+                            )}
+                          </div>
+                        ) : (
+                          <div className="text-md font-bold text-primaryColor">
+                            ₪{item.price.toFixed(2)}
+                          </div>
+                        )}
                       </div>
-                      <div className="text-md font-bold text-primaryColor ml-auto">
-                        ₪{item.price}
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
 
                   <div className="mt-3 text-right">
                     <label className="block font-semibold mb-1">

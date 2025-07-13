@@ -1,6 +1,9 @@
-// קובץ: StoreAnalytics.jsx
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+/**
+ * @file StoreAnalytics.jsx
+ * @description Displays analytics for a store including monthly revenue and product category breakdowns.
+ */
+
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -26,6 +29,11 @@ const COLORS = [
   "#00BCD4",
 ];
 
+/**
+ * StoreAnalytics component shows revenue by month and products breakdown by category.
+ * @param {Object} props - Component props.
+ * @param {string} props.storeId - Store ID to fetch analytics for.
+ */
 const StoreAnalytics = ({ storeId }) => {
   const [monthlyData, setMonthlyData] = useState([]);
   const [categoryData, setCategoryData] = useState([]);
@@ -33,20 +41,60 @@ const StoreAnalytics = ({ storeId }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const res = await fetchWithTokenRefresh(
+        const transactionRes = await fetchWithTokenRefresh(
           `/api/Transactions/transactions/${storeId}`
         );
-        const data = await res.json();
-        setMonthlyData(groupTransactionsByMonth(data));
-        setCategoryData(groupProductsByCategory(data));
+        const transactions = await transactionRes.json();
+
+        // Extract all unique product IDs from all transactions
+        const allProductIds = [
+          ...new Set(
+            transactions.flatMap((tx) => tx.products.map((p) => p.productId))
+          ),
+        ];
+
+        // Fetch all product details in batch
+        const productRes = await fetchWithTokenRefresh("/api/Products/batch", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ ids: allProductIds }),
+        });
+        const allProducts = await productRes.json();
+
+        // Create map for quick product lookup
+        const productMap = {};
+        allProducts.forEach((p) => {
+          productMap[p._id] = p;
+        });
+
+        // Fetch all categories for ID to name mapping
+        const categoriesRes = await fetchWithTokenRefresh("/api/Category");
+        const categories = await categoriesRes.json();
+        const categoryMap = {};
+        categories.forEach((c) => {
+          categoryMap[c._id] = c.name?.he || "לא ידוע";
+        });
+
+        // Process and group data
+        setMonthlyData(groupTransactionsByMonth(transactions));
+        setCategoryData(
+          groupProductsByCategory(transactions, productMap, categoryMap)
+        );
       } catch (err) {
-        console.error("שגיאה בטעינת נתונים:", err);
+        console.error("Failed to load analytics data:", err);
       }
     };
 
     fetchData();
   }, [storeId]);
 
+  /**
+   * Groups transactions by month and calculates total revenue per month.
+   * @param {Array} transactions - List of store transactions.
+   * @returns {Array} Monthly revenue data.
+   */
   const groupTransactionsByMonth = (transactions) => {
     const monthsMap = {};
     transactions.forEach((tx) => {
@@ -67,19 +115,30 @@ const StoreAnalytics = ({ storeId }) => {
     }));
   };
 
-  const groupProductsByCategory = (transactions) => {
-    const categoryMap = {};
+  /**
+   * Groups all products in transactions by category and counts quantities.
+   * @param {Array} transactions - List of store transactions.
+   * @param {Object} productMap - Map of productId to product details.
+   * @param {Object} categoryMap - Map of categoryId to category name.
+   * @returns {Array} Pie chart compatible data.
+   */
+  const groupProductsByCategory = (transactions, productMap, categoryMap) => {
+    const categoryCount = {};
+
     transactions.forEach((tx) => {
-      tx.products.forEach((p) => {
-        const category = p.categoryName || "ללא קטגוריה";
-        if (!categoryMap[category]) {
-          categoryMap[category] = 0;
-        }
-        categoryMap[category] += p.quantity;
+      tx.products.forEach(({ productId, quantity }) => {
+        const product = productMap[productId];
+        if (!product || !Array.isArray(product.categories)) return;
+
+        product.categories.forEach((catId) => {
+          const name = categoryMap[catId] || "לא ידוע";
+          if (!categoryCount[name]) categoryCount[name] = 0;
+          categoryCount[name] += quantity;
+        });
       });
     });
 
-    return Object.entries(categoryMap).map(([name, value]) => ({
+    return Object.entries(categoryCount).map(([name, value]) => ({
       name,
       value,
     }));
@@ -103,8 +162,15 @@ const StoreAnalytics = ({ storeId }) => {
               textAnchor="end"
               height={80}
               interval={0}
+              dy={30}
+              dx={-20}
             />
-            <YAxis />
+
+            <YAxis
+              // dx ={-50}
+            tickMargin={50}
+              alignmentBaseline="middle"
+            />
             <Tooltip formatter={(value) => `${value.toFixed(2)} ₪`} />
             <Bar dataKey="revenue" fill="#4CAF50" radius={[6, 6, 0, 0]} />
           </BarChart>
@@ -122,6 +188,7 @@ const StoreAnalytics = ({ storeId }) => {
               cx="50%"
               cy="50%"
               outerRadius={130}
+              labelLine={false}
               label>
               {categoryData.map((entry, index) => (
                 <Cell

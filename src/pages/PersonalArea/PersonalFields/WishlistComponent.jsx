@@ -1,8 +1,24 @@
-import React, { useEffect, useState, useCallback } from "react";
+/**
+ * @file WishlistComponent.jsx
+ * @description This component displays the user's wishlist, allowing them to view, remove items,
+ * add items to the cart, and handle missing products gracefully.
+ * It includes responsive design for both desktop and mobile views.
+ */
+import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
 
+/**
+ * @function WishlistComponent
+ * @description Component for displaying the user's wishlist.
+ * @param {Object} props - Component properties.
+ * @param {Array} props.wishlist - Array of wishlist items, each containing productId
+ * @param {Function} props.removeFromWishlist - Function to remove an item from the wishlist.
+ * @param {Function} props.refreshWishlist - Function to refresh the wishlist after an item is removed.
+ * @param {Function} props.addToCart - Function to add an item to the cart.
+ * @returns {JSX.Element} The rendered wishlist component.
+ */
 const WishlistComponent = ({
   wishlist,
   removeFromWishlist,
@@ -114,7 +130,7 @@ const WishlistComponent = ({
                   <img
                     src={product.images?.[0] || "https://placehold.co/50"}
                     alt={
-                      product.name[i18n.language] +"image" ||
+                      product.name[i18n.language] + "image" ||
                       t("product.nameUnavailable")
                     }
                     className="w-12 h-12 rounded-full ml-2"
@@ -138,8 +154,7 @@ const WishlistComponent = ({
                       toast.success(t("wishlist.addToCart") + " ✅");
                     }}
                     className="bg-secondaryColor text-white p-2 rounded-full shadow-lg hover:bg-primaryColor"
-                    aria-label="Add to cart"
-                    >
+                    aria-label="Add to cart">
                     <Icon
                       icon="material-symbols:add-shopping-cart-rounded"
                       width="24"
@@ -149,8 +164,7 @@ const WishlistComponent = ({
                   <button
                     onClick={() => handleRemoveFromWishlist(product)}
                     className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white"
-                    aria-label="Remove from wishlist"
-                    >
+                    aria-label="Remove from wishlist">
                     <Icon
                       icon="material-symbols:delete-outline"
                       width="24"
@@ -198,8 +212,7 @@ const WishlistComponent = ({
                     toast.success(t("wishlist.addToCart") + " ✅");
                   }}
                   className="bg-secondaryColor text-white p-2  rounded-full shadow-lg hover:bg-primaryColor"
-                  aria-label="Add to cart"
-                  >
+                  aria-label="Add to cart">
                   <Icon
                     icon="material-symbols:add-shopping-cart-rounded"
                     width="20"
@@ -209,8 +222,7 @@ const WishlistComponent = ({
                 <button
                   onClick={() => handleRemoveFromWishlist(product)}
                   className="bg-white text-deleteC p-2 ring-1 ring-deleteC rounded-full hover:bg-deleteC hover:text-white"
-                  aria-label="Remove from wishlist"
-                  >
+                  aria-label="Remove from wishlist">
                   <Icon
                     icon="material-symbols:delete-outline"
                     width="20"

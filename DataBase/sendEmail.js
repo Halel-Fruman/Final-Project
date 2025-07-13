@@ -1,18 +1,21 @@
 const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
-  host: "sandbox.smtp.mailtrap.io",
+  host: "smtp.office365.com",
   port: 587,
+  secure: false, // TLS
+debug:true,
+logger:true,
   auth: {
-    user: "4622bf974884f2", // מהDashboard של Mailtrap
-    pass: "610aca788677b4", // מהDashboard של Mailtrap
+    user: process.env.OUTLOOK_EMAIL,
+    pass: process.env.OUTLOOK_PASSWORD,
   },
 });
-
-async function sendTestEmail({ to, subject, html }) {
-  try {
+async function sendEmail( {to, subject, html}) {
+   try {
     const info = await transporter.sendMail({
-      from: '"My Store" <noreply@mystore.com>',
+      from: `Ilan Mall <${process.env.OUTLOOK_EMAIL}>`,
+
       to,
       subject,
       html,
@@ -26,4 +29,4 @@ async function sendTestEmail({ to, subject, html }) {
   }
 }
 
-module.exports = { sendTestEmail };
+module.exports =  sendEmail ;

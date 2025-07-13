@@ -1,7 +1,19 @@
-import React from "react";
+/**
+ * @file SideBar.jsx
+ * @description This component renders the sidebar for the personal area,
+ * allowing users to navigate between different sections.
+ */
+
 import { useTranslation } from "react-i18next";
 
-// The Sidebar component is a functional component that takes the currentView and onViewChange as props.
+/**
+ * @function Sidebar
+ * @description Component for rendering the sidebar in the personal area,
+ * allowing users to navigate between different sections.
+ * @param {Object} props - Component properties.
+ * @param {string} props.currentView - The current view in the personal area .
+ * @param {Function} props.onViewChange - Function to handle view changes when a sidebar item is clicked.
+ */
 const Sidebar = ({ currentView, onViewChange }) => {
   const { t } = useTranslation(); // useTranslation hook to access the i18n instance and the translation function t
 
@@ -60,7 +72,6 @@ const Sidebar = ({ currentView, onViewChange }) => {
           onClick={() => onViewChange("orders")}>
           {t("personal_area.orders")}
         </li>
-
       </ul>
     </div>
   );

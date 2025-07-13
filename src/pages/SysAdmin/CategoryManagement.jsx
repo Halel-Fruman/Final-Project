@@ -1,8 +1,17 @@
-import React, { useState, useEffect } from "react";
+/**
+ * @file CategoryManagement.jsx
+ * @description This file contains the CategoryManagement component which allows
+ * administrators to manage product categories, including adding, editing, and deleting categories.
+ */
+import { useState, useEffect } from "react";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers.js";
 
+/**
+ * @function CategoryManagement
+ * @description This component renders the category management interface for administrators.
+ */
 const CategoryManagement = () => {
   const [categories, setCategories] = useState([]);
   const [categoryNameEn, setCategoryNameEn] = useState("");
@@ -10,6 +19,8 @@ const CategoryManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const { showAlert } = useAlert();
 
+  // Fetch categories from the API when the component mounts
+  // This function retrieves the list of categories and sets the loading state
   useEffect(() => {
     const fetchCategories = async () => {
       try {
@@ -25,6 +36,8 @@ const CategoryManagement = () => {
     fetchCategories();
   }, []);
 
+  // Function to handle adding a new category
+  // It checks if both English and Hebrew names are provided, and shows an error if not
   const handleAddCategory = async () => {
     if (!categoryNameEn || !categoryNameHe) {
       showAlert("יש להזין שם קטגוריה גם בעברית וגם באנגלית.", "error");
@@ -51,6 +64,8 @@ const CategoryManagement = () => {
     }
   };
 
+  // Function to handle deleting a category
+  // It shows a confirmation alert before proceeding with the deletion
   const handleDeleteCategory = (categoryId) => {
     showAlert(
       "האם אתה בטוח שברצונך למחוק את הקטגוריה?",
@@ -69,7 +84,8 @@ const CategoryManagement = () => {
         } catch {
           showAlert("אירעה שגיאה בעת מחיקת הקטגוריה", "error");
         }
-      }
+      },
+      () => {}
     );
   };
 

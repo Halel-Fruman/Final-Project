@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const tranzilaNotifications = new Map();
 // =======================
-// יצירת תשלום Tranzila
+// create-payment
 // =======================
 router.post('/create-payment', (req, res) => {
   const { sum, userId, selectedAddress, customer, cartDetails } = req.body;
@@ -59,7 +59,7 @@ router.post('/create-payment', (req, res) => {
 });
 
 // =======================
-// קבלת אישור תשלום (notify)
+
 // =======================
 router.post('/notify', async (req, res) => {
   try {
@@ -68,8 +68,8 @@ router.post('/notify', async (req, res) => {
     if (data.Response === '000') {
       const userId = data.my_custom_user_id;
       if (userId) {
-        tranzilaNotifications.set(userId, data); // שמור את ההתראה לפי מזהה משתמש
-        setTimeout(() => tranzilaNotifications.delete(userId), 2 * 60 * 1000); // מחיקה אוטומטית אחרי 2 דקות
+        tranzilaNotifications.set(userId, data);
+        setTimeout(() => tranzilaNotifications.delete(userId), 2 * 60 * 1000);
       }
     }
 

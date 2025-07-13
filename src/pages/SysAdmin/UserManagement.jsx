@@ -1,10 +1,20 @@
-import React, { useState, useEffect } from "react";
+/**
+ * @file UserManagement.jsx
+ * @description This file contains the UserManagement component which allows
+ * administrators to manage users, including adding, editing, deleting, and exporting user data.
+ * It also includes search and filter functionalities.
+ */
+import { useState, useEffect } from "react";
 import { useAlert } from "../../components/AlertDialog.jsx";
 import { Icon } from "@iconify/react";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
 
+/**
+ * @function UserManagement
+ * @description This function component manages user-related operations such as adding, editing, and deleting users.
+ */
 const UserManagement = () => {
   const [users, setUsers] = useState([]);
   const [selectedUser, setSelectedUser] = useState(null);
@@ -17,6 +27,12 @@ const UserManagement = () => {
   const [isLoading, setIsLoading] = useState(true);
   const currentUserId = localStorage.getItem("userId");
 
+  // Fetch users from the API when the component mounts
+  // This function retrieves the list of users and sets the loading state
+  // It formats the user data to include first name, last name, email, phone, address, and role
+  // If there's an error, it shows an alert
+  // Finally, it sets the loading state to false
+  // The useEffect hook ensures this runs only once when the component mounts
   useEffect(() => {
     fetchWithTokenRefresh("/api/User/")
       .then((res) => res.json())
@@ -38,6 +54,8 @@ const UserManagement = () => {
       .finally(() => setIsLoading(false));
   }, [showAlert]);
 
+  // Handlers for user actions
+  // These functions handle adding, editing, deleting users, and saving user data
   const handleEditUser = (user) => {
     setSelectedUser(user);
     setIsAdding(false);
@@ -56,20 +74,26 @@ const UserManagement = () => {
   };
 
   const handleDeleteUser = (userId) => {
-    showAlert("האם אתה בטוח שברצונך למחוק את המשתמש?", "warning", () => {
-      fetchWithTokenRefresh(`/api/User/${userId}`, { method: "DELETE" })
-        .then(() => {
-          setUsers(users.filter((u) => u._id !== userId));
-          showAlert("המשתמש נמחק.", "success");
-        })
-        .catch(() => showAlert("שגיאה במחיקה", "error"));
-    });
+    showAlert(
+      "האם אתה בטוח שברצונך למחוק את המשתמש?",
+      "warning",
+      () => {
+        fetchWithTokenRefresh(`/api/User/${userId}`, { method: "DELETE" })
+          .then(() => {
+            setUsers(users.filter((u) => u._id !== userId));
+            showAlert("המשתמש נמחק.", "success");
+          })
+          .catch(() => showAlert("שגיאה במחיקה", "error"));
+      },
+      () => {}
+    );
   };
 
   const handleFieldChange = (field, value) => {
     setSelectedUser((prev) => ({ ...prev, [field]: value }));
   };
-
+  // this function handles saving the user data
+  // It checks if all required fields are filled, and if the user is not trying to change their own role
   const handleSave = () => {
     if (
       !selectedUser.firstName ||
@@ -128,7 +152,8 @@ const UserManagement = () => {
       })
       .catch(() => showAlert("שגיאה בשמירה", "error"));
   };
-
+  // Function to export users data to an Excel file
+  // It formats the user data and uses the XLSX library to create an Excel file
   const handleExport = () => {
     const data = users.map(
       ({ firstName, lastName, email, phone, address, role }) => ({
@@ -258,7 +283,7 @@ const UserManagement = () => {
 
         <tbody>
           {isLoading
-            ? Array.from({ length: 6 }).map((_, rowIdx) => (
+            ? Array.from({ length: 12 }).map((_, rowIdx) => (
                 <tr key={rowIdx} className="animate-pulse">
                   {Array.from({ length: 7 }).map((__, colIdx) => (
                     <td key={colIdx} className="px-4 py-3">

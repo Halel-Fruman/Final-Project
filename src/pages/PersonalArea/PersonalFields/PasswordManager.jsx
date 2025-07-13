@@ -1,7 +1,18 @@
-import React, { useState } from "react";
+/**
+ * @file PasswordManager.jsx
+ * @description This component allows users to manage their password, including changing their current password.
+ */
+import  { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
 
+/**
+ * @function PasswordManager
+ * @description Component for managing user passwords, allowing users to change their current password.
+ * @param {Object} props - Component properties.
+ * @param {string} props.userId - The ID of the user.
+ * @param {string} props.token - The authentication token for API requests.
+ */
 const PasswordManager = ({ userId, token }) => {
   const { t } = useTranslation();
   const [currentPassword, setCurrentPassword] = useState("");
@@ -30,6 +41,7 @@ const PasswordManager = ({ userId, token }) => {
           field: t("personal_area.passwordManagement"),
         })
       );
+      // Reset the password fields after successful update
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");

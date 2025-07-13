@@ -55,7 +55,6 @@ const getTransactionsByID = async (req, res) => {
   try {
     const { transactionId } = req.params;
 
-    // חיפוש במסמך שיש בו את העסקה עם transactionId תואם
     const storeTransaction = await StoreTransactions.findOne({
       "transactions.transactionId": transactionId,
     });
@@ -64,7 +63,6 @@ const getTransactionsByID = async (req, res) => {
       return res.status(404).json({ message: "העסקה לא נמצאה" });
     }
 
-    // שליפת העסקה הספציפית מתוך המערך
     const transaction = storeTransaction.transactions.find(
       (t) => t.transactionId === transactionId
     );
@@ -73,7 +71,6 @@ const getTransactionsByID = async (req, res) => {
       return res.status(404).json({ message: "העסקה לא נמצאה בתוך המסמך" });
     }
 
-    // הוספת שם החנות למידע (כדי שיהיה זמין ב-frontend)
     res.status(200).json({
       ...(transaction.toObject?.() || transaction),
       storeName: storeTransaction.storeName,
@@ -185,7 +182,7 @@ const addTransaction = async (req, res) => {
   try {
     let storeDoc = await StoreTransactions.findOne({ storeId });
     let newTransaction;
-	
+
     if (!storeDoc) {
       const orderCounter = 1;
       const orderId = `${storeName.en

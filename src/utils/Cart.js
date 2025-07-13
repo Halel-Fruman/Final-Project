@@ -1,6 +1,12 @@
 import { fetchWithTokenRefresh } from "../utils/authHelpers";
 
-// קריאת עגלה
+/**
+ * @function fetchCart
+ * @description Fetches the user's cart from the server.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @returns {Promise<Array>} The user's cart items.
+ */
 export const fetchCart = async (userId, token) => {
   try {
     const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
@@ -21,7 +27,13 @@ export const fetchCart = async (userId, token) => {
   }
 };
 
-// שמירת עגלה
+/**
+ * @function saveCart
+ * @description Saves the user's cart to the server.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {Array} cartItems - The items to be saved in the cart.
+ */
 export const saveCart = async (userId, token, cartItems) => {
   try {
     if (cartItems.length === 0) {
@@ -47,8 +59,14 @@ export const saveCart = async (userId, token, cartItems) => {
     console.error("Error saving cart:", error.message);
   }
 };
-
-// הוספה לעגלה
+/**
+ * @function addToCart
+ * @description Adds a product to the user's cart.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {Object} product - The product to be added, containing productId and quantity.
+ * @returns {Promise<Object>} The updated cart item or null if an error occurs.
+ */
 export const addToCart = async (userId, token, product) => {
   try {
     const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
@@ -74,7 +92,14 @@ export const addToCart = async (userId, token, product) => {
   }
 };
 
-// הסרה מהעגלה
+/**
+ * @function removeFromCart
+ * @description Removes a product from the user's cart.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {string} productId - The ID of the product to be removed.
+ * @returns {Promise<Object>} The updated cart item or null if an error occurs.
+ */
 export const removeFromCart = async (userId, token, productId) => {
   try {
     const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
@@ -97,7 +122,15 @@ export const removeFromCart = async (userId, token, productId) => {
   }
 };
 
-// עדכון כמות
+/**
+ * @function updateCartItemQuantity
+ * @description Updates the quantity of a product in the user's cart.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {string} productId - The ID of the product to be updated.
+ * @param {number} quantity - The new quantity of the product.
+ * @returns {Promise<Object>} The updated cart item or null if an error occurs.
+ */
 export const updateCartItemQuantity = async (
   userId,
   productId,
@@ -128,7 +161,12 @@ export const updateCartItemQuantity = async (
   }
 };
 
-// חישוב סה״כ
+/**
+ * @function calculateCartTotal
+ * @description Calculates the total price of items in the cart.
+ * @param {Array} cartItems - The items in the cart, each with a price and quantity.
+ * @returns {number} The total price of the cart items.
+ */
 export const calculateCartTotal = (cartItems) => {
   return cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -136,7 +174,12 @@ export const calculateCartTotal = (cartItems) => {
   );
 };
 
-// שליפת פרטי מוצר (ציבורי - לא צריך refresh)
+/**
+ * @function fetchProductDetails
+ * @description Fetches details of a specific product by its ID.
+ * @param {string} productId - The ID of the product to fetch.
+ * @returns {Promise<Object|null>} The product details or null if an error occurs.
+ */
 export const fetchProductDetails = async (productId) => {
   if (!productId) {
     console.error("fetchProductDetails called with undefined productId");

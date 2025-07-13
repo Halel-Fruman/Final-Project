@@ -14,10 +14,10 @@ const optionalAuthenticateToken = (req, res, next) => {
   jwt.verify(token, SECRET_KEY, (err, decoded) => {
     if (err) {
       console.warn("Invalid token detected:", err.message);
-      return next(); // לא מפיל את הבקשה
+      return next();
     }
 
-    req.user = decoded; // שמור את פרטי המשתמש אם הטוקן תקין
+    req.user = decoded;
     next();
   });
 };
