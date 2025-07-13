@@ -1,8 +1,38 @@
+/**
+ * @file FilterBar.jsx
+ * @description This component provides a filter bar for categories, stores, and other product attributes.
+ * It allows users to filter products based on categories, stores, sale status,
+ * stock availability, price range, and search text.
+ * It also includes a clear filters button and displays selected filters.
+ */
 import { Fragment, useState } from "react";
 import { Menu, Transition } from "@headlessui/react";
 import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import { useTranslation } from "react-i18next";
 
+/**
+ * @function FilterBar
+ * @description Component for filtering products by categories, stores, sale status,
+ * stock availability, price range, and search text.
+ * @param {Object} props - Component properties.
+ * @param {Array} props.categories - List of product categories.
+ * @param {Array} props.stores - List of stores.
+ * @param {Array} props.selectedCategories - Currently selected categories.
+ * @param {Array} props.selectedStores - Currently selected stores.
+ * @param {boolean} props.isOnSaleOnly - Whether to filter only on-sale products.
+ * @param {boolean} props.inStockOnly - Whether to filter only in-stock products.
+ * @param {string} props.searchText - Search text for filtering products.
+ * @param {string} props.minPrice - Minimum price for filtering products.
+ * @param {string} props.maxPrice - Maximum price for filtering products.
+ * @param {Function} props.setSelectedCategories
+ * @param {Function} props.setSelectedStores
+ * @param {Function} props.setIsOnSaleOnly
+ * @param {Function} props.setInStockOnly
+ * @param {Function} props.setSearchText
+ * @param {Function} props.setMinPrice
+ * @param {Function} props.setMaxPrice
+ * @return {JSX.Element} The rendered filter bar component.
+ */
 const FilterBar = ({
   categories,
   stores,
@@ -60,7 +90,7 @@ const FilterBar = ({
           aria-expanded="true">
           {label}
           {selected.length > 0 && (
-            <span className="ml-2 mr-2 rounded-full bg-secondaryColor bg-opacity-20 px-1 text-sm">
+            <span className="ml-2 mr-2 rounded-full bg-secondaryColor bg-opacity-20 px-1 text-sm ">
               {selected.length}
             </span>
           )}
@@ -112,7 +142,7 @@ const FilterBar = ({
       <div className="sm:hidden flex justify-start mb-2">
         <button
           onClick={() => setIsOpen((prev) => !prev)}
-          className="flex items-center gap-2 bg-primaryColor text-white px-4 py-2 rounded-full shadow-md">
+          className="flex items-center gap-2 bg-primaryColor text-white px-4 py-2 rounded-full shadow-md ">
           {t("filters")}
           {hasFilters && (
             <span className="inline-flex items-center justify-center w-5 h-5 text-xs font-bold bg-red-600 text-white rounded-full">
@@ -132,8 +162,8 @@ const FilterBar = ({
 
       {/* Filters section: hidden on mobile unless isOpen is true */}
       <div className={`${isOpen ? "block" : "hidden"} sm:block`}>
-        <div className="flex flex-col  gap-y-4 sm:flex-wrap sm:flex-row sm:items-center sm:gap-4 mb-4">
-          <div className="flex gap-2 mt-2">
+        <div className="flex flex-col  gap-y-4 sm:flex-wrap sm:flex-row sm:items-center sm:gap-4 mb-4 ">
+          <div className="flex gap-2 mt-2 ">
             <FilterDropdown
               label={t("category")}
               options={categories.map((c) => ({

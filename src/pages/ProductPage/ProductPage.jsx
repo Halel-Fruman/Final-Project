@@ -1,17 +1,42 @@
-// ProductPage.jsx – LCP Optimized Version without react-helmet
-import { useEffect, useState } from "react";
-import { useParams, useNavigate,Link } from "react-router-dom";
+/**
+ * @file ProductPage.jsx
+ * @description This component displays product details, allows users to add products to their cart,
+ * and manage their wishlist.
+ */
+import { useEffect, useState , useRef} from "react";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { StarIcon } from "@heroicons/react/20/solid";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
 import toast from "react-hot-toast";
 import { fetchWithTokenRefresh } from "../../utils/authHelpers";
+import useGlobalPromo from "../../hooks/useGlobalPromo";
+import { getActiveDiscount } from "../../utils/discountHelpers";
 
-// ImageWithFallback component to handle WebP fallback
+/**
+ * @function ImageWithFallback
+ * @description Component for rendering an image with a fallback to WebP format.
+ * It attempts to load the WebP version of the image first,
+ * and if it fails, it falls back to the original image format.
+ * @param {Object} props - Component properties.
+ * @param {string} props.src - The source URL of the image.
+ * @param {string} props.alt - The alt text for the image.
+ * @param {string} props.className - Additional CSS classes for styling the image.
+ * @param {Object} props.props - Additional properties to pass to the img element.
+ */
 const ImageWithFallback = ({ src, alt, className, ...props }) => {
   const [useFallback, setUseFallback] = useState(false);
   const webpSrc = src?.replace(/\.(jpg|jpeg|png)$/i, ".webp") || src;
+const zoomContainerRef = useRef(null);
+const [zoomScale, setZoomScale] = useState(1);
+
+const handleWheelZoom = (e) => {
+  e.preventDefault();
+  let newScale = zoomScale - e.deltaY * 0.0015;
+  newScale = Math.min(Math.max(newScale, 1), 3); // מגבילים בין 1 ל־3
+  setZoomScale(newScale);
+};
 
   return (
     <img
@@ -24,11 +49,20 @@ const ImageWithFallback = ({ src, alt, className, ...props }) => {
   );
 };
 
-// ProductPage component to display product details and handle interactions
+/**
+ * @function ProductPage
+ * @description Component for displaying product details, allowing users to add products to their cart,
+ * and manage their wishlist.
+ * @param {Object} props - Component properties.
+ * @param {Function} props.addToWishlist - Function to add or remove a product from the wishlist.
+ * @param {Array} props.wishlist - Array of products in the user's wishlist.
+ * @param {Function} props.addToCart - Function to add a product to the user's cart.
+ */
 const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const { id } = useParams();
   const { t, i18n } = useTranslation();
   const navigate = useNavigate();
+  const promo = useGlobalPromo();
   const token = localStorage.getItem("accessToken");
   const isLoggedIn = !!token;
   const [product, setProduct] = useState(null);
@@ -37,6 +71,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [rating, setRating] = useState(0);
   const [about, setAbout] = useState("");
+const [showModal, setShowModal] = useState(false);
 
   // Scroll to top on mount and fetch product details
   // This ensures the page starts at the top when loaded
@@ -75,7 +110,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   }, [id, t, i18n.language]);
 
   useEffect(() => {
-    if (error==="Service Unavailable") navigate("/503");
+    if (error === "Service Unavailable") navigate("/503");
   }, [error, navigate]);
 
   // Function to toggle wishlist status for the product
@@ -189,25 +224,29 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     );
   }
 
-// If the product is not found, show a 404-like message
-  if (!product) return <div><div className="min-h-screen bg-gray-50 flex border-b flex-col items-center justify-center text-center px-4">
-      <h1 className="text-6xl font-bold text-primaryColor mb-4">{t("product.not_found", "אופס...")}</h1>
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-        {t("product.not_found_title", "המוצר לא נמצא")}
-      </h2>
-      <p className="text-gray-600 mb-6 max-w-md">
-        {t(
-          "product.not_found_message",
-          "נראה שהמוצר לא קיים או שהוסר."
-        )}
-      </p>
-      <Link
-        to="/"
-        className="bg-primaryColor text-white px-6 py-2 rounded-lg shadow hover:bg-secondaryColor transition"
-      >
-        {t("not_found.back_to_home", "חזרה לדף הבית")}
-      </Link>
-    </div></div>;
+  // If the product is not found, show a 404-like message
+  if (!product)
+    return (
+      <div>
+        <div className="min-h-screen bg-gray-50 flex border-b flex-col items-center justify-center text-center px-4">
+          <h1 className="text-6xl font-bold text-primaryColor mb-4">
+            {t("product.not_found", "אופס...")}
+          </h1>
+          <h2 className="text-2xl font-semibold text-gray-800 mb-2">
+            {t("product.not_found_title", "המוצר לא נמצא")}
+          </h2>
+          <p className="text-gray-600 mb-6 max-w-md">
+            {t("product.not_found_message", "נראה שהמוצר לא קיים או שהוסר.")}
+          </p>
+          <Link
+            to="/"
+            className="bg-primaryColor text-white px-6 py-2 rounded-lg shadow hover:bg-secondaryColor transition"
+          >
+            {t("not_found.back_to_home", "חזרה לדף הבית")}
+          </Link>
+        </div>
+      </div>
+    );
 
   // Extract product details and prepare data for rendering
 
@@ -221,47 +260,56 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   const isInWishlist = wishlist?.find(
     (item) => String(item.productId) === String(product._id)
   );
-  const currentDate = new Date();
-  const activeDiscount = product.discounts?.find((discount) => {
-    const start = new Date(discount.startDate);
-    const end = new Date(discount.endDate);
-    return start <= currentDate && currentDate <= end;
-  });
+  const activeDiscount = getActiveDiscount(product.discounts, promo);
   const isOnSale = !!activeDiscount;
-  const discountPercentage = isOnSale ? activeDiscount.percentage || 0 : 0;
+
   const discountedPrice = isOnSale
-    ? productPrice - productPrice * (discountPercentage / 100)
+    ? activeDiscount.type === "percent"
+      ? productPrice * (1 - activeDiscount.value / 100)
+      : productPrice - activeDiscount.value
     : productPrice;
 
+  const discountPercentage = isOnSale
+    ? activeDiscount.type === "percent"
+      ? activeDiscount.value
+      : Math.round((activeDiscount.value / productPrice) * 100)
+    : 0;
 
   return (
+    
     <main className="bg-gray-50">
-      <div className="container mx-auto py-12">
-        <div className="flex flex-col lg:flex-row gap-12 items-start">
-          <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-center items-center bg-white rounded-lg shadow-lg min-h-128">
-            <div className="w-full max-w-lg aspect-[4/3]">
-              <ImageWithFallback
-                src={selectedImage || "https://placehold.co/300"}
-                alt={productName}
-                className="object-cover w-full h-full rounded-md border"
-              />
-            </div>
-            <div className="flex m-4 flex-wrap gap-2 min-h-[88px]">
-              {product.images.map((image, index) => (
-                <ImageWithFallback
-                  key={index}
-                  src={image}
-                  alt={`Thumbnail ${index + 1}`}
-                  onClick={() => handleImageClick(image)}
-                  className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
-                    selectedImage === image
-                      ? "border-4 border-primaryColor"
-                      : "border-gray-300"
-                  }`}
-                />
-              ))}
-            </div>
-          </div>
+  <div className="container mx-auto py-12">
+    <div className="flex flex-col lg:flex-row gap-12 items-start">
+      <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-start items-center bg-white rounded-lg shadow-lg p-4">
+        
+        {/* תמונה ראשית */}
+        <div className="w-full max-w-lg">
+          <ImageWithFallback
+            src={selectedImage || "https://placehold.co/300"}
+            alt={productName}
+            className="object-contain w-full max-h-[500px] rounded-md border cursor-zoom-in"
+            onClick={() => setShowModal(true)}
+          />
+        </div>
+
+        {/* שורת התמונות הקטנות */}
+        <div className="flex justify-center flex-wrap gap-2 mt-4">
+          {product.images.map((image, index) => (
+            <ImageWithFallback
+              key={index}
+              src={image}
+              alt={`Thumbnail ${index + 1}`}
+              onClick={() => handleImageClick(image)}
+              className={`h-20 w-20 object-cover rounded-lg cursor-pointer border ${
+                selectedImage === image
+                  ? "border-4 border-primaryColor"
+                  : "border-gray-300"
+              }`}
+            />
+          ))}
+        </div>
+      </div>
+
 
           <div className="bg-white rounded-lg shadow-lg p-6 lg:flex-grow relative w-full lg:min-h-128">
             <h1 className="text-3xl font-bold text-gray-900 mb-2 min-h-[3.6rem] line-clamp-2">
@@ -339,7 +387,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   product.stock <= 0 && !product.allowBackorder
                     ? "bg-gray-400 text-white cursor-not-allowed"
                     : "bg-primaryColor text-white hover:bg-primaryColor"
-                }`}>
+                }`}
+              >
                 {product.stock <= 0 && !product.allowBackorder
                   ? t("product.outOfStock")
                   : t("product.addToCart")}
@@ -351,7 +400,8 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
                   className="w-full h-full bg-white p-3 rounded-full ring-1 ring-secondaryColor shadow-lg hover:bg-gray-100 transition"
                   aria-label={
                     isInWishlist ? "Remove from wishlist" : "Add to wishlist"
-                  }>
+                  }
+                >
                   {isInWishlist ? (
                     <SolidHeartIcon className="h-6 w-6 text-primaryColor" />
                   ) : (
@@ -370,6 +420,42 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
           </div>
         </div>
       </div>
+
+      
+      {showModal && (
+  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-80">
+    <div className="relative max-w-4xl w-full p-4">
+      <button
+        onClick={() => setShowModal(false)}
+        className="absolute top-4 right-4 text-white text-2xl font-bold"
+      >
+        ✕
+      </button>
+
+      <img
+        src={selectedImage}
+        alt="Zoomed"
+        className="w-full max-h-[80vh] object-contain mx-auto rounded shadow-lg"
+      />
+
+      <div className="flex justify-center gap-2 mt-4 flex-wrap">
+        {product.images.map((img, i) => (
+          <img
+            key={i}
+            src={img}
+            onClick={() => setSelectedImage(img)}
+            className={`h-20 w-20 object-cover rounded cursor-pointer border-2 ${
+              selectedImage === img
+                ? "border-white"
+                : "border-gray-300 hover:border-primaryColor"
+            }`}
+          />
+        ))}
+      </div>
+    </div>
+  </div>
+)}
+
     </main>
   );
 };

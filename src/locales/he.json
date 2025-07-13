@@ -18,8 +18,32 @@
   "max_price": "מחיר מקסימלי",
   "min_price": "מחיר מינימלי",
   "in_stock_only": "זמין במלאי",
+  "page": "עמוד",
+  "of": "מתוך",
+  "globalPromo": {
+  "title": "מבצע אתר",
+  "saved": "השינויים נשמרו!",
+  "deleteConfirm": "האם אתה בטוח שברצונך למחוק את המבצע ?",
+  "deleted": "המבצע נמחק בהצלחה!",
+  "form": {
+    "promoTitle": "כותרת המבצע",
+    "typeLabel": "סוג ההנחה",
+    "percent": "אחוז (%)",
+    "fixed": "סכום קבוע (₪)",
+    "value": "ערך ההנחה",
+    "start": "תאריך התחלה",
+    "end": "תאריך סיום",
+    "bannerHe": "טקסט באנר (עברית)",
+    "bannerEn": "טקסט באנר (English)"
+  }
+},
+"buttons": {
+  "save": "שמור",
+  "delete": "מחק"
+},
 
-  "view_products": "צפה במוצרים",
+
+  "view_products": "לצפייה במוצרים",
   "header": {
     "home": "בית",
     "products": "מוצרים",
@@ -219,7 +243,8 @@
     "empty": "רשימת המשאלות שלך ריקה",
     "loading": "טוען את רשימת המשאלות שלך...",
     "remove_from_wishlist": "הסר מרשימת המשאלות",
-    "partialLoad": "לא ניתן היה לטעון {{count}} מוצרים"
+    "partialLoad": "לא ניתן היה לטעון {{count}} מוצרים",
+    "loginRequired": "יש להתחבר כדי להוסיף לרשימת המשאלות"
   },
 
   "product": {
@@ -274,6 +299,8 @@
     "cancel": "ביטול",
     "edit": "ערוך",
     "store_email": "מייל החנות",
+    "totalOrders": "סה״כ הזמנות",
+      "totalRevenue": "סה״כ הכנסות",
     "dashboard": {
       "title": "סקירה מערכתית",
       "salesComparison": "השוואת מכירות בין חנויות",
@@ -287,6 +314,11 @@
       "storeName": "שם החנות",
       "price": "מחיר",
       "sold": "כמות שנמכרה",
+      "exportExcel": "ייצא לאקסל",
+      "currentMonth": "החודש הנוכחי",
+      "lastMonth": "החודש הקודם",
+      "reset": "אפס תאריכים",
+
       "errors": {
         "fetchFailed": "נכשל בטעינת נתונים סטטיסטיים."
       },

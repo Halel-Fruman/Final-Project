@@ -1,20 +1,31 @@
-// File: ConfirmationPage.jsx
-import React from "react";
+/**
+ * @file ConfirmationPage.jsx
+ * @description This file contains the ConfirmationPage component
+ * which displays the order confirmation details after a successful order.
+ * It shows the store name, order ID, status, products, and delivery method.
+ */
 import { useLocation, useNavigate } from "react-router-dom";
 import { useTranslation } from "react-i18next";
-
-// This component is responsible for displaying the confirmation page after a successful order
-// It shows the order details, including the store name, order ID, status, products, and delivery method
+import { getActiveDiscount } from "../../utils/discountHelpers";
+import useGlobalPromo from "../../hooks/useGlobalPromo";
+/**
+ * @function ConfirmationPage
+ * @description This component renders the order confirmation page.
+ * It retrieves the order details from the location state,
+ * groups transactions by transaction ID, and displays the order summary.
+ * @returns {JSX.Element} The rendered confirmation page component.
+ */
 const ConfirmationPage = () => {
-
   const { state } = useLocation();
   const navigate = useNavigate();
   const { t, i18n } = useTranslation();
+  const promo = useGlobalPromo(); // Fetch the global promotion if any
 
   const transactions = state?.transactions || [];
   const detailedCart = state?.detailedCart || [];
   const deliveryMethods = state?.deliveryMethods || {};
-
+  // Function to check if two IDs are the same
+  // This is useful for comparing product IDs
   const isSameId = (a, b) => a?.toString?.() === b?.toString?.();
 
   // Group transactions by transactionId
@@ -55,7 +66,7 @@ const ConfirmationPage = () => {
         {t("confirmation.successMessage")}
       </h2>
 
-
+      {/*map through the grouped transactions and display each group*/}
       {Object.entries(groupedByTransactionId).map(([txId, group], groupIdx) => (
         <div
           key={groupIdx}
@@ -101,6 +112,15 @@ const ConfirmationPage = () => {
                         isSameId(item._id, product.productId) &&
                         isSameId(item.storeId?._id || item.storeId, storeId)
                     );
+                    const active = getActiveDiscount(
+                      matchedProduct.discounts,
+                      promo
+                    );
+                    const finalPrice = active
+                      ? active.type === "percent"
+                        ? matchedProduct.price * (1 - active.value / 100)
+                        : matchedProduct.price - active.value
+                      : matchedProduct.price;
 
                     return (
                       <div
@@ -120,7 +140,19 @@ const ConfirmationPage = () => {
                             {t("checkout.quantity")}: {product.quantity}
                           </p>
                           <p className="text-sm text-gray-600">
-                            {t("price")}: ₪{product.price}
+                            {t("price")}:{" "}
+                            {active ? (
+                              <>
+                                <span className="text-red-600 font-semibold">
+                                  ₪{finalPrice.toFixed(2)}
+                                </span>
+                                <span className="line-through mx-1 text-gray-500">
+                                  ₪{matchedProduct.price.toFixed(2)}
+                                </span>
+                              </>
+                            ) : (
+                              `₪${matchedProduct.price.toFixed(2)}`
+                            )}
                           </p>
                         </div>
                       </div>
@@ -170,6 +202,7 @@ const ConfirmationPage = () => {
       ))}
 
       <div className="text-center  mt-6">
+        {/* Buttons to navigate to personal area or back home */}
         <button
           onClick={() =>
             navigate("/personal-area", { state: { selectedTab: "orders" } })
@@ -178,9 +211,7 @@ const ConfirmationPage = () => {
           {t("confirmation.viewOrders")}
         </button>
         <button
-          onClick={() =>
-            navigate("/")
-          }
+          onClick={() => navigate("/")}
           className="px-6 py-2 bg-primaryColor text-white text-xl font-bold rounded-full hover:bg-secondaryColor">
           {t("confirmation.backHome")}
         </button>

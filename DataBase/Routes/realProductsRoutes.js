@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const multer = require("multer");
 const path = require("path");
+const fs = require("fs");
+const sharp = require("sharp");
 const authenticateToken = require("../Middleware/authenticateToken");
 
 // storage setting
@@ -36,13 +38,27 @@ router.get("/", async (req, res) => {
   }
 });
 
-router.post("/upload-image", upload.single("image"), (req, res) => {
+router.post("/upload-image", upload.single("image"), async (req, res) => {
   if (!req.file) return res.status(400).json({ error: "No file uploaded" });
 
-  const imageUrl = `/uploads/${req.file.filename}`;
-  res.json({ imageUrl });
-});
+  const inputPath = req.file.path;
+  const outputFilename = path.parse(req.file.filename).name + ".webp";
+  const outputPath = path.join(path.dirname(inputPath), outputFilename);
 
+  try {
+    await sharp(inputPath)
+      .webp({ quality: 80 })
+      .toFile(outputPath);
+
+    fs.unlinkSync(inputPath);
+
+    const imageUrl = `/uploads/${outputFilename}`;
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error("Image conversion error:", error);
+    res.status(500).json({ error: "Failed to convert image" });
+  }
+});
 router.get("/by-store", async (req, res) => {
   const storeId = req.query.store;
 
@@ -127,28 +143,61 @@ router.put("/:storeId/:productId", async (req, res) => {
   }
 });
 
-// delete product from store by storeId and productId
+// Route to delete a product by storeId and productId
 router.delete("/:storeId/:productId", async (req, res) => {
   const { storeId, productId } = req.params;
 
   try {
+    // Find the store's product document by storeId
     const store = await StoreProducts.findOne({ storeId });
     if (!store) return res.status(404).json({ message: "Store not found" });
 
-    const originalLength = store.products.length;
-    store.products = store.products.filter((p) => String(p._id) !== productId);
+    // Find the specific product to delete
+    const productToDelete = store.products.find(
+      (p) => String(p._id) === productId
+    );
 
-    if (store.products.length === originalLength) {
+    // If product doesn't exist in the store, return 404
+    if (!productToDelete) {
       return res.status(404).json({ message: "Product not found" });
     }
 
+    // Delete locally hosted images associated with the product
+    if (Array.isArray(productToDelete.images)) {
+      productToDelete.images.forEach((imageUrl) => {
+        // Only delete images that are stored on the server (not external links)
+        if (imageUrl.includes("/uploads/")) {
+          // Extract the filename from the image URL
+          const filename = path.basename(imageUrl); // e.g., '123456789.webp'
+
+          // Construct the absolute file path based on public/uploads folder
+          const filePath = path.join(__dirname, "../uploads", filename);
+
+          // Attempt to delete the file
+          try {
+            fs.unlinkSync(filePath);
+            console.log("Deleted local image:", filename);
+          } catch (err) {
+            console.error("Failed to delete image:", filename, err.message);
+          }
+        }
+      });
+    }
+
+    // Remove the product from the store's products array
+    store.products = store.products.filter(
+      (p) => String(p._id) !== productId
+    );
+
+    // Save the updated store document
     await store.save();
-    res.json({ message: "Product deleted successfully" });
+
+    res.json({ message: "Product and its images deleted successfully" });
   } catch (err) {
+    console.error("Error deleting product:", err.message);
     res.status(500).json({ message: err.message });
   }
 });
-
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
@@ -212,7 +261,7 @@ router.post("/:id/rate", authenticateToken, async (req, res) => {
     const product = store.products.find((p) => String(p._id) === id);
     if (!product) return res.status(404).json({ message: "Product not found" });
 
-    const userId = req.user.userId; // כאן בטוח יש userId כי authenticateToken דרש טוקן תקין
+    const userId = req.user.userId;
 
     const alreadyReviewed = product.reviews.some(
       (review) => review.user?.toString() === userId
@@ -259,12 +308,10 @@ router.get("/filter-by-categories", async (req, res) => {
       .split(",")
       .map((id) => new mongoose.Types.ObjectId(id));
 
-    // שליפה של כל החנויות שמכילות לפחות מוצר אחד עם אחת מהקטגוריות
     const stores = await StoreProducts.find({
       "products.categories": { $in: categoryIds },
     });
 
-    // סינון מוצרים בכל חנות לפי הקטגוריות שנבחרו
     const filtered = stores
       .map((store) => ({
         storeId: store.storeId,
@@ -281,6 +328,34 @@ router.get("/filter-by-categories", async (req, res) => {
   } catch (err) {
     console.error("Error filtering products by categories:", err);
     res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch("/:productId/decrease-stock", authenticateToken, async (req, res) => {
+  const { productId } = req.params;
+  const { quantity } = req.body;
+  if (!quantity || quantity <= 0) {
+    return res.status(400).json({ error: "Invalid quantity" });
+  }
+
+  try {
+    const store = await StoreProducts.findOne({ "products._id": productId });
+    if (!store) return res.status(404).json({ error: "Product not found" });
+
+    const product = store.products.id(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    if (product.stock < quantity) {
+      return res.status(400).json({ error: "Not enough stock available" });
+    }
+
+    product.stock -= quantity;
+    await store.save();
+
+    res.json({ message: "Stock updated", product });
+  } catch (error) {
+    console.error("Error updating stock:", error.message);
+    res.status(500).json({ error: "Failed to update stock" });
   }
 });
 

@@ -7,29 +7,44 @@ const openai = new OpenAI({
 });
 
 router.post("/", async (req, res) => {
-  const { messages, userId, role } = req.body;
+  const { messages, userId, role, imageUrl } = req.body;
 
   if (!messages || !Array.isArray(messages)) {
-    return res.status(400).json({ reply: "פורמט הודעות לא תקין" });
+    return res.status(400).json({ reply: "Invalid message format" });
   }
 
   try {
+    const fullMessages = [...messages];
+
+    // ✅ If an image is provided, add it as a vision input
+    if (imageUrl) {
+  fullMessages.push({
+    role: "user",
+    content: [
+      {
+        type: "image_url",
+        image_url: { url: imageUrl },
+      },
+    ],
+  });
+}
+
     const completion = await openai.chat.completions.create({
       model: "gpt-4o-2024-05-13",
-      messages,
+      messages: fullMessages,
       temperature: 0.5,
     });
-console.dir(completion, { depth: null });
-console.log("📨 GPT Reply Text:", completion.choices[0].message.content);
+
+    console.dir(completion, { depth: null });
+    console.log("📨 GPT Reply Text:", completion.choices[0].message.content);
 
     let rawReply = completion.choices[0].message.content;
     let parsed = null;
 
-    // 🔍 ננסה לפרש JSON תקני ישיר
+    // Try parsing the raw JSON from GPT response
     try {
       parsed = JSON.parse(rawReply);
     } catch (e) {
-      // 🔍 אם זה נכשל – ננסה לחלץ JSON מתוך טקסט
       const match = rawReply.match(/\{[\s\S]*\}/);
       if (match) {
         try {
@@ -40,7 +55,6 @@ console.log("📨 GPT Reply Text:", completion.choices[0].message.content);
       }
     }
 
-    // ✅ אם הצלחנו לפענח – נחזיר את התוצאה
     if (parsed && typeof parsed === "object") {
       return res.json({
         reply: parsed.reply || "אין תגובה",
@@ -49,8 +63,7 @@ console.log("📨 GPT Reply Text:", completion.choices[0].message.content);
       });
     }
 
-    // ❌ אם הכל נכשל – נחזיר את הטקסט המקורי
-    console.warn("⚠ לא נמצא JSON תקני. מחזירים טקסט כמו שהוא.");
+    console.warn("⚠ Could not extract valid JSON. Returning raw text.");
     return res.json({
       reply: rawReply,
       action: null,
@@ -67,4 +80,4 @@ console.log("📨 GPT Reply Text:", completion.choices[0].message.content);
   }
 });
 
-module.exports = router;
+module.exports = router;

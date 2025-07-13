@@ -20,11 +20,25 @@ exports.forgotPassword = async (req, res) => {
 
     const resetLink = `${BASE_URL}/reset-password/${token}`;
 
-    await sendEmail(
-      email,
-      "Password Reset Request",
-      `Click the link to reset your password: ${resetLink}`
-    );
+    await sendEmail({
+  to: email,
+  subject: "בקשה לאיפוס סיסמה",
+  html: `
+     <div style="font-family: Arial, sans-serif; direction: rtl; max-width: 600px; margin: auto;">
+    <h2 style="margin-bottom: 12px; font-size: 22px; color: #333;">איפוס סיסמה</h2>
+    <div style="margin: 0 0 12px 0; font-size: 15px;">קיבלנו את הבקשה שלך לאיפוס הסיסמה .
+     <br/>
+     כדי להגדיר סיסמה חדשה, לחץ על הקישור הבא:</div>
+    <p style="margin: 0 0 18px 0;">
+      <a href="${resetLink}" style="font-size: 15px; color: #1a73e8; text-decoration: none; font-weight: bold;">
+        לחץ כאן לאיפוס הסיסמה
+      </a>
+    </p>
+    <p style="margin: 0; font-size: 13px; color: #555;">
+      אם לא אתה ביצעת את הבקשה – פשוט התעלם מההודעה.
+    </p>
+  </div>
+`});
 
     res.json({ message: "Reset link sent." });
   } catch (err) {
@@ -62,3 +76,5 @@ exports.resetPassword = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+

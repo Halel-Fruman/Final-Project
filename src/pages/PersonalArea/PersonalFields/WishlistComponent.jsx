@@ -1,8 +1,24 @@
+/**
+ * @file WishlistComponent.jsx
+ * @description This component displays the user's wishlist, allowing them to view, remove items,
+ * add items to the cart, and handle missing products gracefully.
+ * It includes responsive design for both desktop and mobile views.
+ */
 import { useEffect, useState, useCallback } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 import toast from "react-hot-toast";
 
+/**
+ * @function WishlistComponent
+ * @description Component for displaying the user's wishlist.
+ * @param {Object} props - Component properties.
+ * @param {Array} props.wishlist - Array of wishlist items, each containing productId
+ * @param {Function} props.removeFromWishlist - Function to remove an item from the wishlist.
+ * @param {Function} props.refreshWishlist - Function to refresh the wishlist after an item is removed.
+ * @param {Function} props.addToCart - Function to add an item to the cart.
+ * @returns {JSX.Element} The rendered wishlist component.
+ */
 const WishlistComponent = ({
   wishlist,
   removeFromWishlist,

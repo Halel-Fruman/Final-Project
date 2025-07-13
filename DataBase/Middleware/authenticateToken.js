@@ -13,7 +13,7 @@ const authenticateToken = (req, res, next) => {
       return res.status(401).json({ error: "Invalid or expired token" });
     }
 
-    req.user = decoded; // שמור את פרטי המשתמש ב-request
+    req.user = decoded;
     next();
   });
 };

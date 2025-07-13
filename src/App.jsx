@@ -1,3 +1,10 @@
+/**
+ * @file App.jsx
+ * @description Main application component that sets up routing, state management, and lazy loading of components
+ * Handles user authentication, cart, and wishlist functionality.
+ * @authors @Halel-Fruman & @danielBenTov26
+ */
+
 import { useEffect, useState, useCallback, lazy, Suspense } from "react";
 import {
   BrowserRouter as Router,
@@ -16,8 +23,12 @@ import {
 import { fetchWishlist, updateWishlist } from "./utils/Wishlist";
 import { AlertProvider } from "./components/AlertDialog.jsx";
 import { fetchWithTokenRefresh } from "./utils/authHelpers";
+import ChatBot from "./components/chatbotFolder/ChatBotFile.jsx";
+import { useNavigate } from "react-router-dom";
+import ScrollTopButton from "./components/ScrollTopButton";
+import useGlobalPromo from "./hooks/useGlobalPromo";
 
-// Lazy-loaded components and pages
+// Lazy load components to improve initial load time
 const Header = lazy(() => import("./components/Header/Header"));
 const Footer = lazy(() => import("./components/Footer/Footer"));
 const CartModal = lazy(() => import("./components/CartModal"));
@@ -50,7 +61,13 @@ const RegisterPage = lazy(() => import("./pages/Registeration/RegisterPage"));
 const NotFound = lazy(() => import("./pages/Errors/NotFound.jsx"));
 const ServiceUnavailablePage = lazy(() => import("./pages/Errors/Service.jsx"));
 
-
+/**
+ *
+ * @function App
+ * @description Main application component that sets up routing, state management, and lazy loading of components
+ * Handles user authentication, cart, and wishlist functionality.
+ * @returns {JSX.Element} The main application component
+ */
 const App = () => {
   const { t, i18n } = useTranslation();
   const [token, setToken] = useState(localStorage.getItem("accessToken"));
@@ -63,6 +80,7 @@ const App = () => {
   const [isWishlistOpen, setIsWishlistOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
+  const promo = useGlobalPromo();
 
   // Function to handle logout and clear local storage
   const handleLogout = () => {
@@ -74,30 +92,54 @@ const App = () => {
   };
 
   // Verify token on initial load
+  // and set userId and role from local storage
+
   useEffect(() => {
     const verifyToken = async () => {
+      // Check if accessToken and userId are available in localStorage
+      // If not, redirect to login or handle logout
+      let accessToken = localStorage.getItem("accessToken");
       const storedUserId = localStorage.getItem("userId");
       const storedUserRole = localStorage.getItem("role");
       if (!storedUserId || !localStorage.getItem("refreshToken")) {
         handleLogout();
         return;
       }
-
+      // If accessToken is not available, try to refresh it
       try {
         const res = await fetchWithTokenRefresh("/api/User/verify-token");
+        // If the response is ok, set the token, userId, and role from localStorage
         if (res.ok) {
           setToken(localStorage.getItem("accessToken"));
           setUserId(storedUserId);
           setRole(storedUserRole);
-        } else {
+        }
+        // If the response is not ok, handle logout
+        else {
           handleLogout();
         }
       } catch {
+        // If there is an error (e.g., network error, server error), handle logout
         handleLogout();
       }
     };
+    // Call the verifyToken function to check the token validity
     verifyToken();
   }, []);
+
+  const handleOpenCart = () => setIsCartOpen(true);
+  const handleCloseCart = () => setIsCartOpen(false);
+  const handleOpenWishlist = () => setIsWishlistOpen(true);
+  const handleCloseWishlist = () => setIsWishlistOpen(false);
+
+  const handleOpenAddProductForm = () =>
+    window.dispatchEvent(new CustomEvent("openAddProductForm"));
+
+  const handleCreateDiscount = () =>
+    window.dispatchEvent(new CustomEvent("createDiscount"));
+
+  const handleSendNewsletter = () =>
+    window.dispatchEvent(new CustomEvent("sendNewsletter"));
 
   // Set document direction based on language
   useEffect(() => {
@@ -112,11 +154,14 @@ const App = () => {
     }
   }, [userId, token]);
 
+  // Handle removing item from cart
+  // This function is called when the user clicks the remove button in the cart modal
   const handleRemoveFromCart = async (productId) => {
     const updatedCart = await removeFromCart(userId, token, productId);
     if (updatedCart) setCartItems(updatedCart);
   };
-
+  // Handle adding item to cart
+  // This function is called when the user clicks the add to cart button in the product page
   const handleAddToCart = async (product) => {
     const updatedCart = await addToCart(userId, token, product);
     if (updatedCart) {
@@ -126,6 +171,7 @@ const App = () => {
   };
 
   // Load wishlist items when userId and token are available
+  // This function fetches the wishlist from the server and updates the state
   const loadWishlist = useCallback(async () => {
     setWishlistLoading(true);
     if (!userId || !token) {
@@ -139,6 +185,8 @@ const App = () => {
   }, [userId, token]);
 
   // Load cart and wishlist on initial load or when token/userId changes
+  // This effect runs when the component mounts or when the token or userId changes
+  // It checks if the user is logged in (token and userId are available) and fetches the cart and wishlist
   useEffect(() => {
     if (token && userId) {
       loadCart();
@@ -147,7 +195,14 @@ const App = () => {
   }, [token, userId, loadWishlist, loadCart]);
 
   // Add or remove product from wishlist
+  // This function is called when the user clicks the add to wishlist button in the product page
+  // It updates the wishlist on the server and shows a toast notification
   const addToWishlist = async (product, isInWishlist) => {
+    if (!userId || !token) {
+      toast.error(t("wishlist.loginRequired"));
+      return;
+    }
+
     const success = await updateWishlist(userId, token, product, isInWishlist);
     if (success) {
       toast.success(
@@ -158,7 +213,6 @@ const App = () => {
       loadWishlist();
     }
   };
-
 
   return (
     // Wrap the entire app in AlertProvider for alert dialogs
@@ -184,6 +238,12 @@ const App = () => {
               role={role}
             />
           </Suspense>
+
+          {promo && (
+            <div className="w-full bg-primaryColor text-white text-center py-2 px-4">
+              {promo.bannerText[i18n.language]}
+            </div>
+          )}
 
           <Suspense fallback={null}>
             <CartModal
@@ -231,12 +291,12 @@ const App = () => {
               />
             </Modal>
           </Suspense>
-
+          {/* Main content area where routes are rendered
+          This is where the main content of the app will be displayed based on the current route */}
           <div className="app-content">
-            <Suspense
-              fallback={
-                null
-              }>
+            <Suspense fallback={null}>
+              <ScrollTopButton />
+
               <Routes>
                 <Route
                   path="/"
@@ -334,6 +394,16 @@ const App = () => {
               </Routes>
             </Suspense>
           </div>
+          <ChatBot
+            token={token}
+            userId={userId}
+            onOpenCart={handleOpenCart}
+            onOpenWishlist={handleOpenWishlist}
+            onLogout={handleLogout}
+            onOpenAddProductForm={handleOpenAddProductForm}
+            onCreateDiscount={handleCreateDiscount}
+            onSendNewsletter={handleSendNewsletter}
+          />
 
           <Suspense fallback={null}>
             <Footer />
