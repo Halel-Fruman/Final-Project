@@ -245,9 +245,9 @@ const ChatBot = ({
       }
 
       const fullImageUrl = `https://ilan-israel.co.il/api${uploadData.imageUrl}`;
-
+      const isImg = true;
       if (actionHandlers.openAddProduct) {
-        actionHandlers.openAddProduct();
+        actionHandlers.openAddProduct(isImg);
       }
 
       setTimeout(async () => {
