@@ -165,7 +165,6 @@ const CheckoutPage = ({
 
             const method = deliveryMethods[storeId];
             const shipping = storeShippingInfo[storeId];
-            console.log(method);
             let price = 0;
             let company = "";
             let deliveryMethod = "";

@@ -14,7 +14,7 @@ import { Icon } from "@iconify/react";
  * @param {Function} props.handleEdit - Callback function to handle editing a product.
  * @param {Function} props.handleDelete - Callback function to handle deleting a product.
  */
-const ProductTableMobile = ({ products, handleEdit, handleDelete }) => {
+const ProductTableMobile = ({ products, onEdit, handleDelete }) => {
   return (
     <div className="block md:hidden p-2 space-y-4">
       {(products || []).map((product) => {
@@ -69,7 +69,7 @@ const ProductTableMobile = ({ products, handleEdit, handleDelete }) => {
             <div className="flex justify-end gap-3">
               <button
                 className="text-blue-600"
-                onClick={() => handleEdit(product)}>
+                onClick={() => onEdit(product)}>
                 <Icon icon="material-symbols:edit" className="text-xl" />
               </button>
               <button

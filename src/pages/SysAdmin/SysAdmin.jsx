@@ -24,7 +24,7 @@ const SysAdmin = () => {
   const [selectedStore, setSelectedStore] = useState(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newStoreMode, setNewStoreMode] = useState(false);
-  const { showAlert } = useAlert();
+  const {showAlert} = useAlert();
   const [isLoading, setIsLoading] = useState(true);
 
   const handleCloseModal = () => {
@@ -86,7 +86,7 @@ const SysAdmin = () => {
         showAlert("אירעה שגיאה בשרת, אנא נסה שנית.", "error");
       })
       .finally(() => setIsLoading(false));
-  }, []);
+  }, [showAlert]);
 
   // Function to open the modal for adding or editing a store
   // It initializes the selectedStore state with default values if no store is provided

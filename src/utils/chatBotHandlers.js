@@ -452,10 +452,8 @@ export const createActionHandlers = (
         speak("חסר מידע לעדכון המוצר.");
         return;
       }
-      console.log("editProduct payload:", payload);
 
       if (window.location.pathname === "/shop/store-management") {
-        console.log("here");
         window.dispatchEvent(
           new CustomEvent("autofillEditProductForm", {
             detail: {

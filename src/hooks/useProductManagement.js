@@ -7,7 +7,6 @@ import { useState, useRef, useEffect } from "react";
 import axios from "axios";
 import { useAlert } from "../components/AlertDialog";
 import exportToExcel from "../utils/exportToExcel";
-import e from "cors";
 
 /**
  * @function useProductManagement
@@ -30,7 +29,6 @@ const useProductManagement = (
   const [autofillPayload, setAutofillPayload] = useState(null);
   const [pendingEditRequest, setPendingEditRequest] = useState(null);
   const [pendingAutofillPayload, setPendingAutofillPayload] = useState(null);
-  const [pendingEditFields, setPendingEditFields] = useState(null);
   const isAddingProductRef = useRef(isAddingProduct);
   const { showAlert } = useAlert();
   const [formMode, setFormMode] = useState("add");
@@ -53,7 +51,7 @@ const useProductManagement = (
       .get(`/api/Category`)
       .then((res) => setCategories(res.data))
       .catch(() => showAlert("אירעה שגיאה בעת קבלת הקטגוריות", "error"));
-  }, [storeId]);
+  }, [storeId, showAlert]);
 
   // Handle auto-open add product form
   useEffect(() => {
@@ -117,7 +115,7 @@ const useProductManagement = (
     window.addEventListener("openEditProductForm", handleEditProductForm);
     return () =>
       window.removeEventListener("openEditProductForm", handleEditProductForm);
-  }, [products]);
+  }, [products, showAlert]);
 
   // Handle pending edit request from external sources
   // This is used to open the edit form when a product name is provided
@@ -147,7 +145,7 @@ const useProductManagement = (
         setPendingEditRequest(null);
       }
     }
-  }, [pendingEditRequest, products]);
+  }, [pendingEditRequest, products, showAlert]);
 
   // Handle pending edit request from external sources
   // This is used to open the edit form when a product name is provided
@@ -244,7 +242,7 @@ const useProductManagement = (
 
     window.addEventListener("autofillEditProductForm", handler);
     return () => window.removeEventListener("autofillEditProductForm", handler);
-  }, [products, editingProduct]);
+  }, [products, editingProduct, showAlert]);
 
   useEffect(() => {
     if (editingProduct?._id) {
@@ -255,7 +253,6 @@ const useProductManagement = (
 
   useEffect(() => {
     if (editingProduct?._id) {
-      console.log("🟢 Saving editingProduct._id:", editingProduct._id);
       window.__editingProductId = editingProduct._id;
       localStorage.setItem("lastEditedProductId", editingProduct._id);
     }

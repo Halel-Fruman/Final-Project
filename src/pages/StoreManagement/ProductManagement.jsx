@@ -9,7 +9,11 @@ import { fi } from "date-fns/locale";
 
 // This component manages the product management functionality for a store
 // It includes adding, editing, deleting products, searching, and exporting to Excel
-const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {} }) => {
+const ProductManagement = ({
+  storeId,
+  autoOpenAddForm = false,
+  autofill = {},
+}) => {
   const {
     isAddingProduct,
     editingProduct,
@@ -25,37 +29,35 @@ const ProductManagement = ({ storeId, autoOpenAddForm = false, autofill = {} }) 
     setSearchQuery,
     handleExportProducts,
     filteredProducts,
-      formMode,
+    formMode,
   } = useProductManagement(storeId, autoOpenAddForm, autofill);
-
 
   return (
     <div className="w-full">
       <h1 className="text-2xl font-bold mb-4 text-center">ניהול מוצרים</h1>
 
-      <div className="mb-4 mr-4 flex justify">
-        <button
-          className="bg-blue-700 font-bold text-xl ml-4 text-white px-4 py-2 rounded-full"
-          onClick={handleAdd}>
-          <h2>הוסף מוצר</h2>
-        </button>
-
-        <div className="flex w-full max-w-md gap-2">
-          <input
-            type="text"
-            placeholder="חפש מוצר לפי שם..."
-            className="flex-grow p-2 border rounded-full shadow-sm text-right"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
+      <div className=" gap-3 mb-4 flex flex-col md:flex-row md:items-center">
+        <div className="flex flex-row gap-2">
+          <button
+            onClick={handleAdd}
+            className=" md:w-auto bg-blue-700 text-white md:font-bold md:text-xl px-4 py-2 rounded-full">
+            הוסף מוצר
+          </button>
 
         <button
           onClick={handleExportProducts}
-          className="bg-green-600 mx-4 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow"
-          title="ייצוא לאקסל">
+          className=" md:w-auto bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-full shadow">
           ייצוא לאקסל
         </button>
+        </div>
+
+        <input
+          type="text"
+          placeholder="חפש מוצר לפי שם..."
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          className="  p-2 border rounded-full shadow-sm text-right"
+        />
       </div>
 
       {isAddingProduct && (
