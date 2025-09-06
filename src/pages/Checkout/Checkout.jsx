@@ -48,6 +48,8 @@ const CheckoutPage = ({
   const [deliveryMethods, setDeliveryMethods] = useState({});
   const [storeShippingInfo, setStoreShippingInfo] = useState({});
   const [isFinalizing, setIsFinalizing] = useState(false);
+  const [showDonationPopup, setShowDonationPopup] = useState(false);
+  const [postCheckoutData, setPostCheckoutData] = useState(null);
 
   // Navigate hook from react-router-dom to handle navigation
   // after successful payment processing
@@ -99,9 +101,12 @@ const CheckoutPage = ({
               setCartItems,
             });
 
-            navigate("/confirmation", {
-              state: { transactions, detailedCart, deliveryMethods },
+            setPostCheckoutData({
+              transactions,
+              detailedCart,
+              deliveryMethods,
             });
+            setShowDonationPopup(true);
           } catch (err) {
             console.error("❌ Error during post-payment processing:", err);
             alert("שגיאה בעת השלמת ההזמנה");
@@ -354,7 +359,7 @@ const CheckoutPage = ({
       sum += itemsSum + extra;
     }
     return sum;
-  }, [groupedByStore, deliveryMethods, storeShippingInfo]);
+  }, [groupedByStore, deliveryMethods, storeShippingInfo, promo]);
 
   // Handle adding a new address
   // This function will call the addAddress utility function
@@ -511,6 +516,7 @@ const CheckoutPage = ({
                 storeShippingInfo={storeShippingInfo}
               />
             )}
+
           </div>
 
           {/* Summary Section with delivery options */}
@@ -716,6 +722,68 @@ const CheckoutPage = ({
           </div>
         </div>
       </main>
+      {showDonationPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center">
+            <h2 className="text-2xl font-bold text-primaryColor mb-4">
+              {t("Thanks_for_shopping")}
+            </h2>
+            <p className="mb-6 text-gray-700">
+              {t("we_appreciate_your_support")}
+              <br />
+              {t("would you like to help us further")}
+              <br />
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center mb-2 gap-4">
+              <button
+                onClick={() => {
+                  window.open(
+                    "https://ilan-israel.co.il/%D7%AA%D7%A8%D7%95%D7%9E%D7%94",
+                    "_blank"
+                  );
+                  setShowDonationPopup(false);
+                  if (postCheckoutData) {
+                    navigate("/confirmation", {
+                      state: postCheckoutData,
+                    });
+                  }
+                }}
+                className="px-5 py-2 rounded-full bg-primaryColor text-white hover:bg-secondaryColor transition">
+                {" "}
+                {t("donate_to_ilan")}
+              </button>
+
+              <button
+                onClick={() => {
+                  window.open("https://www.igul.org.il/amutot/ilan/", "_blank");
+                  setShowDonationPopup(false);
+                  if (postCheckoutData) {
+                    navigate("/confirmation", {
+                      state: postCheckoutData,
+                    });
+                  }
+                }}
+                className="px-5 py-2 rounded-full bg-primaryColor text-white hover:bg-secondaryColor transition">
+                {t("round_up_donation")}
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                setShowDonationPopup(false);
+                if (postCheckoutData) {
+                  navigate("/confirmation", {
+                    state: postCheckoutData,
+                  });
+                }
+              }}
+              className="px-4 py-2 rounded-full border border-primaryColor text-primaryColor hover:bg-gray-100 transition">
+              {" "}
+              {t("no_thanks")}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };
