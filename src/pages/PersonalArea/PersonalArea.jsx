@@ -119,7 +119,7 @@ const PersonalArea = ({ userId, addToWishlist, addToCart, token }) => {
   //  (details, addresses, password, wishlist, orders).
   // The main content displays the selected view based on the currentView state.
   return user ? (
-    <div className="bg-gray-100 min-h-screen ">
+    <div className="bg-gray-50 min-h-screen ">
       <div className="container mx-auto py-8 px-4 lg:px-0">
         <div className="lg:grid lg:grid-cols-12 gap-6 h-full">
           {/* Sidebar for navigation

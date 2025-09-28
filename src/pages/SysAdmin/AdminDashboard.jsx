@@ -167,7 +167,7 @@ const AdminDashboard = () => {
   };
 
   return (
-    <div className="p-6 bg-gray-50 h-fit">
+    <div className="p-6 bg-white h-fit">
       <h1 className="text-3xl font-bold text-primaryColor mb-6 text-center">
         {t("sysadmin.dashboard.title")}
       </h1>

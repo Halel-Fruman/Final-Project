@@ -70,7 +70,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   // It also preloads the first product image in WebP format
   // and handles errors by navigating to a 503 page if needed
   useEffect(() => {
-    window.scrollTo({ top: 0, behavior: "instant" });
+    window.parent.scrollTo({ top: 0, behavior: "instant" });
     const fetchProduct = async () => {
       try {
         const headers = token ? { Authorization: `Bearer ${token}` } : {};
@@ -160,7 +160,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   // If the product is still loading, show a skeleton loader
   if (isLoading) {
     return (
-      <main className="bg-gray-50">
+      <main className="bg-white">
         <div className="container mx-auto py-12 animate-pulse">
           <div className="flex flex-col lg:flex-row gap-12 items-start">
             {/* Skeleton for image + thumbnails */}
@@ -219,7 +219,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
   if (!product)
     return (
       <div>
-        <div className="min-h-screen bg-gray-50 flex border-b flex-col items-center justify-center text-center px-4">
+        <div className="min-h-screen bg-white flex border-b flex-col items-center justify-center text-center px-4">
           <h1 className="text-6xl font-bold text-primaryColor mb-4">
             {t("product.not_found", "אופס...")}
           </h1>
@@ -266,7 +266,7 @@ const ProductPage = ({ addToWishlist, wishlist, addToCart }) => {
     : 0;
 
   return (
-    <main className="bg-gray-50">
+    <main className="bg-white">
       <div className="container mx-auto py-12">
         <div className="flex flex-col lg:flex-row gap-12 items-start">
           <div className="flex-shrink-0 w-full lg:w-1/2 flex flex-col justify-start items-center bg-white rounded-lg shadow-lg p-4">

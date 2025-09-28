@@ -238,7 +238,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     sessionStorage.setItem("currentPage", newPage);
-    window.scrollTo({ top: 781.25, behavior: "smooth" });
+    window.parent.scrollTo({ top: 781.25, behavior: "smooth" });
   };
 
   // Handle product click to navigate to product details page
