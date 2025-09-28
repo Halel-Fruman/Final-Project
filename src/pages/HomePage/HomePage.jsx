@@ -10,7 +10,7 @@ import { useTranslation } from "react-i18next";
 import { useNavigate } from "react-router-dom";
 import { HeartIcon as OutlineHeartIcon } from "@heroicons/react/24/outline";
 import { HeartIcon as SolidHeartIcon } from "@heroicons/react/20/solid";
-import backgroundImage from "../../backgroung.webp";
+import headerImage from "../../header.webp";
 import FilterBar from "../../components/Category/FilterBar";
 import { getActiveDiscount } from "../../utils/discountHelpers";
 import useGlobalPromo from "../../hooks/useGlobalPromo";
@@ -238,7 +238,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   const handlePageChange = (newPage) => {
     setCurrentPage(newPage);
     sessionStorage.setItem("currentPage", newPage);
-    window.scrollTo({ top: 781.25, behavior: "smooth" });
+    window.parent.scrollTo({ top: 781.25, behavior: "smooth" });
   };
 
   // Handle product click to navigate to product details page
@@ -264,7 +264,7 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
       <div className="bg-primaryColor bg-opacity-10">
         <header className="relative h-[700px] overflow-hidden">
           <img
-            src={backgroundImage}
+            src={headerImage}
             alt=""
             className="absolute inset-0 w-full h-full object-cover"
             aria-hidden="true"
@@ -300,32 +300,13 @@ const HomePage = ({ addToWishlist, wishlist, wishlistLoading }) => {
   return (
     <div className="bg-primaryColor bg-opacity-10">
       {/* Hero Section */}
-      <header className="relative h-[700px] overflow-hidden">
+      <header className="relative md:h-[700px] h-[250px] overflow-hidden">
         <img
-          src={backgroundImage}
+          src={headerImage}
           alt=""
           className="absolute inset-0 w-full h-full object-cover"
           aria-hidden="true"
         />
-        <div className="absolute inset-0 bg-black opacity-50 mix-blend-multiply" />
-        <div className="relative z-10 flex flex-col items-center justify-center h-full px-4 text-center">
-          <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-8.5xl font-bold text-secondaryColor">
-            {t("welcome")}
-          </h1>
-          <p
-            className="mt-4 text-xl sm:text-2xl md:text-5xl text-secondaryColor"
-            dangerouslySetInnerHTML={{ __html: t("welcome_subtitle") }}
-          />
-          <button
-            className="mt-6 bg-white text-black py-2 px-6 rounded-full font-semibold shadow-lg hover:bg-gray-200 transition transition-transform duration-200 transform hover:scale-110"
-            onClick={() =>
-              document
-                .getElementById("products-section")
-                .scrollIntoView({ behavior: "smooth" })
-            }>
-            {t("view_products")}
-          </button>
-        </div>
       </header>
 
       <main id="products-section" className="py-10 px-4 sm:px-6 lg:px-12">

@@ -217,13 +217,13 @@ const OrderHistory = ({ user, addToCart }) => {
                   })}
                 </div>
 
-                <div className="text-right text-primaryColor font-bold text-xl pr-6 pt-2 pb-4">
+                <div className="text-primaryColor font-bold text-xl pl-6 pt-2 pb-4">
                   {t("orders.subtotal")}: ₪{order.totalAmount?.toFixed(2)}
                 </div>
               </div>
             ))}
 
-            <div className="text-right text-xl font-bold text-primaryColor px-6 py-4 border-t rounded-md bg-secondaryColor bg-opacity-10">
+            <div className=" text-xl font-bold text-primaryColor px-6 py-4 border-t rounded-md bg-secondaryColor bg-opacity-10">
               {t("orders.totalForTransaction")}: ₪
               {orders
                 .reduce((sum, order) => sum + (order.totalAmount || 0), 0)

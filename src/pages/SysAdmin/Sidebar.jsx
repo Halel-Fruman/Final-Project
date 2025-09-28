@@ -94,7 +94,7 @@ const Sidebar = ({ token }) => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={`flex items-center text-right w-full p-3 rounded hover:bg-gray-200 ${
+              className={`flex items-center  w-full p-3 rounded hover:bg-gray-200 ${
                 activeTab === tab.id ? "bg-gray-300 font-semibold" : ""
               }`}
               onClick={() => setActiveTab(tab.id)}>
@@ -112,7 +112,7 @@ const Sidebar = ({ token }) => {
             {tabs.map((tab) => (
               <button
                 key={tab.id}
-                className={`flex items-center  text-right py-3 border-b hover:bg-gray-100 ${
+                className={`flex items-center   py-3 border-b hover:bg-gray-100 ${
                   activeTab === tab.id ? "bg-gray-200 font-semibold" : ""
                 }`}
                 onClick={() => {

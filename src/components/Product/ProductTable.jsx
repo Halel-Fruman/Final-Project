@@ -17,7 +17,7 @@ import { Icon } from "@iconify/react";
 const ProductTable = ({ products, onEdit, onDelete }) => {
   return (
     <div className="hidden md:block">
-      <table className="w-full table-fixed text-sm text-right">
+      <table className="w-full table-fixed text-sm ">
         <thead className="bg-gray-100 font-bold block w-full">
           <tr className="table w-full">
             <th className="p-2 border w-[8%]">תמונה</th>

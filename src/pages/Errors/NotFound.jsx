@@ -6,7 +6,7 @@ const NotFoundPage = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center px-4">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center text-center px-4">
       <h1 className="text-6xl font-bold text-primaryColor mb-4">404</h1>
       <h2 className="text-2xl font-semibold text-gray-800 mb-2">
         {t("not_found.title", "הדף לא נמצא")}

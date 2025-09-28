@@ -354,7 +354,7 @@ export const createActionHandlers = (
       speak("מעביר אותך לעמוד ניהול המוצרים.");
     },
 
-    openAddProduct: () => {
+    openAddProduct: (isImg = false) => {
       // Check if we are already on the store management page
       // If so, dispatch the event directly
       // Otherwise, navigate to the store management page and then dispatch the event
@@ -375,10 +375,12 @@ export const createActionHandlers = (
           window.dispatchEvent(event);
         }, 1000);
       }
-      setTimeout(() => {
-        speak(ask);
-        externalHandlers.addBotMessage?.(ask);
-      }, 1000);
+      if (!isImg) {
+        setTimeout(() => {
+          speak(ask);
+          externalHandlers.addBotMessage?.(ask);
+        }, 1000);
+      }
     },
 
     openAddProductForm: (payload) => {
@@ -450,10 +452,8 @@ export const createActionHandlers = (
         speak("חסר מידע לעדכון המוצר.");
         return;
       }
-      console.log("editProduct payload:", payload);
 
       if (window.location.pathname === "/shop/store-management") {
-        console.log("here");
         window.dispatchEvent(
           new CustomEvent("autofillEditProductForm", {
             detail: {

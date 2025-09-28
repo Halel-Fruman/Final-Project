@@ -37,7 +37,6 @@ export const fetchCart = async (userId, token) => {
 export const saveCart = async (userId, token, cartItems) => {
   try {
     if (cartItems.length === 0) {
-      console.log("Cart is empty. Skipping save.");
       return;
     }
 
@@ -54,7 +53,6 @@ export const saveCart = async (userId, token, cartItems) => {
       throw new Error("Failed to update cart.");
     }
 
-    console.log("Cart updated successfully.");
   } catch (error) {
     console.error("Error saving cart:", error.message);
   }

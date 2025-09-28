@@ -48,6 +48,8 @@ const CheckoutPage = ({
   const [deliveryMethods, setDeliveryMethods] = useState({});
   const [storeShippingInfo, setStoreShippingInfo] = useState({});
   const [isFinalizing, setIsFinalizing] = useState(false);
+  const [showDonationPopup, setShowDonationPopup] = useState(false);
+  const [postCheckoutData, setPostCheckoutData] = useState(null);
 
   // Navigate hook from react-router-dom to handle navigation
   // after successful payment processing
@@ -99,9 +101,12 @@ const CheckoutPage = ({
               setCartItems,
             });
 
-            navigate("/confirmation", {
-              state: { transactions, detailedCart, deliveryMethods },
+            setPostCheckoutData({
+              transactions,
+              detailedCart,
+              deliveryMethods,
             });
+            setShowDonationPopup(true);
           } catch (err) {
             console.error("❌ Error during post-payment processing:", err);
             alert("שגיאה בעת השלמת ההזמנה");
@@ -165,7 +170,6 @@ const CheckoutPage = ({
 
             const method = deliveryMethods[storeId];
             const shipping = storeShippingInfo[storeId];
-            console.log(method);
             let price = 0;
             let company = "";
             let deliveryMethod = "";
@@ -355,7 +359,7 @@ const CheckoutPage = ({
       sum += itemsSum + extra;
     }
     return sum;
-  }, [groupedByStore, deliveryMethods, storeShippingInfo]);
+  }, [groupedByStore, deliveryMethods, storeShippingInfo, promo]);
 
   // Handle adding a new address
   // This function will call the addAddress utility function
@@ -512,18 +516,19 @@ const CheckoutPage = ({
                 storeShippingInfo={storeShippingInfo}
               />
             )}
+
           </div>
 
           {/* Summary Section with delivery options */}
           <div className="order-1 md:order-2 border bg-white p-6 shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold mb-6 text-right">
+            <h2 className="text-2xl font-bold mb-6 ">
               {t("checkout.summary")}
             </h2>
 
             <div className=" overflow-y-auto space-y-6">
               {Object.entries(groupedByStore).map(([storeId, products]) => (
                 <div key={storeId} className="border-b pb-4 space-y-4">
-                  <h3 className="text-xl font-semibold text-right">
+                  <h3 className="text-xl font-semibold ">
                     {products[0].storeName?.[i18n.language] || "Store"}
                   </h3>
                   {products.map((item) => {
@@ -537,7 +542,7 @@ const CheckoutPage = ({
                     return (
                       <div
                         key={item._id}
-                        className="flex items-center justify-between text-right border rounded p-2">
+                        className="flex items-center justify-between  border rounded p-2">
                         <img
                           src={item.images?.[0]}
                           alt={item.name?.[i18n.language]}
@@ -643,7 +648,7 @@ const CheckoutPage = ({
                     );
                   })}
 
-                  <div className="mt-3 text-right">
+                  <div className="mt-3 ">
                     <label className="block font-semibold mb-1">
                       {t("checkout.deliveryMethods.selectDeliveryMethod")}:
                     </label>
@@ -711,12 +716,74 @@ const CheckoutPage = ({
               ))}
             </div>
 
-            <div className="mt-6 pt-4 border-t text-right text-xl font-bold text-gray-900">
+            <div className="mt-6 pt-4 border-t  text-xl font-bold text-gray-900">
               {t("checkout.subtotal")}: ₪{total.toFixed(2)}
             </div>
           </div>
         </div>
       </main>
+      {showDonationPopup && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md text-center">
+            <h2 className="text-2xl font-bold text-primaryColor mb-4">
+              {t("Thanks_for_shopping")}
+            </h2>
+            <p className="mb-6 text-gray-700">
+              {t("we_appreciate_your_support")}
+              <br />
+              {t("would you like to help us further")}
+              <br />
+            </p>
+
+            <div className="flex flex-col sm:flex-row justify-center mb-2 gap-4">
+              <button
+                onClick={() => {
+                  window.open(
+                    "https://ilan-israel.co.il/%D7%AA%D7%A8%D7%95%D7%9E%D7%94",
+                    "_blank"
+                  );
+                  setShowDonationPopup(false);
+                  if (postCheckoutData) {
+                    navigate("/confirmation", {
+                      state: postCheckoutData,
+                    });
+                  }
+                }}
+                className="px-5 py-2 rounded-full bg-primaryColor text-white hover:bg-secondaryColor transition">
+                {" "}
+                {t("donate_to_ilan")}
+              </button>
+
+              <button
+                onClick={() => {
+                  window.open("https://www.igul.org.il/amutot/ilan/", "_blank");
+                  setShowDonationPopup(false);
+                  if (postCheckoutData) {
+                    navigate("/confirmation", {
+                      state: postCheckoutData,
+                    });
+                  }
+                }}
+                className="px-5 py-2 rounded-full bg-primaryColor text-white hover:bg-secondaryColor transition">
+                {t("round_up_donation")}
+              </button>
+            </div>
+            <button
+              onClick={() => {
+                setShowDonationPopup(false);
+                if (postCheckoutData) {
+                  navigate("/confirmation", {
+                    state: postCheckoutData,
+                  });
+                }
+              }}
+              className="px-4 py-2 rounded-full border border-primaryColor text-primaryColor hover:bg-gray-100 transition">
+              {" "}
+              {t("no_thanks")}
+            </button>
+          </div>
+        </div>
+      )}
     </>
   );
 };

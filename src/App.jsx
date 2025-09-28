@@ -30,7 +30,6 @@ import useGlobalPromo from "./hooks/useGlobalPromo";
 
 // Lazy load components to improve initial load time
 const Header = lazy(() => import("./components/Header/Header"));
-const Footer = lazy(() => import("./components/Footer/Footer"));
 const CartModal = lazy(() => import("./components/CartModal"));
 const WishlistModal = lazy(() => import("./components/WishlistModal"));
 const Modal = lazy(() => import("./components/Modal"));
@@ -221,7 +220,7 @@ const App = () => {
           Use Toaster for toast notifications*/}
       <Router basename="/shop">
         <Toaster position="bottom-center" toastOptions={{ duration: 2500 }} />
-        <div className="flex flex-col bg-gray-50 w-full max-w-[1920px] min-h-[100dvh] mx-auto">
+        <div className="flex flex-col bg-white w-full  mx-auto">
           <Suspense fallback={null}>
             <Header
               onLoginClick={() => setIsLoginModalOpen(true)}
@@ -394,7 +393,7 @@ const App = () => {
               </Routes>
             </Suspense>
           </div>
-          <ChatBot
+          {/* <ChatBot
             token={token}
             userId={userId}
             onOpenCart={handleOpenCart}
@@ -403,11 +402,7 @@ const App = () => {
             onOpenAddProductForm={handleOpenAddProductForm}
             onCreateDiscount={handleCreateDiscount}
             onSendNewsletter={handleSendNewsletter}
-          />
-
-          <Suspense fallback={null}>
-            <Footer />
-          </Suspense>
+          /> */}
         </div>
       </Router>
     </AlertProvider>

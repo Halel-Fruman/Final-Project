@@ -161,7 +161,7 @@ const ConfirmationPage = () => {
                 </div>
 
                 {method !== "pickupFromStore" && (
-                  <div className="mt-4 text-right text-sm text-gray-600">
+                  <div className="mt-4  text-sm text-gray-600">
                     <p>
                       <strong>{t("checkout.deliveryMethod")}:</strong>{" "}
                       {t(`checkout.deliveryMethods.${method}`)}
@@ -181,7 +181,7 @@ const ConfirmationPage = () => {
                   </div>
                 )}
 
-                <div className="text-right mt-4 text-xl font-bold text-primaryColor">
+                <div className="mt-4 text-xl font-bold text-primaryColor">
                   {t("orders.subtotal")}: ₪
                   {parseFloat(transaction.totalAmount).toFixed(2)}
                 </div>
@@ -189,7 +189,7 @@ const ConfirmationPage = () => {
             );
           })}
 
-          <div className="text-right m-4 font-bold text-2xl text-primaryColor">
+          <div className=" m-4 font-bold text-2xl text-primaryColor">
             {t("confirmation.totalSum")}: ₪
             {group
               .reduce(

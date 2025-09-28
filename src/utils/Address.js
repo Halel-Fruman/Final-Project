@@ -33,7 +33,6 @@ export const addAddress = async ({ userId, token, address }) => {
  * @returns {Promise<Object>} The response from the server.
  */
 export const editAddress = async ({ userId, token, updated }) => {
-  console.log("Editing address:", updated);
   const res = await fetchWithTokenRefresh(
     `/api/User/${userId}/update-addresses`,
     {

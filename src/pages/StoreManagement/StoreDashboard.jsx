@@ -5,7 +5,6 @@
  * It includes revenue calculations, order statuses, and overdue alerts.
  */
 import { useEffect, useState } from "react";
-import axios from "axios";
 import {
   FaChartBar,
   FaMoneyBillWave,
@@ -84,7 +83,7 @@ const StoreDashboard = ({ storeId }) => {
     };
 
     fetchTransactions();
-  }, [storeId]);
+  }, []);
 
   useEffect(() => {
     calculateRevenueByDateRange(
@@ -93,7 +92,7 @@ const StoreDashboard = ({ storeId }) => {
       endDate,
       setCustomRangeRevenue
     );
-  }, [startDate, endDate]);
+  }, [transactions,startDate, endDate]);
 
   // Calculate statistics based on transactions data
   const calculateStats = (transactions) => {
@@ -150,10 +149,12 @@ const StoreDashboard = ({ storeId }) => {
   const calculateRevenueByDateRange = (transactions, from, to, setter) => {
     const fromDate = new Date(from);
     const toDate = new Date(to);
+    const nextDay = new Date(toDate);
+    nextDay.setDate(nextDay.getDate() + 1);
     const total = transactions
       .filter((tx) => {
         const date = new Date(tx.createdAt);
-        return date >= fromDate && date <= toDate;
+        return date >= fromDate && date < nextDay;
       })
       .reduce((sum, tx) => sum + tx.totalAmount, 0);
     setter(total);
@@ -288,8 +289,8 @@ const StoreDashboard = ({ storeId }) => {
           <table className="w-fit text-sm border border-gray-300 bg-white rounded shadow">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-2 text-right">סטטוס</th>
-                <th className="p-2 text-right">כמות</th>
+                <th className="p-2 ">סטטוס</th>
+                <th className="p-2 ">כמות</th>
               </tr>
             </thead>
             <tbody>
@@ -330,6 +331,7 @@ const StoreDashboard = ({ storeId }) => {
               />
             </div>
           </div>
+
           <div className="bg-white border p-4 rounded shadow w-fit">
             סה"כ הכנסות בטווח:{" "}
             <span className="font-bold text-green-800">

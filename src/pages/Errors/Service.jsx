@@ -6,7 +6,7 @@ const ServiceUnavailablePage = () => {
   const { t } = useTranslation();
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center text-center px-4">
+    <div className="min-h-screen bg-white flex flex-col items-center justify-center text-center px-4">
       <h1 className="text-6xl font-bold text-red-600 mb-4">503</h1>
       <h2 className="text-2xl font-semibold text-gray-800 mb-2">
         {t("error503.title", "השירות אינו זמין כרגע")}
