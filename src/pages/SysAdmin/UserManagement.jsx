@@ -244,7 +244,7 @@ const UserManagement = () => {
         </div>
       </div>
 
-      <table className="table-auto w-full border border-gray-300 text-right">
+      <table className="table-auto w-full border border-gray-300 ">
         <thead>
           <tr className="bg-primaryColor text-white">
             <th

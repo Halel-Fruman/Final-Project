@@ -289,8 +289,8 @@ const StoreDashboard = ({ storeId }) => {
           <table className="w-fit text-sm border border-gray-300 bg-white rounded shadow">
             <thead className="bg-gray-100">
               <tr>
-                <th className="p-2 text-right">סטטוס</th>
-                <th className="p-2 text-right">כמות</th>
+                <th className="p-2 ">סטטוס</th>
+                <th className="p-2 ">כמות</th>
               </tr>
             </thead>
             <tbody>

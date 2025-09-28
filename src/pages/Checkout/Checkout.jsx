@@ -521,14 +521,14 @@ const CheckoutPage = ({
 
           {/* Summary Section with delivery options */}
           <div className="order-1 md:order-2 border bg-white p-6 shadow-lg rounded-lg">
-            <h2 className="text-2xl font-bold mb-6 text-right">
+            <h2 className="text-2xl font-bold mb-6 ">
               {t("checkout.summary")}
             </h2>
 
             <div className=" overflow-y-auto space-y-6">
               {Object.entries(groupedByStore).map(([storeId, products]) => (
                 <div key={storeId} className="border-b pb-4 space-y-4">
-                  <h3 className="text-xl font-semibold text-right">
+                  <h3 className="text-xl font-semibold ">
                     {products[0].storeName?.[i18n.language] || "Store"}
                   </h3>
                   {products.map((item) => {
@@ -542,7 +542,7 @@ const CheckoutPage = ({
                     return (
                       <div
                         key={item._id}
-                        className="flex items-center justify-between text-right border rounded p-2">
+                        className="flex items-center justify-between  border rounded p-2">
                         <img
                           src={item.images?.[0]}
                           alt={item.name?.[i18n.language]}
@@ -648,7 +648,7 @@ const CheckoutPage = ({
                     );
                   })}
 
-                  <div className="mt-3 text-right">
+                  <div className="mt-3 ">
                     <label className="block font-semibold mb-1">
                       {t("checkout.deliveryMethods.selectDeliveryMethod")}:
                     </label>
@@ -716,7 +716,7 @@ const CheckoutPage = ({
               ))}
             </div>
 
-            <div className="mt-6 pt-4 border-t text-right text-xl font-bold text-gray-900">
+            <div className="mt-6 pt-4 border-t  text-xl font-bold text-gray-900">
               {t("checkout.subtotal")}: ₪{total.toFixed(2)}
             </div>
           </div>

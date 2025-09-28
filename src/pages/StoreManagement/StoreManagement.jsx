@@ -246,7 +246,7 @@ const StoreManagement = () => {
           {tabs.map((tab) => (
             <button
               key={tab.id}
-              className={`flex items-center text-right w-full p-3 rounded hover:bg-gray-200 ${
+              className={`flex items-center  w-full p-3 rounded hover:bg-gray-200 ${
                 activeTab === tab.id ? "bg-gray-300 font-semibold" : ""
               }`}
               onClick={() => {

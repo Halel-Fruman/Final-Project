@@ -174,7 +174,7 @@ const AdminDashboard = () => {
 
       {/* Filters */}
       <div className="flex flex-col sm:flex-row gap-4 justify-center mb-6 items-end">
-        <div className="flex flex-col text-right">
+        <div className="flex flex-col ">
           <label className="mb-1 text-sm font-medium text-gray-700">
             {t("sysadmin.dashboard.fromDate")}
           </label>
@@ -185,7 +185,7 @@ const AdminDashboard = () => {
             className="border px-3 py-2 rounded shadow"
           />
         </div>
-        <div className="flex flex-col text-right">
+        <div className="flex flex-col ">
           <label className="mb-1 text-sm font-medium text-gray-700">
             {t("sysadmin.dashboard.toDate")}
           </label>
@@ -235,7 +235,7 @@ const AdminDashboard = () => {
           {/* Revenue Chart */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             <div className="bg-white p-6 rounded shadow">
-              <h2 className="text-lg font-semibold mb-4 text-right">
+              <h2 className="text-lg font-semibold mb-4 ">
                 {t("sysadmin.dashboard.totalRevenue")}
               </h2>
               <ResponsiveContainer width="100%" height={300}>
@@ -264,7 +264,7 @@ const AdminDashboard = () => {
             </div>
 
             <div className="bg-white p-6 rounded shadow">
-              <h2 className="text-lg font-semibold mb-4 text-right">
+              <h2 className="text-lg font-semibold mb-4 ">
                 {t("sysadmin.dashboard.ordersCount")}
               </h2>
               <ResponsiveContainer width="100%" height={300}>
@@ -297,16 +297,16 @@ const AdminDashboard = () => {
               <table className="min-w-full table-auto border border-gray-200">
                 <thead className="bg-gray-100 text-gray-700">
                   <tr>
-                    <th className="px-4 py-2 text-right">
+                    <th className="px-4 py-2 text-left">
                       {t("sysadmin.dashboard.productName")}
                     </th>
-                    <th className="px-4 py-2 text-right">
+                    <th className="px-4 py-2 text-left">
                       {t("sysadmin.dashboard.storeName")}
                     </th>
-                    <th className="px-4 py-2 text-right">
+                    <th className="px-4 py-2 text-left">
                       {t("sysadmin.dashboard.price")}
                     </th>
-                    <th className="px-4 py-2 text-right">
+                    <th className="px-4 py-2 text-left">
                       {t("sysadmin.dashboard.sold")}
                     </th>
                   </tr>

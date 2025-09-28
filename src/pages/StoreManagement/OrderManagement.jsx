@@ -226,7 +226,7 @@ const OrderManagement = ({ storeId, statusFilter = [], title }) => {
 
       <div className="max-h-[480px] rounded-lg shadow w-full overflow-x-auto bg-transparent">
         <div className="w-full overflow-x-auto max-h-[480px]">
-          <table className="min-w-full text-sm text-right border border-gray-300 rounded-lg">
+          <table className="min-w-full text-sm  border border-gray-300 rounded-lg">
             <thead className="bg-gray-100 font-bold sticky top-0 z-10 hidden md:table-header-group">
               <tr>
                 <th className="p-2 border w-1/10">תאריך</th>

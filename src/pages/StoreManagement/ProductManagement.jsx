@@ -56,7 +56,7 @@ const ProductManagement = ({
           placeholder="חפש מוצר לפי שם..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="  p-2 border rounded-full shadow-sm text-right"
+          className="  p-2 border rounded-full shadow-sm "
         />
       </div>
 
