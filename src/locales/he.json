@@ -1,18 +1,56 @@
 {
   "welcome": "ברוכים הבאים לחנות איל''ן",
   "welcome_subtitle": " אנו מזמינים אתכם להיות שותפים למטרה <br> ולרכוש מוצרים ומתנות שמייצרים באהבה אנשים עם מוגבלות.",
-  "categories": {
-    "title": "קניות לפי קטגוריה",
-    "electronics": "אלקטרוניקה",
-    "clothing": "ביגוד",
-    "home_garden": "בית וגינה",
-    "beauty_health": "יופי ובריאות"
-
-  },
-  "add_to_wishlist ":"הוסף לרשימת המשאלות",
+  "show_filters": "הצג סינון",
+  "hide_filters": "הסתר סינון",
+  "clear_filters": "נקה סינון",
+  "on_sale_only": "במבצע",
+  "error": "שגיאה",
+  "add_to_wishlist": "הוסף לרשימת המשאלות",
   "remove_from_wishlist": "הסר מרשימת המשאלות",
   "loading": "טוען...",
-  "view_products": "צפה במוצרים",
+  "store": "חנות",
+  "category": "קטגוריה",
+  "no_products_found": "לא נמצאו מוצרים מתאימים",
+  "filters": "סינון",
+  "remove_filter": "הסר סינון",
+  "search": "חיפוש",
+  "max_price": "מחיר מקסימלי",
+  "min_price": "מחיר מינימלי",
+  "in_stock_only": "זמין במלאי",
+  "page": "עמוד",
+  "of": "מתוך",
+  "Thanks_for_shopping": "תודה שקניתם אצלנו!",
+  "we_appreciate_your_support": "  אנו מעריכים את התמיכה שלכם במטרה שלנו.",
+  "would you like to help us further": "האם תרצו להגדיל את התרומה שלכם?",
+  "donate_to_ilan": "לתרומה לאיל''ן",
+  "round_up_donation": "לעגל לטובה לאיל''ן  ",
+  "click_here": "לחצו כאן",
+  "no_thanks": "לא תודה",
+  "globalPromo": {
+  "title": "מבצע אתר",
+  "saved": "השינויים נשמרו!",
+  "deleteConfirm": "האם אתה בטוח שברצונך למחוק את המבצע ?",
+  "deleted": "המבצע נמחק בהצלחה!",
+  "form": {
+    "promoTitle": "כותרת המבצע",
+    "typeLabel": "סוג ההנחה",
+    "percent": "אחוז (%)",
+    "fixed": "סכום קבוע (₪)",
+    "value": "ערך ההנחה",
+    "start": "תאריך התחלה",
+    "end": "תאריך סיום",
+    "bannerHe": "טקסט באנר (עברית)",
+    "bannerEn": "טקסט באנר (English)"
+  }
+},
+"buttons": {
+  "save": "שמור",
+  "delete": "מחק"
+},
+
+
+  "view_products": "לצפייה במוצרים",
   "header": {
     "home": "בית",
     "products": "מוצרים",
@@ -22,11 +60,14 @@
     "personal_area": "אזור אישי",
     "cart": "עגלת קניות",
     "search": "חיפוש",
+    "admin_area": "איזור ניהול מערכת",
+    "store_area": "איזור ניהול חנות",
     "admin_dashboard": "לוח בקרה למנהל"
   },
-  "featured_products": "מוצרים נבחרים",
+  "featured_products": "המוצרים שלנו",
   "price": "מחיר",
   "view_details": "צפה בפרטים",
+
   "personal_area": {
     "welcome": "ברוך הבא, {{username}}",
     "userInfo": "פרטי משתמש",
@@ -85,6 +126,10 @@
       "saveSuccess": "עודכן בהצלחה!",
       "saveError": "שגיאה בעת שמירת השינויים.",
       "deleteConfirm": "האם אתה בטוח שברצונך למחוק את הפריט?",
+      "addressAdded": "כתובת נוספה בהצלחה!",
+      "addError": "שגיאה בהוספת הכתובת.",
+      "deleteSuccess": "הכתובת נמחקה בהצלחה!",
+      "deleteError": "שגיאה במחיקת הכתובת.",
       "noAddresses": "אין כתובות זמינות"
     }
   },
@@ -97,10 +142,51 @@
     "password": "סיסמה",
     "confirmPassword": "אשר סיסמה",
     "submit": "הרשם",
+    "loading": "נרשם...",
     "success": "ההרשמה הצליחה!",
+    "terms": "אני מסכים לתנאי השימוש",
+    "viewTerms": "צפה בתנאי השימוש",
+    "close": "סגור",
+    "termsTitle": "תנאי השימוש",
+    "termsContent": "עליך להסכים לתנאי השימוש כדי להמשיך.",
     "errors": {
       "passwordMismatch": "הסיסמאות אינן תואמות!",
-      "failed": "ההרשמה נכשלה."
+      "failed": "ההרשמה נכשלה.",
+      "network": "שגיאת רשת. בדוק את החיבור שלך",
+      "emailExists": "כתובת האימייל כבר רשומה",
+      "serverUnavailable": "השרת אינו זמין כרגע. נסה שוב מאוחר יותר"
+    }
+  },
+  "verify_email": {
+    "loading": "מאמת את כתובת המייל שלך...",
+    "success_title": "המייל אומת בהצלחה!",
+    "success_message": "כתובת המייל שלך אומתה בהצלחה. תוכל כעת להתחבר.",
+    "error_title": "האימות נכשל",
+    "error_message": "הקישור שגוי או שפג תוקפו.",
+    "redirecting":"מעביר אותך לדף הבית..."
+  },
+  "forgotPassword": {
+    "title": "שכחת סיסמה?",
+    "email": "כתובת מייל",
+    "submit": "שלח קישור לאיפוס",
+    "loading": "שולח...",
+    "success": "נשלח קישור לאיפוס סיסמה למייל",
+    "errors": {
+      "failed": "שליחה נכשלה",
+      "network": "שגיאת רשת"
+    }
+  },
+  "resetPassword": {
+    "title": "איפוס סיסמה",
+    "newPassword": "סיסמה חדשה",
+    "confirmPassword": "אימות סיסמה",
+    "submit": "אפס סיסמה",
+    "loading": "מאפס...",
+    "success": "הסיסמה אופסה בהצלחה. אפשר להתחבר.",
+    "errors": {
+      "passwordMismatch": "הסיסמאות אינן תואמות",
+      "failed": "האיפוס נכשל",
+      "network": "שגיאת רשת"
     }
   },
   "login": {
@@ -108,18 +194,34 @@
     "email": "אימייל",
     "password": "סיסמה",
     "submit": "התחבר",
-    "notMember": "אין לך חשבון? הרשם כאן",
+    "emailRequired": "כתובת אימייל נדרשת",
+    "passwordRequired": "סיסמה נדרשת",
+    "notMember": "אין לך חשבון? הרשם כאן  ",
     "registerLink": "להרשמה",
     "emailPlaceholder": "הכנס את כתובת האימייל שלך",
     "passwordPlaceholder": "הכנס את הסיסמה שלך",
     "success": "ההתחברות הצליחה!",
-    "failed": "ההתחברות נכשלה. אנא בדוק את הפרטים."
+    "failed": "ההתחברות נכשלה. אנא בדוק את הפרטים.",
+    "loading": "מתחבר...",
+    "invalidCredentials": "כתובת דוא\"ל או סיסמה שגויים",
+    "genericError": "אירעה שגיאה. נסה שוב מאוחר יותר",
+    "networkError": "אין חיבור לשרת. נסה שוב מאוחר יותר",
+    "serverUnavailable": "השרת אינו זמין כעת. אנא נסה מאוחר יותר",
+    "requiredToRate": "יש להתחבר כדי לדרג מוצרים",
+    "userNotFound": "משתמש לא נמצא. אנא בדוק את הפרטים שלך",
+    "forgotPassword": "שכחת סיסמה?",
+    "emailNotVerified": "יש לאמת את כתובת המייל לפני התחברות",
+    "resendVerificationText": "לא קיבלת את מייל האימות?",
+    "resendVerificationButton": "שלח שוב מייל אימות",
+    "verificationEmailSent": "מייל אימות נשלח בהצלחה",
+    "verificationEmailError": "שליחת מייל האימות נכשלה"
   },
   "addAddress": {
     "title": "הוספת כתובת",
     "address": "כתובת",
     "submit": "שלח",
     "success": "כתובת נוספה בהצלחה!",
+    "city": "עיר",
     "errors": {
       "failed": "נכשלה הוספת הכתובת.",
       "deleteSuccess": "הכתובת נמחקה בהצלחה!",
@@ -129,7 +231,6 @@
       "updateError": "שגיאה בעדכון כתובת",
       "updateSuccess": "כתובת עודכנה בהצלחה!",
       "noAddresses": "אין כתובות זמינות"
-
     }
   },
   "wishlist": {
@@ -140,31 +241,60 @@
     "stockStatus": "סטטוס מלאי",
     "actions": "פעולות",
     "addToCart": "הוסף לעגלת הקניות",
+    "added": "הפריט נוסף לרשימת המשאלות",
+    "removed": "הפריט הוסר מרשימת המשאלות",
     "remove": "הסר",
+    "add": "הוסף",
     "inStock": "במלאי",
     "outOfStock": "אין במלאי",
     "empty": "רשימת המשאלות שלך ריקה",
-    "loading": "טוען את רשימת המשאלות שלך..."
+    "loading": "טוען את רשימת המשאלות שלך...",
+    "remove_from_wishlist": "הסר מרשימת המשאלות",
+    "partialLoad": "לא ניתן היה לטעון {{count}} מוצרים",
+    "loginRequired": "יש להתחבר כדי להוסיף לרשימת המשאלות"
   },
+
   "product": {
     "addToCart": "הוסף לעגלת הקניות",
     "noPrice": "מחיר לא זמין",
     "highlights": "מאפיינים",
     "details": "פרטים",
-    "reviews": "דירוג"
+    "reviews": "דירוג",
+    "img": "תמונה",
+    "onSale": "מחיר מבצע",
+    "alreadyRated": "כבר דירגת מוצר זה.",
+    "ratingError": "הייתה שגיאה בשליחת הדירוג.",
+    "ratingSuccess": "תודה על הדירוג!",
+    "about": "על החנות",
+    "outOfStock": "זמנית אזל מהמלאי",
+    "not_found":"אופס...",
+    "not_found_title": "המוצר לא נמצא",
+    "not_found_message": "נראה שהמוצר לא קיים או שהוסר."
   },
 
   "sysadmin": {
     "admin_management": "ניהול מערכת",
-    "store_managemnt" : "ניהול חנות",
+    "store_managemnt": "ניהול חנות",
+    "go_to_store_management": "מעבר לניהול חנות",
     "stores": "חנויות",
     "store_name": "שם החנות",
     "store_address": "כתובת החנות",
+    "about": "על החנות",
+    "store_about_he": "על החנות בעברית",
+    "store_about_en": "על החנות באנגלית",
+    "store_about_placeholder_he": "הכנס טקסט בעברית",
+    "store_about_placeholder_en": "הכנס טקסט באנגלית",
+
     "managers": "מנהלים",
     "manager_name": "שם המנהל",
     "manager_email": "אימייל של המנהל",
+    "delivery_company_home": "חברת משלוח עד הבית",
+    "delivery_price_home": "מחיר משלוח עד הבית",
+    "delivery_company_pickup": "חברת משלוח לנקודת איסוף",
+    "delivery_price_pickup": "מחיר לנקודת איסוף",
     "actions": "פעולות",
     "add_store": "הוסף חנות",
+    "edit_store": "ערוך חנות",
     "add_manager": "+",
     "save": "שמור",
     "save_managers": "שמור מנהלים",
@@ -172,16 +302,35 @@
     "delete": "מחק",
     "delete_manager": "מחק מנהל",
     "statistics": "סטטיסטיקה",
-    "statistics_info": "כאן יוצגו נתונים סטטיסטיים על פעילות החנויות.",
     "invalid_email": "כתובת מייל לא חוקית! הכנס בבקשה כתובת מייל חוקית.",
     "cancel": "ביטול",
-    "edit" : "ערוך",
+    "edit": "ערוך",
+    "store_email": "מייל החנות",
+    "totalOrders": "סה״כ הזמנות",
+      "totalRevenue": "סה״כ הכנסות",
+    "dashboard": {
+      "title": "סקירה מערכתית",
+      "salesComparison": "השוואת מכירות בין חנויות",
+      "ordersCount": "מספר עסקאות",
+      "totalRevenue": "סכום עסקאות (₪)",
+      "filter": "סנן",
+      "fromDate": "מתאריך",
+      "toDate": "עד תאריך",
+      "topProducts": "המוצרים הנמכרים ביותר",
+      "productName": "שם מוצר",
+      "storeName": "שם החנות",
+      "price": "מחיר",
+      "sold": "כמות שנמכרה",
+      "exportExcel": "ייצא לאקסל",
+      "currentMonth": "החודש הנוכחי",
+      "lastMonth": "החודש הקודם",
+      "reset": "אפס תאריכים",
 
-
-
-    "store_email": "מייל החנות"
-
-
+      "errors": {
+        "fetchFailed": "נכשל בטעינת נתונים סטטיסטיים."
+      },
+      "noData": "אין נתונים זמינים עבור התקופה שנבחרה."
+    }
   },
 
   "storemanage": {
@@ -193,8 +342,21 @@
     "products": "מוצרים",
     "delete": "מחק"
   },
-
-    "cart": {
+  "store_settings": {
+    "title": "הגדרות החנות",
+    "loading": "טוען...",
+    "about_he": "תיאור החנות (עברית)",
+    "about_en": "תיאור החנות (אנגלית)",
+    "courier": "משלוח עד הבית",
+    "pickup_point": "משלוח לנקודת איסוף",
+    "company_name": "שם החברה",
+    "price": "מחיר (₪)",
+    "save_button": "שמור שינויים",
+    "save_success": "החנות עודכנה בהצלחה",
+    "save_error": "שגיאה בעדכון החנות",
+    "load_error": "שגיאה בטעינת פרטי החנות"
+  },
+  "cart": {
     "title": "עגלת קניות",
     "close": "סגור",
     "price": "מחיר",
@@ -202,16 +364,101 @@
     "remove": "הסר",
     "empty": "העגלה שלך ריקה.",
     "subtotal": "סכום ביניים",
-    "shipping": "משלוח ומסים יחושבו בתשלום.",
+    "shipping": " דמי משלוח יחושבו בתשלום.",
     "checkout": "לקופה",
-    "continueShopping": "המשך בקניות"
+    "continueShopping": "המשך בקניות",
+    "removed": "הפריט הוסר מהעגלה",
+    "quantity_updated": "הכמות עודכנה בהצלחה",
+    "quantity_update_failed": "אירעה שגיאה בעדכון הכמות",
+    "mustBeLoggedIn": "עליך להתחבר כדי להוסיף לעגלה"
   },
   "modal": {
     "close": "סגור"
+  },
+  "orders": {
+    "title": "ההזמנות שלי",
+    "subtitle": "כאן תוכל לצפות בהיסטוריית ההזמנות שלך",
+    "orderGroup": "מספר עסקה כולל",
+    "order": "הזמנה",
+    "orderId": "מספר הזמנה",
+    "store": "חנות",
+    "date": "תאריך הזמנה",
+    "status": "סטטוס",
+    "total": "סכום כולל",
+    "viewInvoice": "צפה בקבלה",
+    "quantity": "כמות",
+    "buyAgain": "קנה שוב",
+    "shopSimilar": "מוצרים דומים",
+    "noOrders": "לא נמצאו הזמנות קודמות",
+    "subtotal": "סה״כ לחנות זו",
+    "loading": "טוען עסקאות...",
+    "totalForTransaction": "סך הכל לעסקה"
+  },
+  "status": {
+    "pending": "ממתין",
+    "packed": "נארז",
+    "shipped": "נשלח",
+    "completed": "הושלם",
+    "canceled": "בוטל"
+  },
+  "checkout": {
+    "title": "קופה",
+    "subtitle": "אנא אשר את הפרטים שלך להשלמת ההזמנה",
+    "contactInformation": "פרטי קשר",
+    "shippingAddress": "כתובת למשלוח",
+    "paymentDetails": "פרטי תשלום",
+    "cardNumber": "מספר כרטיס אשראי",
+    "expiry": "תוקף",
+    "cvc": "CVV",
+    "payNow": "בצע תשלום",
+    "summary": "סיכום הזמנה",
+    "quantity": "כמות",
+    "subtotal": "סה״כ",
+    "email": "דוא\"ל",
+    "city": "עיר",
+    "address": "כתובת",
+    "addNewAddress": "הוסף כתובת חדשה",
+    "cancelNewAddress": "ביטול הוספת כתובת",
+    "saveNewAddress": "שמור כתובת ",
+    "deliveryCompany": "חברת משלוח",
+    "deliveryPrice": "מחיר משלוח",
+    "deliveryMethod": "שיטת משלוח",
+    "remove": "הסר",
+    "finalizingTransaction": "ממתין לאישור התשלום",
+    "deliveryMethods": {
+      "title": "שיטת משלוח",
+      "pickup": "איסוף עצמי",
+      "express": "משלוח מהיר",
+      "courier": "משלוח עד הבית",
+      "delivery_box": "נקודת איסוף",
+      "pickupFromStore": "איסוף מהחנות",
+      "pickupPoint": "איסוף מהחנות",
+      "selectDeliveryMethod": "בחר שיטת משלוח",
+      "selectAddress": "בחר כתובת"
+    }
+  },
+
+  "confirmation": {
+    "title": "תודה על ההזמנה!",
+    "successMessage": "ההזמנה שלך התקבלה בהצלחה.",
+    "transactionId": "מספר עסקה",
+    "orderId": "מספר הזמנה",
+    "deliveryMethod": "שיטת משלוח",
+    "noTransactions": "לא נמצאו פרטי הזמנה",
+    "backHome": "חזרה לדף הבית",
+    "unknownStore": "חנות לא ידועה",
+    "noDeliveryInfo": "אין מידע על משלוח",
+    "viewOrders": "מעבר להיסטוריית הזמנות",
+    "totalSum": "סכום כולל"
+  },
+  "not_found": {
+    "title": "הדף לא נמצא",
+    "message": "נראה שכתובת ה־URL לא קיימת או שהדף הועבר למיקום אחר.",
+    "back_to_home": "חזרה לדף הבית"
+  },
+  "error503": {
+    "title": "השירות אינו זמין כרגע",
+    "message": "אנו חווים עומס או תחזוקה זמנית. אנא נסו שוב מאוחר יותר.",
+    "back_to_home": "חזרה לדף הבית"
   }
-
-
-
-
-
 }

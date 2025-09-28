@@ -1,28 +1,42 @@
-import React, { useState } from "react";
+/** * @file PersonalAreaEditor.jsx
+ * @description This component allows users to view and edit their personal area details,
+ * including first name, last name, email, and phone number.
+ */
+import { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { Icon } from "@iconify/react";
 
+/**
+ * @function PersonalAreaEditor
+ * @description Component for viewing and editing user personal area details.
+ * @param {Object} props - Component properties.
+ * @param {Object} props.user - The user object containing personal details.
+ * @param {Function} props.setUser - Function to update the user state.
+ * @param {Function} props.onSave - Function to handle saving the updated user details.
+ */
 const PersonalAreaEditor = ({ user, setUser, onSave }) => {
-  const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
-  const [editedUser, setEditedUser] = useState({ ...user });
+  const { t } = useTranslation(); // useTranslation hook to access the i18n instance and the translation function t
+  const [isEditing, setIsEditing] = useState(false); // useState hook to store the editing state
+  const [editedUser, setEditedUser] = useState({ ...user }); // useState hook to store the edited user data
 
+  // handleFieldChange function to update the edited user data based on the field and value
   const handleFieldChange = (field, value) => {
     setEditedUser((prev) => ({ ...prev, [field]: value }));
   };
 
+  // handleSave function to send a request to the server to save the updated user data
   const handleSave = async () => {
     try {
-      await onSave(editedUser);
-      setUser(editedUser); // עדכון נתוני המשתמש לאחר שמירה
-      setIsEditing(false); // חזרה למצב תצוגה
+      await onSave(editedUser); // Call the onSave function with the edited user data
+      setUser(editedUser); // Update the user state with the edited user data
+      setIsEditing(false); // Set the editing state to false
       alert(t("personal_area.updateSuccess"));
     } catch (err) {
       console.error(err.message);
       alert(t("personal_area.updateFailed"));
     }
   };
-
+  // Return the personal area editor form with the first name, last name, email, phone number, and save and cancel buttons
   if (isEditing) {
     return (
       <div>
@@ -31,10 +45,14 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
         </h2>
         <div className="grid grid-cols-2 gap-4">
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="firstName"
+              className="block text-gray-700 font-semibold mb-2">
               {t("personal_area.firstName")}
             </label>
             <input
+              id="firstName"
+              name="firstName"
               type="text"
               value={editedUser.first_name}
               onChange={(e) => handleFieldChange("first_name", e.target.value)}
@@ -43,10 +61,14 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="lastName"
+              className="block text-gray-700 font-semibold mb-2">
               {t("personal_area.lastName")}
             </label>
             <input
+              id="lastName"
+              name="lastName"
               type="text"
               value={editedUser.last_name}
               onChange={(e) => handleFieldChange("last_name", e.target.value)}
@@ -55,10 +77,14 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
           </div>
 
           <div>
-            <label className="block text-gray-700 font-semibold mb-2">
+            <label
+              htmlFor="email"
+              className="block text-gray-700 font-semibold mb-2">
               {t("personal_area.email")}
             </label>
             <input
+              id="email"
+              name="email"
               type="email"
               value={editedUser.email}
               onChange={(e) => handleFieldChange("email", e.target.value)}
@@ -66,7 +92,7 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
             />
           </div>
 
-          {/* הוספת שדה מספר טלפון */}
+          {/* show phone number */}
           <div>
             <label className="block text-gray-700 font-semibold mb-2">
               {t("personal_area.phone")}
@@ -105,7 +131,7 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
       </div>
     );
   }
-
+  // Return the personal area details with the user data and edit button
   return (
     <div>
       <h2 className="text-xl font-bold mb-4">{t("personal_area.myDetails")}</h2>
@@ -137,7 +163,7 @@ const PersonalAreaEditor = ({ user, setUser, onSave }) => {
           </p>
         </div>
 
-        {/* הצגת מספר טלפון */}
+        {/*show phone number */}
         <div>
           <label className="block text-gray-700 font-semibold mb-2">
             {t("personal_area.phone")}

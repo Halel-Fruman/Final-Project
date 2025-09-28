@@ -1,9 +1,20 @@
-import React, { useState } from "react";
+/**
+ * @file PasswordManager.jsx
+ * @description This component allows users to manage their password, including changing their current password.
+ */
+import  { useState } from "react";
 import { useTranslation } from "react-i18next";
+import { fetchWithTokenRefresh } from "../../../utils/authHelpers";
 
+/**
+ * @function PasswordManager
+ * @description Component for managing user passwords, allowing users to change their current password.
+ * @param {Object} props - Component properties.
+ * @param {string} props.userId - The ID of the user.
+ * @param {string} props.token - The authentication token for API requests.
+ */
 const PasswordManager = ({ userId, token }) => {
   const { t } = useTranslation();
-  const [isEditing, setIsEditing] = useState(false);
   const [currentPassword, setCurrentPassword] = useState("");
   const [newPassword, setNewPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
@@ -15,26 +26,22 @@ const PasswordManager = ({ userId, token }) => {
     }
 
     try {
-      const response = await fetch(
-        `http://localhost:5000/User/${userId}/change-password`,
+      const response = await fetchWithTokenRefresh(
+        `/api/User/${userId}/change-password`,
         {
           method: "PUT",
-          headers: {
-            Authorization: `Bearer ${token}`, // הוסף את ה-token לכותרות
-            "Content-Type": "application/json",
-          },
           body: JSON.stringify({ currentPassword, newPassword }),
         }
       );
 
-      if (!response.ok) {
-        throw new Error("Failed to change password");
-      }
+      if (!response.ok) throw new Error("Failed to change password");
 
       alert(
-        t("personal_area.updateSuccess", { field: t("personal_area.password") })
+        t("personal_area.updateSuccess", {
+          field: t("personal_area.passwordManagement"),
+        })
       );
-      setIsEditing(false);
+      // Reset the password fields after successful update
       setCurrentPassword("");
       setNewPassword("");
       setConfirmPassword("");
@@ -45,46 +52,46 @@ const PasswordManager = ({ userId, token }) => {
   };
 
   return (
-    <div className="card-body">
-      {isEditing ? (
-        <>
+    <div className="max-w-md mx-auto bg-white p-6 rounded-lg shadow-md mt-6">
+      <h2 className="text-2xl font-bold text-gray-800 mb-4">
+        {t("personal_area.passwordManagement")}
+      </h2>
+
+      {
+        <form className="space-y-4">
           <input
             type="password"
-            className="form-control mb-2"
             placeholder={t("personal_area.currentPassword")}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200"
             value={currentPassword}
+            autoComplete="current-password"
             onChange={(e) => setCurrentPassword(e.target.value)}
           />
           <input
             type="password"
-            className="form-control mb-2"
             placeholder={t("personal_area.newPassword")}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200"
             value={newPassword}
+            autoComplete="new-password"
             onChange={(e) => setNewPassword(e.target.value)}
           />
           <input
             type="password"
-            className="form-control mb-2"
             placeholder={t("personal_area.confirmPassword")}
+            className="w-full border border-gray-300 rounded-md p-2 focus:ring focus:ring-blue-200"
             value={confirmPassword}
+            autoComplete="new-password"
             onChange={(e) => setConfirmPassword(e.target.value)}
           />
-          <button
-            className="btn btn-success me-2"
-            onClick={handlePasswordChange}>
-            {t("personal_area.save")}
-          </button>
-          <button
-            className="btn btn-secondary"
-            onClick={() => setIsEditing(false)}>
-            {t("personal_area.cancel")}
-          </button>
-        </>
-      ) : (
-        <button className="btn btn-primary" onClick={() => setIsEditing(true)}>
-          {t("personal_area.changePassword")}
-        </button>
-      )}
+          <div className="flex justify-end gap-3 mt-2">
+            <button
+              className="bg-primaryColor text-white font-bold text-xl px-4 py-2 rounded-full hover:bg-secondaryColor transition"
+              onClick={handlePasswordChange}>
+              {t("personal_area.save")}
+            </button>
+          </div>
+        </form>
+      }
     </div>
   );
 };

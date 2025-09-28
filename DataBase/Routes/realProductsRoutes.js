@@ -1,17 +1,34 @@
 const express = require("express");
 const router = express.Router();
-const StoreProducts = require("../models/Products");
-const mongoose = require("mongoose");
-const axios = require("axios");
+const multer = require("multer");
+const path = require("path");
+const fs = require("fs");
+const sharp = require("sharp");
+const authenticateToken = require("../Middleware/authenticateToken");
 
-// קבלת כל המוצרים מכל החנויות
+// storage setting
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, "uploads/");
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
+});
+
+const upload = multer({ storage });
+const mongoose = require("mongoose");
+const StoreProducts = require("../models/Products");
+const Store = require("../models/Stores");
+
+
 router.get("/", async (req, res) => {
   try {
     const stores = await StoreProducts.find();
     const allProducts = stores.flatMap((store) =>
       store.products.map((product) => ({
         ...product.toObject(),
-        storeId: store._id,
+        storeId: store.storeId,
         storeName: store.storeName,
       }))
     );
@@ -21,36 +38,207 @@ router.get("/", async (req, res) => {
   }
 });
 
-// קבלת מוצר לפי ID
+router.post("/upload-image", upload.single("image"), async (req, res) => {
+  if (!req.file) return res.status(400).json({ error: "No file uploaded" });
+
+  const inputPath = req.file.path;
+  const outputFilename = path.parse(req.file.filename).name + ".webp";
+  const outputPath = path.join(path.dirname(inputPath), outputFilename);
+
+  try {
+    await sharp(inputPath)
+      .webp({ quality: 80 })
+      .toFile(outputPath);
+
+    fs.unlinkSync(inputPath);
+
+    const imageUrl = `/uploads/${outputFilename}`;
+    res.json({ imageUrl });
+  } catch (error) {
+    console.error("Image conversion error:", error);
+    res.status(500).json({ error: "Failed to convert image" });
+  }
+});
+router.get("/by-store", async (req, res) => {
+  const storeId = req.query.store;
+
+  if (!storeId || !mongoose.Types.ObjectId.isValid(storeId)) {
+    return res.status(400).json({ message: "Invalid or missing storeId" });
+  }
+
+  try {
+    const store = await StoreProducts.findOne({
+      storeId: new mongoose.Types.ObjectId(storeId),
+    });
+    if (!store) return res.status(404).json({ message: "Store not found" });
+
+    const products = store.products.map((product) => ({
+      ...product.toObject(),
+      storeId: store.storeId,
+      storeName: store.storeName,
+    }));
+
+    res.json(products);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+router.post("/:storeId", async (req, res) => {
+  const { storeId } = req.params;
+
+  if (!mongoose.Types.ObjectId.isValid(storeId)) {
+    return res.status(400).json({ message: "Invalid store ID" });
+  }
+
+  try {
+    const objectId = new mongoose.Types.ObjectId(storeId);
+
+    const store = await StoreProducts.findOne({ storeId: objectId });
+    if (!store) return res.status(404).json({ message: "Store not found" });
+
+    const productData = req.body;
+
+    if (Array.isArray(productData.categories)) {
+      productData.categories = productData.categories.map(
+        (id) => new mongoose.Types.ObjectId(id)
+      );
+    }
+
+    store.products.push(productData);
+    await store.save();
+
+    res.status(201).json(productData);
+  } catch (err) {
+    console.error("❌ שגיאה בהוספת מוצר:", err.message);
+    res.status(400).json({ message: err.message });
+  }
+});
+
+//update product by id
+router.put("/:storeId/:productId", async (req, res) => {
+  const { storeId, productId } = req.params;
+
+  try {
+    const store = await StoreProducts.findOne({ storeId });
+
+    if (!store) return res.status(404).json({ message: "Store not found" });
+
+    const productIndex = store.products.findIndex(
+      (p) => String(p._id) === productId
+    );
+    if (productIndex === -1)
+      return res.status(404).json({ message: "Product not found" });
+
+    store.products[productIndex] = {
+      ...store.products[productIndex].toObject(),
+      ...req.body,
+    };
+
+    await store.save();
+
+    res.json(store.products[productIndex]);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+});
+
+// Route to delete a product by storeId and productId
+router.delete("/:storeId/:productId", async (req, res) => {
+  const { storeId, productId } = req.params;
+
+  try {
+    // Find the store's product document by storeId
+    const store = await StoreProducts.findOne({ storeId });
+    if (!store) return res.status(404).json({ message: "Store not found" });
+
+    // Find the specific product to delete
+    const productToDelete = store.products.find(
+      (p) => String(p._id) === productId
+    );
+
+    // If product doesn't exist in the store, return 404
+    if (!productToDelete) {
+      return res.status(404).json({ message: "Product not found" });
+    }
+
+    // Delete locally hosted images associated with the product
+    if (Array.isArray(productToDelete.images)) {
+      productToDelete.images.forEach((imageUrl) => {
+        // Only delete images that are stored on the server (not external links)
+        if (imageUrl.includes("/uploads/")) {
+          // Extract the filename from the image URL
+          const filename = path.basename(imageUrl); // e.g., '123456789.webp'
+
+          // Construct the absolute file path based on public/uploads folder
+          const filePath = path.join(__dirname, "../uploads", filename);
+
+          // Attempt to delete the file
+          try {
+            fs.unlinkSync(filePath);
+            console.log("Deleted local image:", filename);
+          } catch (err) {
+            console.error("Failed to delete image:", filename, err.message);
+          }
+        }
+      });
+    }
+
+    // Remove the product from the store's products array
+    store.products = store.products.filter(
+      (p) => String(p._id) !== productId
+    );
+
+    // Save the updated store document
+    await store.save();
+
+    res.json({ message: "Product and its images deleted successfully" });
+  } catch (err) {
+    console.error("Error deleting product:", err.message);
+    res.status(500).json({ message: err.message });
+  }
+});
 router.get("/:id", async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Validate ObjectId
+    // Validate if the ID is a valid MongoDB ObjectId
     if (!mongoose.Types.ObjectId.isValid(id)) {
       return res.status(400).json({ message: "Invalid Product ID" });
     }
 
-    // Find the store that contains the product
-    const store = await StoreProducts.findOne({ "products._id": id });
-    if (!store) {
+    // Step 1: Find the StoreProducts document that contains the product
+    const storeProducts = await StoreProducts.findOne({ "products._id": id });
+    if (!storeProducts) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Find the product inside the store
-    const product = store.products.find(
-      (product) => String(product._id) === id
+    // Step 2: Extract the product from the matched StoreProducts document
+    const product = storeProducts.products.find(
+      (p) => String(p._id) === id
     );
-
     if (!product) {
       return res.status(404).json({ message: "Product not found" });
     }
 
-    // Return the product with store details
+    // Step 3: Fetch the actual Store document to get the 'about' field
+    const store = await Store.findById(storeProducts.storeId);
+    if (!store) {
+      return res.status(404).json({ message: "Store not found" });
+    }
+
+    // Step 4: Return the product info along with store details and multilingual 'about'
     res.json({
       ...product.toObject(),
-      storeId: store.storeId, // Include the store's ID
-      storeName: store.storeName, // Include the store's name
+      storeId: store._id,
+      storeName: store.name,
+      storeAbout: store.about, // renamed to avoid collision with product.about
+      averageRating:
+        product.reviews?.length > 0
+          ? product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+            product.reviews.length
+          : 0,
+      totalReviews: product.reviews?.length || 0,
     });
   } catch (err) {
     console.error("Error fetching product:", err.message);
@@ -58,86 +246,116 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// יצירת מוצר חדש בחנות
-router.post("/", async (req, res) => {
-  try {
-    const { name, price, stock, description, storeId, categories } = req.body;
+router.post("/:id/rate", authenticateToken, async (req, res) => {
+  const { id } = req.params;
+  const { rating } = req.body;
 
-    const store = await StoreProducts.findById(storeId);
-    if (!store) {
-      return res.status(404).json({ message: "Store not found" });
-    }
-
-    const newProduct = {
-      name,
-      price: parseFloat(price),
-      stock: parseInt(stock, 10),
-      description,
-      categories,
-    };
-
-    store.products.push(newProduct);
-    await store.save();
-
-    res.status(201).json(newProduct);
-  } catch (err) {
-    console.error("Error creating product:", err.message);
-    res.status(400).json({ message: err.message });
+  if (!rating || rating < 1 || rating > 5) {
+    return res.status(400).json({ message: "Rating must be between 1 and 5" });
   }
-});
 
-// עדכון מוצר
-router.put("/:id", async (req, res) => {
   try {
-    const { id } = req.params;
-
     const store = await StoreProducts.findOne({ "products._id": id });
-    if (!store) {
-      return res.status(404).json({ message: "Product not found" });
-    }
+    if (!store) return res.status(404).json({ message: "Product not found" });
 
-    const productIndex = store.products.findIndex(
-      (product) => String(product._id) === id
+    const product = store.products.find((p) => String(p._id) === id);
+    if (!product) return res.status(404).json({ message: "Product not found" });
+
+    const userId = req.user.userId;
+
+    const alreadyReviewed = product.reviews.some(
+      (review) => review.user?.toString() === userId
     );
-
-    if (productIndex === -1) {
-      return res.status(404).json({ message: "Product not found" });
+    if (alreadyReviewed) {
+      return res
+        .status(400)
+        .json({ message: "You have already rated this product." });
     }
 
-    const updatedProduct = {
-      ...store.products[productIndex].toObject(),
-      ...req.body,
-    };
-
-    store.products[productIndex] = updatedProduct;
+    product.reviews.push({
+      user: userId,
+      rating,
+    });
 
     await store.save();
 
-    res.json(updatedProduct);
+    const averageRating =
+      product.reviews.reduce((sum, r) => sum + r.rating, 0) /
+      product.reviews.length;
+
+    res.json({
+      message: "Rating submitted successfully",
+      product: {
+        ...product.toObject(),
+        averageRating,
+        totalReviews: product.reviews.length,
+      },
+    });
   } catch (err) {
-    res.status(400).json({ message: err.message });
-  }
-});
-
-// מחיקת מוצר
-router.delete("/:id", async (req, res) => {
-  try {
-    const { id } = req.params;
-
-    const store = await StoreProducts.findOne({ "products._id": id });
-    if (!store) {
-      return res.status(404).json({ message: "Product not found" });
-    }
-
-    store.products = store.products.filter(
-      (product) => String(product._id) !== id
-    );
-
-    await store.save();
-
-    res.json({ message: "Product deleted successfully" });
-  } catch (err) {
+    console.error("Error updating rating:", err.message);
     res.status(500).json({ message: err.message });
+  }
+});
+router.get("/filter-by-categories", async (req, res) => {
+  try {
+    const { categories } = req.query;
+
+    if (!categories) {
+      return res.status(400).json({ error: "No category ids provided" });
+    }
+
+    const categoryIds = categories
+      .split(",")
+      .map((id) => new mongoose.Types.ObjectId(id));
+
+    const stores = await StoreProducts.find({
+      "products.categories": { $in: categoryIds },
+    });
+
+    const filtered = stores
+      .map((store) => ({
+        storeId: store.storeId,
+        storeName: store.storeName,
+        products: store.products.filter((product) =>
+          product.categories.some((catId) =>
+            categoryIds.some((cid) => catId.equals(cid))
+          )
+        ),
+      }))
+      .filter((store) => store.products.length > 0);
+
+    res.json(filtered);
+  } catch (err) {
+    console.error("Error filtering products by categories:", err);
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.patch("/:productId/decrease-stock", authenticateToken, async (req, res) => {
+  const { productId } = req.params;
+  const { quantity } = req.body;
+  if (!quantity || quantity <= 0) {
+    return res.status(400).json({ error: "Invalid quantity" });
+  }
+
+  try {
+    const store = await StoreProducts.findOne({ "products._id": productId });
+    if (!store) return res.status(404).json({ error: "Product not found" });
+
+    const product = store.products.id(productId);
+    if (!product) return res.status(404).json({ error: "Product not found" });
+
+    if (product.stock < quantity) {
+      return res.status(400).json({ error: "Not enough stock available" });
+    }
+
+    product.stock -= quantity;
+    await store.save();
+
+    res.json({ message: "Stock updated", product });
+  } catch (error) {
+    console.error("Error updating stock:", error.message);
+    res.status(500).json({ error: "Failed to update stock" });
   }
 });
 

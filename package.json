@@ -1,11 +1,12 @@
 {
   "name": "final-project",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@fontsource-utils/cli": "^0.6.1",
     "@fontsource/rubik": "^5.1.1",
     "@fortawesome/fontawesome-svg-core": "^6.7.2",
+    "@fortawesome/free-brands-svg-icons": "^6.7.2",
     "@fortawesome/free-solid-svg-icons": "^6.7.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@headlessui/react": "^2.2.0",
@@ -14,40 +15,53 @@
     "@iconify/json": "^2.2.293",
     "@iconify/react": "^5.2.0",
     "autoprefixer": "^10.4.14",
-    "axios": "^1.7.9",
+    "axios": "^1.4.0",
     "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "cra-template": "1.2.0",
+    "date-fns": "^4.1.0",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
+    "file-saver": "^2.0.5",
+    "font-awesome": "^4.7.0",
+    "framer-motion": "^12.6.3",
     "google-font-metadata": "^6.0.2",
     "i18next": "^23.2.0",
     "i18next-browser-languagedetector": "^8.0.2",
     "i18next-http-backend": "^3.0.1",
     "jsonwebtoken": "^9.0.2",
+    "jwt-decode": "^4.0.0",
     "mongodb": "^6.12.0",
     "mongoose": "^8.9.3",
+    "nodemailer": "^6.10.0",
     "nth-check": "^2.1.1",
     "postcss": "^8.4.24",
     "postcss-rtl": "^2.0.0",
     "react": "^19.0.0",
+    "react-datepicker": "^8.3.0",
+    "react-docgen": "^8.0.0",
     "react-dom": "^19.0.0",
+    "react-helmet": "^6.1.0",
+    "react-hot-toast": "^2.5.2",
     "react-i18next": "^12.1.0",
     "react-icons": "^5.4.0",
+    "react-medium-image-zoom": "^5.2.14",
     "react-router-dom": "^7.1.1",
-    "react-scripts": "^5.0.1",
+    "recharts": "^2.15.3",
     "resolve-url-loader": "^5.0.0",
+    "rsuite": "^5.80.0",
+    "sib-api-v3-sdk": "^8.5.0",
     "source-map-loader": "^5.0.0",
     "tailwindcss": "^3.3.2",
     "tailwindcss-rtl": "^0.9.0",
     "web-vitals": "^4.2.4",
-    "webpack": "^5.97.1"
+    "webpack": "^5.97.1",
+    "xlsx": "^0.18.5"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
   },
   "eslintConfig": {
     "extends": [
@@ -74,6 +88,8 @@
   "devDependencies": {
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@iconify/tailwind": "^1.2.0",
-    "typescript": "^4.9.5"
+    "@vitejs/plugin-react": "^5.0.4",
+    "typescript": "^4.9.5",
+    "vite": "^7.1.7"
   }
 }

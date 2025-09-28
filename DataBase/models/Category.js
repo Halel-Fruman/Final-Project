@@ -1,15 +1,22 @@
 // models/Category.js
 
-const mongoose = require('mongoose');
+const mongoose = require("mongoose");
 
+/**
+ * @module Category
+ * @typedef {Object} CategorySchema
+ * @property {Object} name - Name of the category in Hebrew and English.
+ * @description Mongoose schema for a category in the Categories collection.
+ * @requires mongoose
+ */
 const categorySchema = new mongoose.Schema(
   {
     name: {
-      en: { type: String, required: true, unique: true }, // שם באנגלית
-      he: { type: String, required: true, unique: true }, // שם בעברית
+      en: { type: String, required: true, unique: true },
+      he: { type: String, required: true, unique: true },
     },
   },
-  { timestamps: true } // מוסיף שדות createdAt ו-updatedAt
+  { timestamps: true }
 );
 
-module.exports = mongoose.model('Category', categorySchema);
+module.exports = mongoose.model("Category", categorySchema);

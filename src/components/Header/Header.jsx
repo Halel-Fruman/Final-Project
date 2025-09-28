@@ -1,15 +1,41 @@
-import React, { useState } from "react";
+/**
+ * @file Header.jsx
+ * @description This file contains the Header component,
+ * which includes the navigation bar, logo, and user account controls.
+ * It also handles mobile responsiveness and user authentication modals.
+ */
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import { useTranslation } from "react-i18next";
 import { Dialog, DialogPanel } from "@headlessui/react";
-import { Bars3Icon, XMarkIcon } from "@heroicons/react/24/outline";
-import LanguageSelector from "../LanguageSelector";
+import {
+  Bars3Icon,
+  XMarkIcon,
+  ShoppingCartIcon,
+} from "@heroicons/react/24/outline";
+import { HeartIcon as HeartIconSolid } from "@heroicons/react/24/solid";
 import { Icon } from "@iconify/react";
 import logo from "../../logo-ilan-g.svg";
-import { ShoppingCartIcon } from "@heroicons/react/24/outline";
-import Login from "../..//pages/PersonalArea/LoginPage";
+import LanguageSelector from "../LanguageSelector";
+import Login from "../../pages/PersonalArea/LoginPage";
 import Register from "../../pages/Registeration/RegisterPage";
 
+/**
+ * @component Header
+ * @description The Header component renders the navigation bar with links to different sections,
+ * handles user authentication, and provides a responsive design for mobile devices.
+ * It includes a logo, language selector, shopping cart, and wishlist icons.
+ * @param {Object} props - The properties passed to the component.
+ * @param {Function} props.onLogout - Function to handle user logout.
+ * @param {boolean} props.isLoggedIn - Indicates if the user is logged in.
+ * @param {Function} props.onCartClick - Function to open the cart modal.
+ * @param {Array} props.cartItems - Array of items in the shopping cart.
+ * @param {string} props.role - User's role (e.g., admin, storeManager).
+ * @param {Function} props.setToken - Function to set the authentication token.
+ * @param {Function} props.setUserId - Function to set the user ID.
+ * @param {Array} props.wishlist - Array of items in the user's wishlist.
+ * @param {Function} props.onWishlistClick - Function to open the wishlist modal.
+ */
 const Header = ({
   onLogout,
   isLoggedIn,
@@ -19,51 +45,48 @@ const Header = ({
   setToken,
   setUserId,
   setUserRole,
+  wishlist,
+  onWishlistClick,
 }) => {
   const { i18n, t } = useTranslation();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [isLoginModalOpen, setIsLoginModalOpen] = useState(false);
   const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false);
 
+  // Function to change the language
+  // This function updates the language in the i18n instance
   const changeLanguage = (lang) => {
     i18n.changeLanguage(lang);
   };
-  console.log(isLoggedIn);   // האם המשתמש מחובר?
-  console.log(role);   // מה הערך של ה-role?
 
   return (
+    <header
+      id="general"
+      className="bg-white shadow border-b-2 border-gray-50"
+      aria-label="Navigation Header">
+      <nav className="w-full px-6 flex items-center justify-between py-4">
+        <div className="flex items-center " />
 
-    <header className="bg-gray-50 shadow border-b-2 border-gray-200">
-      <nav className="container mx-auto flex items-center justify-between py-4 px-6">
-        {/* לוגו */}
-        <div className="flex items-center">
-          <Link to="/" className="flex items-center">
-            <img src={logo} alt="logo-ilan-g.svg" className="h-12 w-12" />
-          </Link>
-        </div>
-
-        {/* ניווט דסקטופ */}
-        <div className="hidden lg:flex items-center space-x-2">
+        {/* Desktop Menu */}
+        <div className="hidden lg:flex items-center gap-x-4">
           {isLoggedIn && role === "admin" && (
             <Link
               to="/SysAdmin"
-              className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
-                  איזור ניהול מערכת
-                  </Link>
+              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110">
+              {t("header.admin_area")}
+            </Link>
           )}
-
-          {isLoggedIn && role === 'storeManager' && (
+          {isLoggedIn && role === "storeManager" && (
             <Link
               to="/store-management"
-              className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
-                  איזור ניהול חנות
-                  </Link>
+              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110">
+              {t("header.store_area")}
+            </Link>
           )}
-
           {isLoggedIn && (
             <Link
               to="/personal-area"
-              className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
+              className="text-sm text-gray-700 hover:text-primaryColor font-medium transition-transform duration-200 transform hover:scale-110">
               {t("header.personal_area")}
             </Link>
           )}
@@ -72,21 +95,20 @@ const Header = ({
             <button
               onClick={onLogout}
               title={t("header.logout")}
-              className="text-sm font-medium text-gray-700 hover:text-gray-800">
+              className="text-gray-700 hover:text-red-600 transition-transform duration-200 transform hover:scale-110">
               <Icon icon="mdi-light:logout" width="24" height="24" />
             </button>
           ) : (
             <>
               <button
                 onClick={() => setIsLoginModalOpen(true)}
-                className="text-sm font-medium text-gray-700 p-2 hover:text-gray-800">
+                className="text-sm text-gray-700 hover:text-primaryColor transition-transform duration-200 transform hover:scale-110">
                 {t("login.title")}
               </button>
-              <div className="h-6 border-r border-gray-300"></div>
-
+              <div className="h-6 border-r border-gray-300 transition-transform duration-200 transform hover:scale-110"></div>
               <button
                 onClick={() => setIsRegisterModalOpen(true)}
-                className="text-sm font-medium text-gray-700 hover:text-gray-800">
+                className="text-sm text-gray-700 hover:text-primaryColor transition-transform duration-200 transform hover:scale-110">
                 {t("register.title")}
               </button>
             </>
@@ -96,99 +118,128 @@ const Header = ({
             changeLanguage={changeLanguage}
             currentLanguage={i18n.language}
           />
-          <button onClick={onCartClick} className="relative">
-            <ShoppingCartIcon className="h-6 w-6 text-gray-500" />
-            <span className="absolute top-0 right-0 inline-flex items-center justify-center h-4 w-4 rounded-full bg-red-500 text-white text-xs">
+
+          {/* Cart */}
+          <button
+            onClick={onCartClick}
+            className="relative transition-transform duration-200 transform hover:scale-110"
+            aria-label="Shopping Cart">
+            <ShoppingCartIcon className="h-6 w-6 text-gray-700 " />
+            <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
               {cartItems?.length || 0}
             </span>
           </button>
+
+          {/* Wishlist */}
+          <button
+            onClick={onWishlistClick}
+            className="relative transition-transform duration-200 transform hover:scale-110"
+            aria-label="Wishlist">
+            <HeartIconSolid className="h-6 w-6 text-primaryColor" />
+          </button>
         </div>
 
-        {/* כפתור תפריט מובייל */}
-        <div className="lg:hidden">
+        {/* Mobile menu toggle */}
+        <div className="lg:hidden transition-transform duration-200 transform hover:scale-110">
           <button
             onClick={() => setMobileMenuOpen(true)}
-            className="-m-2.5 inline-flex items-center justify-center rounded-md p-2.5 text-gray-700">
+            className="-m-2.5 p-2.5 text-gray-700"
+            aria-label="Open Mobile Menu">
             <Bars3Icon className="h-6 w-6" />
           </button>
         </div>
       </nav>
 
-      {/* תפריט מובייל */}
+      {/* Mobile Menu */}
       <Dialog
         open={mobileMenuOpen}
         onClose={() => setMobileMenuOpen(false)}
-        className="lg:hidden">
+        className="lg:hidden"
+        aria-label="Mobile Menu">
         <div className="fixed inset-0 z-10 bg-black bg-opacity-50" />
-        <DialogPanel className="fixed inset-y-0 right-0 z-20 w-80 bg-gray-700 shadow-lg">
-          <div className="flex items-center justify-between p-4 bg-secondaryColor">
-            <Link to="/" className="flex items-center">
-              <span className="text-lg font-bold text-gray-700"></span>
+        <DialogPanel className="fixed inset-y-0 right-0 z-20 w-80 bg-white shadow-lg border-l border-gray-200">
+          <div className="flex items-center justify-between p-4 border-b border-gray-200">
+            <Link to="/" onClick={() => setMobileMenuOpen(false)}>
+              <img src={logo} alt="Logo" className="h-10" />
             </Link>
             <button
               onClick={() => setMobileMenuOpen(false)}
-              className="-m-2.5 rounded-md p-2.5 text-gray-700">
+              className="text-gray-500 hover:text-gray-700"
+              aria-label="Close Mobile Menu">
               <XMarkIcon className="h-6 w-6" />
             </button>
           </div>
-          <div className="px-4 py-6">
-            <div className="space-y-4">
+
+          <div className="px-4 py-6 space-y-4">
+            <div className="flex justify-between items-center">
               <LanguageSelector
                 changeLanguage={changeLanguage}
                 currentLanguage={i18n.language}
               />
-
-              {isLoggedIn && role === "admin" && (
-                <Link
-                  to="/SysAdmin"
-                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
-                  איזור ניהול מערכת
-                                 </Link>
-              )}
-
-              {isLoggedIn && role === "storeManager" && (
-                <Link
-                  to="/store-management"
-                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
-                  איזור ניהול חנות
-                                 </Link>
-              )}
-
-              {isLoggedIn && (
-                <Link
-                  to="/personal-area"
-                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-secondaryColor rounded hover:bg-primaryColor">
-                  {t("header.personal_area")}
-                </Link>
-              )}
-
-              {isLoggedIn ? (
-                <button
-                  onClick={onLogout}
-                  className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-red-500 rounded hover:bg-red-600">
-                  {t("header.logout")}
+              <div className="flex items-center space-x-4">
+                <button onClick={onCartClick} className="relative">
+                  <ShoppingCartIcon className="h-6 w-6 text-gray-700" />
+                  <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full px-1">
+                    {cartItems?.length || 0}
+                  </span>
                 </button>
-              ) : (
-                <>
-                  <button
-                    onClick={() => {
-                      setIsLoginModalOpen(true);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-green-500 rounded hover:bg-green-600">
-                    {t("login.title")}
-                  </button>
-                  <button
-                    onClick={() => {
-                      setIsRegisterModalOpen(true);
-                      setMobileMenuOpen(false);
-                    }}
-                    className="block w-full px-4 py-2 text-sm text-center text-gray-700 bg-blue-500 rounded hover:bg-blue-600">
-                    {t("register.title")}
-                  </button>
-                </>
-              )}
+                <button onClick={onWishlistClick} aria-label="Wishlist">
+                  <HeartIconSolid className="h-6 w-6 text-primaryColor" />
+                </button>
+              </div>
             </div>
+
+            {isLoggedIn && role === "admin" && (
+              <Link
+                to="/SysAdmin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-700 hover:text-primaryColor font-medium">
+                {t("header.admin_area")}
+              </Link>
+            )}
+            {isLoggedIn && role === "storeManager" && (
+              <Link
+                to="/store-management"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-700 hover:text-primaryColor  font-medium">
+                {t("header.store_area")}
+              </Link>
+            )}
+            {isLoggedIn && (
+              <Link
+                to="/personal-area"
+                onClick={() => setMobileMenuOpen(false)}
+                className="block text-gray-700 hover:text-primaryColor font-medium">
+                {t("header.personal_area")}
+              </Link>
+            )}
+
+            {isLoggedIn ? (
+              <button
+                onClick={onLogout}
+                className="w-full text-center text-xl font-bold text-red-600 hover:text-red-700 ">
+                {t("header.logout")}
+              </button>
+            ) : (
+              <>
+                <button
+                  onClick={() => {
+                    setIsLoginModalOpen(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-primaryColor text-xl font-bold text-white py-2 rounded hover:bg-secondaryColor">
+                  {t("login.title")}
+                </button>
+                <button
+                  onClick={() => {
+                    setIsRegisterModalOpen(true);
+                    setMobileMenuOpen(false);
+                  }}
+                  className="w-full bg-gray-200 text-gray-700 py-2 rounded hover:bg-gray-300">
+                  {t("register.title")}
+                </button>
+              </>
+            )}
           </div>
         </DialogPanel>
       </Dialog>
@@ -202,7 +253,8 @@ const Header = ({
         <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6">
           <button
             onClick={() => setIsLoginModalOpen(false)}
-            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
+            className="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
+            aria-label="Close Login Modal">
             <XMarkIcon className="h-6 w-6" />
           </button>
           <Login
@@ -211,8 +263,8 @@ const Header = ({
             setUserRole={setUserRole}
             onClose={() => setIsLoginModalOpen(false)}
             openRegisterModal={() => {
-              setIsLoginModalOpen(false); // סגור את מודאל ההתחברות
-              setIsRegisterModalOpen(true); // פתח את מודאל ההרשמה
+              setIsLoginModalOpen(false);
+              setIsRegisterModalOpen(true);
             }}
           />
         </DialogPanel>
@@ -222,9 +274,9 @@ const Header = ({
       <Dialog
         open={isRegisterModalOpen}
         onClose={() => setIsRegisterModalOpen(false)}
-        className="fixed inset-0 z-50 flex items-center justify-center">
-        <div className="fixed inset-0 bg-black bg-opacity-50" />
-        <DialogPanel className="relative bg-white rounded-lg shadow-lg max-w-md w-full p-6">
+        className="fixed inset-0 z-50 flex p-4 items-center justify-center max-h-screen overflow-y-scroll">
+        <div className="fixed inset-0 bg-black bg-opacity-50 max-h-screen" />
+        <DialogPanel className="relative bg-white rounded-lg shadow-lg  max-w-md w-full h-max max-h-screen p-6 overflow-y-auto">
           <Register
             setToken={setToken}
             setUserId={setUserId}

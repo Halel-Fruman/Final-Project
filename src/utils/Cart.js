@@ -1,9 +1,15 @@
-// utils/Cart.js
+import { fetchWithTokenRefresh } from "../utils/authHelpers";
 
-// טעינת עגלה מהדאטה בייס
+/**
+ * @function fetchCart
+ * @description Fetches the user's cart from the server.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @returns {Promise<Array>} The user's cart items.
+ */
 export const fetchCart = async (userId, token) => {
   try {
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -21,16 +27,21 @@ export const fetchCart = async (userId, token) => {
   }
 };
 
-// שמירת עגלה בדאטה בייס
+/**
+ * @function saveCart
+ * @description Saves the user's cart to the server.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {Array} cartItems - The items to be saved in the cart.
+ */
 export const saveCart = async (userId, token, cartItems) => {
   try {
     if (cartItems.length === 0) {
-      console.log("Cart is empty. Skipping save.");
       return;
     }
 
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
-      method: "PUT", // עדכון כמות או שמירת פריטים קיימים
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
+      method: "PUT",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
@@ -42,63 +53,118 @@ export const saveCart = async (userId, token, cartItems) => {
       throw new Error("Failed to update cart.");
     }
 
-    console.log("Cart updated successfully.");
   } catch (error) {
     console.error("Error saving cart:", error.message);
   }
 };
-
+/**
+ * @function addToCart
+ * @description Adds a product to the user's cart.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {Object} product - The product to be added, containing productId and quantity.
+ * @returns {Promise<Object>} The updated cart item or null if an error occurs.
+ */
 export const addToCart = async (userId, token, product) => {
-  console.log("Product being sent to cart:", { productId: product.productId });
-
   try {
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ productId: product.productId }),
+      body: JSON.stringify({
+        productId: product.productId,
+        quantity: product.quantity,
+      }),
     });
 
     if (!response.ok) {
       throw new Error("Failed to add to cart.");
     }
 
-    const updatedCart = await response.json();
-    return updatedCart;
+    return await response.json();
   } catch (error) {
     console.error("Error adding to cart:", error.message);
     return null;
   }
 };
 
-// הסרת פריט מהעגלה
+/**
+ * @function removeFromCart
+ * @description Removes a product from the user's cart.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {string} productId - The ID of the product to be removed.
+ * @returns {Promise<Object>} The updated cart item or null if an error occurs.
+ */
 export const removeFromCart = async (userId, token, productId) => {
-  console.log("Removing product from cart:", { productId });
   try {
-    const response = await fetch(`http://localhost:5000/User/${userId}/cart`, {
+    const response = await fetchWithTokenRefresh(`/api/User/${userId}/cart`, {
       method: "DELETE",
       headers: {
         "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
-      body: JSON.stringify({ productId: productId, quantity: 1 }),
+      body: JSON.stringify({ productId, quantity: 1 }),
     });
 
     if (!response.ok) {
       throw new Error("Failed to remove item from cart.");
     }
 
-    const updatedCart = await response.json();
-    return updatedCart; // החזרת עגלה מעודכנת
+    return await response.json();
   } catch (error) {
     console.error("Error removing item from cart:", error.message);
     return null;
   }
 };
 
-// חישוב סה"כ העגלה
+/**
+ * @function updateCartItemQuantity
+ * @description Updates the quantity of a product in the user's cart.
+ * @param {string} userId - The ID of the user.
+ * @param {string} token - The authentication token.
+ * @param {string} productId - The ID of the product to be updated.
+ * @param {number} quantity - The new quantity of the product.
+ * @returns {Promise<Object>} The updated cart item or null if an error occurs.
+ */
+export const updateCartItemQuantity = async (
+  userId,
+  productId,
+  quantity,
+  token
+) => {
+  try {
+    const res = await fetchWithTokenRefresh(
+      `/api/User/${userId}/cart/update-quantity`,
+      {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify({ productId, quantity }),
+      }
+    );
+
+    if (!res.ok) {
+      throw new Error("Failed to update cart quantity");
+    }
+
+    return await res.json();
+  } catch (err) {
+    console.error("Error updating cart quantity:", err.message);
+    throw err;
+  }
+};
+
+/**
+ * @function calculateCartTotal
+ * @description Calculates the total price of items in the cart.
+ * @param {Array} cartItems - The items in the cart, each with a price and quantity.
+ * @returns {number} The total price of the cart items.
+ */
 export const calculateCartTotal = (cartItems) => {
   return cartItems.reduce(
     (total, item) => total + item.price * item.quantity,
@@ -106,6 +172,12 @@ export const calculateCartTotal = (cartItems) => {
   );
 };
 
+/**
+ * @function fetchProductDetails
+ * @description Fetches details of a specific product by its ID.
+ * @param {string} productId - The ID of the product to fetch.
+ * @returns {Promise<Object|null>} The product details or null if an error occurs.
+ */
 export const fetchProductDetails = async (productId) => {
   if (!productId) {
     console.error("fetchProductDetails called with undefined productId");
@@ -113,7 +185,7 @@ export const fetchProductDetails = async (productId) => {
   }
 
   try {
-    const response = await fetch(`http://localhost:5000/Products/${productId}`);
+    const response = await fetch(`/api/Products/${productId}`);
     if (!response.ok) {
       throw new Error("Failed to fetch product details.");
     }

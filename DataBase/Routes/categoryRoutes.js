@@ -2,7 +2,6 @@ const express = require("express");
 const router = express.Router();
 const Category = require("../models/Category");
 
-// 📌 קבלת כל הקטגוריות
 router.get("/", async (req, res) => {
   try {
     const categories = await Category.find();
@@ -12,7 +11,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// 📌 קבלת קטגוריה לפי ID
 router.get("/:id", async (req, res) => {
   try {
     const category = await Category.findById(req.params.id);
@@ -25,7 +23,6 @@ router.get("/:id", async (req, res) => {
   }
 });
 
-// 📌 יצירת קטגוריה חדשה
 router.post("/", async (req, res) => {
   const { en, he } = req.body.name;
   if (!en || !he) {
@@ -41,7 +38,6 @@ router.post("/", async (req, res) => {
   }
 });
 
-// 📌 עדכון קטגוריה לפי ID
 router.put("/:id", async (req, res) => {
   const { en, he } = req.body.name;
   if (!en || !he) {
@@ -65,7 +61,6 @@ router.put("/:id", async (req, res) => {
   }
 });
 
-// 📌 מחיקת קטגוריה לפי ID
 router.delete("/:id", async (req, res) => {
   try {
     const deletedCategory = await Category.findByIdAndDelete(req.params.id);
